@@ -5,6 +5,8 @@ import { Navigate } from "react-router-dom";
 import MaintenancePanel from "@/components/admin/MaintenancePanel";
 import AnalyticsPanel from "@/components/admin/AnalyticsPanel";
 import NotificationsPanel from "@/components/admin/NotificationsPanel";
+import BookingPanel from "@/components/admin/BookingPanel";
+import UsersPanel from "@/components/admin/UsersPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   LayoutDashboard, 
@@ -68,17 +70,13 @@ const AdminDashboard: React.FC = () => {
           
           <TabsContent value="booking">
             <div className="grid grid-cols-1 gap-4">
-              <div className="p-8 border rounded-lg flex items-center justify-center">
-                <p className="text-lg text-muted-foreground">Booking Management (Coming Soon)</p>
-              </div>
+              <BookingPanel />
             </div>
           </TabsContent>
           
           <TabsContent value="users">
             <div className="grid grid-cols-1 gap-4">
-              <div className="p-8 border rounded-lg flex items-center justify-center">
-                <p className="text-lg text-muted-foreground">User Management (Coming Soon)</p>
-              </div>
+              <UsersPanel />
             </div>
           </TabsContent>
           
