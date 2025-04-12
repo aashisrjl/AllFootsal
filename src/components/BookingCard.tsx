@@ -8,7 +8,8 @@ import {
   Clock, 
   MapPin, 
   ExternalLink, 
-  X
+  X,
+  AlertTriangle
 } from "lucide-react";
 import { Booking } from "@/types";
 import { facilities, pitches } from "@/data/mockData";
@@ -52,6 +53,14 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
     (booking.status === "confirmed" || booking.status === "pending") &&
     new Date(`${booking.date}T${booking.startTime}`) > new Date();
 
+  // Check if the pitch or facility is under maintenance
+  const isUnderMaintenance = pitch?.isUnderMaintenance || facility?.isUnderMaintenance;
+  const maintenanceReason = pitch?.isUnderMaintenance 
+    ? pitch.maintenanceReason 
+    : facility?.isUnderMaintenance 
+      ? facility.maintenanceReason 
+      : "";
+
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -75,6 +84,14 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
           <MapPin className="h-4 w-4" />
           <span>{facility?.location}</span>
         </div>
+        {isUnderMaintenance && (
+          <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 p-2 rounded-md mt-2">
+            <AlertTriangle className="h-4 w-4" />
+            <span>
+              {maintenanceReason || "Currently under maintenance"}
+            </span>
+          </div>
+        )}
         <div className="mt-2">
           <p className="font-medium">Total Price</p>
           <p className="text-green-600 font-semibold">NPR {booking.totalPrice}</p>

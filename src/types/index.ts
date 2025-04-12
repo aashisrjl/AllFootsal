@@ -1,4 +1,3 @@
-
 export interface Facility {
   id: string;
   name: string;
@@ -8,6 +7,8 @@ export interface Facility {
   pitches: Pitch[];
   rating: number;
   reviews: number;
+  isUnderMaintenance?: boolean;
+  maintenanceReason?: string;
 }
 
 export interface Pitch {
@@ -17,6 +18,8 @@ export interface Pitch {
   pricePerHour: number;
   isEnabled: boolean;
   image: string;
+  isUnderMaintenance?: boolean;
+  maintenanceReason?: string;
 }
 
 export interface TimeSlot {
@@ -49,7 +52,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'user' | 'admin';
+  role: "user" | "admin" | "staff";
 }
 
 export interface AuthState {

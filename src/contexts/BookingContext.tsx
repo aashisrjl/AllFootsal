@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { Booking, TimeSlot } from "@/types";
 import { 
@@ -6,7 +5,9 @@ import {
   createBooking as createBookingAPI,
   getUserBookings as getUserBookingsAPI,
   getAllBookings as getAllBookingsAPI,
-  updateBookingStatus as updateBookingStatusAPI
+  updateBookingStatus as updateBookingStatusAPI,
+  facilities,
+  pitches
 } from "@/data/mockData";
 import { toast } from "@/components/ui/use-toast";
 
@@ -43,7 +44,25 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   const fetchAvailableTimeSlots = (pitchId: string, date: string) => {
     const timeSlots = getAvailableTimeSlots(pitchId, date);
-    setAvailableTimeSlots(timeSlots);
+    
+    // Check if the pitch or its facility is under maintenance
+    const pitch = pitches.find(p => p.id === pitchId);
+    const facility = pitch ? facilities.find(f => f.id === pitch.facilityId) : null;
+    
+    if (pitch?.isUnderMaintenance || facility?.isUnderMaintenance) {
+      // If under maintenance, mark all slots as unavailable
+      setAvailableTimeSlots([]);
+      
+      toast({
+        title: "Maintenance in Progress",
+        description: pitch?.isUnderMaintenance 
+          ? pitch.maintenanceReason || "This pitch is currently under maintenance."
+          : facility?.maintenanceReason || "This facility is currently under maintenance.",
+        variant: "destructive",
+      });
+    } else {
+      setAvailableTimeSlots(timeSlots);
+    }
   };
 
   const selectTimeSlot = (timeSlotId: string | null) => {

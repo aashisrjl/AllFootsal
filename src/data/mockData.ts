@@ -1,4 +1,3 @@
-
 import { Facility, Pitch, TimeSlot, Booking, User } from "@/types";
 
 // Mock users data
@@ -28,6 +27,8 @@ export const facilities: Facility[] = [
     pitches: [],
     rating: 4.8,
     reviews: 127,
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
   {
     id: "facility2",
@@ -38,6 +39,8 @@ export const facilities: Facility[] = [
     pitches: [],
     rating: 4.6,
     reviews: 98,
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
   {
     id: "facility3",
@@ -48,6 +51,8 @@ export const facilities: Facility[] = [
     pitches: [],
     rating: 4.9,
     reviews: 156,
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
   {
     id: "facility4",
@@ -58,6 +63,8 @@ export const facilities: Facility[] = [
     pitches: [],
     rating: 4.7,
     reviews: 89,
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
 ];
 
@@ -70,6 +77,8 @@ export const pitches: Pitch[] = [
     pricePerHour: 1000,
     isEnabled: true,
     image: "/images/pitch1.jpg",
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
   {
     id: "pitch2",
@@ -78,6 +87,8 @@ export const pitches: Pitch[] = [
     pricePerHour: 1200,
     isEnabled: true,
     image: "/images/pitch2.jpg",
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
   {
     id: "pitch3",
@@ -86,6 +97,8 @@ export const pitches: Pitch[] = [
     pricePerHour: 1000,
     isEnabled: true,
     image: "/images/pitch3.jpg",
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
   {
     id: "pitch4",
@@ -94,6 +107,8 @@ export const pitches: Pitch[] = [
     pricePerHour: 900,
     isEnabled: true,
     image: "/images/pitch4.jpg",
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
   {
     id: "pitch5",
@@ -102,6 +117,8 @@ export const pitches: Pitch[] = [
     pricePerHour: 900,
     isEnabled: true,
     image: "/images/pitch5.jpg",
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
   {
     id: "pitch6",
@@ -110,6 +127,8 @@ export const pitches: Pitch[] = [
     pricePerHour: 1100,
     isEnabled: true,
     image: "/images/pitch6.jpg",
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
   {
     id: "pitch7",
@@ -118,6 +137,8 @@ export const pitches: Pitch[] = [
     pricePerHour: 1100,
     isEnabled: true,
     image: "/images/pitch7.jpg",
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
   {
     id: "pitch8",
@@ -126,6 +147,8 @@ export const pitches: Pitch[] = [
     pricePerHour: 1100,
     isEnabled: true,
     image: "/images/pitch8.jpg",
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
   {
     id: "pitch9",
@@ -134,6 +157,8 @@ export const pitches: Pitch[] = [
     pricePerHour: 1200,
     isEnabled: true,
     image: "/images/pitch9.jpg",
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
   {
     id: "pitch10",
@@ -142,6 +167,8 @@ export const pitches: Pitch[] = [
     pricePerHour: 800,
     isEnabled: true,
     image: "/images/pitch10.jpg",
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
   {
     id: "pitch11",
@@ -150,6 +177,8 @@ export const pitches: Pitch[] = [
     pricePerHour: 800,
     isEnabled: true,
     image: "/images/pitch11.jpg",
+    isUnderMaintenance: false,
+    maintenanceReason: "",
   },
 ];
 
@@ -272,6 +301,40 @@ export const updateBookingStatus = (bookingId: string, status: 'pending' | 'conf
   if (bookingIndex !== -1) {
     bookings[bookingIndex].status = status;
     return bookings[bookingIndex];
+  }
+  return null;
+};
+
+// Function to toggle maintenance mode for a facility
+export const toggleFacilityMaintenance = (facilityId: string, isUnderMaintenance: boolean, reason: string = "") => {
+  const facilityIndex = facilities.findIndex(facility => facility.id === facilityId);
+  if (facilityIndex !== -1) {
+    facilities[facilityIndex].isUnderMaintenance = isUnderMaintenance;
+    facilities[facilityIndex].maintenanceReason = reason;
+    
+    // Also disable all pitches when facility is under maintenance
+    if (isUnderMaintenance) {
+      pitches
+        .filter(pitch => pitch.facilityId === facilityId)
+        .forEach(pitch => {
+          const pitchIndex = pitches.findIndex(p => p.id === pitch.id);
+          pitches[pitchIndex].isUnderMaintenance = true;
+          pitches[pitchIndex].maintenanceReason = reason || "Facility under maintenance";
+        });
+    }
+    
+    return facilities[facilityIndex];
+  }
+  return null;
+};
+
+// Function to toggle maintenance mode for a pitch
+export const togglePitchMaintenance = (pitchId: string, isUnderMaintenance: boolean, reason: string = "") => {
+  const pitchIndex = pitches.findIndex(pitch => pitch.id === pitchId);
+  if (pitchIndex !== -1) {
+    pitches[pitchIndex].isUnderMaintenance = isUnderMaintenance;
+    pitches[pitchIndex].maintenanceReason = reason;
+    return pitches[pitchIndex];
   }
   return null;
 };
