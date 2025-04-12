@@ -3,15 +3,25 @@ import React from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Clock, MapPin } from "lucide-react";
+import { 
+  CalendarDays, 
+  Clock, 
+  MapPin, 
+  ExternalLink, 
+  X
+} from "lucide-react";
 import { Booking } from "@/types";
 import { facilities, pitches } from "@/data/mockData";
+import { useBooking } from "@/contexts/BookingContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface BookingCardProps {
   booking: Booking;
 }
 
 const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
+  const { cancelBooking } = useBooking();
+  const { user } = useAuth();
   const facility = facilities.find(f => f.id === booking.facilityId);
   const pitch = pitches.find(p => p.id === booking.pitchId);
 
@@ -29,6 +39,18 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  const handleCancel = async () => {
+    if (!user) return;
+    
+    await cancelBooking(booking.id, user.id);
+  };
+
+  // Check if the booking is in the future and not cancelled
+  // Only allow cancellations for confirmed or pending bookings
+  const canBeCancelled = 
+    (booking.status === "confirmed" || booking.status === "pending") &&
+    new Date(`${booking.date}T${booking.startTime}`) > new Date();
 
   return (
     <Card>
@@ -60,10 +82,23 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
       </CardContent>
       <CardFooter className="flex gap-2">
         {booking.status === "confirmed" && (
-          <Button variant="outline" className="w-full">Get Directions</Button>
+          <Button variant="outline" className="w-full flex items-center gap-2">
+            <ExternalLink className="h-4 w-4" />
+            Get Directions
+          </Button>
         )}
         {booking.status === "completed" && (
           <Button variant="outline" className="w-full">Leave Review</Button>
+        )}
+        {canBeCancelled && (
+          <Button 
+            variant="outline" 
+            className="w-full text-red-600 border-red-200 hover:bg-red-50 flex items-center gap-2"
+            onClick={handleCancel}
+          >
+            <X className="h-4 w-4" />
+            Cancel Booking
+          </Button>
         )}
       </CardFooter>
     </Card>

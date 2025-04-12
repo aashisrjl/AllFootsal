@@ -7,7 +7,7 @@ import BookingCard from "@/components/BookingCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBooking } from "@/contexts/BookingContext";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, List, Grid } from "lucide-react";
+import { CalendarDays, List, Grid, Trash } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const UserBookings = () => {
@@ -30,6 +30,7 @@ const UserBookings = () => {
   const upcomingBookings = userBookings.filter(b => b.status === "confirmed");
   const pastBookings = userBookings.filter(b => b.status === "completed");
   const pendingBookings = userBookings.filter(b => b.status === "pending");
+  const cancelledBookings = userBookings.filter(b => b.status === "cancelled");
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -61,6 +62,10 @@ const UserBookings = () => {
                 <TabsTrigger value="past" className="gap-2">
                   <Grid className="h-4 w-4" />
                   Past ({pastBookings.length})
+                </TabsTrigger>
+                <TabsTrigger value="cancelled" className="gap-2">
+                  <Trash className="h-4 w-4" />
+                  Cancelled ({cancelledBookings.length})
                 </TabsTrigger>
               </TabsList>
               
@@ -105,6 +110,20 @@ const UserBookings = () => {
                 ) : (
                   <div className="text-center py-12">
                     <p className="text-muted-foreground">No past bookings.</p>
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="cancelled">
+                {cancelledBookings.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {cancelledBookings.map((booking) => (
+                      <BookingCard key={booking.id} booking={booking} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-muted-foreground">No cancelled bookings.</p>
                   </div>
                 )}
               </TabsContent>

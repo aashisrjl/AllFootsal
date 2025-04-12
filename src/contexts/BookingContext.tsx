@@ -5,8 +5,10 @@ import {
   getAvailableTimeSlots, 
   createBooking as createBookingAPI,
   getUserBookings as getUserBookingsAPI,
-  getAllBookings as getAllBookingsAPI
+  getAllBookings as getAllBookingsAPI,
+  updateBookingStatus as updateBookingStatusAPI
 } from "@/data/mockData";
+import { toast } from "@/components/ui/use-toast";
 
 interface BookingContextType {
   selectedDate: string;
@@ -25,6 +27,7 @@ interface BookingContextType {
   ) => Promise<Booking | null>;
   fetchUserBookings: (userId: string) => void;
   getAllBookings: () => Booking[];
+  cancelBooking: (bookingId: string, userId: string) => Promise<boolean>;
 }
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
@@ -97,6 +100,34 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
     return getAllBookingsAPI();
   };
 
+  const cancelBooking = async (bookingId: string, userId: string): Promise<boolean> => {
+    try {
+      const booking = updateBookingStatusAPI(bookingId, 'cancelled');
+      
+      if (booking) {
+        // Refresh user bookings
+        fetchUserBookings(userId);
+        
+        toast({
+          title: "Booking Cancelled",
+          description: "Your booking has been successfully cancelled.",
+        });
+        
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      toast({
+        title: "Cancellation Failed",
+        description: "There was an error cancelling your booking. Please try again.",
+        variant: "destructive",
+      });
+      
+      return false;
+    }
+  };
+
   return (
     <BookingContext.Provider
       value={{
@@ -112,6 +143,7 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
         createBooking,
         fetchUserBookings,
         getAllBookings,
+        cancelBooking,
       }}
     >
       {children}
