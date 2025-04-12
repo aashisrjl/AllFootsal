@@ -6,7 +6,7 @@ import MaintenancePanel from "@/components/admin/MaintenancePanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   LayoutDashboard, 
-  Tool, 
+  Wrench, 
   Calendar, 
   Settings,
   Users,
@@ -34,7 +34,7 @@ const AdminDashboard: React.FC = () => {
             <LayoutDashboard className="h-4 w-4" /> Analytics
           </TabsTrigger>
           <TabsTrigger value="maintenance" className="flex items-center gap-1">
-            <Tool className="h-4 w-4" /> Maintenance
+            <Wrench className="h-4 w-4" /> Maintenance
           </TabsTrigger>
           <TabsTrigger value="booking" className="flex items-center gap-1">
             <Calendar className="h-4 w-4" /> Bookings

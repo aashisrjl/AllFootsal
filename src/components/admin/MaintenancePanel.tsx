@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { 
   AlertTriangle, 
   CheckCircle, 
-  Tool, 
+  Wrench, 
   Building2,
   CircleOff
 } from "lucide-react";
@@ -78,7 +78,7 @@ const MaintenancePanel: React.FC = () => {
     <Card className="col-span-3">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Tool className="h-5 w-5" />
+          <Wrench className="h-5 w-5" />
           Maintenance Mode
         </CardTitle>
         <CardDescription>
