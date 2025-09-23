@@ -21,12 +21,9 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/facilities', require('./routes/facilities'));
-app.use('/api/bookings', require('./routes/bookings'));
-app.use('/api/payments', require('./routes/payments'));
-app.use('/api/admin', require('./routes/admin'));
+const authRoutes = require("./routes/authRoutes/authRoute");
+app.use('/api/auth', authRoutes);
+
 
 // Health check
 app.get('/health', (req, res) => {
