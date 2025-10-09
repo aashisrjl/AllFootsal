@@ -1,29 +1,49 @@
 module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define("user", {
-      email: {
-        type: DataTypes.STRING
-      },
-      password:{
-        type: DataTypes.STRING
-      },
-      googleId: {
-        type: DataTypes.STRING
-       
-      },
-      username: {
-        type: DataTypes.STRING
-       
-      },
-      currentOrgNumber:{
-        type: DataTypes.INTEGER
-        
-      },
-      role:{
-        type: DataTypes.STRING,
-        defaultValue: "user"
-      }
+  const User = sequelize.define("user", {
+    // Basic Info
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: { isEmail: true }
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: true // null when using Google login
+    },
+    googleId: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
 
-    
-    });
-    return User;
-  };
+    // Optional fields
+    profile_image: {
+      type: DataTypes.STRING,
+      allowNull: true // for storing Cloudinary URL or profile picture
+    },
+
+    // Booking and System Info
+    currentOrgNumber: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+
+    // Roles
+    role: {
+      type: DataTypes.ENUM("user", "admin", "footsal_owner"),
+      defaultValue: "user"
+    },
+
+    // Account Status
+    is_active: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    }
+  });
+
+  return User;
+};
