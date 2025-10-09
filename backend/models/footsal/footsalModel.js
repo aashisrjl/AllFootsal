@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: true, // null if using Google/Facebook login
+      allowNull: true,
     },
     googleId: {
       type: DataTypes.STRING,
@@ -37,12 +37,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    // Array of images
     images: {
-      type: DataTypes.JSON, // Store array of image URLs
+      type: DataTypes.JSON,
       allowNull: true,
     },
-    // Location Info
+
+    // Basic Location (for quick reference)
     district: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -50,14 +50,6 @@ module.exports = (sequelize, DataTypes) => {
     address: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    latitude: {
-      type: DataTypes.DECIMAL(10, 7),
-      allowNull: true,
-    },
-    longitude: {
-      type: DataTypes.DECIMAL(10, 7),
-      allowNull: true,
     },
 
     // Contact & Payment
@@ -77,43 +69,7 @@ module.exports = (sequelize, DataTypes) => {
     // Admin & Status
     is_active: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false, // admin approval required
-    },
-    subscription_status: {
-      type: DataTypes.STRING, // e.g., 'active', 'expired', 'pending'
-      defaultValue: "pending",
-    },
-
-    // AI & Analytics Fields (optional, for future use)
-    avg_rating: {
-      type: DataTypes.FLOAT,
-      defaultValue: 0,
-    },
-    review_summary: {
-      type: DataTypes.TEXT, // summarized by AI later
-      allowNull: true,
-    },
-
-    //subscription details
-    subscription_plan: {
-      type: DataTypes.ENUM("monthly", "half-yearly", "yearly"),
-      defaultValue: "monthly",
-    },
-    subscription_start: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-    subscription_end: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-    subscription_fee: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    payment_status: {
-      type: DataTypes.ENUM("pending", "paid", "expired"),
-      defaultValue: "pending",
+      defaultValue: false,
     },
   });
 
