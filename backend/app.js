@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const { users } = require("./model/index");
+const { users } = require("./models/index");
 
 // Middleware
 app.use(helmet());
