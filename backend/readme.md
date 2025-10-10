@@ -50,6 +50,67 @@ backend/
 └── package.json              # Project dependencies
 ```
 
+## 📊 Database Migrations
+
+This project uses **Knex.js** for database migrations to keep your database schema in sync with code changes.
+
+### Why Migrations?
+
+- **Schema versioning**: Track all database changes over time
+- **Team collaboration**: Share schema changes via version control
+- **Safe updates**: Apply changes without data loss
+- **Rollback support**: Revert changes if needed
+
+### Migration Commands
+
+```bash
+# Run all pending migrations
+npm run migrate
+
+# Create a new migration file
+npx knex migrate:make migration_name
+
+# Rollback last migration
+npx knex migrate:rollback
+
+# Check migration status
+npx knex migrate:status
+```
+
+### Creating a New Migration
+
+When you change a model (e.g., add a column to `footsalModel.js`):
+
+```bash
+# 1. Create a migration file
+npx knex migrate:make add_column_to_footsals
+
+# 2. Edit the generated file in migrations/ folder
+# Example: migrations/20250410120000_add_column_to_footsals.js
+exports.up = function(knex) {
+  return knex.schema.alterTable('footsals', function(table) {
+    table.string('new_column');
+  });
+};
+
+exports.down = function(knex) {
+  return knex.schema.alterTable('footsals', function(table) {
+    table.dropColumn('new_column');
+  });
+};
+
+# 3. Run the migration
+npm run migrate
+```
+
+### Initial Setup Migration
+
+The project includes an initial migration (`20250410000001_initial_schema.js`) that creates all tables. Run this after setting up your database:
+
+```bash
+npm run migrate
+```
+
 ## Getting Started
 
 ### Option 1: Running with Docker (Recommended)

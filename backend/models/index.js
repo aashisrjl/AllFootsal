@@ -55,8 +55,11 @@ db.footsalPayment.belongsTo(db.footsal, { foreignKey: 'footsal_id' });
 db.footsalSubscription.hasMany(db.footsalPayment, { foreignKey: 'subscription_id', as: 'payments' });
 db.footsalPayment.belongsTo(db.footsalSubscription, { foreignKey: 'subscription_id' });
 
-db.sequelize.sync({ force: false}).then(() => {
-  console.log("CONNECTED TO DATABASE!!!😊😉");
+// NOTE: Database schema is managed by Knex migrations
+// Run migrations using: npm run migrate
+// To create a new migration: npx knex migrate:make migration_name
+db.sequelize.sync({ alter: false, force: false }).then(() => {
+  console.log("✅ Database connection established! Use 'npm run migrate' to sync schema changes.");
 });
 
 module.exports = db;
