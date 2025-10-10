@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
   const Info = sequelize.define("footsal_info", {
     footsal_id: {
-      types: DataTypes.INTEGER,
+      type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       references: {
@@ -40,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
     note: {
-      types: DataTypes.TEXT,
+      type: DataTypes.TEXT,
       allowNull: true,
     },
   });

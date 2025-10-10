@@ -50,6 +50,49 @@ backend/
 └── package.json              # Project dependencies
 ```
 
+## 📋 Database Schema
+
+The database includes the following tables with proper foreign key relationships:
+
+### Core Tables
+- **users** - Customer accounts (authentication and profile)
+- **footsals** - Main futsal facilities
+
+### Footsal Related Tables (One-to-One Relationships)
+- **footsal_locations** - Location details (address, coordinates, district)
+- **footsal_analytics** - Analytics data (ratings, bookings, revenue)
+- **footsal_infos** - Additional information (operating hours, facilities, social links)
+
+### Footsal Related Tables (One-to-Many Relationships)
+- **footsal_subscriptions** - Subscription plans (monthly, half-yearly, yearly)
+- **footsal_payments** - Payment records and transactions
+- **footsal_pitches** - Individual pitches/courts within a facility
+- **footsal_time_slots** - Available time slots per pitch
+- **footsal_ratings** - User reviews and ratings
+- **footsal_bookings** - Customer bookings
+
+### Entity Relationships
+```
+footsal (1) ─── (1) footsal_location
+footsal (1) ─── (1) footsal_analytics  
+footsal (1) ─── (1) footsal_info
+footsal (1) ─── (*) footsal_subscriptions
+footsal (1) ─── (*) footsal_payments
+footsal (1) ─── (*) footsal_pitches
+footsal (1) ─── (*) footsal_ratings
+footsal (1) ─── (*) footsal_bookings
+
+footsal_pitch (1) ─── (*) footsal_time_slots
+footsal_pitch (1) ─── (*) footsal_bookings
+
+user (1) ─── (*) footsal_ratings
+user (1) ─── (*) footsal_bookings
+
+footsal_subscription (1) ─── (*) footsal_payments
+footsal_time_slot (1) ─── (*) footsal_bookings
+footsal_payment (1) ─── (*) footsal_bookings
+```
+
 ## 📊 Database Migrations
 
 This project uses **Knex.js** for database migrations to keep your database schema in sync with code changes.
@@ -105,7 +148,11 @@ npm run migrate
 
 ### Initial Setup Migration
 
-The project includes an initial migration (`20250410000001_initial_schema.js`) that creates all tables. Run this after setting up your database:
+The project includes two initial migrations:
+1. **20250410000001_initial_schema.js** - Creates core tables (users, footsals, locations, analytics, subscriptions, payments)
+2. **20250410000002_add_remaining_tables.js** - Creates additional tables (infos, pitches, time_slots, ratings, bookings)
+
+Run these migrations after setting up your database:
 
 ```bash
 npm run migrate
@@ -255,15 +302,24 @@ For local development without Docker, you need to set up MariaDB separately.
 
 ## Database Models
 
-### Users Table
-- User authentication and profile information
+### Core Models
+- **users**: User authentication and profile (id, username, email, password, googleId, phoneNumber)
+- **footsals**: Main facility information (id, email, password, username, footsalName, phoneNumber, description, images, contact info, is_active)
 
-### Footsal Tables
-- **footsals**: Main facility information
-- **footsal_locations**: Geographic location data
-- **footsal_analytics**: Ratings, bookings, and revenue metrics
-- **footsal_subscriptions**: Subscription plans and status
-- **footsal_payments**: Payment records and transactions
+### One-to-One Related Models
+- **footsal_locations**: Geographic data (footsal_id [PK], district, address, latitude, longitude, city, postal_code)
+- **footsal_analytics**: Metrics (footsal_id [PK], avg_rating, total_bookings, total_revenue, last_booking_date)
+- **footsal_infos**: Additional details (footsal_id [PK], established_year, facilities, operating_hours, social_links, website_url)
+
+### One-to-Many Related Models
+- **footsal_subscriptions**: Plans (id, footsal_id, subscription_plan, subscription_start/end, status, auto_renew)
+- **footsal_payments**: Transactions (id, footsal_id, subscription_id, amount, payment_date, payment_method, transaction_id, status)
+- **footsal_pitches**: Courts (id, footsal_id, name, pitch_type, surface_type, dimensions, lighting, indoor)
+- **footsal_time_slots**: Availability (id, footsal_id, pitch_id, day_of_week, start_time, end_time, price)
+- **footsal_ratings**: Reviews (id, footsal_id, user_id, rating [1-5], review, review_date)
+- **footsal_bookings**: Reservations (id, footsal_id, pitch_id, user_id, time_slot_id, booking_date, status, total_amount, payment_status, payment_id)
+
+All models are properly registered in `backend/models/index.js` with Sequelize associations.
 
 ## Troubleshooting
 

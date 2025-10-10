@@ -1,10 +1,20 @@
 module.exports = (sequelize, DataTypes) => {
-    const Booking = sequelize.define("footsal_bookings", {
+    const Booking = sequelize.define("footsal_booking", {
         footsal_id:{
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
                 model: 'footsals',
+                key: 'id'
+            },
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE'
+        },
+        pitch_id:{
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'footsal_pitches',
                 key: 'id'
             },
             onDelete: 'CASCADE',
@@ -20,12 +30,18 @@ module.exports = (sequelize, DataTypes) => {
             onDelete: 'CASCADE',
             onUpdate: 'CASCADE'
         },
+        time_slot_id:{
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'footsal_time_slots',
+                key: 'id'
+            },
+            onDelete: 'RESTRICT',
+            onUpdate: 'CASCADE'
+        },
         booking_date:{
             type: DataTypes.DATEONLY,
-            allowNull: false,
-        },
-        time_slot:{
-            type: DataTypes.STRING,
             allowNull: false,
         },
         status:{
@@ -40,14 +56,20 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.ENUM('pending', 'paid', 'failed', 'refunded'),
             defaultValue: 'pending',
         },
-        created_at:{
-            type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW,
+        payment_id:{
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'footsal_payments',
+                key: 'id'
+            },
+            onDelete: 'SET NULL',
+            onUpdate: 'CASCADE'
         },
-        updated_at:{
-            type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW,
+        notes:{
+            type: DataTypes.TEXT,
+            allowNull: true,
         }
-    })
-    return Booking
+    });
+    return Booking;
 }
