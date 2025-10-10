@@ -42,16 +42,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
 
-    // Basic Location (for quick reference)
-    district: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    address: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-
     // Contact & Payment
     contact_phone: {
       type: DataTypes.STRING,

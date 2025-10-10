@@ -3,12 +3,21 @@ module.exports = (sequelize, DataTypes) => {
     footsal_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      primaryKey: true,
       references: {
         model: 'footsals',
         key: 'id'
       },
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE'
+    },
+    district: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     latitude: {
       type: DataTypes.DECIMAL(10, 7),

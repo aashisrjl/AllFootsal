@@ -3,6 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     footsal_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      primaryKey: true,
       references: {
         model: 'footsals',
         key: 'id'
