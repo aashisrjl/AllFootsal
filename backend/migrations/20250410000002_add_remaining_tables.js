@@ -2,12 +2,11 @@
  * Migration to add remaining footsal-related tables
  * Creates info, pitches, time_slots, ratings, and bookings tables
  */
-
 exports.up = function(knex) {
   return knex.schema
     // Create footsal_infos table
     .createTable('footsal_infos', function(table) {
-      table.integer('footsal_id').primary();
+      table.integer('footsal_id').unsigned().primary();
       table.integer('established_year');
       table.json('facilities');
       table.json('operating_hours');
@@ -27,8 +26,8 @@ exports.up = function(knex) {
     
     // Create footsal_pitches table
     .createTable('footsal_pitches', function(table) {
-      table.increments('id').primary();
-      table.integer('footsal_id').notNullable();
+      table.increments('id').unsigned().primary();
+      table.integer('footsal_id').unsigned().notNullable();
       table.string('name').notNullable();
       table.string('pitch_type').notNullable();
       table.string('surface_type').notNullable();
@@ -46,9 +45,9 @@ exports.up = function(knex) {
     
     // Create footsal_time_slots table
     .createTable('footsal_time_slots', function(table) {
-      table.increments('id').primary();
-      table.integer('footsal_id').notNullable();
-      table.integer('pitch_id').notNullable();
+      table.increments('id').unsigned().primary();
+      table.integer('footsal_id').unsigned().notNullable();
+      table.integer('pitch_id').unsigned().notNullable();
       table.integer('day_of_week').notNullable();
       table.time('start_time').notNullable();
       table.time('end_time').notNullable();
@@ -67,9 +66,11 @@ exports.up = function(knex) {
         .onDelete('CASCADE')
         .onUpdate('CASCADE');
         
-      // Constraint to ensure day_of_week is between 0-6
       table.check('day_of_week >= 0 AND day_of_week <= 6');
     })
+    
+    // (rest of your tables remain the same)
+
     
     // Create footsal_ratings table
     .createTable('footsal_ratings', function(table) {
