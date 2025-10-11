@@ -1,6 +1,16 @@
 module.exports = (sequelize, DataTypes) => {
   const Footsal = sequelize.define("footsal", {
     // Authentication & Identity
+    userId:{
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "users",
+        key: "id",
+      },
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    },
     footsalCode: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
