@@ -96,7 +96,37 @@
 }
 
 .hero-gradient {
-  background: linear-gradient(to right, rgba(16, 185, 129, 0.8), rgba(59, 130, 246, 0.8));
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-gradient::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 150px;
+  background: white;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+}
+
+.wave-decoration {
+  position: absolute;
+  right: -10%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 .booking-grid {
