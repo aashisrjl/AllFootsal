@@ -17,9 +17,9 @@ const Index = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="hero-gradient text-white py-20 md:py-32 relative">
-        <div className="wave-decoration"></div>
-        <div className="container mx-auto px-4 md:px-6 hero-content">
+      <section className="hero-gradient text-white py-20 md:py-32 relative overflow-hidden">
+        <div className="wave-decoration animate-fade-in"></div>
+        <div className="container mx-auto px-4 md:px-6 hero-content animate-fade-in">
           <div className="max-w-4xl">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
               Your Ultimate Futsal Hub<br />
@@ -29,11 +29,17 @@ const Index = () => {
               Empowering Futsal Owners, Players, and Fans across Nepal
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button asChild size="lg" className="bg-white text-primary hover:bg-green-50 text-lg px-8 py-6 h-auto">
+              <Button asChild size="lg" className="bg-white text-primary hover:bg-green-50 text-lg px-8 py-6 h-auto hover-scale">
                 <Link to="/facilities">Explore Facilities</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6 h-auto">
-                <Link to="/login">Join the Community</Link>
+              <Button asChild size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6 h-auto hover-scale">
+                <Link to="/register">Join the Community</Link>
+              </Button>
+            </div>
+            <div className="mt-6">
+              <p className="text-green-50 mb-3">Are you a facility owner?</p>
+              <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-6 h-auto hover-scale">
+                <Link to="/footsal-register">Register Your Futsal</Link>
               </Button>
             </div>
           </div>
@@ -90,7 +96,7 @@ const Index = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16 bg-muted/30">
+      <section className="py-16 bg-muted/30 animate-fade-in">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">How It Works</h2>
@@ -100,8 +106,8 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="text-center p-6 bg-card rounded-lg shadow-sm border">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center p-6 bg-card rounded-lg shadow-sm border hover-scale transition-all duration-300 hover:shadow-lg">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 animate-scale-in">
                 <MapPin className="h-8 w-8 text-primary" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Find a Facility</h3>
@@ -110,8 +116,8 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="text-center p-6 bg-card rounded-lg shadow-sm border">
-              <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center p-6 bg-card rounded-lg shadow-sm border hover-scale transition-all duration-300 hover:shadow-lg">
+              <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4 animate-scale-in">
                 <CalendarDays className="h-8 w-8 text-secondary" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Select a Time Slot</h3>
@@ -120,8 +126,8 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="text-center p-6 bg-card rounded-lg shadow-sm border">
-              <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center p-6 bg-card rounded-lg shadow-sm border hover-scale transition-all duration-300 hover:shadow-lg">
+              <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4 animate-scale-in">
                 <Star className="h-8 w-8 text-accent" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Enjoy Your Game</h3>
@@ -146,8 +152,10 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredFacilities.map((facility) => (
-              <FacilityCard key={facility.id} facility={facility} />
+            {featuredFacilities.map((facility, index) => (
+              <div key={facility.id} className="animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
+                <FacilityCard facility={facility} />
+              </div>
             ))}
           </div>
         </div>
@@ -161,7 +169,7 @@ const Index = () => {
           <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto text-green-50">
             Join thousands of players who book their futsal sessions through Goal Futsal Nepal. Experience seamless booking and premium facilities.
           </p>
-          <Button asChild size="lg" className="bg-white text-primary hover:bg-green-50 text-lg px-8 py-6 h-auto">
+          <Button asChild size="lg" className="bg-white text-primary hover:bg-green-50 text-lg px-8 py-6 h-auto hover-scale">
             <Link to="/facilities">Book Your Pitch Now</Link>
           </Button>
         </div>

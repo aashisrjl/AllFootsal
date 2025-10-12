@@ -11,6 +11,8 @@ import Index from "./pages/Index";
 import Facilities from "./pages/Facilities";
 import FacilityDetails from "./pages/FacilityDetails";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
+import FootsalRegister from "./pages/FootsalRegister";
 import UserBookings from "./pages/UserBookings";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -32,6 +34,8 @@ const App = () => (
               <Route path="/facilities" element={<Facilities />} />
               <Route path="/facilities/:id" element={<FacilityDetails />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/footsal-register" element={<FootsalRegister />} />
               <Route path="/bookings" element={<UserBookings />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/about" element={<About />} />
