@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import Header from "@/components/Header";
+import Header from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -63,7 +63,7 @@ const Contact: React.FC = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       
-      <main className="flex-1 container mx-auto px-4 py-12">
+      <main className="flex-1 container mx-auto px-4 py-12 mt-20">
         <div className="max-w-5xl mx-auto">
           <h1 className="text-3xl md:text-4xl font-bold mb-2 text-footsal-dark">Contact Us</h1>
           <p className="text-lg text-gray-600 mb-10">
