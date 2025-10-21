@@ -1,0 +1,17 @@
+import { SVGProps } from '@eduPlatform/types';
+export const AddIcon = ({ color = 'black' }: SVGProps) => {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 25 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M11.5 13H5.5V11H11.5V5H13.5V11H19.5V13H13.5V19H11.5V13Z"
+        fill={color}
+      />
+    </svg>
+  );
+};

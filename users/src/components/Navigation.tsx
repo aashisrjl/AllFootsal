@@ -72,13 +72,13 @@ export default function Navigation() {
               Pricing
             </button>
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/auth/login")}
               className={`font-medium transition ${linkColor}`}
             >
               Login
             </button>
             <button
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/auth/register")}
               className={`font-medium transition ${linkColor} bg-green-600 rounded-lg px-3 py-1 text-white hover:bg-blue-500 hover:text-white`}
             >
               Register
@@ -112,14 +112,14 @@ export default function Navigation() {
               Pricing
             </button>
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/auth/login")}
               className="block w-full text-left py-2 text-gray-700 hover:text-green-600"
             >
               Login
             </button>
             <button
-              onClick={() => navigate("/register")}
-              className="block w-full text-left py-2 text-gray-700 hover:text-green-600 bg-blue-500 rounded-md"
+              onClick={() => navigate("/auth/register")}
+              className="block w-full text-left py-2 text-gray-700 hover:bg-blue-600 hover:text-white bg-green-500 rounded-md"
             >
               Register
             </button>
