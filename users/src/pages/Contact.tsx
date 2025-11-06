@@ -1,24 +1,147 @@
-
 import React, { useState } from "react";
+// NOTE: Assuming Header and Footer components are available in your environment, 
+// they are imported here but not defined within this single file.
 import Header from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
+
 import { 
   MapPin, 
   Phone, 
   Mail, 
   Clock, 
   Send,
-  CheckCircle,
-  MessageSquare,
   HelpCircle,
   Users,
-  Building
+  Building,
+  Loader2,
+  MessageSquare,
+  Facebook,
+  Twitter,
+  Instagram
 } from "lucide-react";
+
+// --- START: PLACEHOLDER UI COMPONENTS (Simulating external dependencies like shadcn/ui) ---
+
+// 1. Toast Utility
+interface ToastParams {
+    title: string;
+    description: string;
+    variant?: 'default' | 'destructive';
+}
+const useToast = () => {
+    // In a real app, this would show a notification, here we just log.
+    return {
+        toast: ({ title, description, variant }: ToastParams) => {
+            console.log(`[TOAST - ${variant || 'default'}] ${title}: ${description}`);
+        }
+    };
+};
+const toast = useToast().toast;
+
+// 2. Button
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    variant?: 'default' | 'outline' | 'ghost' | 'secondary' | 'link' | 'accent';
+    size?: 'default' | 'sm' | 'lg' | 'icon';
+    children: React.ReactNode;
+}
+
+const Button: React.FC<ButtonProps> = ({ 
+    variant = 'default', 
+    size = 'default', 
+    className = '', 
+    children, 
+    ...props 
+}) => {
+    // Base styles for professional appearance and animation
+    let baseStyle = "font-medium rounded-lg transition-all duration-300 active:scale-95 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed";
+    
+    let sizeStyle = {
+        default: 'h-10 px-4 py-2 text-base',
+        sm: 'h-9 px-3 text-sm',
+        lg: 'h-11 px-8 text-lg',
+        icon: 'h-10 w-10 p-0',
+    }[size];
+
+    // Color logic: Green (default) and Blue (accent)
+    let variantStyle = '';
+    if (variant === 'default') {
+        variantStyle = 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg hover:shadow-xl';
+    } else if (variant === 'accent') {
+        variantStyle = 'bg-sky-600 text-white hover:bg-sky-700 shadow-lg hover:shadow-xl';
+    } else if (variant === 'outline') {
+        variantStyle = 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 hover:border-emerald-500';
+    } else {
+        variantStyle = 'bg-gray-200 text-gray-800 hover:bg-gray-300';
+    }
+
+    return (
+        <button className={`${baseStyle} ${sizeStyle} ${variantStyle} ${className}`} {...props}>
+            {children}
+        </button>
+    );
+};
+
+// 3. Input
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+const Input: React.FC<InputProps> = (props) => (
+    <input 
+        className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+        {...props} 
+    />
+);
+
+// 4. Textarea
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+
+const Textarea: React.FC<TextareaProps> = (props) => (
+    <textarea 
+        className="flex min-h-[80px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+        {...props} 
+    />
+);
+
+// 5. Card Components
+interface CardProps { children: React.ReactNode; className?: string; }
+const Card: React.FC<CardProps> = ({ children, className }) => (
+    <div className={`bg-white rounded-xl shadow-lg border border-gray-100 p-6 transition-all duration-500 hover:shadow-xl ${className}`}>
+        {children}
+    </div>
+);
+const CardHeader: React.FC<CardProps> = ({ children, className }) => (
+    <div className={`flex flex-col space-y-1.5 pb-4 ${className}`}>{children}</div>
+);
+const CardTitle: React.FC<CardProps> = ({ children, className }) => (
+    <h3 className={`text-xl font-bold tracking-tight text-gray-900 ${className}`}>{children}</h3>
+);
+const CardDescription: React.FC<CardProps> = ({ children, className }) => (
+    <p className={`text-sm text-gray-500 ${className}`}>{children}</p>
+);
+const CardContent: React.FC<CardProps> = ({ children, className }) => (
+    <div className={`p-0 ${className}`}>{children}</div>
+);
+
+// --- END: PLACEHOLDER UI COMPONENTS ---
+
+// Custom Animation Class (for subtle entrance)
+const ANIMATION_CLASSES = "opacity-0 translate-y-4 animate-fadeInUp fill-mode-forwards";
+
+// CSS for the custom animation (must be inline)
+const animationStyle = `
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeInUp {
+    animation-name: fadeInUp;
+    animation-duration: 0.6s;
+    animation-timing-function: ease-out;
+}
+.fill-mode-forwards {
+    animation-fill-mode: forwards;
+}
+`;
+
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -44,9 +167,8 @@ const Contact: React.FC = () => {
     // Simulate form submission
     setTimeout(() => {
       toast({
-        title: "Message Sent",
-        description: "Thank you for contacting us. We'll get back to you soon!",
-        duration: 5000,
+        title: "Message Sent Successfully",
+        description: "Thank you for reaching out! We aim to respond within 24 hours.",
       });
       
       setFormData({
@@ -59,34 +181,55 @@ const Contact: React.FC = () => {
     }, 1500);
   };
 
+  const contactInfo = [
+    { icon: MapPin, title: "Our Location", text: "Thamel, Kathmandu, Nepal", color: "text-emerald-600" },
+    { icon: Phone, title: "Call Us (24/7 Support)", text: "+977 1 234 5678", color: "text-sky-600" },
+    { icon: Mail, title: "General Inquiries", text: "info@goalfutsal.com.np", color: "text-emerald-600" },
+    { icon: Clock, title: "Business Hours", text: "Sun - Fri: 9:00 AM - 5:00 PM", color: "text-sky-600" },
+  ];
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <>
+    <div className="flex flex-col min-h-screen bg-gray-50 font-sans">
+      {/* Inject Custom CSS for animation */}
+      <style>{animationStyle}</style>
+
+      {/* Placeholder for imported Header component */}
       <Header />
       
-      <main className="flex-1 container mx-auto px-4 py-12 mt-20">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-footsal-dark">Contact Us</h1>
-          <p className="text-lg text-gray-600 mb-10">
-            Have questions or feedback? We'd love to hear from you.
-          </p>
+      <main className="flex-1 container mx-auto px-4 py-16 pt-32">
+        <div className="max-w-6xl mx-auto">
+
+          {/* Hero/Title Section with Animation */}
+          <div className={`text-center mb-16 ${ANIMATION_CLASSES}`} style={{animationDelay: '0.1s'}}>
+            <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
+              Get in Touch with AllFutsal
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              We're here to help you with pitch bookings, partnerships, or any other query.
+            </p>
+          </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-footsal-green" />
-                  Send Us a Message
+          {/* Main Contact Grid: Form (2/3) and Info (1/3) */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            
+            {/* 1. Contact Form */}
+            <Card className={`lg:col-span-2 p-8 shadow-2xl transition-all duration-500 hover:shadow-emerald-300/50 ${ANIMATION_CLASSES}`} style={{animationDelay: '0.3s'}}>
+              <CardHeader className="pb-6">
+                <CardTitle className="flex items-center gap-3 text-3xl font-extrabold text-emerald-600">
+                  <MessageSquare className="h-7 w-7" />
+                  Direct Inquiry Form
                 </CardTitle>
-                <CardDescription>
-                  Fill out the form below and we'll get back to you as soon as possible.
+                <CardDescription className="text-base text-gray-600">
+                  Please provide detailed information so we can assist you efficiently.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label htmlFor="name" className="text-sm font-medium">
-                        Your Name
+                      <label htmlFor="name" className="text-sm font-semibold text-gray-700">
+                        Your Full Name
                       </label>
                       <Input
                         id="name"
@@ -98,8 +241,8 @@ const Contact: React.FC = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label htmlFor="email" className="text-sm font-medium">
-                        Your Email
+                      <label htmlFor="email" className="text-sm font-semibold text-gray-700">
+                        Email Address
                       </label>
                       <Input
                         id="email"
@@ -114,13 +257,13 @@ const Contact: React.FC = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <label htmlFor="subject" className="text-sm font-medium">
+                    <label htmlFor="subject" className="text-sm font-semibold text-gray-700">
                       Subject
                     </label>
                     <Input
                       id="subject"
                       name="subject"
-                      placeholder="How can we help you?"
+                      placeholder="e.g., Pitch Booking Issue, Partnership Inquiry"
                       value={formData.subject}
                       onChange={handleChange}
                       required
@@ -128,14 +271,14 @@ const Contact: React.FC = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <label htmlFor="message" className="text-sm font-medium">
-                      Message
+                    <label htmlFor="message" className="text-sm font-semibold text-gray-700">
+                      Your Message
                     </label>
                     <Textarea
                       id="message"
                       name="message"
-                      placeholder="Write your message here..."
-                      rows={5}
+                      placeholder="Describe your query in detail..."
+                      rows={6}
                       value={formData.message}
                       onChange={handleChange}
                       required
@@ -144,15 +287,15 @@ const Contact: React.FC = () => {
                   
                   <Button 
                     type="submit" 
-                    className="w-full" 
+                    className="w-full h-12 text-lg" 
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
-                      <>Processing...</>
+                      <><Loader2 className="h-5 w-5 mr-2 animate-spin" /> Submitting...</>
                     ) : (
                       <>
-                        <Send className="h-4 w-4 mr-2" />
-                        Send Message
+                        <Send className="h-5 w-5 mr-2" />
+                        Send Professional Inquiry
                       </>
                     )}
                   </Button>
@@ -160,140 +303,104 @@ const Contact: React.FC = () => {
               </CardContent>
             </Card>
             
-            <div className="space-y-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building className="h-5 w-5 text-footsal-green" />
-                    Our Office
+            {/* 2. Contact Information & Socials */}
+            <div className={`space-y-6 ${ANIMATION_CLASSES}`} style={{animationDelay: '0.5s'}}>
+              
+              {/* Card 1: Main Contact Details (Blue accent for contrast) */}
+              <Card className="p-6 bg-green-200 border-sky-200 hover:shadow-sky-300/50">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-3 text-2xl text-gray-900">
+                    <Building className="h-6 w-6 text-sky-600" />
+                    Office & Direct Info
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex gap-3">
-                    <MapPin className="h-5 w-5 text-footsal-green shrink-0 mt-0.5" />
-                    <div>
-                      <h3 className="font-medium">Address</h3>
-                      <p className="text-gray-600">
-                        Thamel, Kathmandu, Nepal
-                      </p>
+                  {contactInfo.map((item, index) => (
+                    <div 
+                      key={index} 
+                      className={`flex gap-4 p-3 rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:translate-y-[-2px] border border-gray-100`} 
+                    >
+                      <item.icon className={`h-5 w-5 shrink-0 ${item.color}`} />
+                      <div>
+                        <h3 className="font-semibold text-gray-800 text-base">{item.title}</h3>
+                        <p className="text-sm text-gray-600">{item.text}</p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    <Phone className="h-5 w-5 text-footsal-green shrink-0 mt-0.5" />
-                    <div>
-                      <h3 className="font-medium">Phone</h3>
-                      <p className="text-gray-600">
-                        +977 1 234 5678
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    <Mail className="h-5 w-5 text-footsal-green shrink-0 mt-0.5" />
-                    <div>
-                      <h3 className="font-medium">Email</h3>
-                      <p className="text-gray-600">
-                        info@goalfutsal.com.np
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    <Clock className="h-5 w-5 text-footsal-green shrink-0 mt-0.5" />
-                    <div>
-                      <h3 className="font-medium">Business Hours</h3>
-                      <p className="text-gray-600">
-                        Sunday - Friday: 9:00 AM - 5:00 PM<br />
-                        Saturday: Closed
-                      </p>
-                    </div>
-                  </div>
+                  ))}
                 </CardContent>
               </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <HelpCircle className="h-5 w-5 text-footsal-green" />
-                    Frequently Asked Questions
+
+              {/* Card 2: Social Media/Community (Black accent) */}
+              <Card className="p-6 bg-gray-900 text-white border-gray-700 hover:shadow-gray-700/50">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-3 text-2xl ">
+                    <Users className="h-6 w-6 text-emerald-400" />
+                    Connect with Us
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <h3 className="font-medium">How do I book a futsal pitch?</h3>
-                    <p className="text-gray-600 text-sm">
-                      Browse facilities, choose a date and time slot, then confirm your booking.
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-medium">Can I cancel my booking?</h3>
-                    <p className="text-gray-600 text-sm">
-                      Yes, bookings can be cancelled up to 24 hours before the scheduled time.
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-medium">How do I become a facility partner?</h3>
-                    <p className="text-gray-600 text-sm">
-                      Contact our partnerships team via email at partners@goalfutsal.com.np.
-                    </p>
+                  <p className="text-gray-700">
+                    Follow us for real-time updates on pitch availability and events.
+                  </p>
+                  <div className="flex gap-4">
+                    <Button variant="accent" size="icon" className="hover:scale-110">
+                      <Facebook className="h-5 w-5" />
+                    </Button>
+                    <Button variant="accent" size="icon" className="hover:scale-110">
+                      <Twitter className="h-5 w-5" />
+                    </Button>
+                    <Button variant="accent" size="icon" className="hover:scale-110">
+                      <Instagram className="h-5 w-5" />
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
             </div>
           </div>
           
-          <Card className="bg-gray-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-footsal-green" />
-                Join Our Community
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col md:flex-row items-center gap-6">
-                <div className="flex-1">
-                  <p className="text-gray-700 mb-4">
-                    Subscribe to our newsletter to stay updated with the latest news, 
-                    tournaments, and special offers.
-                  </p>
-                  <div className="flex gap-2">
-                    <Input placeholder="Your email address" className="max-w-xs" />
-                    <Button>
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Subscribe
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="w-px h-16 bg-gray-300 hidden md:block"></div>
-                
-                <div className="flex-1">
-                  <p className="text-gray-700 mb-4">
-                    Follow us on social media for daily updates and community highlights.
-                  </p>
-                  <div className="flex gap-4">
-                    <Button variant="outline" size="icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-facebook"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-                    </Button>
-                    <Button variant="outline" size="icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-twitter"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
-                    </Button>
-                    <Button variant="outline" size="icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* FAQ Section - Below the main content */}
+          <div className={`mt-16 ${ANIMATION_CLASSES}`} style={{animationDelay: '0.8s'}}>
+            <Card className="bg-white p-8">
+                <CardHeader className="text-center pb-6">
+                  <CardTitle className="text-3xl font-extrabold text-sky-600 flex items-center justify-center gap-3">
+                    <HelpCircle className="h-7 w-7" />
+                    Frequently Asked Questions
+                  </CardTitle>
+                  <CardDescription className="text-base">Quick answers to common queries about booking and facilities.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 transition-all duration-300 hover:shadow-md">
+                            <h3 className="font-semibold text-lg text-gray-900 mb-1">How do I book a futsal pitch?</h3>
+                            <p className="text-gray-600 text-sm">
+                              Simply browse available facilities on our homepage, choose your desired time slot, and proceed to secure your reservation online.
+                            </p>
+                        </div>
+                        
+                        <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 transition-all duration-300 hover:shadow-md">
+                            <h3 className="font-semibold text-lg text-gray-900 mb-1">What is your cancellation policy?</h3>
+                            <p className="text-gray-600 text-sm">
+                              Bookings can be cancelled up to 24 hours prior to the scheduled time for a full refund. Cancellations within 24 hours may incur a penalty fee.
+                            </p>
+                        </div>
+                        
+                        <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 transition-all duration-300 hover:shadow-md">
+                            <h3 className="font-semibold text-lg text-gray-900 mb-1">How do I become a facility partner?</h3>
+                            <p className="text-gray-600 text-sm">
+                              Please email our dedicated partnerships team at <b className="text-emerald-600">partners@Allfutsal.com.np</b> with details about your facility.
+                            </p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+          </div>
         </div>
       </main>
       
+      {/* Placeholder for imported Footer component */}
       <Footer />
     </div>
+    </>
   );
 };
 

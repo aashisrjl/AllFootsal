@@ -1,20 +1,29 @@
-import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
-import { useState } from 'react';
+import { logo_transparent } from "@/assets/images";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+} from "lucide-react";
+import { useState } from "react";
 
 export default function Footer() {
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage('Thank you for subscribing!');
-    setEmail('');
+    setMessage("Thank you for subscribing!");
+    setEmail("");
   };
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -23,11 +32,18 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           <div>
-            <h3 className="text-2xl font-bold mb-4 text-green-400">NepFootsal</h3>
+            {/* <h3 className="text-2xl font-bold mb-4 text-green-400">NepFootsal</h3> */}
+            <img
+              src={logo_transparent}
+              alt="NepFutsal Logo"
+              className="h-24 w-auto object-contain mb-4 transition-transform duration-300 hover:scale-105"
+            />
             <p className="text-gray-400 mb-4">
               Nepal's first all-in-one futsal management and booking platform.
             </p>
-            <p className="text-gray-400 mb-4 font-semibold">🌐 nepfootsal.com</p>
+            <p className="text-gray-400 mb-4 font-semibold">
+              🌐 allfootsal.com
+            </p>
             <div className="flex gap-4">
               <a href="#" className="hover:text-green-400 transition">
                 <Facebook size={24} />
@@ -48,22 +64,34 @@ export default function Footer() {
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <button onClick={() => scrollToSection('home')} className="text-gray-400 hover:text-green-400 transition">
+                <button
+                  onClick={() => scrollToSection("home")}
+                  className="text-gray-400 hover:text-green-400 transition"
+                >
                   Home
                 </button>
               </li>
               <li>
-                <button onClick={() => scrollToSection('mission')} className="text-gray-400 hover:text-green-400 transition">
+                <button
+                  onClick={() => scrollToSection("mission")}
+                  className="text-gray-400 hover:text-green-400 transition"
+                >
                   Mission
                 </button>
               </li>
               <li>
-                <button onClick={() => scrollToSection('ecosystem')} className="text-gray-400 hover:text-green-400 transition">
+                <button
+                  onClick={() => scrollToSection("ecosystem")}
+                  className="text-gray-400 hover:text-green-400 transition"
+                >
                   Ecosystem
                 </button>
               </li>
               <li>
-                <button onClick={() => scrollToSection('platforms')} className="text-gray-400 hover:text-green-400 transition">
+                <button
+                  onClick={() => scrollToSection("platforms")}
+                  className="text-gray-400 hover:text-green-400 transition"
+                >
                   Platforms
                 </button>
               </li>
@@ -74,16 +102,22 @@ export default function Footer() {
             <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
-                <MapPin size={20} className="text-green-400 flex-shrink-0 mt-1" />
+                <MapPin
+                  size={20}
+                  className="text-green-400 flex-shrink-0 mt-1"
+                />
                 <span className="text-gray-400">📍 Kathmandu, Nepal</span>
               </li>
               <li className="flex items-start gap-3">
-                <Phone size={20} className="text-green-400 flex-shrink-0 mt-1" />
-                <span className="text-gray-400">📞 +977 9812345678</span>
+                <Phone
+                  size={20}
+                  className="text-green-400 flex-shrink-0 mt-1"
+                />
+                <span className="text-gray-400">📞 +977 9800000000</span>
               </li>
               <li className="flex items-start gap-3">
                 <Mail size={20} className="text-green-400 flex-shrink-0 mt-1" />
-                <span className="text-gray-400">✉️ info@nepfootsal.com</span>
+                <span className="text-gray-400">✉️ info@allfootsal.com</span>
               </li>
             </ul>
           </div>
@@ -93,7 +127,9 @@ export default function Footer() {
             <p className="text-gray-400 mb-4">
               Stay updated with new futsal venues, tournaments, and events!
             </p>
-            <p className="text-gray-400 mb-2 text-sm">👉 Enter your email to subscribe.</p>
+            <p className="text-gray-400 mb-2 text-sm">
+              👉 Enter your email to subscribe.
+            </p>
             <form onSubmit={handleSubscribe} className="space-y-2">
               <input
                 type="email"
@@ -111,7 +147,13 @@ export default function Footer() {
               </button>
             </form>
             {message && (
-              <p className={`mt-2 text-sm ${message.includes('Thank') ? 'text-green-400' : 'text-yellow-400'}`}>
+              <p
+                className={`mt-2 text-sm ${
+                  message.includes("Thank")
+                    ? "text-green-400"
+                    : "text-yellow-400"
+                }`}
+              >
                 {message}
               </p>
             )}
@@ -119,8 +161,10 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-          <p>&copy; 2025 NepFootsal. All rights reserved.</p>
-          <p className="mt-2 text-sm">Designed and built to grow Nepal's futsal community ⚽🇳🇵</p>
+          <p>&copy; 2025 AllFootsal. All rights reserved.</p>
+          <p className="mt-2 text-sm">
+            Designed and built to grow Nepal's futsal community ⚽🇳🇵
+          </p>
         </div>
       </div>
     </footer>

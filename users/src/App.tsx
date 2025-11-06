@@ -16,6 +16,11 @@ import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Register from "./pages/Register";
+import EmailVerification from "./pages/EmailVerification";
+import Pricing from "./pages/Pricing";
 
 const queryClient = new QueryClient();
 
@@ -32,11 +37,14 @@ const App = () => (
               {/* <Route path="/facilities" element={<Facilities />} />
               <Route path="/facilities/:id" element={<FacilityDetails />} /> */}
               <Route path="/auth/login" element={<Login />} />
-              {/* <Route path="/auth/register" element={<Register />} /> */}
+              <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+              <Route path="/auth/reset-password" element={<ResetPassword />} />
+              <Route path="/auth/register" element={<Register />} />
+              <Route path="/auth/verify-email" element={<EmailVerification />} />
 
               {/* <Route path="/bookings" element={<UserBookings />} /> */}
               {/* <Route path="/admin" element={<AdminDashboard />} /> */}
-              {/* <Route path="/about" element={<About />} /> */}
+              <Route path="/pricing" element={<Pricing />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

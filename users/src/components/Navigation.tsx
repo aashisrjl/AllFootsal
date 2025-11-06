@@ -1,3 +1,4 @@
+import { logo_transparent, DashboardBanner } from "@/assets/images";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -20,7 +21,7 @@ export default function Navigation() {
 
   const scrollToSection = (id) => {
     if (!isHome) {
-      navigate("/#" + id); // redirect to home first if not already there
+      navigate("/#" + id);
       return;
     }
     const element = document.getElementById(id);
@@ -30,43 +31,54 @@ export default function Navigation() {
     }
   };
 
-  // Dynamic styles
-  const navBg = isHome
-    ? isScrolled
-      ? "bg-white shadow-md"
-      : "bg-transparent"
-    : "bg-white shadow-md";
-
+  // Text & link color logic
   const textColor = isHome
     ? isScrolled
-      ? "text-green-600"
+      ? "text-white"
       : "text-white"
-    : "text-green-600";
+    : "text-white";
 
   const linkColor = isHome
     ? isScrolled
-      ? "text-gray-700 hover:text-green-600"
+      ? "text-white hover:text-green-600"
       : "text-white hover:text-green-300"
-    : "text-gray-700 hover:text-green-600";
+    : "text-white hover:text-green-600";
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBg}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        isScrolled ? "shadow-md" : ""
+      }`}
+      style={{
+        backgroundImage:
+          isHome && !isScrolled
+            ? "none"
+            : `url(${DashboardBanner})`,
+        backgroundColor: isHome && !isScrolled ? "transparent" : "rgba(255,255,255,0.9)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backdropFilter: "blur(8px)",
+      }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
+          {/* Logo */}
           <div
             className={`flex items-center gap-2 font-bold text-2xl transition-colors ${textColor}`}
             onClick={() => navigate("/")}
             style={{ cursor: "pointer" }}
           >
-            AllFootsal
+            <img
+              src={logo_transparent}
+              alt="NepFutsal Logo"
+              className="h-24 w-auto object-contain transition-transform duration-300 hover:scale-105"
+            />
           </div>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8">
             <button
-              onClick={() => scrollToSection("pricing")}
+              onClick={() => navigate("/pricing")}
               className={`font-medium transition ${linkColor}`}
             >
               Pricing
@@ -79,7 +91,7 @@ export default function Navigation() {
             </button>
             <button
               onClick={() => navigate("/auth/register")}
-              className={`font-medium transition ${linkColor} bg-green-600 rounded-lg px-3 py-1 text-white hover:bg-blue-500 hover:text-white`}
+              className={`font-medium transition ${linkColor} bg-green-600 rounded-lg px-4 py-1 text-white hover:bg-blue-500`}
             >
               Register
             </button>
@@ -101,7 +113,7 @@ export default function Navigation() {
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
+      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t shadow-md">
           <div className="px-4 pt-2 pb-4 space-y-2">
@@ -119,7 +131,7 @@ export default function Navigation() {
             </button>
             <button
               onClick={() => navigate("/auth/register")}
-              className="block w-full text-left py-2 text-gray-700 hover:bg-blue-600 hover:text-white bg-green-500 rounded-md"
+              className="block w-full text-left py-2 text-white bg-green-600 hover:bg-blue-600 rounded-md"
             >
               Register
             </button>

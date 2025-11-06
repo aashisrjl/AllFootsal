@@ -1,3 +1,4 @@
+import { RegisterIllustration } from '@/assets/images';
 import { AuthImage } from '@/assets/images';
 export { default as LoginIllustration } from './login-illustration.png';
 export { default as SaralSikshyaLogoFull } from './saral_sikshya_full.png';
@@ -26,3 +27,6 @@ export { default as BottomDesign } from './bottom-design.png';
 export { default as LandingForumIcon } from './forums.png';
 export { default as EmptyData } from './empty-course.png';
 export {default as AuthImage} from './AuthImage.png';
+export {default as Logo} from './allfootsalraw1.png';
+export {default as logo_transparent} from './allfootsal_trasnparent1.png';
+export { default as RegisterIllustration} from './registerpage.png';
