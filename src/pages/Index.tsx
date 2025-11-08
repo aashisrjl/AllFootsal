@@ -39,7 +39,7 @@ const Index = () => {
             <div className="mt-6">
               <p className="text-green-50 mb-3">Are you a facility owner?</p>
               <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-6 h-auto hover-scale">
-                <Link to="/footsal-register">Register Your Futsal</Link>
+                <Link to="/auth/footsal/register">Register Your Futsal</Link>
               </Button>
             </div>
           </div>
