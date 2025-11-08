@@ -21,6 +21,8 @@ import ResetPassword from "./pages/ResetPassword";
 import Register from "./pages/Register";
 import EmailVerification from "./pages/EmailVerification";
 import Pricing from "./pages/Pricing";
+import FootsalAuthRegister from "./pages/FootsalAuthRegister";
+import Subscription from "./pages/Subscription";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,8 @@ const App = () => (
               <Route path="/auth/reset-password" element={<ResetPassword />} />
               <Route path="/auth/register" element={<Register />} />
               <Route path="/auth/verify-email" element={<EmailVerification />} />
+              <Route path="/auth/footsal/register" element={<FootsalAuthRegister />} />
+              <Route path="/subscription" element={<Subscription />} />
 
               {/* <Route path="/bookings" element={<UserBookings />} /> */}
               {/* <Route path="/admin" element={<AdminDashboard />} /> */}
