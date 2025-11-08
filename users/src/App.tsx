@@ -40,6 +40,7 @@ const App = () => (
               <Route path="/auth/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/reset-password" element={<ResetPassword />} />
               <Route path="/auth/register" element={<Register />} />
+              <Route path="/auth/footsal/register" element = {<Register />} />
               <Route path="/auth/verify-email" element={<EmailVerification />} />
 
               {/* <Route path="/bookings" element={<UserBookings />} /> */}

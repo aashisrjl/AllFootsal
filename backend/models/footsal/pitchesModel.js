@@ -10,7 +10,7 @@ module.exports = (sequelize,DataTypes) =>{
             onDelete: 'CASCADE',
             onUpdate: 'CASCADE'
         },
-        // footsal owner can add multiple pitches with multiple spe cification in this tasble and can be booked separately
+        // footsal owner can add multiple pitches with multiple specification in this table and can be booked separately
         name:{
             type: DataTypes.STRING,
             allowNull: false,
