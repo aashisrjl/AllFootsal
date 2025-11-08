@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const { User } = require("../../models/index");
-const jwt = require('jsonwebtoken');
+const generateJwt = require("../../utils/jwt/generateJwt");
+const {USER_PASSWORD_SALT_ROUNDS, USER_TOKEN_EXPIRATION, JWT_SECRET_USER } = process.env;
 
 // register user api
 module.exports = registerUser = async (req, res) => {
@@ -36,7 +37,7 @@ module.exports = registerUser = async (req, res) => {
   }
 
   // Hash password
-  const hashedPassword = password ? await bcrypt.hash(password, 8) : null;
+  const hashedPassword = password ? await bcrypt.hash(password,USER_PASSWORD_SALT_ROUNDS ) : null;
 
   const newUser = await User.create({
     username,
@@ -101,12 +102,20 @@ module.exports = loginUser = async(req,res)=>{
         });
     }
 
+    // // Generate JWT
+    // const token = jwt.sign(
+    //     {id: user.id, email: user.email, role: user.role},
+    //     JWT_SECRET_USER || 'fallback-user-secret',
+    //     {expiresIn: USER_TOKEN_EXPIRATION || '30d'}
+    // );
+
     // Generate JWT
-    const token = jwt.sign(
+    const token = generateJwt(
         {id: user.id, email: user.email, role: user.role},
-        process.env.JWT_SECRET || 'fallback-secret',
-        {expiresIn: '7d'}
-    );
+        JWT_SECRET_USER || 'fallback-user-secret',
+        USER_TOKEN_EXPIRATION || '30d'
+    )
+
 
     // Return user data and token
     res.status(200).json({

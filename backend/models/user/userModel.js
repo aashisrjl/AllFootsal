@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
 
     // Roles
     role: {
-      type: DataTypes.ENUM("user", "admin", "footsal_owner"),
+      type: DataTypes.ENUM("user"),
       defaultValue: "user"
     },
 
@@ -42,6 +42,10 @@ module.exports = (sequelize, DataTypes) => {
     is_active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true
+    },
+    isVerified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   });
 
