@@ -1,7 +1,7 @@
 
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import Header from "@/components/Header";
+import Header from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PitchCard from "@/components/PitchCard";
 import TimeSlotPicker from "@/components/TimeSlotPicker";
@@ -12,7 +12,7 @@ import { MapPin, Star, Clock, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
-const FacilityDetails = () => {
+const FacilityDetails:React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { 

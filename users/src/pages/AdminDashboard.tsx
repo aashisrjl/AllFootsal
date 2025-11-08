@@ -16,7 +16,7 @@ import {
   Users,
   Bell
 } from "lucide-react";
-import Header from "@/components/Header";
+import Header from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
 const AdminDashboard: React.FC = () => {
