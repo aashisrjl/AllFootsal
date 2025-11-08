@@ -52,7 +52,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: "user" | "admin" | "staff";
+  role: "user" | "admin" | "footsal";
 }
 
 export interface AuthState {

@@ -8,6 +8,8 @@ interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   registerFootsal: (name: string, email: string, password: string) => Promise<boolean>;
+  //google
+  
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -78,7 +80,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       id: Date.now().toString(),
       name,
       email,
-      role: "footsal_owner",
+      role: "footsal",
     };
     
     setAuthState({
