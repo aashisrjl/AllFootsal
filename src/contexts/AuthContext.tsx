@@ -7,6 +7,7 @@ import { toast } from "@/components/ui/use-toast";
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
+  registerFootsal: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -82,6 +83,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return true;
   };
 
+  const registerFootsal = async (name: string, email: string, password: string): Promise<boolean> => {
+    setAuthState((prev) => ({ ...prev, isLoading: true }));
+    
+    // Simulate API call delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    
+    // Mock registration - in a real app, this would call backend
+    const newUser: User = {
+      id: String(users.length + 1),
+      name,
+      email,
+      role: "admin", // Footsal owners get admin role
+    };
+    
+    setAuthState({
+      user: newUser,
+      isAuthenticated: true,
+      isLoading: false,
+    });
+    
+    toast({
+      title: "Registration successful",
+      description: `Welcome to Goal Futsal Nepal, ${name}!`,
+    });
+    
+    return true;
+  };
+
   const logout = () => {
     setAuthState({
       user: null,
@@ -96,7 +125,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ ...authState, login, register, logout }}>
+    <AuthContext.Provider value={{ ...authState, login, register, registerFootsal, logout }}>
       {children}
     </AuthContext.Provider>
   );

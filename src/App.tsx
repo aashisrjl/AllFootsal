@@ -13,6 +13,8 @@ import FacilityDetails from "./pages/FacilityDetails";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import FootsalRegister from "./pages/FootsalRegister";
+import FootsalAuthRegister from "./pages/FootsalAuthRegister";
+import Subscription from "./pages/Subscription";
 import UserBookings from "./pages/UserBookings";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -36,6 +38,8 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/footsal-register" element={<FootsalRegister />} />
+              <Route path="/auth/footsal/register" element={<FootsalAuthRegister />} />
+              <Route path="/subscription" element={<Subscription />} />
               <Route path="/bookings" element={<UserBookings />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/about" element={<About />} />
