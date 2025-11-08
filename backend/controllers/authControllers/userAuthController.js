@@ -131,3 +131,11 @@ module.exports = userLogin = async(req,res)=>{
         }
     });
 }
+
+// google login user api
+module.exports = userGoogleLogin_Register = async(req,res)=>{
+    // to be implemented
+    res.status(200).json({
+        message: "Google login successful"
+    });
+}
