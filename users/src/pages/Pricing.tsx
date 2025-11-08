@@ -270,7 +270,7 @@ const Pricing: React.FC = () => {
                             Players: Connect, Play, and Enjoy the Game
                         </h2>
                         
-                        <Card className="max-w-5xl mx-auto p-10 bg-sky-600 text-white border-sky-800 shadow-2xl shadow-sky-400/30">
+                        <Card className="max-w-5xl mx-auto p-10 bg-green-700 text-white border-sky-800 shadow-2xl shadow-sky-400/30">
                             <div className="flex flex-col md:flex-row items-center justify-between">
                                 <div className="text-center md:text-left md:w-1/3 mb-6 md:mb-0">
                                     <div className="flex flex-col items-center md:items-start gap-1 mb-4">
@@ -318,7 +318,7 @@ const Pricing: React.FC = () => {
                             </div>
                             <div className="mt-8 text-center">
                                 <Button 
-                                    className="w-full md:w-2/3 h-14 text-xl font-extrabold bg-gray-200 shadow-2xl"
+                                    className="w-full md:w-2/3 h-14 text-xl text-black font-extrabold bg-gray-200 hover:text-white shadow-2xl"
                                     variant="default"
                                     onClick={() => {Navigate("/auth/register")}}
                                 >
