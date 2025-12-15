@@ -28,6 +28,7 @@
   "devDependencies": {
     "jest": "^29.6.2",
     "nodemon": "^3.0.1",
+    "sequelize-cli": "^6.6.3",
     "supertest": "^6.3.3"
   }
 }

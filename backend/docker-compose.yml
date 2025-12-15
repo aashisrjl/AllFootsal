@@ -1,59 +1,27 @@
 version: '3.8'
 
 services:
-  db:
-    image: mariadb:latest
-    container_name: footsal-mariadb
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
-      MYSQL_DATABASE: ${DB_NAME:-footsal}
-      MYSQL_USER: ${DB_USER:-footsal_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-root}
-    ports:
-      - "3306:3306"
-    volumes:
-      - mariadb_data:/var/lib/mysql
-    networks:
-      - futsal
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  phpmyadmin:
-    image: phpmyadmin:latest
-    container_name: footsal-phpmyadmin
-    restart: always
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
-    ports:
-      - "8080:80"
-    depends_on:
-      - db
-    networks:
-      - futsal
-
   backend:
     build: .
     container_name: futsal-backend
     restart: always
+    # Load app/env vars solely from docker-mariadb-pma/.env
     env_file:
-      - .env
+      - ./docker-mariadb-pma/.env
     ports:
       - "${PORT:-3000}:3000"
     depends_on:
-      db:
+      mariadb:
         condition: service_healthy
     networks:
-      - futsal
+      - services
 
 networks:
-  futsal:
+  services:
+    external: true
+    name: ${PROJECT}-futsal
     driver: bridge
 
 volumes:
   mariadb_data:
+

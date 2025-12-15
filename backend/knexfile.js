@@ -4,11 +4,11 @@ module.exports = {
   development: {
     client: 'mysql2',
     connection: {
-      host: process.env.DB_HOST || 'localhost',
-      user: process.env.DB_USER || 'footsal_user',
-      password: process.env.DB_PASSWORD || 'root',
-      database: process.env.DB_NAME || 'footsal',
-      port: 3306
+      host: process.env.MARIADB_HOST || process.env.DB_HOST || 'mariadb',
+      user: process.env.MARIADB_USER || process.env.DB_USER || 'footsal_user',
+      password: process.env.MARIADB_PASSWORD || process.env.DB_PASSWORD || 'root',
+      database: process.env.MARIADB_DATABASE || process.env.DB_NAME || 'footsal',
+      port: Number(process.env.MARIADB_PORT || process.env.DB_PORT || 3306)
     },
     migrations: {
       directory: './migrations',
@@ -22,11 +22,11 @@ module.exports = {
   production: {
     client: 'mysql2',
     connection: {
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      port: 3306
+      host: process.env.MARIADB_HOST || process.env.DB_HOST,
+      user: process.env.MARIADB_USER || process.env.DB_USER,
+      password: process.env.MARIADB_PASSWORD || process.env.DB_PASSWORD,
+      database: process.env.MARIADB_DATABASE || process.env.DB_NAME,
+      port: Number(process.env.MARIADB_PORT || process.env.DB_PORT || 3306)
     },
     migrations: {
       directory: './migrations',
