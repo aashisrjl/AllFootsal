@@ -52,19 +52,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
 
-    // Contact & Payment
-    contact_phone: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    contact_email: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    qr_payment_url: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
 
     // Admin & Status
     is_active: {

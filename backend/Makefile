@@ -1,5 +1,8 @@
 # Makefile for running backend and database together
-import env vars from docker-mariadb-pma/.env
+# import env vars from docker-mariadb-pma/.env
+PROJECT ?= futsal
+include docker-mariadb-pma/.env
+export $(shell sed 's/=.*//' docker-mariadb-pma/.env)
 export $(shell sed 's/=.*//' docker-mariadb-pma/.env)
 
 up:

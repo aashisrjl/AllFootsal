@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build: .
@@ -11,15 +9,14 @@ services:
     ports:
       - "${PORT:-3000}:3000"
     depends_on:
-      mariadb:
-        condition: service_healthy
+      - mariadb
     networks:
       - services
 
 networks:
   services:
     external: true
-    name: ${PROJECT}-futsal
+    name: ${PROJECT:-futsal}
     driver: bridge
 
 volumes:

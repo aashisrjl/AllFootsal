@@ -5,7 +5,7 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.SERVER_PORT || 3000;
 const { users } = require("./models/index");
 const { footsal } = require("./models/index");
 
@@ -44,6 +44,12 @@ app.use((err, req, res, next) => {
     message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
   });
 });
+
+app.get("/",(req,res) =>{
+  res.status(200).json({
+    message: "Welcome to the Footsal Backend API"
+  })
+})
 
 // 404 handler
 app.use('*', (req, res) => {

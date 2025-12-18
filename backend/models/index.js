@@ -7,7 +7,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
   operatorsAliases: false,
-  port: 3306,
+  port: dbConfig.PORT,
 
   pool: {
     max: dbConfig.pool.max,
@@ -43,7 +43,8 @@ db.footsalPitch = require("./footsal/pitchesModel.js")(sequelize, DataTypes);
 db.footsalTimeSlot = require("./footsal/timeSlotModel.js")(sequelize, DataTypes);
 db.footsalRating = require("./footsal/ratingModel.js")(sequelize, DataTypes);
 db.footsalBooking = require("./footsal/bookingModel.js")(sequelize, DataTypes);
-
+db.admin = require("./admin/adminModel.js")(sequelize, DataTypes);
+db.footsalContact = require("./footsal/contactModel.js")(sequelize, DataTypes);
 // Define associations
 
 // Footsal one-to-one relationships
@@ -98,9 +99,15 @@ db.footsalBooking.belongsTo(db.users, { foreignKey: 'user_id' });
 db.footsalPayment.hasMany(db.footsalBooking, { foreignKey: 'payment_id', as: 'bookings' });
 db.footsalBooking.belongsTo(db.footsalPayment, { foreignKey: 'payment_id' });
 
-// NOTE: Database schema is managed by Knex migrations
-// Run migrations using: npm run migrate
-// To create a new migration: npx knex migrate:make migration_name
+// Admin relationships
+db.admin.hasMany(db.footsal, { foreignKey: 'admin_id', as: 'footsals' });
+db.footsal.belongsTo(db.admin, { foreignKey: 'admin_id' });
+
+// Contact relationships
+db.footsal.hasOne(db.footsalContact, { foreignKey: 'footsal_id', as: 'contact' });
+db.footsalContact.belongsTo(db.footsal, { foreignKey: 'footsal_id' });
+
+
 db.sequelize.sync({ alter: false, force: false }).then(() => {
   console.log("✅ Database connection established! Use 'npm run migrate' to sync schema changes.");
 });
