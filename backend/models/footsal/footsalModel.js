@@ -1,63 +1,67 @@
 module.exports = (sequelize, DataTypes) => {
   const Footsal = sequelize.define("footsal", {
-    // Authentication & Identity
-    // userId:{
-    //   type: DataTypes.INTEGER,
-    //   allowNull: false,
-    //   references: {
-    //     model: "users",
-    //     key: "id",
-    //   },
-    //   onDelete: "CASCADE",
-    //   onUpdate: "CASCADE",
-    // },
     footsalCode: {
       type: DataTypes.INTEGER,
-      defaultValue: 0,
+      unique: true,
+      allowNull: false
     },
+
+    footsalName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+
+    ownerName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+
     email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
-      validate: { isEmail: true },
+      validate: { isEmail: true }
     },
+
     password: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: true
     },
+
     googleId: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: true
     },
 
-    // Basic Info
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    footsalName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     phoneNumber: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
+
     description: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: true
     },
+
     images: {
       type: DataTypes.JSON,
-      allowNull: true,
+      allowNull: true
     },
 
+    role: {
+      type: DataTypes.ENUM("footsal_admin"),
+      defaultValue: "footsal_admin"
+    },
 
-    // Admin & Status
-    is_active: {
+    isActive: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false,
+      defaultValue: false
     },
+
+    isVerified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
   });
 
   return Footsal;
