@@ -14,6 +14,13 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true // Google login
     },
+    phoneNumber:{
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true,
+      validate: { isNumeric: true },
+      len : [10,10]
+    },
     googleId: {
       type: DataTypes.STRING,
       allowNull: true
