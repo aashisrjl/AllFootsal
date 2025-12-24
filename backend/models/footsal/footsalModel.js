@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
-      validate: { isEmail: true }
+      // validate: { isEmail: true }
     },
 
     password: {
@@ -36,16 +36,6 @@ module.exports = (sequelize, DataTypes) => {
     phoneNumber: {
       type: DataTypes.STRING,
       allowNull: false
-    },
-
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
-
-    images: {
-      type: DataTypes.JSON,
-      allowNull: true
     },
 
     role: {

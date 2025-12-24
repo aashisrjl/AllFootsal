@@ -21,7 +21,8 @@
     "knex": "^2.5.1",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.15.2",
-    "nodemailer": "^6.9.4",
+    "nodemailer": "^6.10.1",
+    "redis": "^5.10.0",
     "sequelize": "^6.37.7",
     "stripe": "^12.18.0"
   },
