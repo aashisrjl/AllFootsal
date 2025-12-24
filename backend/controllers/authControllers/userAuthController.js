@@ -28,7 +28,7 @@ module.exports = userRegister = async (req, res) => {
     where: { phoneNumber },
   });
 
-    const userExists = emailExists || phoneExists;
+  const userExists = emailExists || phoneExists;
 
   if (userExists) {
     return res.status(400).json({
@@ -87,49 +87,81 @@ module.exports = userLogin = async(req,res)=>{
     });
 
     const user = userEmail || userPhone;
-    
-    if(!user){
-        return res.status(400).json({
-            error: "Invalid email or password"
-        });
+
+    const footsalEmail = await footsal.findOne({
+      where:{email}
+    })
+
+    const footsalPhone = await footsal.findOne({
+      where:{phoneNumber}
+    })
+
+    const footsalUser = footsalEmail || footsalPhone;
+
+    if(user && !footsalUser){
+      // check password
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if(!isMatch){
+          return res.status(400).json({
+              error: "Invalid email/phone number or password"
+          });
+      }
+      
+      // Generate JWT
+      const token = generateJwt(
+          {id: user.id, email: user.email, role: user.role},
+          JWT_SECRET || 'fallback-user-secret',
+          USER_TOKEN_EXPIRATION || '30d'
+      )
+      
+      // Return user data and token
+      return res.status(200).json({
+          message: "Login successful",
+          token,
+          user: {
+              id: user.id,
+              username: user.username,
+              email: user.email,
+              phoneNumber: user.phoneNumber,
+              role: user.role,
+              is_active: user.is_active
+          }
+      });
     }
+
+    if(footsalUser && !user){
     
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if(!isMatch){
-        return res.status(400).json({
-            error: "Invalid email or password"
-        });
+      // Check password
+      const isMatch = await bcrypt.compare(password, footsalUser.password);
+      
+      if(!isMatch){
+          return res.status(400).json({
+              error: "Invalid email/phone number or password"
+          });
+      }
+
+      // Generate JWT
+      const token = generateJwt(
+          {id: footsalUser.id, email: footsalUser.email, role: footsalUser.role},
+          JWT_SECRET || 'fallback-user-secret',
+          USER_TOKEN_EXPIRATION || '30d'
+      )
+
+      // Return user data and token
+      return res.status(200).json({
+          message: "Login successful",
+          token,
+          user: {
+              id: footsalUser.id,
+              username: footsalUser.username,
+              email: footsalUser.email,
+              phoneNumber: footsalUser.phoneNumber,
+              role: footsalUser.role,
+              is_active: footsalUser.is_active
+          }
+      });
     }
-
-    // // Generate JWT
-    // const token = jwt.sign(
-    //     {id: user.id, email: user.email, role: user.role},
-    //     JWT_SECRET_USER || 'fallback-user-secret',
-    //     {expiresIn: USER_TOKEN_EXPIRATION || '30d'}
-    // );
-
-    // Generate JWT
-    const token = generateJwt(
-        {id: user.id, email: user.email, role: user.role},
-        JWT_SECRET_USER || 'fallback-user-secret',
-        USER_TOKEN_EXPIRATION || '30d'
-    )
-
-
-    // Return user data and token
-    res.status(200).json({
-        message: "Login successful",
-        token,
-        user: {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            phoneNumber: user.phoneNumber,
-            role: user.role,
-            is_active: user.is_active
-        }
-    });
 }
 
 // google login user api

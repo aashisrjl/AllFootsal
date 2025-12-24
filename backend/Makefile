@@ -60,3 +60,30 @@ seed:
 		-f docker-compose.yml \
 		-f docker-mariadb-pma/docker-compose.yml \
 		-p $${PROJECT:-futsal} run --rm --no-deps backend npm run seed
+
+remove-db-volume:
+	@printf "\033[0;32m>>> Removing database volume\033[0m\n"
+	docker volume rm $${PROJECT:-futsal}_mariadb-data
+
+remove-backend-volume:
+	@printf "\033[0;32m>>> Removing backend volume\033[0m\n"
+	docker volume rm $${PROJECT:-futsal}_backend-data
+
+remove-volumes:
+	@printf "\033[0;32m>>> Removing all volumes\033[0m\n"
+	docker volume rm $${PROJECT:-futsal}_mariadb-data
+	docker volume rm $${PROJECT:-futsal}_backend-data
+
+remove-images:
+	@printf "\033[0;32m>>> Removing all images\033[0m\n"
+	docker rmi $${PROJECT:-futsal}_backend
+	docker rmi $${PROJECT:-futsal}_mariadb-pma
+	docker rmi mariadb:latest
+	docker rmi phpmyadmin/phpmyadmin:latest
+	docker rmi node:latest
+	docker rmi nginx:latest
+	docker rmi mariadb:latest
+
+remove-all-images:
+	@printf "\033[0;32m>>> Removing all images including dangling ones\033[0m\n"
+	docker rmi $(docker images) || true

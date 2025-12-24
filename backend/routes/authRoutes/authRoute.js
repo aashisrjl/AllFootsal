@@ -9,6 +9,7 @@ router.post('/user/register', userRegister);
 router.post('/user/login', userLogin);
 
 
+
 // Footsal ===================================
 // router.post('/footsal/register', footsalRegister);
 // router.post('/footsal/login',footsalRegister)
