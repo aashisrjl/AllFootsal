@@ -1,134 +1,205 @@
-import { Smartphone, Building, Layout } from 'lucide-react';
+import { motion } from "framer-motion";
+import { Building, Layout, Smartphone } from "lucide-react";
 
 export default function PlatformHighlights() {
   return (
-    <section id="platforms" className="py-20 bg-gradient-to-br from-gray-50 to-green-50">
+    <section id="platforms" className="py-20 sm:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-5xl sm:text-6xl font-extrabold text-gray-900 mb-4">
-            Platform Highlights
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          viewport={{ once: true }}
+        >
+          <div className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-800">
+            Platforms
+          </div>
+          <h2 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900">
+            One ecosystem, three portals
           </h2>
-        </div>
+          <p className="mt-4 text-base sm:text-lg text-slate-600 max-w-3xl mx-auto">
+            A tailored experience for players, venue owners, and administrators — with consistent design and powerful tools.
+          </p>
+        </motion.div>
 
-        <div className="space-y-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="order-2 lg:order-1">
-              <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl h-96 flex items-center justify-center shadow-2xl transform hover:scale-105 transition duration-300">
-                <div className="text-white text-center">
-                  <Smartphone size={80} className="mx-auto mb-4" />
-                  <p className="text-3xl font-bold">NepFootsal Player Portal</p>
+        <div className="mt-12 sm:mt-16 space-y-10 sm:space-y-14">
+          {/* Player portal */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
+            <motion.div
+              className="order-2 lg:order-1"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="rounded-3xl border border-slate-200/70 bg-white shadow-sm hover:shadow-xl transition-shadow overflow-hidden">
+                <div className="p-6 sm:p-7 border-b border-slate-200/60 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="h-3 w-3 rounded-full bg-red-400/80" />
+                    <span className="h-3 w-3 rounded-full bg-yellow-400/80" />
+                    <span className="h-3 w-3 rounded-full bg-green-400/80" />
+                  </div>
+                  <div className="text-xs font-semibold text-slate-500">Player Portal</div>
+                </div>
+                <div className="p-10 h-[22rem] flex items-center justify-center bg-gradient-to-br from-emerald-500 to-emerald-600">
+                  <div className="text-white text-center">
+                    <Smartphone className="mx-auto mb-4 h-16 w-16" />
+                    <p className="text-2xl sm:text-3xl font-bold">Book in seconds</p>
+                    <p className="mt-2 text-white/85">Real‑time availability and instant confirmation.</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="order-1 lg:order-2">
-              {/* <div className="text-4xl mb-4">🕹️</div> */}
-              <h3 className="text-4xl font-bold text-gray-900 mb-4">
+            <motion.div
+              className="order-1 lg:order-2"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
+            >
+              <h3 className="text-2xl sm:text-3xl font-bold text-slate-900">
                 NepFootsal Player Portal
               </h3>
-              <p className="text-xl text-gray-600 mb-6">
-                Your go-to web app for discovering and booking futsal venues.
+              <p className="mt-3 text-slate-600 text-base sm:text-lg">
+                Find nearby futsals, compare slots, and reserve confidently — designed for speed on mobile.
               </p>
 
-              <ul className="space-y-3 text-gray-700 text-lg">
-                <li className="flex items-center gap-3">
-                  <span className="text-green-600 font-bold">✓</span>
-                  <span>Real-time availability of pitches</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="text-green-600 font-bold">✓</span>
-                  <span>Instant booking confirmation</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="text-green-600 font-bold">✓</span>
-                  <span>Location-based search</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="text-green-600 font-bold">✓</span>
-                  <span>Reviews and ratings</span>
-                </li>
+              <ul className="mt-6 space-y-3">
+                {[
+                  "Real-time availability of pitches",
+                  "Instant booking confirmation",
+                  "Location-based discovery",
+                  "Reviews and ratings",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-3">
+                    <span className="mt-0.5 h-5 w-5 rounded-full bg-emerald-500/15 text-emerald-800 flex items-center justify-center text-xs font-bold">
+                      ✓
+                    </span>
+                    <span className="text-slate-700">{t}</span>
+                  </li>
+                ))}
               </ul>
-            </div>
+            </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              {/* <div className="text-4xl mb-4">🧾</div> */}
-              <h3 className="text-4xl font-bold text-gray-900 mb-4">
+          {/* Owner portal */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <h3 className="text-2xl sm:text-3xl font-bold text-slate-900">
                 NepFootsal Owner Portal
               </h3>
-              <p className="text-xl text-gray-600 mb-6">
-                Simplify your futsal operations.
+              <p className="mt-3 text-slate-600 text-base sm:text-lg">
+                A clean dashboard to manage pitches, schedules, payments, and day‑to‑day operations.
               </p>
 
-              <ul className="space-y-3 text-gray-700 text-lg">
-                <li className="flex items-center gap-3">
-                  <span className="text-blue-600 font-bold">✓</span>
-                  <span>Manage pitches and booking slots</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="text-blue-600 font-bold">✓</span>
-                  <span>View daily, weekly, and monthly analytics</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="text-blue-600 font-bold">✓</span>
-                  <span>Display QR for easy onsite payments</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="text-blue-600 font-bold">✓</span>
-                  <span>Track subscription and renewal dates</span>
-                </li>
+              <ul className="mt-6 space-y-3">
+                {[
+                  "Manage pitches and booking slots",
+                  "Daily, weekly, and monthly analytics",
+                  "On-site QR for easy payments",
+                  "Subscription and renewal tracking",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-3">
+                    <span className="mt-0.5 h-5 w-5 rounded-full bg-sky-600/15 text-sky-800 flex items-center justify-center text-xs font-bold">
+                      ✓
+                    </span>
+                    <span className="text-slate-700">{t}</span>
+                  </li>
+                ))}
               </ul>
-            </div>
+            </motion.div>
 
-            <div>
-              <div className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl h-96 flex items-center justify-center shadow-2xl transform hover:scale-105 transition duration-300">
-                <div className="text-white text-center">
-                  <Building size={80} className="mx-auto mb-4" />
-                  <p className="text-3xl font-bold">NepFootsal Owner Portal</p>
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
+            >
+              <div className="rounded-3xl border border-slate-200/70 bg-white shadow-sm hover:shadow-xl transition-shadow overflow-hidden">
+                <div className="p-6 sm:p-7 border-b border-slate-200/60 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="h-3 w-3 rounded-full bg-red-400/80" />
+                    <span className="h-3 w-3 rounded-full bg-yellow-400/80" />
+                    <span className="h-3 w-3 rounded-full bg-green-400/80" />
+                  </div>
+                  <div className="text-xs font-semibold text-slate-500">Owner Portal</div>
+                </div>
+                <div className="p-10 h-[22rem] flex items-center justify-center bg-gradient-to-br from-sky-600 to-cyan-600">
+                  <div className="text-white text-center">
+                    <Building className="mx-auto mb-4 h-16 w-16" />
+                    <p className="text-2xl sm:text-3xl font-bold">Operate smoothly</p>
+                    <p className="mt-2 text-white/85">Schedules, payments, and insights in one view.</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="order-2 lg:order-1">
-              <div className="bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl h-96 flex items-center justify-center shadow-2xl transform hover:scale-105 transition duration-300">
-                <div className="text-white text-center">
-                  <Layout size={80} className="mx-auto mb-4" />
-                  <p className="text-3xl font-bold">NepFootsal Admin Dashboard</p>
+          {/* Admin dashboard */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
+            <motion.div
+              className="order-2 lg:order-1"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="rounded-3xl border border-slate-200/70 bg-white shadow-sm hover:shadow-xl transition-shadow overflow-hidden">
+                <div className="p-6 sm:p-7 border-b border-slate-200/60 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="h-3 w-3 rounded-full bg-red-400/80" />
+                    <span className="h-3 w-3 rounded-full bg-yellow-400/80" />
+                    <span className="h-3 w-3 rounded-full bg-green-400/80" />
+                  </div>
+                  <div className="text-xs font-semibold text-slate-500">Admin Dashboard</div>
+                </div>
+                <div className="p-10 h-[22rem] flex items-center justify-center bg-gradient-to-br from-violet-600 to-purple-600">
+                  <div className="text-white text-center">
+                    <Layout className="mx-auto mb-4 h-16 w-16" />
+                    <p className="text-2xl sm:text-3xl font-bold">Run the platform</p>
+                    <p className="mt-2 text-white/85">Visibility across venues, users, and performance.</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="order-1 lg:order-2">
-              {/* <div className="text-4xl mb-4">🧠</div> */}
-              <h3 className="text-4xl font-bold text-gray-900 mb-4">
+            <motion.div
+              className="order-1 lg:order-2"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
+            >
+              <h3 className="text-2xl sm:text-3xl font-bold text-slate-900">
                 NepFootsal Admin Dashboard
               </h3>
-              <p className="text-xl text-gray-600 mb-6">
-                For platform administrators (you).
+              <p className="mt-3 text-slate-600 text-base sm:text-lg">
+                Tools for administrators to keep the ecosystem healthy and growing.
               </p>
 
-              <ul className="space-y-3 text-gray-700 text-lg">
-                <li className="flex items-center gap-3">
-                  <span className="text-purple-600 font-bold">✓</span>
-                  <span>Manage all futsals and users</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="text-purple-600 font-bold">✓</span>
-                  <span>Track revenue and active subscriptions</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="text-purple-600 font-bold">✓</span>
-                  <span>Analyze booking data by region</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="text-purple-600 font-bold">✓</span>
-                  <span>AI-powered review summarization</span>
-                </li>
+              <ul className="mt-6 space-y-3">
+                {[
+                  "Manage all futsals and users",
+                  "Track revenue and subscriptions",
+                  "Analyze booking data by region",
+                  "AI-powered review summarization",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-3">
+                    <span className="mt-0.5 h-5 w-5 rounded-full bg-violet-600/15 text-violet-800 flex items-center justify-center text-xs font-bold">
+                      ✓
+                    </span>
+                    <span className="text-slate-700">{t}</span>
+                  </li>
+                ))}
               </ul>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>

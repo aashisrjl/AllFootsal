@@ -95,6 +95,7 @@
   }
 }
 
+/* Landing hero background */
 .hero-gradient {
   background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   position: relative;
@@ -149,4 +150,86 @@
 
 .time-slot-selected {
   @apply bg-green-500 text-white border-green-600;
+}
+
+/* Index page layout + animations */
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.99);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@layer utilities {
+  .page-gradient {
+    @apply bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950;
+  }
+
+  .section-shell {
+    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-fade-in {
+    opacity: 0;
+    animation-name: fade-in-up;
+    animation-duration: 0.75s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: forwards;
+  }
+
+  .fade-delay-1 {
+    animation-delay: 0.05s;
+  }
+  .fade-delay-2 {
+    animation-delay: 0.12s;
+  }
+  .fade-delay-3 {
+    animation-delay: 0.18s;
+  }
+  .fade-delay-4 {
+    animation-delay: 0.24s;
+  }
+  .fade-delay-5 {
+    animation-delay: 0.3s;
+  }
+  .fade-delay-6 {
+    animation-delay: 0.36s;
+  }
+  .fade-delay-7 {
+    animation-delay: 0.42s;
+  }
+  .fade-delay-8 {
+    animation-delay: 0.48s;
+  }
+
+  .page-orbit {
+    @apply rounded-full blur-3xl opacity-60;
+    position: absolute;
+    filter: blur(58px);
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  .page-orbit--primary {
+    top: -160px;
+    right: -80px;
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle at 30% 30%, #22c55e 0%, transparent 65%);
+  }
+
+  .page-orbit--secondary {
+    bottom: -160px;
+    left: -40px;
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle at 30% 30%, #22c55e 0%, #0ea5e9 20%, transparent 70%);
+  }
 }

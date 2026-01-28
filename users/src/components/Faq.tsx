@@ -31,54 +31,55 @@ const faqs = [
 ];
 
 export default function FAQ() {
-  const [activeIndex, setActiveIndex] = useState(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  const toggleFAQ = (index) => {
+  const toggleFAQ = (index: number) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
   return (
     <section
       id="faq"
-      className="py-24 bg-gradient-to-br from-white to-green-50 relative overflow-hidden"
+      className="py-20 sm:py-24 bg-white"
     >
-      {/* Background Glow */}
-      <div className="absolute top-0 left-0 w-72 h-72 bg-green-300 opacity-20 blur-3xl rounded-full -z-10"></div>
-      <div className="absolute bottom-0 right-0 w-80 h-80 bg-green-400 opacity-20 blur-3xl rounded-full -z-10"></div>
-
-      <div className="max-w-4xl mx-auto px-6 text-center">
-        <motion.h2
-          className="text-5xl font-extrabold text-gray-900 mb-6"
-          initial={{ opacity: 0, y: 30 }}
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           viewport={{ once: true }}
         >
-          Frequently Asked Questions
-        </motion.h2>
-        <p className="text-lg text-gray-600 mb-12">
-          Everything you need to know about how NepFootsal helps you play, manage, and grow.
-        </p>
+          <div className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-800">
+            FAQ
+          </div>
+          <motion.h2 className="mt-4 text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
+            Frequently asked questions
+          </motion.h2>
+          <p className="mt-4 text-base sm:text-lg text-slate-600">
+            Everything you need to know about how NepFootsal helps you play, manage, and grow.
+          </p>
+        </motion.div>
 
-        <div className="space-y-5 text-left">
+        <div className="mt-10 space-y-4 text-left">
           {faqs.map((faq, index) => (
             <motion.div
               key={index}
-              className="bg-white shadow-md border border-green-100 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300"
+              className="bg-white shadow-sm border border-slate-200/70 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300"
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
               viewport={{ once: true }}
             >
               <button
-                className="w-full flex justify-between items-center px-6 py-5 text-left focus:outline-none"
+                className="w-full flex justify-between items-center gap-4 px-5 sm:px-6 py-5 text-left focus:outline-none"
                 onClick={() => toggleFAQ(index)}
               >
-                <h3 className="text-xl font-semibold text-gray-800">
+                <h3 className="text-base sm:text-lg font-semibold text-slate-900">
                   {faq.question}
                 </h3>
                 <ChevronDown
-                  className={`w-6 h-6 text-green-600 transition-transform duration-300 ${
+                  className={`w-5 h-5 text-emerald-700 transition-transform duration-300 ${
                     activeIndex === index ? "rotate-180" : ""
                   }`}
                 />
@@ -91,7 +92,7 @@ export default function FAQ() {
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="px-6 pb-6 text-gray-600"
+                    className="px-5 sm:px-6 pb-6 text-slate-600 leading-relaxed"
                   >
                     {faq.answer}
                   </motion.div>

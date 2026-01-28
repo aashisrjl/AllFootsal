@@ -1,9 +1,5 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-
-import { CalendarDays, ChevronRight, MapPin, Star } from "lucide-react";
 
 import Footer from "@/components/Footer";
 import CompleteEcosystem from "@/components/CompleteEcosystem";
@@ -24,7 +20,7 @@ const Index = () => {
       <Ecosystem />
       <PlatformHighlights />
       <TestimonialsMarquee />
-      < FAQ />
+      <FAQ />
       <CompleteEcosystem />
       <Footer />
     </div>

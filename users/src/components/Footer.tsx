@@ -9,6 +9,7 @@ import {
   Linkedin,
 } from "lucide-react";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -28,7 +29,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-gray-900 text-white pt-16 pb-8">
+    <footer className="bg-slate-950 text-white pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           <div>
@@ -36,25 +37,41 @@ export default function Footer() {
             <img
               src={logo_transparent}
               alt="NepFutsal Logo"
-              className="h-24 w-auto object-contain mb-4 transition-transform duration-300 hover:scale-105"
+              className="h-20 w-auto object-contain mb-5 transition-transform duration-300 hover:scale-105"
             />
-            <p className="text-gray-400 mb-4">
+            <p className="text-slate-300/80 mb-4 leading-relaxed">
               Nepal's first all-in-one futsal management and booking platform.
             </p>
-            <p className="text-gray-400 mb-4 font-semibold">
-              🌐 allfootsal.com
+            <p className="text-slate-300/80 mb-4 font-semibold">
+              allfootsal.com
             </p>
             <div className="flex gap-4">
-              <a href="#" className="hover:text-green-400 transition">
+              <a
+                href="#"
+                aria-label="Facebook"
+                className="text-white/70 hover:text-emerald-300 transition"
+              >
                 <Facebook size={24} />
               </a>
-              <a href="#" className="hover:text-green-400 transition">
+              <a
+                href="#"
+                aria-label="Twitter"
+                className="text-white/70 hover:text-emerald-300 transition"
+              >
                 <Twitter size={24} />
               </a>
-              <a href="#" className="hover:text-green-400 transition">
+              <a
+                href="#"
+                aria-label="Instagram"
+                className="text-white/70 hover:text-emerald-300 transition"
+              >
                 <Instagram size={24} />
               </a>
-              <a href="#" className="hover:text-green-400 transition">
+              <a
+                href="#"
+                aria-label="LinkedIn"
+                className="text-white/70 hover:text-emerald-300 transition"
+              >
                 <Linkedin size={24} />
               </a>
             </div>
@@ -66,7 +83,7 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => scrollToSection("home")}
-                  className="text-gray-400 hover:text-green-400 transition"
+                  className="text-slate-300/80 hover:text-emerald-300 transition"
                 >
                   Home
                 </button>
@@ -74,7 +91,7 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => scrollToSection("mission")}
-                  className="text-gray-400 hover:text-green-400 transition"
+                  className="text-slate-300/80 hover:text-emerald-300 transition"
                 >
                   Mission
                 </button>
@@ -82,7 +99,7 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => scrollToSection("ecosystem")}
-                  className="text-gray-400 hover:text-green-400 transition"
+                  className="text-slate-300/80 hover:text-emerald-300 transition"
                 >
                   Ecosystem
                 </button>
@@ -90,9 +107,17 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => scrollToSection("platforms")}
-                  className="text-gray-400 hover:text-green-400 transition"
+                  className="text-slate-300/80 hover:text-emerald-300 transition"
                 >
                   Platforms
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => scrollToSection("faq")}
+                  className="text-slate-300/80 hover:text-emerald-300 transition"
+                >
+                  FAQ
                 </button>
               </li>
             </ul>
@@ -104,31 +129,31 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin
                   size={20}
-                  className="text-green-400 flex-shrink-0 mt-1"
+                  className="text-emerald-300 flex-shrink-0 mt-1"
                 />
-                <span className="text-gray-400">📍 Kathmandu, Nepal</span>
+                <span className="text-slate-300/80">Kathmandu, Nepal</span>
               </li>
               <li className="flex items-start gap-3">
                 <Phone
                   size={20}
-                  className="text-green-400 flex-shrink-0 mt-1"
+                  className="text-emerald-300 flex-shrink-0 mt-1"
                 />
-                <span className="text-gray-400">📞 +977 9800000000</span>
+                <span className="text-slate-300/80">+977 9800000000</span>
               </li>
               <li className="flex items-start gap-3">
-                <Mail size={20} className="text-green-400 flex-shrink-0 mt-1" />
-                <span className="text-gray-400">✉️ info@allfootsal.com</span>
+                <Mail size={20} className="text-emerald-300 flex-shrink-0 mt-1" />
+                <span className="text-slate-300/80">info@allfootsal.com</span>
               </li>
             </ul>
           </div>
 
           <div>
             <h4 className="text-lg font-semibold mb-4">Newsletter</h4>
-            <p className="text-gray-400 mb-4">
+            <p className="text-slate-300/80 mb-4">
               Stay updated with new futsal venues, tournaments, and events!
             </p>
-            <p className="text-gray-400 mb-2 text-sm">
-              👉 Enter your email to subscribe.
+            <p className="text-slate-300/70 mb-2 text-sm">
+              Enter your email to subscribe.
             </p>
             <form onSubmit={handleSubscribe} className="space-y-2">
               <input
@@ -137,20 +162,22 @@ export default function Footer() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email"
                 required
-                className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-green-500 text-white"
+                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-emerald-400 text-white placeholder:text-white/40"
               />
-              <button
+              <motion.button
                 type="submit"
-                className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-semibold transition"
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 rounded-xl font-semibold transition shadow-lg shadow-emerald-500/15"
               >
                 Subscribe
-              </button>
+              </motion.button>
             </form>
             {message && (
               <p
                 className={`mt-2 text-sm ${
                   message.includes("Thank")
-                    ? "text-green-400"
+                    ? "text-emerald-300"
                     : "text-yellow-400"
                 }`}
               >
@@ -160,11 +187,9 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
+        <div className="border-t border-white/10 pt-8 text-center text-slate-300/70">
           <p>&copy; 2025 AllFootsal. All rights reserved.</p>
-          <p className="mt-2 text-sm">
-            Designed and built to grow Nepal's futsal community ⚽🇳🇵
-          </p>
+          <p className="mt-2 text-sm">Designed to grow Nepal's futsal community.</p>
         </div>
       </div>
     </footer>

@@ -5,95 +5,104 @@ export default function Mission() {
   return (
     <section
       id="mission"
-      className="relative py-24 bg-gradient-to-br from-green-50 via-white to-green-100 overflow-hidden"
+      className="relative py-20 sm:py-24 bg-white"
     >
-      {/* Background Accent */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-0 left-0 w-64 h-64 bg-green-300 opacity-20 blur-3xl rounded-full"></div>
-        <div className="absolute bottom-0 right-0 w-72 h-72 bg-green-400 opacity-20 blur-3xl rounded-full"></div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-6 text-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <motion.div
-          className="mb-16"
+          className="text-center mb-12 sm:mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-5xl sm:text-6xl font-extrabold text-gray-900 mb-6">
+          <div className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-800">
             Our Mission
+          </div>
+          <h2 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900">
+            Digitalize Nepal’s futsal ecosystem
           </h2>
-          <p className="text-xl sm:text-2xl text-gray-700 font-medium max-w-3xl mx-auto leading-relaxed">
-            To digitalize Nepal’s futsal ecosystem — empowering players, venues, and organizers with technology that simplifies booking, management, and community growth.
+          <p className="mt-4 text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            Empower players, venues, and organizers with technology that simplifies booking, day‑to‑day management, and community growth.
           </p>
         </motion.div>
 
         {/* Mission Cards */}
-        <div className="grid md:grid-cols-3 gap-10">
+        <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
           {/* Empower Players */}
           <motion.div
-            className="bg-white rounded-2xl shadow-md hover:shadow-lg p-8 transition-all duration-300 border border-green-100"
-            whileHover={{ scale: 1.05 }}
+            className="group relative bg-white rounded-2xl border border-slate-200/70 shadow-sm hover:shadow-lg transition-all duration-300 p-7 sm:p-8"
+            whileHover={{ y: -6 }}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            <div className="flex justify-center mb-4">
-              <Target className="w-12 h-12 text-green-600" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              Empower Players
-            </h3>
-            <p className="text-gray-600 leading-relaxed">
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 rounded-2xl border border-emerald-200 bg-emerald-50 p-3">
+                <Target className="w-6 h-6 text-emerald-700" />
+              </div>
+              <div className="text-left">
+                <h3 className="text-xl font-bold text-slate-900">
+                  Empower players
+                </h3>
+                <p className="mt-2 text-slate-600 leading-relaxed">
               Help players discover futsal venues, connect with teammates, and
               participate in tournaments effortlessly — all through one
               platform.
-            </p>
+                </p>
+              </div>
+            </div>
           </motion.div>
 
           {/* Build Community */}
           <motion.div
-            className="bg-white rounded-2xl shadow-md hover:shadow-lg p-8 transition-all duration-300 border border-green-100"
-            whileHover={{ scale: 1.05 }}
+            className="group relative bg-white rounded-2xl border border-slate-200/70 shadow-sm hover:shadow-lg transition-all duration-300 p-7 sm:p-8"
+            whileHover={{ y: -6 }}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
           >
-            <div className="flex justify-center mb-4">
-              <Users className="w-12 h-12 text-green-600" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              Build Community
-            </h3>
-            <p className="text-gray-600 leading-relaxed">
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 rounded-2xl border border-emerald-200 bg-emerald-50 p-3">
+                <Users className="w-6 h-6 text-emerald-700" />
+              </div>
+              <div className="text-left">
+                <h3 className="text-xl font-bold text-slate-900">
+                  Build community
+                </h3>
+                <p className="mt-2 text-slate-600 leading-relaxed">
               Create a thriving futsal community where players, venues, and
               organizers come together to share, grow, and celebrate the game.
-            </p>
+                </p>
+              </div>
+            </div>
           </motion.div>
 
           {/* Drive Growth */}
           <motion.div
-            className="bg-white rounded-2xl shadow-md hover:shadow-lg p-8 transition-all duration-300 border border-green-100"
-            whileHover={{ scale: 1.05 }}
+            className="group relative bg-white rounded-2xl border border-slate-200/70 shadow-sm hover:shadow-lg transition-all duration-300 p-7 sm:p-8"
+            whileHover={{ y: -6 }}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
             viewport={{ once: true }}
           >
-            <div className="flex justify-center mb-4">
-              <TrendingUp className="w-12 h-12 text-green-600" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              Drive Growth
-            </h3>
-            <p className="text-gray-600 leading-relaxed">
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 rounded-2xl border border-emerald-200 bg-emerald-50 p-3">
+                <TrendingUp className="w-6 h-6 text-emerald-700" />
+              </div>
+              <div className="text-left">
+                <h3 className="text-xl font-bold text-slate-900">
+                  Drive growth
+                </h3>
+                <p className="mt-2 text-slate-600 leading-relaxed">
               Empower futsal owners and organizers with smart management tools
               and analytics that promote sustainable business growth.
-            </p>
+                </p>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>
