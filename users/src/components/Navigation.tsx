@@ -84,6 +84,12 @@ export default function Navigation() {
               Pricing
             </button>
             <button
+              onClick={() => navigate("/forum")}
+              className={`font-medium transition ${linkColor}`}
+            >
+              Forum
+            </button>
+            <button
               onClick={() => navigate("/auth/login")}
               className={`font-medium transition ${linkColor}`}
             >
@@ -122,6 +128,12 @@ export default function Navigation() {
               className="block w-full text-left py-2 text-gray-700 hover:text-green-600"
             >
               Pricing
+            </button>
+            <button
+              onClick={() => navigate("/forum")}
+              className="block w-full text-left py-2 text-gray-700 hover:text-green-600"
+            >
+              Forum
             </button>
             <button
               onClick={() => navigate("/auth/login")}

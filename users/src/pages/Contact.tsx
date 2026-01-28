@@ -19,6 +19,7 @@ import {
   Twitter,
   Instagram
 } from "lucide-react";
+import { FaTiktok } from "react-icons/fa";
 
 // --- START: PLACEHOLDER UI COMPONENTS (Simulating external dependencies like shadcn/ui) ---
 
@@ -33,6 +34,7 @@ const useToast = () => {
     return {
         toast: ({ title, description, variant }: ToastParams) => {
             console.log(`[TOAST - ${variant || 'default'}] ${title}: ${description}`);
+            // In a real browser context, you might alert or set a temporary state to show a banner
         }
     };
 };
@@ -65,13 +67,13 @@ const Button: React.FC<ButtonProps> = ({
     // Color logic: Green (default) and Blue (accent)
     let variantStyle = '';
     if (variant === 'default') {
-        variantStyle = 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg hover:shadow-xl';
+        variantStyle = 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg hover:shadow-xl hover:shadow-emerald-200';
     } else if (variant === 'accent') {
-        variantStyle = 'bg-sky-600 text-white hover:bg-sky-700 shadow-lg hover:shadow-xl';
+        variantStyle = 'bg-sky-600 text-white hover:bg-sky-700 shadow-lg hover:shadow-xl hover:shadow-sky-200';
     } else if (variant === 'outline') {
-        variantStyle = 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 hover:border-emerald-500';
+        variantStyle = 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-emerald-500';
     } else {
-        variantStyle = 'bg-gray-200 text-gray-800 hover:bg-gray-300';
+        variantStyle = 'bg-gray-100 text-gray-800 hover:bg-gray-200';
     }
 
     return (
@@ -86,7 +88,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 const Input: React.FC<InputProps> = (props) => (
     <input 
-        className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+        className="flex h-11 w-full rounded-lg border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:bg-white transition-all duration-200"
         {...props} 
     />
 );
@@ -96,20 +98,20 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
 
 const Textarea: React.FC<TextareaProps> = (props) => (
     <textarea 
-        className="flex min-h-[80px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+        className="flex min-h-[120px] w-full rounded-lg border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:bg-white transition-all duration-200"
         {...props} 
     />
 );
 
 // 5. Card Components
-interface CardProps { children: React.ReactNode; className?: string; }
-const Card: React.FC<CardProps> = ({ children, className }) => (
-    <div className={`bg-white rounded-xl shadow-lg border border-gray-100 p-6 transition-all duration-500 hover:shadow-xl ${className}`}>
+interface CardProps { children: React.ReactNode; className?: string; style?: React.CSSProperties }
+const Card: React.FC<CardProps> = ({ children, className, style }) => (
+    <div style={style} className={`bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden ${className}`}>
         {children}
     </div>
 );
 const CardHeader: React.FC<CardProps> = ({ children, className }) => (
-    <div className={`flex flex-col space-y-1.5 pb-4 ${className}`}>{children}</div>
+    <div className={`flex flex-col space-y-1.5 p-6 ${className}`}>{children}</div>
 );
 const CardTitle: React.FC<CardProps> = ({ children, className }) => (
     <h3 className={`text-xl font-bold tracking-tight text-gray-900 ${className}`}>{children}</h3>
@@ -118,30 +120,35 @@ const CardDescription: React.FC<CardProps> = ({ children, className }) => (
     <p className={`text-sm text-gray-500 ${className}`}>{children}</p>
 );
 const CardContent: React.FC<CardProps> = ({ children, className }) => (
-    <div className={`p-0 ${className}`}>{children}</div>
+    <div className={`p-6 pt-0 ${className}`}>{children}</div>
 );
 
 // --- END: PLACEHOLDER UI COMPONENTS ---
 
-// Custom Animation Class (for subtle entrance)
-const ANIMATION_CLASSES = "opacity-0 translate-y-4 animate-fadeInUp fill-mode-forwards";
-
-// CSS for the custom animation (must be inline)
+// Custom Animation Styles
 const animationStyle = `
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
-.animate-fadeInUp {
-    animation-name: fadeInUp;
-    animation-duration: 0.6s;
-    animation-timing-function: ease-out;
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-14px); }
 }
-.fill-mode-forwards {
-    animation-fill-mode: forwards;
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+}
+.animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+.animate-pulseGlow {
+  animation: pulseGlow 2s infinite;
 }
 `;
-
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -151,178 +158,189 @@ const Contact: React.FC = () => {
     message: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
+    // Simulate network request
     setTimeout(() => {
       toast({
         title: "Message Sent Successfully",
         description: "Thank you for reaching out! We aim to respond within 24 hours.",
       });
       
-      setFormData({
-        name: "",
-        email: "",
-        subject: "",
-        message: ""
-      });
+      setShowSuccess(true);
+      setFormData({ name: "", email: "", subject: "", message: "" });
       setIsSubmitting(false);
+
+      // Hide success message after 5 seconds
+      setTimeout(() => setShowSuccess(false), 5000);
     }, 1500);
   };
 
-  const contactInfo = [
-    { icon: MapPin, title: "Our Location", text: "Thamel, Kathmandu, Nepal", color: "text-emerald-600" },
-    { icon: Phone, title: "Call Us (24/7 Support)", text: "+977 1 234 5678", color: "text-sky-600" },
-    { icon: Mail, title: "General Inquiries", text: "info@goalfutsal.com.np", color: "text-emerald-600" },
-    { icon: Clock, title: "Business Hours", text: "Sun - Fri: 9:00 AM - 5:00 PM", color: "text-sky-600" },
+  const contactDetails = [
+    { icon: MapPin, title: "Our Location", text: "Thamel, Kathmandu, Nepal", color: "text-emerald-600", bg: "bg-emerald-50" },
+    { icon: Phone, title: "Support Line", text: "+977 1 234 5678", color: "text-sky-600", bg: "bg-sky-50" },
+    { icon: Mail, title: "Email Us", text: "info@goalfutsal.com.np", color: "text-emerald-600", bg: "bg-emerald-50" },
+    { icon: Clock, title: "Open Hours", text: "Sun - Fri: 9am - 9pm", color: "text-sky-600", bg: "bg-sky-50" },
   ];
 
   return (
-    <>
-    <div className="flex flex-col min-h-screen bg-gray-50 font-sans">
-      {/* Inject Custom CSS for animation */}
+    <div className="flex flex-col min-h-screen bg-gray-50 font-sans relative overflow-x-hidden">
       <style>{animationStyle}</style>
 
-      {/* Placeholder for imported Header component */}
+      {/* Decorative Background Elements */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-gradient-to-r from-emerald-100/50 to-sky-100/50 blur-3xl animate-float" />
+        <div className="absolute top-[20%] right-[-5%] w-[30%] h-[30%] rounded-full bg-sky-100/40 blur-3xl animate-float" style={{ animationDelay: "2s" }} />
+      </div>
+
       <Header />
       
-      <main className="flex-1 container mx-auto px-4 py-16 pt-32">
-        <div className="max-w-6xl mx-auto">
+      <main className="flex-1 container mx-auto px-4 py-12 pt-24 relative z-10">
+        <div className="max-w-6xl mx-auto space-y-16">
 
-          {/* Hero/Title Section with Animation */}
-          <div className={`text-center mb-16 ${ANIMATION_CLASSES}`} style={{animationDelay: '0.1s'}}>
-            <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
-              Get in Touch with AllFutsal
+          {/* 1. Hero Section */}
+          <div className="text-center space-y-6 animate-fadeInUp">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-emerald-100 shadow-sm mb-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-emerald-800">We respond fast</span>
+            </div>
+            
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight">
+              Get in touch with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-sky-600">AllFutsal</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              We're here to help you with pitch bookings, partnerships, or any other query.
+            
+            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Have questions about pitch booking, technical support, or partnership opportunities? We're here to help you get back in the game.
             </p>
           </div>
-          
-          {/* Main Contact Grid: Form (2/3) and Info (1/3) */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+          {/* 2. Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            {/* 1. Contact Form */}
-            <Card className={`lg:col-span-2 p-8 shadow-2xl transition-all duration-500 hover:shadow-emerald-300/50 ${ANIMATION_CLASSES}`} style={{animationDelay: '0.3s'}}>
-              <CardHeader className="pb-6">
-                <CardTitle className="flex items-center gap-3 text-3xl font-extrabold text-emerald-600">
-                  <MessageSquare className="h-7 w-7" />
-                  Direct Inquiry Form
-                </CardTitle>
-                <CardDescription className="text-base text-gray-600">
-                  Please provide detailed information so we can assist you efficiently.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label htmlFor="name" className="text-sm font-semibold text-gray-700">
-                        Your Full Name
-                      </label>
-                      <Input
-                        id="name"
-                        name="name"
-                        placeholder="John Doe"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                      />
+            {/* Left Column: Contact Form (7 columns) */}
+            <div className="lg:col-span-7 animate-fadeInUp" style={{ animationDelay: "0.2s" }}>
+              <Card className="shadow-xl border-gray-100/80 bg-white/80 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-2xl">Send us a message</CardTitle>
+                  <CardDescription>Fill out the form below and our team will get back to you.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {showSuccess ? (
+                    <div className="flex flex-col items-center justify-center py-12 space-y-4 text-center bg-emerald-50 rounded-lg border border-emerald-100 animate-fadeInUp">
+                      <div className="h-16 w-16 bg-emerald-100 rounded-full flex items-center justify-center">
+                         <Send className="h-8 w-8 text-emerald-600" />
+                      </div>
+                      <h3 className="text-xl font-bold text-emerald-800">Message Sent!</h3>
+                      <p className="text-emerald-600 max-w-xs">We've received your inquiry and will contact you shortly.</p>
+                      <Button variant="outline" onClick={() => setShowSuccess(false)} className="mt-4">
+                        Send another message
+                      </Button>
                     </div>
-                    <div className="space-y-2">
-                      <label htmlFor="email" className="text-sm font-semibold text-gray-700">
-                        Email Address
-                      </label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        placeholder="john@example.com"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label htmlFor="subject" className="text-sm font-semibold text-gray-700">
-                      Subject
-                    </label>
-                    <Input
-                      id="subject"
-                      name="subject"
-                      placeholder="e.g., Pitch Booking Issue, Partnership Inquiry"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label htmlFor="message" className="text-sm font-semibold text-gray-700">
-                      Your Message
-                    </label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      placeholder="Describe your query in detail..."
-                      rows={6}
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full h-12 text-lg" 
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <><Loader2 className="h-5 w-5 mr-2 animate-spin" /> Submitting...</>
-                    ) : (
-                      <>
-                        <Send className="h-5 w-5 mr-2" />
-                        Send Professional Inquiry
-                      </>
-                    )}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-            
-            {/* 2. Contact Information & Socials */}
-            <div className={`space-y-6 ${ANIMATION_CLASSES}`} style={{animationDelay: '0.5s'}}>
+                  ) : (
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="space-y-2">
+                          <label htmlFor="name" className="text-sm font-medium text-gray-700">Full Name</label>
+                          <Input
+                            id="name"
+                            name="name"
+                            placeholder="e.g. Roshan Thapa"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address</label>
+                          <Input
+                            id="email"
+                            name="email"
+                            type="email"
+                            placeholder="name@example.com"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label htmlFor="subject" className="text-sm font-medium text-gray-700">Subject</label>
+                        <Input
+                          id="subject"
+                          name="subject"
+                          placeholder="How can we help you?"
+                          value={formData.subject}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label htmlFor="message" className="text-sm font-medium text-gray-700">Message</label>
+                        <Textarea
+                          id="message"
+                          name="message"
+                          placeholder="Tell us more about your inquiry..."
+                          rows={5}
+                          value={formData.message}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="pt-2">
+                        <Button type="submit" className="w-full md:w-auto min-w-[160px]" disabled={isSubmitting}>
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Sending...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="mr-2 h-4 w-4" />
+                              Send Message
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right Column: Contact Info & Socials (5 columns) */}
+            <div className="lg:col-span-5 space-y-6 animate-fadeInUp" style={{ animationDelay: "0.3s" }}>
               
-              {/* Card 1: Main Contact Details (Blue accent for contrast) */}
-              <Card className="p-6 bg-green-200 border-sky-200 hover:shadow-sky-300/50">
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center gap-3 text-2xl text-gray-900">
-                    <Building className="h-6 w-6 text-sky-600" />
-                    Office & Direct Info
+              {/* Contact Details Card */}
+              <Card className="bg-gradient-to-br from-white to-gray-50 border-gray-100 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building className="h-5 w-5 text-sky-600" />
+                    Contact Information
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {contactInfo.map((item, index) => (
-                    <div 
-                      key={index} 
-                      className={`flex gap-4 p-3 rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:translate-y-[-2px] border border-gray-100`} 
-                    >
-                      <item.icon className={`h-5 w-5 shrink-0 ${item.color}`} />
+                <CardContent className="grid gap-4">
+                  {contactDetails.map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-4 p-3 rounded-xl hover:bg-white hover:shadow-md transition-all duration-300 border border-transparent hover:border-gray-100">
+                      <div className={`p-3 rounded-lg ${item.bg}`}>
+                        <item.icon className={`h-5 w-5 ${item.color}`} />
+                      </div>
                       <div>
-                        <h3 className="font-semibold text-gray-800 text-base">{item.title}</h3>
+                        <p className="text-sm font-semibold text-gray-900">{item.title}</p>
                         <p className="text-sm text-gray-600">{item.text}</p>
                       </div>
                     </div>
@@ -330,77 +348,68 @@ const Contact: React.FC = () => {
                 </CardContent>
               </Card>
 
-              {/* Card 2: Social Media/Community (Black accent) */}
-              <Card className="p-6 bg-gray-900 text-white border-gray-700 hover:shadow-gray-700/50">
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center gap-3 text-2xl ">
-                    <Users className="h-6 w-6 text-emerald-400" />
-                    Connect with Us
+              {/* Social Media Card */}
+              <Card className="bg-gray-900 text-white border-gray-800 shadow-xl overflow-hidden relative">
+                {/* Abstract decorative circle */}
+                <div className="absolute -right-10 -bottom-10 h-32 w-32 bg-emerald-500/20 rounded-full blur-2xl" />
+                
+                <CardHeader>
+                  <CardTitle className="text-black flex items-center gap-2">
+                    <Users className="h-5 w-5 text-green-500" />
+                    Join the Community
                   </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Follow us for updates, tournament news, and venue highlights.
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-gray-700">
-                    Follow us for real-time updates on pitch availability and events.
-                  </p>
-                  <div className="flex gap-4">
-                    <Button variant="accent" size="icon" className="hover:scale-110">
-                      <Facebook className="h-5 w-5" />
-                    </Button>
-                    <Button variant="accent" size="icon" className="hover:scale-110">
-                      <Twitter className="h-5 w-5" />
-                    </Button>
-                    <Button variant="accent" size="icon" className="hover:scale-110">
-                      <Instagram className="h-5 w-5" />
-                    </Button>
-                  </div>
+                <CardContent className="flex gap-4 relative z-10">
+                   <a href="#" className="bg-gray-800 p-3 rounded-lg hover:bg-[#1877F2] transition-colors duration-300 group">
+                      <Facebook className="h-5 w-5 text-gray-300 group-hover:text-white" />
+                   </a>
+                   <a href="#" className="bg-gray-800 p-3 rounded-lg hover:bg-[#1DA1F2] transition-colors duration-300 group">
+                      <Twitter className="h-5 w-5 text-gray-300 group-hover:text-white" />
+                   </a>
+                   <a href="#" className="bg-gray-800 p-3 rounded-lg hover:bg-[#E1306C] transition-colors duration-300 group">
+                      <Instagram className="h-5 w-5 text-gray-300 group-hover:text-white" />
+                   </a>
+                   <a href="#" className="bg-gray-800 p-3 rounded-lg hover:bg-[#E1306C] transition-colors duration-300 group">
+                      <FaTiktok className="h-5 w-5 text-gray-300 group-hover:text-white" />
+                   </a>
+                   
                 </CardContent>
               </Card>
             </div>
           </div>
-          
-          {/* FAQ Section - Below the main content */}
-          <div className={`mt-16 ${ANIMATION_CLASSES}`} style={{animationDelay: '0.8s'}}>
-            <Card className="bg-white p-8">
-                <CardHeader className="text-center pb-6">
-                  <CardTitle className="text-3xl font-extrabold text-sky-600 flex items-center justify-center gap-3">
-                    <HelpCircle className="h-7 w-7" />
-                    Frequently Asked Questions
-                  </CardTitle>
-                  <CardDescription className="text-base">Quick answers to common queries about booking and facilities.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 transition-all duration-300 hover:shadow-md">
-                            <h3 className="font-semibold text-lg text-gray-900 mb-1">How do I book a futsal pitch?</h3>
-                            <p className="text-gray-600 text-sm">
-                              Simply browse available facilities on our homepage, choose your desired time slot, and proceed to secure your reservation online.
-                            </p>
-                        </div>
-                        
-                        <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 transition-all duration-300 hover:shadow-md">
-                            <h3 className="font-semibold text-lg text-gray-900 mb-1">What is your cancellation policy?</h3>
-                            <p className="text-gray-600 text-sm">
-                              Bookings can be cancelled up to 24 hours prior to the scheduled time for a full refund. Cancellations within 24 hours may incur a penalty fee.
-                            </p>
-                        </div>
-                        
-                        <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 transition-all duration-300 hover:shadow-md">
-                            <h3 className="font-semibold text-lg text-gray-900 mb-1">How do I become a facility partner?</h3>
-                            <p className="text-gray-600 text-sm">
-                              Please email our dedicated partnerships team at <b className="text-emerald-600">partners@Allfutsal.com.np</b> with details about your facility.
-                            </p>
-                        </div>
+
+          {/* 3. FAQ Section */}
+          <div className="animate-fadeInUp" style={{ animationDelay: "0.4s" }}>
+             <div className="text-center mb-10">
+                <h2 className="text-3xl font-bold text-gray-900">Frequently Asked Questions</h2>
+                <p className="text-gray-500 mt-2">Quick answers to common questions.</p>
+             </div>
+             
+             <div className="grid md:grid-cols-3 gap-6">
+                {[
+                  { q: "How do I book a pitch?", a: "Simply log in, search for your preferred venue, select a time slot, and proceed to payment." },
+                  { q: "Can I cancel my booking?", a: "Yes, cancellations made 24 hours prior to the match time are eligible for a full refund." },
+                  { q: "Do you offer memberships?", a: "Some venues offer membership cards directly through our platform for discounted rates." },
+                ].map((faq, i) => (
+                  <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div className="h-10 w-10 bg-sky-50 rounded-full flex items-center justify-center mb-4">
+                      <HelpCircle className="h-5 w-5 text-sky-600" />
                     </div>
-                </CardContent>
-            </Card>
+                    <h3 className="font-bold text-gray-900 mb-2">{faq.q}</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">{faq.a}</p>
+                  </div>
+                ))}
+             </div>
           </div>
+
         </div>
       </main>
       
-      {/* Placeholder for imported Footer component */}
       <Footer />
     </div>
-    </>
   );
 };
 

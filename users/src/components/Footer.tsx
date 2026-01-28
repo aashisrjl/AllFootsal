@@ -9,11 +9,13 @@ import {
   Linkedin,
 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,6 +120,14 @@ export default function Footer() {
                   className="text-slate-300/80 hover:text-emerald-300 transition"
                 >
                   FAQ
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => navigate("/forum")}
+                  className="text-slate-300/80 hover:text-emerald-300 transition"
+                >
+                  Forum
                 </button>
               </li>
             </ul>

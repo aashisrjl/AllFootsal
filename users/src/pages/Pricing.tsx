@@ -217,6 +217,7 @@ const Pricing: React.FC = () => {
     const plan = ownerPlans[0]; // Access the single Standard plan
 
     return (
+        <>
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50 text-gray-900 font-sans relative overflow-hidden">
             {styleElement}
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -235,10 +236,10 @@ const Pricing: React.FC = () => {
                         <div className="space-y-6">
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 shadow-lg border border-emerald-100 backdrop-blur">
                                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulseGlow" />
-                                <span className="text-sm font-semibold text-emerald-700">Built for futsal owners & players</span>
+                                <span className="text-sm font-semibold text-emerald-700 ">Built for futsal owners & players</span>
                             </div>
                             <h1 className="text-5xl sm:text-6xl font-extrabold leading-tight tracking-tight">
-                                Pricing that gets you <span className="text-transparent bg-clip-text gradient-shift">booked fast</span>.
+                                Pricing that gets you <span className="text-transparent bg-clip-text gradient-shift text-white rounded-lg mt-6">booked fast</span>.
                             </h1>
                             <p className="text-xl text-gray-600 max-w-2xl">
                                 Launch a digital-ready futsal venue with payments, analytics, and bookings in minutes. No hidden fees—just pick the duration that matches your ambition.
@@ -390,7 +391,7 @@ const Pricing: React.FC = () => {
                             </div>
                             <div className="relative mt-10 text-center">
                                 <Button 
-                                    className="w-full md:w-2/3 h-14 text-xl font-extrabold bg-white text-emerald-600 hover:bg-slate-100 shadow-2xl"
+                                    className="w-full md:w-2/3 h-14 text-xl font-extrabold bg-slate-400  text-emerald-600 hover:bg-slate-200 shadow-2xl"
                                     variant="default"
                                     onClick={() => {Navigate("/auth/register")}}
                                 >
@@ -422,8 +423,9 @@ const Pricing: React.FC = () => {
                 </div>
             </main>
 
-            <Footer />
         </div>
+            <Footer />
+            </>
     );
 };
 
