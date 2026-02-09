@@ -20,7 +20,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 sequelize
   .authenticate()
   .then(() => {
-    console.log("CONNECTED!!");
+    console.log("DATABASE CONNECTED!!");
   })
   .catch((err) => {
     console.log("Error" + err);
@@ -32,6 +32,10 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 // //relations can be defined here
+db.User = require("./user/userModel")(sequelize, DataTypes);
+db.Footsal = require("./footsal/footsalModel")(sequelize, DataTypes);
+db.Subscription = require("./footsal/subscriptionModel")(sequelize, DataTypes);
+db.Analytics = require("./footsal/analyticsModel")(sequelize, DataTypes);
 
 // db.User = require("./user/userModel")(sequelize, DataTypes);
 // db.Footsal = require("./footsal/footsalModel")(sequelize, DataTypes);
@@ -46,7 +50,6 @@ db.sequelize = sequelize;
 // db.Analytics.belongsTo(db.Footsal, {foreignKey: "footsal_id"});
 
 // // Sync database - use 'npm run migrate' to sync schema changes
-
 
 
 

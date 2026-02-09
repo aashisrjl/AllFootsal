@@ -6,8 +6,8 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
-const { users } = require("./models/index");
-const { footsal } = require("./models/index");
+// const { users } = require("./models/index");
+// const { footsal } = require("./models/index");
 
 // Middleware
 app.use(helmet());
@@ -57,6 +57,6 @@ app.use('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Footsal Backend Server running on port ${PORT}`);
-  console.log(`📊 Health check available at http://localhost:${PORT}/health`);
+  console.log(`Footsal Backend Server running on port ${PORT}`);
+  console.log(` Health check available at http://localhost:${PORT}/health`);
 });
