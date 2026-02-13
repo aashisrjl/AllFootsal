@@ -1,7 +1,7 @@
 const { redisClient } = require('../../config/redisConfig');
 const sendEmail = require('../../services/mail/sendEmail');
 
-const sendOtp = async (email, otp) => {
+const sendOtp = async (email, otp, subject, text) => {
     try {
         // Store OTP in Redis with a 5-minute expiration
         await redisClient.setEx(`otp:${email}`, 300, otp);
@@ -11,8 +11,8 @@ const sendOtp = async (email, otp) => {
         await sendEmail({
             option: {
                 to: email,
-                subject: 'Your OTP Code for Footsal Registration',
-                text: `Your OTP code is ${otp} Expires in 5 minutes.`
+                subject: subject || 'Your OTP Code for Footsal Registration',
+                text: text || `Your OTP code is ${otp} Expires in 5 minutes.`
             }
         });
         return true;

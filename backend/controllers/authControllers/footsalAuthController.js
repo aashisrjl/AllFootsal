@@ -1,6 +1,7 @@
 const { FOOTSAL_PASSWORD_SALT_ROUNDS } = process.env;
 const { redisClient } = require("../../config/redisConfig");
 const footsal = require("../../models/footsal/footsalModel");
+const createTenantTables = require("../../models/footsal_tanents/createTenantTables");
 const user = require("../../models/user/userModel");
 const { generateOTP } = require("../../utils/otpGenerator/otpGenerator");
 const sendOtp = require("../../utils/sendOtp/sendOtp");
@@ -31,6 +32,9 @@ module.exports = RegisterFootsal = async (req, res) => {
     });
   }
 
+  futsal_code = Number(generateOTP(6));
+  console.log("Generated Futsal Code:", futsal_code);
+
   // hash password
   const hashedPassword = await bcrypt.hash(
     password,
@@ -39,6 +43,7 @@ module.exports = RegisterFootsal = async (req, res) => {
 
   // create new footsal
   const newFootsal = await footsal.create({
+    footsalCode: futsal_code,
     footsalName,
     ownerName,
     email,
@@ -46,17 +51,25 @@ module.exports = RegisterFootsal = async (req, res) => {
     phoneNumber,
   });
 
+  await createTenantTables(newFootsal.footsalCode);
+
   // Generate otp code
   const otp = generateOTP();
+  redisClient.setEx(`footsal:otp:${email}`, 300, otp); // 5 min
   console.log(`Generated OTP for ${email}: ${otp}`);
 
   // send otp to footsal email
-  sendOtp(email, otp); // set for redis for 5 min also send email
+  sendOtp(email=email,
+     otp=otp, 
+     subject="Your OTP Code for Footsal Registration", 
+     text=`Your OTP code is ${otp} Expires in 5 minutes.`
+    );
 
   return res.status(201).json({
     message: "Footsal registered successfully",
     footsal: {
       id: newFootsal.id,
+      footsalCode: newFootsal.footsalCode,
       footsalName: newFootsal.footsalName,
       ownerName: newFootsal.ownerName,
       email: newFootsal.email,

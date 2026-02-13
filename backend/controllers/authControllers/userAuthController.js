@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const { User } = require("../../models/index");
 const generateJwt = require("../../utils/jwt/generateJwt");
+const sendOtp = require("../../utils/sendOtp/sendOtp");
 const {USER_PASSWORD_SALT_ROUNDS, USER_TOKEN_EXPIRATION, JWT_SECRET_USER } = process.env;
 
 // register user api
@@ -45,6 +46,7 @@ module.exports = userRegister = async (req, res) => {
     password: hashedPassword,
     phoneNumber,
   });
+  
 
   if (newUser) {
     res.status(201).json({
@@ -58,6 +60,17 @@ module.exports = userRegister = async (req, res) => {
         is_active: newUser.is_active,
       },
     });
+
+    // Generate otp code and send email with redis
+    otp = generateOTP();
+    redisClient.setEx(`otp:${email}`, 300, otp); // 5 min
+    console.log(`Generated OTP for ${email}: ${otp}`);
+    sendOtp(email=email,
+      otp=otp,
+      subject="Your OTP Code for User Registration", 
+      text=`Your OTP code is ${otp} Expires in 5 minutes.`
+    );
+
   } else {
     res.status(400).json({
       error: "Invalid user data",
