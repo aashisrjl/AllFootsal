@@ -1,4 +1,4 @@
-require('dotenv').config({ path: 'docker-mariadb-pma/.env' });
+require('dotenv').config();
 
 module.exports = {
     DB:  process.env.DB_NAME,

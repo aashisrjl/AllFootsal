@@ -6,14 +6,17 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
-// const { users } = require("./models/index");
-// const { footsal } = require("./models/index");
+
 
 // Middleware
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// redis connection
+const { connectRedis } = require("./config/redisConfig");
+connectRedis();
 
 // Rate limiting
 const limiter = rateLimit({
@@ -28,7 +31,7 @@ app.use('/api/auth', authRoutes);
 
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
@@ -45,11 +48,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.get("/",(req,res) =>{
-  res.status(200).json({
-    message: "Welcome to the Footsal Backend API"
-  })
-})
 
 // 404 handler
 app.use('*', (req, res) => {

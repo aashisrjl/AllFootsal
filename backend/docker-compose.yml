@@ -5,11 +5,9 @@ services:
     restart: always
     # Load app/env vars solely from docker-mariadb-pma/.env
     env_file:
-      - ./docker-mariadb-pma/.env
+      - .env
     ports:
       - "${PORT:-3000}:3000"
-    depends_on:
-      - mariadb
     networks:
       - services
 
@@ -18,7 +16,4 @@ networks:
     external: true
     name: ${PROJECT:-futsal}
     driver: bridge
-
-volumes:
-  mariadb_data:
 

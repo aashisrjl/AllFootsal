@@ -1,10 +1,10 @@
-const bcrypt = require("bcrypt");
 const { FOOTSAL_PASSWORD_SALT_ROUNDS } = process.env;
 const { redisClient } = require("../../config/redisConfig");
 const footsal = require("../../models/footsal/footsalModel");
 const user = require("../../models/user/userModel");
 const { generateOTP } = require("../../utils/otpGenerator/otpGenerator");
 const sendOtp = require("../../utils/sendOtp/sendOtp");
+const bcrypt = require("bcryptjs");
 
 module.exports = RegisterFootsal = async (req, res) => {
   const { footsalName, ownerName, email, password, phoneNumber } = req.body;
@@ -64,53 +64,5 @@ module.exports = RegisterFootsal = async (req, res) => {
       isActive: newFootsal.isActive,
       isVerified: newFootsal.isVerified,
     },
-  });
-};
-
-//verify footsal by otp
-module.exports = VerifyOtp = async (req, res) => {
-  const { email } = req.params;
-  const { otp } = req.body;
-
-  // check if footsal exists
-  const footsalData = await footsal.findOne({
-    where: { email },
-  });
-  const userData = await user.findOne({
-    where: { email },
-  });
-
-  // verify otp using redis
-  const isValidOtp = await redisClient.get(`otp:${email}`);
-  console.log(`Retrieved OTP for ${email} from Redis: ${isValidOtp}`);
-
-  if (otp !== isValidOtp) {
-    return res.status(400).json({
-      error: "Invalid OTP",
-    });
-  }
-
-  if (footsalData && !userData) {
-    footsalData.isVerified = true;
-    await footsalData.save();
-    // delete otp from redis
-    await redisClient.del(`otp:${email}`);
-    return res.status(200).json({
-      message: "Footsal verified successfully",
-    });
-  }
-
-  if (userData && !footsalData) {
-    userData.isVerified = true;
-    await userData.save();
-    // delete otp from redis
-    await redisClient.del(`otp:${email}`);
-    return res.status(200).json({
-      message: "User verified successfully",
-    });
-  }
-
-  return res.status(404).json({
-    error: "User not found",
   });
 };

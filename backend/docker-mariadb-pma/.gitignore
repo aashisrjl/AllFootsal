@@ -1,7 +1,0 @@
-.env*
-.env
-.idea/
-!.env.example
-**/*.sql
-.DS_Store
-./.env

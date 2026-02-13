@@ -37,17 +37,13 @@ db.Footsal = require("./footsal/footsalModel")(sequelize, DataTypes);
 db.Subscription = require("./footsal/subscriptionModel")(sequelize, DataTypes);
 db.Analytics = require("./footsal/analyticsModel")(sequelize, DataTypes);
 
-// db.User = require("./user/userModel")(sequelize, DataTypes);
-// db.Footsal = require("./footsal/footsalModel")(sequelize, DataTypes);
-// db.Subscription = require("./footsal/subscriptionModel")(sequelize, DataTypes);
-// db.Analytics = require("./footsal/analyticsModel")(sequelize, DataTypes);
 
 // // Define relationships
-// db.Footsal.hasOne(db.Subscription, {foreignKey: "footsal_id", as: "subscription"});
-// db.Subscription.belongsTo(db.Footsal, {foreignKey: "footsal_id"});
+db.Footsal.hasOne(db.Subscription, {foreignKey: "footsal_id", as: "subscription"});
+db.Subscription.belongsTo(db.Footsal, {foreignKey: "footsal_id"});
 
-// db.Footsal.hasOne(db.Analytics, {foreignKey: "footsal_id", as: "analytics"});
-// db.Analytics.belongsTo(db.Footsal, {foreignKey: "footsal_id"});
+db.Footsal.hasOne(db.Analytics, {foreignKey: "footsal_id", as: "analytics"});
+db.Analytics.belongsTo(db.Footsal, {foreignKey: "footsal_id"});
 
 // // Sync database - use 'npm run migrate' to sync schema changes
 
