@@ -1,5 +1,6 @@
 const { FOOTSAL_PASSWORD_SALT_ROUNDS } = process.env;
 const { redisClient } = require("../../config/redisConfig");
+const { Footsal } = require("../../models");
 const footsal = require("../../models/footsal/footsalModel");
 const createTenantTables = require("../../models/footsal_tanents/createTenantTables");
 const user = require("../../models/user/userModel");
@@ -17,10 +18,10 @@ module.exports = RegisterFootsal = async (req, res) => {
   }
 
   // check if footsal already exists
-  const footsalEmail = await footsal.findOne({
+  const footsalEmail = await Footsal.findOne({
     where: { email },
   });
-  const footsalPhone = await footsal.findOne({
+  const footsalPhone = await Footsal.findOne({
     where: { phoneNumber },
   });
 
@@ -38,11 +39,11 @@ module.exports = RegisterFootsal = async (req, res) => {
   // hash password
   const hashedPassword = await bcrypt.hash(
     password,
-    FOOTSAL_PASSWORD_SALT_ROUNDS
+    parseInt(FOOTSAL_PASSWORD_SALT_ROUNDS)
   );
 
   // create new footsal
-  const newFootsal = await footsal.create({
+  const newFootsal = await Footsal.create({
     footsalCode: futsal_code,
     footsalName,
     ownerName,
@@ -51,7 +52,7 @@ module.exports = RegisterFootsal = async (req, res) => {
     phoneNumber,
   });
 
-  await createTenantTables(newFootsal.footsalCode);
+  // await createTenantTables(newFootsal.footsalCode);
 
   // Generate otp code
   const otp = generateOTP();
@@ -59,8 +60,8 @@ module.exports = RegisterFootsal = async (req, res) => {
   console.log(`Generated OTP for ${email}: ${otp}`);
 
   // send otp to footsal email
-  sendOtp(email=email,
-     otp=otp, 
+  sendOtp(email,
+     otp, 
      subject="Your OTP Code for Footsal Registration", 
      text=`Your OTP code is ${otp} Expires in 5 minutes.`
     );
