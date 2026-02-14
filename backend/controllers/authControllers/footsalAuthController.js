@@ -1,6 +1,6 @@
 const { FOOTSAL_PASSWORD_SALT_ROUNDS } = process.env;
 const { redisClient } = require("../../config/redisConfig");
-const { Footsal } = require("../../models");
+const { Footsal, User } = require("../../models");
 const footsal = require("../../models/footsal/footsalModel");
 const createTenantTables = require("../../models/footsal_tanents/createTenantTables");
 const user = require("../../models/user/userModel");
@@ -14,6 +14,15 @@ module.exports = RegisterFootsal = async (req, res) => {
   if (!footsalName || !ownerName || !email || !password || !phoneNumber) {
     return res.status(400).json({
       error: "Please provide all required fields",
+    });
+  }
+
+  const user = await User.findOne({
+    where:{email}
+  })
+  if(user){
+    return res.status(400).json({
+      error: "User with this email already exists",
     });
   }
 
@@ -55,7 +64,7 @@ module.exports = RegisterFootsal = async (req, res) => {
   // await createTenantTables(newFootsal.footsalCode);
 
   // Generate otp code
-  const otp = generateOTP();
+  const otp = generateOTP(6);
   redisClient.setEx(`footsal:otp:${email}`, 300, otp); // 5 min
   console.log(`Generated OTP for ${email}: ${otp}`);
 

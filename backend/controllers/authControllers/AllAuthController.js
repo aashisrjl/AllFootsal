@@ -48,7 +48,15 @@ const Login = async (req, res) => {
   const user = userEmail || userPhone;
   const footsalUser = footsalEmail || footsalPhone;
 
+
   if (user && !footsalUser) {
+    const isVerified = user.isVerified;
+    if (!isVerified) {
+      return res.status(400).json({
+        error: "User is not verified. Please verify your account first.",
+      });
+    }
+
     // check password
     const isMatch = await bcryptjs.compare(password, user.password);
 
@@ -64,6 +72,8 @@ const Login = async (req, res) => {
       JWT_SECRET_USER || "fallback-user-secret",
       TOKEN_EXPIRATION_USER || "30d",
     );
+    user.is_active = true;
+    await user.save();
 
     // Return user data and token
     return res.status(200).json({
@@ -81,8 +91,16 @@ const Login = async (req, res) => {
   }
 
   if (footsalUser && !user) {
+
+    // check if footsal is verified
+    const isVerified = footsalUser.isVerified;
+    if (!isVerified) {
+      return res.status(400).json({
+        error: "Footsal is not verified. Please verify your account first.",
+      });
+    }
     // Check password
-    const isMatch = await bcrypt.compare(password, footsalUser.password);
+    const isMatch = await bcryptjs.compare(password, footsalUser.password);
 
     if (!isMatch) {
       return res.status(400).json({
@@ -102,7 +120,9 @@ const Login = async (req, res) => {
       TOKEN_EXPIRATION_FUTSAL || "7d",
     );
 
-    // Return user data and token
+    footsalUser.is_active = true;
+    await footsalUser.save();
+
     return res.status(200).json({
       message: "Login successful",
       futsaltoken,
@@ -183,6 +203,7 @@ const VerifyOtp = async (req, res) => {
 const Logout = async (req, res) => {
   //token
   const token = req.headers.authorization?.split(" ")[1];
+  userId = req.user.id;
 
   if (!token) {
     return res.status(400).json({
@@ -191,6 +212,8 @@ const Logout = async (req, res) => {
   }
   //logout clear cookies
   res.clearCookie("token");
+  await User.update({ is_active: false }, { where: { id: userId } });
+  await Footsal.update({ is_active: false }, { where: { id: userId } });
 
   return res.status(200).json({
     message: "Logout successful",

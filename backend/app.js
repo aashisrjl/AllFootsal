@@ -3,9 +3,13 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
+const passport = require('./utils/passport/passport'); 
 
 const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
+
+// Routes
+const authRoutes = require("./routes/authRoutes/authRoute");
 
 
 // Middleware
@@ -13,6 +17,7 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
 
 // redis connection
 const { connectRedis } = require("./config/redisConfig");
@@ -25,9 +30,8 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Routes
-const authRoutes = require("./routes/authRoutes/authRoute");
-app.use('/', authRoutes);
+// call routes
+app.use(authRoutes);
 
 
 // Health check
