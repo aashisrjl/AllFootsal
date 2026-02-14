@@ -49,7 +49,7 @@ db.Analytics.belongsTo(db.Footsal, {foreignKey: "footsal_id"});
 
 
 
-db.sequelize.sync({ alter: false, force: true }).then(() => {
+db.sequelize.sync({ alter: false, force: false }).then(() => {
   console.log("✅ Database connection established! Use 'npm run migrate' to sync schema changes.");
 });
 

@@ -27,7 +27,7 @@ app.use(limiter);
 
 // Routes
 const authRoutes = require("./routes/authRoutes/authRoute");
-app.use('/api/auth', authRoutes);
+app.use('/', authRoutes);
 
 
 // Health check

@@ -2,18 +2,18 @@ const express = require('express');
 const router = express.Router();
 const userRegister = require("./../../controllers/authControllers/userAuthController")
 const Login = require("./../../controllers/authControllers/userAuthController")
-const RegisterFootsal = require("./../../controllers/authControllers/footsalAuthController")
+const RegisterFootsal = require("./../../controllers/authControllers/footsalAuthController");
+const { VerifyOtp } = require('../../controllers/authControllers/AllAuthController');
 
-
+const BASE_URL = '/api/auth';
 // User ======================================
-router.post('/user/register', userRegister);
-router.post('/user/login', Login);
-
+router.post(`${BASE_URL}/user/register`, userRegister);
+router.post(`${BASE_URL}/user/login`, Login);
 
 // Footsal ===================================
-router.post('/footsal/register', RegisterFootsal);
-router.post('/footsal/login', Login);
+router.post(`${BASE_URL}/footsal/register`, RegisterFootsal);
+router.post(`${BASE_URL}/footsal/login`, Login);
 
-
+router.post(`${BASE_URL}/verify-otp/`, VerifyOtp);
 module.exports = router;
 

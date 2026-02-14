@@ -2,12 +2,12 @@ const bcryptjs = require("bcryptjs");
 const generateJwt = require("../../utils/jwt/generateJwt");
 const { redisClient } = require("../../config/redisConfig");
 const { User } = require("../../models/index");
-const { footsal } = require("../../models/index");
+const { Footsal } = require("../../models/index");
 const { TOKEN_EXPIRATION_USER, JWT_SECRET_USER, TOKEN_EXPIRATION_FUTSAL, JWT_SECRET_FUTSAL} = process.env;
 
 
 //Login user api
-module.exports = Login = async(req,res)=>{
+const  Login = async(req,res)=>{
     const {email, password , phoneNumber} = req.body;
     //login using email or phone number
     
@@ -28,11 +28,11 @@ module.exports = Login = async(req,res)=>{
 
     const user = userEmail || userPhone;
 
-    const footsalEmail = await footsal.findOne({
+    const footsalEmail = await Footsal.findOne({
       where:{email}
     })
 
-    const footsalPhone = await footsal.findOne({
+    const footsalPhone = await Footsal.findOne({
       where:{phoneNumber}
     })
 
@@ -113,16 +113,20 @@ module.exports = userGoogleLogin_Register = async(req,res)=>{
 }
 
 //verify footsal by otp
-module.exports = VerifyOtp = async (req, res) => {
-  const { email } = req.params;
+const VerifyOtp = async (req, res) => {
+  console.log("verigyig otp:")
+  const { email } = req.query;
   const { otp } = req.body;
 
+  console.log(email)
+  console.log(otp)
+
   // check if footsal exists
-  const footsalData = await footsal.findOne({
-    where: { email },
+  const footsalData = await Footsal.findOne({
+    where: { email }
   });
-  const userData = await user.findOne({
-    where: { email },
+  const userData = await User.findOne({
+    where: { email }
   });
 
   // verify otp using redis
@@ -160,8 +164,9 @@ module.exports = VerifyOtp = async (req, res) => {
   });
 };
 
+
 //Logout user and futsal api
-module.exports = Logout = async(req,res)=>{
+const  Logout = async(req,res)=>{
     //token
     const token = req.headers.authorization?.split(" ")[1];
 
@@ -178,3 +183,10 @@ module.exports = Logout = async(req,res)=>{
     });
 
 }
+
+module.exports = AllAuthController = {
+  VerifyOtp,
+  Logout,
+  Login
+}
+
