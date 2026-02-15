@@ -75,6 +75,12 @@ const Login = async (req, res) => {
     user.is_active = true;
     await user.save();
 
+    res.cookie("utoken", usertoken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
     // Return user data and token
     return res.status(200).json({
       message: "Login successful",
@@ -123,6 +129,14 @@ const Login = async (req, res) => {
     footsalUser.is_active = true;
     await footsalUser.save();
 
+    // Set cookie
+    res.cookie("ftoken", futsaltoken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    // Return footsal data and token
     return res.status(200).json({
       message: "Login successful",
       futsaltoken,

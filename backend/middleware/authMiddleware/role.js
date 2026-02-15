@@ -11,3 +11,5 @@ function auth(requiredRole) {
     next();
   };
 }
+
+module.exports = auth;

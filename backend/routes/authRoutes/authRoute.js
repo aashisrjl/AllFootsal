@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const passport = require("../../config/passportConfig");
 const userRegister = require("./../../controllers/authControllers/userAuthController");
 const RegisterFootsal = require("./../../controllers/authControllers/footsalAuthController");
 const { VerifyOtp, Login, Logout } = require("../../controllers/authControllers/AllAuthController");
 const generateJwt = require("../../utils/jwt/generateJwt");
+const passport = require("passport");
+const {NODE_ENV} = process.env;
 
 const BASE_URL = "/api/auth";
 
@@ -27,8 +28,13 @@ router.get(
       process.env.JWT_SECRET_USER,
       process.env.TOKEN_EXPIRATION_USER
     );
+    res.cookie("utoken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
 
-    const redirectUrl = `${process.env.USER_FRONTEND_URL}/auth/success?token=${token}`;
+    const redirectUrl = `${process.env.USER_FRONTEND_URL}`;
     res.redirect(redirectUrl);
   }
 );
@@ -48,8 +54,13 @@ router.get(
       process.env.JWT_SECRET_USER,
       process.env.TOKEN_EXPIRATION_USER
     );
+    res.cookie("utoken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
 
-    const redirectUrl = `${process.env.USER_FRONTEND_URL}/auth/success?token=${token}`;
+    const redirectUrl = `${process.env.USER_FRONTEND_URL}`;
     res.redirect(redirectUrl);
   }
 );
@@ -78,8 +89,13 @@ router.get(
       process.env.JWT_SECRET_FUTSAL,
       process.env.TOKEN_EXPIRATION_FUTSAL
     );
-
-    const redirectUrl = `${process.env.FUTSAL_FRONTEND_URL}/auth/success?token=${token}`;
+    res.cookie("ftoken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+      const redirectUrl = `${process.env.FUTSAL_FRONTEND_URL}`;
+    // const redirectUrl = `${process.env.FUTSAL_FRONTEND_URL}/auth/success?token=${token}`;
     res.redirect(redirectUrl);
   }
 );

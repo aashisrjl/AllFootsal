@@ -3,7 +3,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
-const passport = require('./utils/passport/passport'); 
+const passport = require('./utils/passport/passport');
+
 
 const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
