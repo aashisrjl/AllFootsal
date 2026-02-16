@@ -61,7 +61,7 @@ module.exports = RegisterFootsal = async (req, res) => {
     phoneNumber,
   });
 
-  // await createTenantTables(newFootsal.footsalCode);
+  await createTenantTables(newFootsal.footsalCode);
 
   // Generate otp code
   const otp = generateOTP(6);

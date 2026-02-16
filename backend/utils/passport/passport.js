@@ -68,6 +68,13 @@ passport.use(
         if (!futsal.googleId) {
           futsal.googleId = profile.id;
           futsal.isVerified = true;
+          futsal.isActive = true;
+          await futsal.save();
+        }
+        if(futsal.googleId){
+          futsal.googleId= profile.id;
+          futsal.isVerified = true;
+          futsal.isActive = true;
           await futsal.save();
         }
 
