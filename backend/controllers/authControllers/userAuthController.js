@@ -90,3 +90,42 @@ module.exports = userRegister = async (req, res) => {
   }
 };
 
+//forgot password api
+module.exports = forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({
+      error: "Email is required",
+    });
+  }
+
+  const user = await User.findOne({
+    where: { email }
+  });
+
+  const footsal = await Footsal.findOne({
+    where: { email }
+  });
+
+  if (!user && !footsal) {
+    return res.status(404).json({
+      error: "User with this email does not exist",
+    });
+  }
+
+  // Generate otp code and send email with redis
+  otp = generateOTP(6);
+  redisClient.setEx(`otp:${email}`, 300, otp); // 5 min
+  console.log(`Generated OTP for ${email}: ${otp}`);
+  sendOtp(email,
+    otp,
+    subject="Your OTP Code for Password Reset of AllFutsal", 
+    text=`Your OTP code is ${otp} Expires in 2 minutes.`
+  );
+  console.log("mail send");
+
+  res.status(200).json({
+    message: "OTP sent to email for password reset",
+  });
+};

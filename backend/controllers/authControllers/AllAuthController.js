@@ -3,6 +3,8 @@ const generateJwt = require("../../utils/jwt/generateJwt");
 const { redisClient } = require("../../config/redisConfig");
 const { User } = require("../../models/index");
 const { Footsal } = require("../../models/index");
+const { generateOTP } = require("../../utils/otpGenerator/otpGenerator");
+const sendOtp = require("../../utils/sendOtp/sendOtp");
 const {
   TOKEN_EXPIRATION_USER,
   JWT_SECRET_USER,
@@ -152,14 +154,6 @@ const Login = async (req, res) => {
   }
 };
 
-// google login user api
-module.exports = userGoogleLogin_Register = async (req, res) => {
-  // to be implemented
-  res.status(200).json({
-    message: "Google login successful",
-  });
-};
-
 //verify footsal by otp
 const VerifyOtp = async (req, res) => {
   console.log("verigyig otp:");
@@ -234,8 +228,106 @@ const Logout = async (req, res) => {
   });
 };
 
+//forgot password api
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({
+      error: "Email is required",
+    });
+  }
+
+  const user = await User.findOne({
+    where: { email }
+  });
+
+  const footsal = await Footsal.findOne({
+    where: { email }
+  });
+
+  if (!user && !footsal) {
+    return res.status(404).json({
+      error: "User with this email does not exist",
+    });
+  }
+
+
+  // Generate otp code and send email with redis
+  otp = generateOTP(6);
+  redisClient.setEx(`otp:${email}`, 300, otp); // 5 min
+  console.log(`Generated OTP for ${email}: ${otp}`);
+  sendOtp(email,
+    otp,
+    subject="Your OTP Code for Password Reset of AllFutsal", 
+    text=`Your OTP code is ${otp} Expires in 2 minutes.`
+  );
+  console.log("mail send");
+
+  res.status(200).json({
+    message: "OTP sent to email for password reset",
+  });
+};
+
+
+// change password api
+const changePassword = async(req,res)=>{
+  const {email , otp, newPassword, cNewPassword} = req.body;
+  
+  if (!email || !otp || !newPassword || !cNewPassword) {
+    return res.status(400).json({
+      error: "All fields are required",
+    });
+  }
+  if (newPassword !== cNewPassword) {
+    return res.status(400).json({
+      error: "New password and confirm new password do not match",
+    });
+  }
+
+  // verify otp using redis
+  const isValidOtp = await redisClient.get(`otp:${email}`);
+  console.log(`Retrieved OTP for ${email} from Redis: ${isValidOtp}`);
+
+  if (otp !== isValidOtp) {
+    return res.status(400).json({
+      error: "Invalid OTP",
+    });
+  }
+
+  // delete otp from redis
+  await redisClient.del(`otp:${email}`);
+
+  // update password
+  const user = await User.findOne({
+    where: { email }
+  });
+
+  const footsal = await Footsal.findOne({
+    where: { email }
+  });
+
+  if (user) {
+    user.password = await bcrypt.hash(newPassword, parseInt(USER_PASSWORD_SALT_ROUNDS));
+    await user.save();
+  }
+
+  if (footsal) {
+    footsal.password = await bcrypt.hash(newPassword, parseInt(FOOTSAL_PASSWORD_SALT_ROUNDS));
+    await footsal.save();
+  }
+
+  res.status(200).json({
+    message: "Password changed successfully",
+  });
+}
+
+
+
 module.exports = AllAuthController = {
   VerifyOtp,
   Logout,
   Login,
+  forgotPassword,
+  changePassword
 };
