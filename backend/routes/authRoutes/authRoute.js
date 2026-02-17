@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userRegister = require("./../../controllers/authControllers/userAuthController");
 const RegisterFootsal = require("./../../controllers/authControllers/footsalAuthController");
-const { VerifyOtp, Login, Logout } = require("../../controllers/authControllers/AllAuthController");
+const { VerifyOtp, Login, Logout, forgotPassword, changeForgotPassword } = require("../../controllers/authControllers/AllAuthController");
 const generateJwt = require("../../utils/jwt/generateJwt");
 const passport = require("passport");
 const {NODE_ENV} = process.env;
@@ -12,6 +12,10 @@ const BASE_URL = "/api/auth";
 // User ======================================
 router.post(`${BASE_URL}/user/register`, userRegister);
 router.post(`${BASE_URL}/user/login`, Login);
+
+// forgot password
+router.post(`${BASE_URL}/forgot-password`, forgotPassword);
+router.post(`${BASE_URL}/change-forgot-password`, changeForgotPassword);
 
 // Google User OAuth
 router.get(

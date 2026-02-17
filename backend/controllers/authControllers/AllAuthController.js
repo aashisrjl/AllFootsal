@@ -10,6 +10,8 @@ const {
   JWT_SECRET_USER,
   TOKEN_EXPIRATION_FUTSAL,
   JWT_SECRET_FUTSAL,
+  USER_PASSWORD_SALT_ROUNDS,
+  FUTSAL_PASSWORD_SALT_ROUNDS
 } = process.env;
 
 //Login user api
@@ -122,7 +124,7 @@ const Login = async (req, res) => {
         id: footsalUser.id,
         email: footsalUser.email,
         role: footsalUser.role,
-        code: footsalUser.code,
+        code: footsalUser.futsalCode,
       },
       JWT_SECRET_FUTSAL || "fallback-futsal-secret",
       TOKEN_EXPIRATION_FUTSAL || "7d",
@@ -151,177 +153,219 @@ const Login = async (req, res) => {
         is_active: footsalUser.is_active,
       },
     });
+
   }
+  return res.status(400).json({
+  error: "Invalid email/phone number or password",
+});
 };
 
 //verify footsal by otp
 const VerifyOtp = async (req, res) => {
-  console.log("verigyig otp:");
-  const { email } = req.query;
-  const { otp } = req.body;
+  try {
+    const { email } = req.query;
+    const { otp } = req.body;
 
-  console.log(email);
-  console.log(otp);
+    if (!email || !otp) {
+      return res.status(400).json({ error: "Email and OTP are required" });
+    }
 
-  // check if footsal exists
-  const footsalData = await Footsal.findOne({
-    where: { email },
-  });
+    // Try both possible Redis keys
+    let storedData =
+      await redisClient.get(`otp:${email}`) ||
+      await redisClient.get(`footsal:otp:${email}`);
 
-  const userData = await User.findOne({
-    where: { email },
-  });
+    if (!storedData) {
+      return res.status(400).json({
+        error: "OTP expired or not found",
+      });
+    }
 
-  // verify otp using redis
-  const isValidOtp = await redisClient.get(`otp:${email}`);
-  console.log(`Retrieved OTP for ${email} from Redis: ${isValidOtp}`);
+    const parsedData = JSON.parse(storedData);
 
-  if (otp !== isValidOtp) {
-    return res.status(400).json({
-      error: "Invalid OTP",
-    });
-  }
+    if (otp !== parsedData.otp) {
+      return res.status(400).json({
+        error: "Invalid OTP",
+      });
+    }
 
-  if (footsalData && !userData) {
-    footsalData.isVerified = true;
-    await footsalData.save();
-    // delete otp from redis
+    const user = await User.findOne({ where: { email } });
+    const footsal = await Footsal.findOne({ where: { email } });
+
+    if (user) {
+      user.isVerified = true;
+      await user.save();
+    }
+
+    if (footsal) {
+      footsal.isVerified = true;
+      await footsal.save();
+    }
+
+    // Delete both possible keys
     await redisClient.del(`otp:${email}`);
-    return res.status(200).json({
-      message: "Footsal verified successfully",
-    });
-  }
+    await redisClient.del(`footsal:otp:${email}`);
 
-  if (userData && !footsalData) {
-    userData.isVerified = true;
-    await userData.save();
-    // delete otp from redis
-    await redisClient.del(`otp:${email}`);
     return res.status(200).json({
-      message: "User verified successfully",
+      message: "Account verified successfully",
     });
-  }
 
-  return res.status(404).json({
-    error: "User not found",
-  });
+  } catch (error) {
+    console.error("Verify OTP error:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 };
 
-//Logout user and futsal api
+//logout api
 const Logout = async (req, res) => {
-  //token
-  const token = req.headers.authorization?.split(" ")[1];
-  userId = req.user.id;
+  try {
+    const utoken = req.cookies.utoken;
+    const ftoken = req.cookies.ftoken;
 
-  if (!token) {
-    return res.status(400).json({
-      error: "No token provided",
+    const userId = req.user?.id;
+    const futsalId = req.futsal?.id;
+
+    if (utoken && userId) {
+      await User.update(
+        { is_active: false },
+        { where: { id: userId } }
+      );
+      res.clearCookie("utoken");
+    }
+
+    if (ftoken && futsalId) {
+      await Footsal.update(
+        { is_active: false },
+        { where: { id: futsalId } }
+      );
+      res.clearCookie("ftoken");
+    }
+
+    return res.status(200).json({
+      message: "Logout successful",
+    });
+
+  } catch (error) {
+    console.error("Logout error:", error);
+    return res.status(500).json({
+      error: "Internal server error",
     });
   }
-  //logout clear cookies
-  res.clearCookie("token");
-  await User.update({ is_active: false }, { where: { id: userId } });
-  await Footsal.update({ is_active: false }, { where: { id: userId } });
-
-  return res.status(200).json({
-    message: "Logout successful",
-  });
 };
 
-//forgot password api
+// forgot password
 const forgotPassword = async (req, res) => {
-  const { email } = req.body;
+  try {
+    const { email } = req.body;
 
-  if (!email) {
-    return res.status(400).json({
-      error: "Email is required",
+    if (!email) {
+      return res.status(400).json({
+        error: "Email is required",
+      });
+    }
+
+    const user = await User.findOne({ where: { email } });
+    const footsal = await Footsal.findOne({ where: { email } });
+
+    // Always return success (prevent email enumeration)
+    if (!user && !footsal) {
+      return res.status(200).json({
+        message: "If an account exists, OTP has been sent",
+      });
+    }
+
+    const otp = generateOTP(6);
+
+    await redisClient.setEx(
+      `otp:reset:${email}`,
+      300, // 5 minutes
+      otp
+    );
+
+    await sendOtp(
+      email,
+      otp,
+      "Your OTP Code for Password Reset - AllFutsal",
+      `Your OTP code is ${otp}. It expires in 5 minutes.`
+    );
+
+    return res.status(200).json({
+      message: "If an account exists, OTP has been sent",
+    });
+
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    return res.status(500).json({
+      error: "Internal server error",
     });
   }
-
-  const user = await User.findOne({
-    where: { email }
-  });
-
-  const footsal = await Footsal.findOne({
-    where: { email }
-  });
-
-  if (!user && !footsal) {
-    return res.status(404).json({
-      error: "User with this email does not exist",
-    });
-  }
-
-
-  // Generate otp code and send email with redis
-  otp = generateOTP(6);
-  redisClient.setEx(`otp:${email}`, 300, otp); // 5 min
-  console.log(`Generated OTP for ${email}: ${otp}`);
-  sendOtp(email,
-    otp,
-    subject="Your OTP Code for Password Reset of AllFutsal", 
-    text=`Your OTP code is ${otp} Expires in 2 minutes.`
-  );
-  console.log("mail send");
-
-  res.status(200).json({
-    message: "OTP sent to email for password reset",
-  });
 };
 
+//forgot password
+const changeForgotPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword, cNewPassword } = req.body;
 
-// change password api
-const changePassword = async(req,res)=>{
-  const {email , otp, newPassword, cNewPassword} = req.body;
-  
-  if (!email || !otp || !newPassword || !cNewPassword) {
-    return res.status(400).json({
-      error: "All fields are required",
+    if (!email || !otp || !newPassword || !cNewPassword) {
+      return res.status(400).json({
+        error: "All fields are required",
+      });
+    }
+
+    if (newPassword !== cNewPassword) {
+      return res.status(400).json({
+        error: "Passwords do not match",
+      });
+    }
+
+    // Get OTP from Redis
+    const storedOtp = await redisClient.get(`otp:reset:${email}`);
+
+    if (!storedOtp) {
+      return res.status(400).json({
+        error: "OTP expired or invalid",
+      });
+    }
+
+    if (otp !== storedOtp) {
+      return res.status(400).json({
+        error: "Invalid OTP",
+      });
+    }
+
+    // Delete OTP after successful verification
+    await redisClient.del(`otp:reset:${email}`);
+
+    const user = await User.findOne({ where: { email } });
+    const footsal = await Footsal.findOne({ where: { email } });
+
+    if (user) {
+      user.password = await bcryptjs.hash(
+        newPassword,
+        parseInt(USER_PASSWORD_SALT_ROUNDS)
+      );
+      user.is_active = false; 
+      await user.save();
+    } else if (footsal) {
+      footsal.password = await bcryptjs.hash(
+        newPassword,
+        parseInt(FUTSAL_PASSWORD_SALT_ROUNDS)
+      );
+      footsal.is_active = false;
+      await footsal.save();
+    }
+
+    return res.status(200).json({
+      message: "Password changed successfully",
+    });
+
+  } catch (error) {
+    console.error("Change forgot password error:", error);
+    return res.status(500).json({
+      error: "Internal server error",
     });
   }
-  if (newPassword !== cNewPassword) {
-    return res.status(400).json({
-      error: "New password and confirm new password do not match",
-    });
-  }
-
-  // verify otp using redis
-  const isValidOtp = await redisClient.get(`otp:${email}`);
-  console.log(`Retrieved OTP for ${email} from Redis: ${isValidOtp}`);
-
-  if (otp !== isValidOtp) {
-    return res.status(400).json({
-      error: "Invalid OTP",
-    });
-  }
-
-  // delete otp from redis
-  await redisClient.del(`otp:${email}`);
-
-  // update password
-  const user = await User.findOne({
-    where: { email }
-  });
-
-  const footsal = await Footsal.findOne({
-    where: { email }
-  });
-
-  if (user) {
-    user.password = await bcrypt.hash(newPassword, parseInt(USER_PASSWORD_SALT_ROUNDS));
-    await user.save();
-  }
-
-  if (footsal) {
-    footsal.password = await bcrypt.hash(newPassword, parseInt(FOOTSAL_PASSWORD_SALT_ROUNDS));
-    await footsal.save();
-  }
-
-  res.status(200).json({
-    message: "Password changed successfully",
-  });
-}
-
+};
 
 
 module.exports = AllAuthController = {
@@ -329,5 +373,5 @@ module.exports = AllAuthController = {
   Logout,
   Login,
   forgotPassword,
-  changePassword
+  changeForgotPassword
 };

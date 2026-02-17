@@ -1,9 +1,7 @@
 const { FOOTSAL_PASSWORD_SALT_ROUNDS } = process.env;
 const { redisClient } = require("../../config/redisConfig");
 const { Footsal, User } = require("../../models");
-const footsal = require("../../models/footsal/footsalModel");
 const createTenantTables = require("../../models/footsal_tanents/createTenantTables");
-const user = require("../../models/user/userModel");
 const { generateOTP } = require("../../utils/otpGenerator/otpGenerator");
 const sendOtp = require("../../utils/sendOtp/sendOtp");
 const bcrypt = require("bcryptjs");
@@ -61,11 +59,16 @@ module.exports = RegisterFootsal = async (req, res) => {
     phoneNumber,
   });
 
-  await createTenantTables(newFootsal.footsalCode);
+  // await createTenantTables(newFootsal.footsalCode);
 
   // Generate otp code
   const otp = generateOTP(6);
-  redisClient.setEx(`footsal:otp:${email}`, 300, otp); // 5 min
+  const otpData={
+    email,
+    otp,
+    type:"footsal_registration"
+  }
+  redisClient.setEx(`footsal:otp:${email}`, 300, JSON.stringify(otpData)); // 5 min
   console.log(`Generated OTP for ${email}: ${otp}`);
 
   // send otp to footsal email
