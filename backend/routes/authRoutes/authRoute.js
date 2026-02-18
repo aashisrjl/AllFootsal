@@ -9,17 +9,29 @@ const {NODE_ENV} = process.env;
 
 const BASE_URL = "/api/auth";
 
+
 // User ======================================
-router.post(`${BASE_URL}/user/register`, userRegister);
-router.post(`${BASE_URL}/user/login`, Login);
+router.post(
+  `${BASE_URL}/user/register`, // #swagger.tags = ['Auth/User']
+   userRegister); 
 
-// forgot password
-router.post(`${BASE_URL}/forgot-password`, forgotPassword);
-router.post(`${BASE_URL}/change-forgot-password`, changeForgotPassword);
+router.post(
+  `${BASE_URL}/user/login`  // #swagger.tags = ['Auth/User']
+  , Login);
 
-// Google User OAuth
+router.post(
+  `${BASE_URL}/forgot-password`,// #swagger.tags = ['Auth']
+   forgotPassword); 
+
+
+router.post(
+  `${BASE_URL}/change-forgot-password`, // #swagger.tags = ['Auth']
+   changeForgotPassword);
+
+
+
 router.get(
-  `${BASE_URL}/user/google`,
+  `${BASE_URL}/user/google`, // #swagger.tags = ['Auth/User']
   passport.authenticate("google-user", { scope: ["profile", "email"], session: false })
 );
 
@@ -43,9 +55,9 @@ router.get(
   }
 );
 
-// Facebook User OAuth
+
 router.get(
-  `${BASE_URL}/user/facebook`,
+  `${BASE_URL}/user/facebook`, // #swagger.tags = ['Auth/User']
   passport.authenticate("facebook-user", { scope: ["email"], session: false })
 );
 
@@ -69,13 +81,19 @@ router.get(
   }
 );
 
-// Futsal ===================================
-router.post(`${BASE_URL}/futsal/register`, RegisterFootsal);
-router.post(`${BASE_URL}/futsal/login`, Login);
 
-// Google Futsal OAuth
+router.post(
+  `${BASE_URL}/futsal/register`, // #swagger.tags = ['Auth/Footsal']
+  RegisterFootsal); 
+
+
+router.post(
+  `${BASE_URL}/futsal/login`,// #swagger.tags = ['Auth/Footsal']
+   Login); 
+
+
 router.get(
-  `${BASE_URL}/futsal/google`,
+  `${BASE_URL}/futsal/google`, // #swagger.tags = ['Auth/Footsal']
   passport.authenticate("google-futsal", { scope: ["profile", "email"], session: false })
 );
 
@@ -104,8 +122,14 @@ router.get(
   }
 );
 
-// Common
-router.post(`${BASE_URL}/verify-otp/`, VerifyOtp);
-router.post(`${BASE_URL}/logout`, Logout);
+
+router.post(
+  `${BASE_URL}/verify-otp/`,// #swagger.tags = ['Auth']
+  VerifyOtp);
+
+
+router.post(
+  `${BASE_URL}/logout`, // #swagger.tags = ['Auth']
+  Logout); 
 
 module.exports = router;

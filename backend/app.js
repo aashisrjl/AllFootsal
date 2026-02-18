@@ -4,6 +4,11 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 const passport = require('./utils/passport/passport');
+const swaggerUi = require('swagger-ui-express');
+const swaggerFile = require('./swagger-output.json');
+const {User, Futsal} = require("./models/index");
+
+
 
 
 const app = express();
@@ -11,6 +16,38 @@ const PORT = process.env.SERVER_PORT || 3000;
 
 // Routes
 const authRoutes = require("./routes/authRoutes/authRoute");
+
+// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+
+//super admin operation using adminjs
+const AdminJS = require('adminjs')
+const AdminJSExpress = require('@adminjs/express')
+const AdminJSSequelize = require('@adminjs/sequelize')
+
+AdminJS.registerAdapter({
+  Resource: AdminJSSequelize.Resource,
+  Database: AdminJSSequelize.Database,
+})
+
+const admin = new AdminJS({
+  resources: [User, booking, Futsal],
+  rootPath: '/admin',
+})
+
+const router = AdminJSExpress.buildAuthenticatedRouter(admin, {
+  authenticate: async (email, password) => {
+    if (email === "super@admin.com" && password === "123456") {
+      return { email }
+    }
+    return null
+  },
+  cookieName: 'admin',
+  cookiePassword: 'supersecret'
+})
+
+app.use(admin.options.rootPath, router)
 
 
 // Middleware
