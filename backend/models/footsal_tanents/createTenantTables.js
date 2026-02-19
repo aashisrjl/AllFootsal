@@ -1,21 +1,29 @@
-const sequelize = require("../index").sequelize;
-const sqlTemplates = require("./sqlTemplates");
+const db = require('../index');
 
 async function createTenantTables(footsalCode) {
-  const queries = [
-    sqlTemplates.location(footsalCode),
-    sqlTemplates.pitch(footsalCode),
-    sqlTemplates.timeslot(footsalCode),
-    sqlTemplates.booking(footsalCode),
-    sqlTemplates.payment(footsalCode),
-    sqlTemplates.rating(footsalCode),
-    sqlTemplates.contact(footsalCode),
-    sqlTemplates.analytics(footsalCode),
+  const { sequelize } = db;
+  const templates = require('./sqlTemplates');
+
+  const tableCreators = [
+    'location', 'info', 'pitch', 'timeslot',
+    'booking', 'payment', 'rating', 'contact', 'analytics'
   ];
 
-  for (const query of queries) {
-    await sequelize.query(query);
+  for (const name of tableCreators) {
+    await sequelize.query(templates[name](footsalCode));
   }
 }
 
-module.exports = createTenantTables;
+async function dropTenantTables(footsalCode) {
+  const { sequelize } = db;
+  const tables = [
+    'analytics', 'contact', 'rating', 'payment',
+    'booking', 'timeslot', 'pitch', 'info', 'location'
+  ];
+
+  for (const name of tables) {
+    await sequelize.query(`DROP TABLE IF EXISTS ${name}_${footsalCode}`);
+  }
+}
+
+module.exports = { createTenantTables, dropTenantTables };

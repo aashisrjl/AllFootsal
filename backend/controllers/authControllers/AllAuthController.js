@@ -163,16 +163,16 @@ const Login = async (req, res) => {
 //verify footsal by otp
 const VerifyOtp = async (req, res) => {
   try {
-    const { email } = req.query;
+    const email = req.query.email?.toLowerCase();
     const { otp } = req.body;
 
     if (!email || !otp) {
       return res.status(400).json({ error: "Email and OTP are required" });
     }
 
-    // Try both possible Redis keys
+    // Check both possible keys
     let storedData =
-      await redisClient.get(`otp:${email}`) ||
+      await redisClient.get(`user:otp:${email}`) ||
       await redisClient.get(`footsal:otp:${email}`);
 
     if (!storedData) {
@@ -183,7 +183,8 @@ const VerifyOtp = async (req, res) => {
 
     const parsedData = JSON.parse(storedData);
 
-    if (otp !== parsedData.otp) {
+    // Correct comparison
+    if (String(otp).trim() !== String(parsedData.otp).trim()) {
       return res.status(400).json({
         error: "Invalid OTP",
       });
@@ -195,16 +196,14 @@ const VerifyOtp = async (req, res) => {
     if (user) {
       user.isVerified = true;
       await user.save();
+      await redisClient.del(`user:otp:${email}`);
     }
 
     if (footsal) {
       footsal.isVerified = true;
       await footsal.save();
+      await redisClient.del(`footsal:otp:${email}`);
     }
-
-    // Delete both possible keys
-    await redisClient.del(`otp:${email}`);
-    await redisClient.del(`footsal:otp:${email}`);
 
     return res.status(200).json({
       message: "Account verified successfully",

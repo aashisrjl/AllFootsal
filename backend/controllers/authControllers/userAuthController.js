@@ -11,6 +11,7 @@ const { USER_PASSWORD_SALT_ROUNDS, USER_TOKEN_EXPIRATION, JWT_SECRET_USER } =
 module.exports = userRegister = async (req, res) => {
   const { username, email, password, confirmPassword, phoneNumber } = req.body;
 
+  
   // basic validation
   if (!username || !email || !phoneNumber || !password || !confirmPassword) {
     return res.status(400).json({
@@ -70,7 +71,7 @@ module.exports = userRegister = async (req, res) => {
       otp,
       type: "user_registration",
     };
-    redisClient.setEx(`otp:${email}`, 300, JSON.stringify(otpData)); // 5 min
+    redisClient.setEx(`user:otp:${email}`, 300, JSON.stringify(otpData)); // 5 min
     console.log(`Generated OTP for ${email}: ${otp}`);
     sendOtp(
       email,

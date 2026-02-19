@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: true // Google login
+      allowNull: true
     },
     phoneNumber:{
       type: DataTypes.STRING,
@@ -48,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
     isVerified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
-    }
+    },
   });
 
   return User;

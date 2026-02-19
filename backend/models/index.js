@@ -45,11 +45,8 @@ db.Subscription.belongsTo(db.Footsal, {foreignKey: "footsal_id"});
 db.Footsal.hasOne(db.Analytics, {foreignKey: "footsal_id", as: "analytics"});
 db.Analytics.belongsTo(db.Footsal, {foreignKey: "footsal_id"});
 
-// // Sync database - use 'npm run migrate' to sync schema changes
 
-
-
-db.sequelize.sync({ alter: false, force: false }).then(() => {
+db.sequelize.sync({ force: false }).then(() => {
   console.log("✅ Database connection established! Use 'npm run migrate' to sync schema changes.");
 });
 

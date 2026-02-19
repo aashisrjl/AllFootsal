@@ -2,6 +2,12 @@
 
 This is the backend server for Goal Futsal Nepal Booking, supporting user, admin, and futsal management. Built with Node.js, Express, and MariaDB, it provides RESTful APIs for booking, user management, payments, and facility administration.
 
+# to sharemy data 
+``` mysqldump -u root --no-create-info --complete-insert futsal-db \
+  users footsals footsal_analytics footsal_subscriptions \
+  > seeds/dump.sql
+```
+
 ## Features
 - User registration, authentication, and profile management
 - Admin panel for managing users, bookings, and facilities
@@ -82,7 +88,7 @@ footsal (1) ─── (*) footsal_pitches
 footsal (1) ─── (*) footsal_ratings
 footsal (1) ─── (*) footsal_bookings
 
-footsal_pitch (1) ─── (*) footsal_time_slots
+footsal_pitch (1) ─── (*) footsal_time_slots.9 ;..
 footsal_pitch (1) ─── (*) footsal_bookings
 
 user (1) ─── (*) footsal_ratings
