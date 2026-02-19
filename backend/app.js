@@ -25,29 +25,40 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 const AdminJS = require('adminjs')
 const AdminJSExpress = require('@adminjs/express')
 const AdminJSSequelize = require('@adminjs/sequelize')
+const { sequelize } = require('./models')
 
-AdminJS.registerAdapter({
-  Resource: AdminJSSequelize.Resource,
-  Database: AdminJSSequelize.Database,
-})
+AdminJS.registerAdapter(AdminJSSequelize)
 
-const admin = new AdminJS({
-  resources: [User, booking, Futsal],
+const adminJs = new AdminJS({
+  databases: [sequelize],
   rootPath: '/admin',
 })
 
-const router = AdminJSExpress.buildAuthenticatedRouter(admin, {
-  authenticate: async (email, password) => {
-    if (email === "super@admin.com" && password === "123456") {
-      return { email }
-    }
-    return null
+// const router = AdminJSExpress.buildRouter(adminJs)
+const router = AdminJSExpress.buildAuthenticatedRouter(
+  adminJs,
+  {
+    authenticate: async (email, password) => {
+      if (
+        email === process.env.ADMIN_EMAIL &&
+        password === process.env.ADMIN_PASSWORD
+      ) {
+        return { email }
+      }
+      return null
+    },
+    cookieName: 'adminjs',
+    cookiePassword: process.env.ADMIN_COOKIE_SECRET,
   },
-  cookieName: 'admin',
-  cookiePassword: 'supersecret'
-})
+  null,
+  {
+    resave: false,
+    saveUninitialized: true,
+    secret: process.env.ADMIN_COOKIE_SECRET,
+  }
+)
 
-app.use(admin.options.rootPath, router)
+app.use(adminJs.options.rootPath, router)
 
 
 // Middleware
