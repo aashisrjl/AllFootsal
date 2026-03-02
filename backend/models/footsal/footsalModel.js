@@ -1,12 +1,12 @@
 module.exports = (sequelize, DataTypes) => {
   const Footsal = sequelize.define("footsal", {
-    footsalCode: {
+    futsalCode: {
       type: DataTypes.INTEGER,
       unique: true,
       allowNull: false
     },
 
-    footsalName: {
+    futsalName: {
       type: DataTypes.STRING,
       allowNull: false
     },

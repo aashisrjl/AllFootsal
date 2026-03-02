@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const isFutsalAuntihenticated = (req, res, next) => {
+const isFutsalAuthenticated = (req, res, next) => {
   try {
     let token = req.cookies.ftoken || req.headers.authorization?.split(" ")[1];
     if (!token) {
@@ -21,4 +21,4 @@ const isFutsalAuntihenticated = (req, res, next) => {
   }
 };
 
-module.exports = isFutsalAuntihenticated;
+module.exports = isFutsalAuthenticated;

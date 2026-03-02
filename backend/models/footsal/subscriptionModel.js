@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     //   onUpdate: 'CASCADE'
     // },
     subscription_plan: {
-      type: DataTypes.ENUM("monthly", "half-yearly", "yearly"),
+      type: DataTypes.ENUM("trial","monthly", "half-yearly", "yearly"),
       defaultValue: "monthly",
     },
     subscription_start: {
@@ -27,13 +27,17 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
     status: {
-      type: DataTypes.ENUM("pending", "active", "expired", "cancelled"),
+      type: DataTypes.ENUM("trial","pending", "active", "expired", "cancelled"),
       defaultValue: "pending",
     },
     auto_renew: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    is_trial:{
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
   });
 
   return Subscription;
