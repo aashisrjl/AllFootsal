@@ -1,15 +1,15 @@
 module.exports = (sequelize, DataTypes) => {
   const Subscription = sequelize.define("footsal_subscription", {
-    // footsal_id: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: false,
-    //   references: {
-    //     model: 'footsals',
-    //     key: 'id'
-    //   },
-    //   onDelete: 'CASCADE',
-    //   onUpdate: 'CASCADE'
-    // },
+    footsal_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'footsals',
+        key: 'id'
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    },
     subscription_plan: {
       type: DataTypes.ENUM("trial","monthly", "half-yearly", "yearly"),
       defaultValue: "monthly",

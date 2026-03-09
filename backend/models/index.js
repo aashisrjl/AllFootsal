@@ -36,6 +36,7 @@ db.User = require("./user/userModel")(sequelize, DataTypes);
 db.Footsal = require("./footsal/footsalModel")(sequelize, DataTypes);
 db.Subscription = require("./footsal/subscriptionModel")(sequelize, DataTypes);
 db.Analytics = require("./footsal/analyticsModel")(sequelize, DataTypes);
+db.Payment = require("./footsal/paymentModel")(sequelize, DataTypes);
 
 
 // // Define relationships
@@ -44,6 +45,8 @@ db.Subscription.belongsTo(db.Footsal, {foreignKey: "footsal_id"});
 
 db.Footsal.hasOne(db.Analytics, {foreignKey: "footsal_id", as: "analytics"});
 db.Analytics.belongsTo(db.Footsal, {foreignKey: "footsal_id"});
+
+
 
 
 db.sequelize.sync({ force: false }).then(() => {
