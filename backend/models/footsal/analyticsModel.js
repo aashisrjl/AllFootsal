@@ -1,16 +1,16 @@
 module.exports = (sequelize, DataTypes) => {
   const Analytics = sequelize.define("footsal_analytics", {
-    // footsal_id: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: false,
-    //   primaryKey: true,
-    //   references: {
-    //     model: 'footsals',
-    //     key: 'id'
-    //   },
-    //   onDelete: 'CASCADE',
-    //   onUpdate: 'CASCADE'
-    // },
+    footsal_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      references: {
+        model: 'footsals',
+        key: 'id'
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    },
     avg_rating: {
       type: DataTypes.FLOAT,
       defaultValue: 0,
