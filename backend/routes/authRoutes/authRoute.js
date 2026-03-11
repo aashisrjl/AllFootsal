@@ -12,31 +12,31 @@ const {NODE_ENV,BASE_URL} = process.env;
 
 // User ======================================
 router.post(
-  `${BASE_URL}/auth/user/register`, // #swagger.tags = ['Auth/User']
+  `/auth/user/register`, // #swagger.tags = ['Auth/User']
    userRegister); 
 
 router.post(
-  `${BASE_URL}/auth/user/login`  // #swagger.tags = ['Auth/User']
+  `/auth/user/login`  // #swagger.tags = ['Auth/User']
   , Login);
 
 router.post(
-  `${BASE_URL}/auth/forgot-password`,// #swagger.tags = ['Auth']
+  `/auth/forgot-password`,// #swagger.tags = ['Auth']
    forgotPassword); 
 
 
 router.post(
-  `${BASE_URL}/auth/change-forgot-password`, // #swagger.tags = ['Auth']
+  `/auth/change-forgot-password`, // #swagger.tags = ['Auth']
    changeForgotPassword);
 
 
 
 router.get(
-  `${BASE_URL}/auth/user/google`, // #swagger.tags = ['Auth/User']
+  `/auth/user/google`, // #swagger.tags = ['Auth/User']
   passport.authenticate("google-user", { scope: ["profile", "email"], session: false })
 );
 
 router.get(
-  `${BASE_URL}/auth/user/google/callback`,
+  `/auth/user/google/callback`,
   passport.authenticate("google-user", { session: false, failureRedirect: "/login" }),
   (req, res) => {
     const token = generateJwt(
@@ -57,12 +57,12 @@ router.get(
 
 
 router.get(
-  `${BASE_URL}/auth/user/facebook`, // #swagger.tags = ['Auth/User']
+  `/auth/user/facebook`, // #swagger.tags = ['Auth/User']
   passport.authenticate("facebook-user", { scope: ["email"], session: false })
 );
 
 router.get(
-  `${BASE_URL}/auth/user/facebook/callback`,
+  `/auth/user/facebook/callback`,
   passport.authenticate("facebook-user", { session: false, failureRedirect: "/login" }),
   (req, res) => {
     const token = generateJwt(
@@ -83,22 +83,22 @@ router.get(
 
 
 router.post(
-  `${BASE_URL}/auth/futsal/register`, // #swagger.tags = ['Auth/Footsal']
+  `/auth/futsal/register`, // #swagger.tags = ['Auth/Footsal']
   RegisterFootsal); 
 
 
 router.post(
-  `${BASE_URL}/auth/futsal/login`,// #swagger.tags = ['Auth/Footsal']
+  `/auth/futsal/login`,// #swagger.tags = ['Auth/Footsal']
    Login); 
 
 
 router.get(
-  `${BASE_URL}/auth/futsal/google`, // #swagger.tags = ['Auth/Footsal']
+  `/auth/futsal/google`, // #swagger.tags = ['Auth/Footsal']
   passport.authenticate("google-futsal", { scope: ["profile", "email"], session: false })
 );
 
 router.get(
-  `${BASE_URL}/auth/futsal/google/callback`,
+  `/auth/futsal/google/callback`,
   passport.authenticate("google-futsal", { session: false, failureRedirect: "/login" }),
   (req, res) => {
     const token = generateJwt(
@@ -124,12 +124,12 @@ router.get(
 
 
 router.post(
-  `${BASE_URL}/auth/verify-otp/`,// #swagger.tags = ['Auth']
+  `/auth/verify-otp/`,// #swagger.tags = ['Auth']
   VerifyOtp);
 
 
 router.post(
-  `${BASE_URL}/auth/logout`, // #swagger.tags = ['Auth']
+  `/auth/logout`, // #swagger.tags = ['Auth']
   Logout); 
 
 module.exports = router;

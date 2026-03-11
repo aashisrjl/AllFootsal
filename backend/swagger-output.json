@@ -28,7 +28,7 @@
         }
       }
     },
-    "/api/auth/user/register": {
+    "/auth/user/register": {
       "post": {
         "tags": [
           "Auth/User"
@@ -80,7 +80,7 @@
         }
       }
     },
-    "/api/auth/user/login": {
+    "/auth/user/login": {
       "post": {
         "tags": [
           "Auth/User"
@@ -116,7 +116,7 @@
         }
       }
     },
-    "/api/auth/forgot-password": {
+    "/auth/forgot-password": {
       "post": {
         "tags": [
           "Auth"
@@ -149,7 +149,7 @@
         }
       }
     },
-    "/api/auth/change-forgot-password": {
+    "/auth/change-forgot-password": {
       "post": {
         "tags": [
           "Auth"
@@ -191,7 +191,7 @@
         }
       }
     },
-    "/api/auth/user/google": {
+    "/auth/user/google": {
       "get": {
         "tags": [
           "Auth/User"
@@ -204,7 +204,7 @@
         }
       }
     },
-    "/api/auth/user/google/callback": {
+    "/auth/user/google/callback": {
       "get": {
         "description": "",
         "responses": {
@@ -214,7 +214,7 @@
         }
       }
     },
-    "/api/auth/user/facebook": {
+    "/auth/user/facebook": {
       "get": {
         "tags": [
           "Auth/User"
@@ -227,7 +227,7 @@
         }
       }
     },
-    "/api/auth/user/facebook/callback": {
+    "/auth/user/facebook/callback": {
       "get": {
         "description": "",
         "responses": {
@@ -237,7 +237,7 @@
         }
       }
     },
-    "/api/auth/futsal/register": {
+    "/auth/futsal/register": {
       "post": {
         "tags": [
           "Auth/Footsal"
@@ -279,7 +279,7 @@
         }
       }
     },
-    "/api/auth/futsal/login": {
+    "/auth/futsal/login": {
       "post": {
         "tags": [
           "Auth/Footsal"
@@ -315,7 +315,7 @@
         }
       }
     },
-    "/api/auth/futsal/google": {
+    "/auth/futsal/google": {
       "get": {
         "tags": [
           "Auth/Footsal"
@@ -328,7 +328,7 @@
         }
       }
     },
-    "/api/auth/futsal/google/callback": {
+    "/auth/futsal/google/callback": {
       "get": {
         "description": "",
         "responses": {
@@ -338,7 +338,7 @@
         }
       }
     },
-    "/api/auth/verify-otp/": {
+    "/auth/verify-otp/": {
       "post": {
         "tags": [
           "Auth"
@@ -376,7 +376,7 @@
         }
       }
     },
-    "/api/auth/logout": {
+    "/auth/logout": {
       "post": {
         "tags": [
           "Auth"
@@ -385,6 +385,378 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/subscription": {
+      "get": {
+        "tags": [
+          "Futsal/Subscription"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/subscription/create": {
+      "post": {
+        "tags": [
+          "Futsal/Subscription"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "subscription_plan": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/subscription/update": {
+      "put": {
+        "tags": [
+          "Futsal/Subscription"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "subscription_plan": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/subscription/trial": {
+      "post": {
+        "tags": [
+          "Futsal/Subscription"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/subscription/cancel": {
+      "patch": {
+        "tags": [
+          "Futsal/Subscription"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/subscription/renew": {
+      "post": {
+        "tags": [
+          "Futsal/Subscription"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/payment-create": {
+      "post": {
+        "tags": [
+          "Futsal/Payment"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "payment_method": {
+                  "example": "any"
+                },
+                "remarks": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/payment": {
+      "get": {
+        "tags": [
+          "Futsal/Payment"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/payment-verify": {
+      "post": {
+        "tags": [
+          "Futsal/Payment"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "purchase_order_id": {
+                  "example": "any"
+                },
+                "status": {
+                  "example": "any"
+                },
+                "payment_method": {
+                  "example": "any"
+                },
+                "transaction_uuid": {
+                  "example": "any"
+                },
+                "data": {
+                  "example": "any"
+                },
+                "pidx": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
