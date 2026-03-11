@@ -188,9 +188,18 @@ const addTrialSubscription = async (req, res) => {
     });
   }
 };
+const cancelFutsalSubscription = async (req,res)=>{
+
+}
+
+const editFutsalSubscription = async (req,res)=>{
+
+}
 
 module.exports = {
   getFutsalSubscription,
   addFutsalSubscription,
   addTrialSubscription,
+  cancelFutsalSubscription,
+  editFutsalSubscription
 };
