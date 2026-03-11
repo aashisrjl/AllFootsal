@@ -32,8 +32,13 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM("pending", "completed", "failed", "refunded"),
       defaultValue: "pending",
     },
+    payment_date: {
+  type: DataTypes.DATE,
+  defaultValue: DataTypes.NOW
+},
     transaction_id: {
       type: DataTypes.STRING,
+      unique: true,
       allowNull: true,
     },
     remarks: {

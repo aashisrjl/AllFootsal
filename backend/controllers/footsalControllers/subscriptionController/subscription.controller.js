@@ -188,18 +188,178 @@ const addTrialSubscription = async (req, res) => {
     });
   }
 };
-const cancelFutsalSubscription = async (req,res)=>{
 
-}
+const editFutsalSubscription = async (req, res) => {
+  try {
+    const futsalId = req.futsalId;
+    const { subscription_plan } = req.body;
 
-const editFutsalSubscription = async (req,res)=>{
+    if (!subscription_plan) {
+      return res.status(400).json({
+        success: false,
+        message: "Subscription plan is required",
+      });
+    }
 
-}
+    const subscription = await Subscription.findOne({
+      where: { footsal_id: futsalId },
+    });
+
+    if (!subscription) {
+      return res.status(404).json({
+        success: false,
+        message: "Subscription not found",
+      });
+    }
+
+    const now = new Date();
+    let endDate = new Date(now);
+    let price = 0.0;
+
+    if (subscription_plan === "monthly") {
+      endDate.setDate(endDate.getDate() + 30);
+      price = MONTHLY_SUBSCRIPTION_PRICE;
+    } else if (subscription_plan === "half-yearly") {
+      endDate.setDate(endDate.getDate() + 180);
+      price = HALF_YEARLY_SUBSCRIPTION_PRICE;
+    } else if (subscription_plan === "yearly") {
+      endDate.setDate(endDate.getDate() + 360);
+      price = YEARLY_SUBSCRIPTION_PRICE;
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid subscription plan",
+      });
+    }
+
+    subscription.subscription_plan = subscription_plan;
+    subscription.subscription_start = now;
+    subscription.subscription_end = endDate;
+    subscription.subscription_fee = price;
+    subscription.status = "pending";
+
+    await subscription.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Subscription updated successfully",
+      data: subscription,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+const cancelFutsalSubscription = async (req, res) => {
+  try {
+    const futsalId = req.futsalId;
+
+    const subscription = await Subscription.findOne({
+      where: { footsal_id: futsalId },
+    });
+
+    if (!subscription) {
+      return res.status(404).json({
+        success: false,
+        message: "Subscription not found",
+      });
+    }
+
+    if (subscription.status === "cancelled") {
+      return res.status(409).json({
+        success: false,
+        message: "Subscription already cancelled",
+      });
+    }
+
+    subscription.status = "cancelled";
+
+    await subscription.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Subscription cancelled successfully",
+      data: subscription,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+const renewFutsalSubscription = async (req, res) => {
+  try {
+    const futsalId = req.futsalId;
+
+    const subscription = await Subscription.findOne({
+      where: { footsal_id: futsalId },
+    });
+
+    if (!subscription) {
+      return res.status(404).json({
+        success: false,
+        message: "Subscription not found",
+      });
+    }
+
+    if (subscription.subscription_plan === "trial") {
+      return res.status(400).json({
+        success: false,
+        message: "Trial subscription cannot be renewed",
+      });
+    }
+
+    const now = new Date();
+    let endDate = new Date(now);
+    let price = 0;
+
+    if (subscription.subscription_plan === "monthly") {
+      endDate.setDate(endDate.getDate() + 30);
+      price = MONTHLY_SUBSCRIPTION_PRICE;
+    } 
+    else if (subscription.subscription_plan === "half-yearly") {
+      endDate.setDate(endDate.getDate() + 180);
+      price = HALF_YEARLY_SUBSCRIPTION_PRICE;
+    } 
+    else if (subscription.subscription_plan === "yearly") {
+      endDate.setDate(endDate.getDate() + 360);
+      price = YEARLY_SUBSCRIPTION_PRICE;
+    }
+
+    subscription.subscription_start = now;
+    subscription.subscription_end = endDate;
+    subscription.subscription_fee = price;
+    subscription.status = "pending"; // usually pending until payment verification
+
+    await subscription.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Subscription renewed successfully",
+      data: subscription,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
 
 module.exports = {
   getFutsalSubscription,
   addFutsalSubscription,
   addTrialSubscription,
   cancelFutsalSubscription,
-  editFutsalSubscription
+  editFutsalSubscription,
+  renewFutsalSubscription
 };

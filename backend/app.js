@@ -6,16 +6,17 @@ require('dotenv').config();
 const passport = require('./utils/passport/passport');
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger-output.json');
-const {User, Futsal} = require("./models/index");
+const {User, Futsal,Subscription,Payment} = require("./models/index");
 
 
-
-
+const BASE_URL = process.env.BASE_URL
 const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
 
 // Routes
 const authRoutes = require("./routes/authRoutes/authRoute");
+const subscriptionRoutes = require("./routes/footsalRoutes/subscription.route")
+const paymentRoutes = require("./routes/footsalRoutes/payment.route")
 
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
@@ -80,7 +81,9 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // call routes
-app.use(authRoutes);
+app.use(BASE_URL, authRoutes);
+app.use(BASE_URL, subscriptionRoutes)
+app.use(BASE_URL, paymentRoutes)
 
 
 // Health check
