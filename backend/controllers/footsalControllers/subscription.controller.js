@@ -1,4 +1,4 @@
-const { Subscription } = require("../../../models");
+const { Subscription } = require("../../models");
 const {
   YEARLY_SUBSCRIPTION_PRICE,
   HALF_YEARLY_SUBSCRIPTION_PRICE,

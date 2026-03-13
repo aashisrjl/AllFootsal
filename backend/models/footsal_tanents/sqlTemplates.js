@@ -38,7 +38,6 @@ module.exports = {
       booking_date DATE NOT NULL,
       amount DECIMAL(10,2) NOT NULL,
       status ENUM('pending','confirmed','cancelled','completed') DEFAULT 'pending',
-      payment_status ENUM('pending','paid','failed','refunded') DEFAULT 'pending',
       notes TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -49,19 +48,24 @@ module.exports = {
     ) ENGINE=InnoDB;
   `,
 
-  payment: (code) => `
-    CREATE TABLE IF NOT EXISTS payment_${code} (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      booking_id INT NOT NULL,
-      payment_method ENUM('cash','qr','online','bank_transfer') NOT NULL,
-      transaction_id VARCHAR(255),
-      amount DECIMAL(10,2) NOT NULL,
-      status ENUM('pending','success','failed','refunded') DEFAULT 'pending',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      INDEX idx_booking (booking_id),
-      INDEX idx_status (status)
-    ) ENGINE=InnoDB;
-  `,
+payment: (code) => `
+  CREATE TABLE IF NOT EXISTS payment_${code} (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_id INT NOT NULL,
+    gateway ENUM('cash','khalti','esewa','bank_transfer') NOT NULL,
+    provider_order_id VARCHAR(255),
+    provider_txn_id VARCHAR(255),
+    amount DECIMAL(10,2) NOT NULL,
+    status ENUM('pending','success','failed','refunded') DEFAULT 'pending',
+    raw_response JSON,
+    verified_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_booking (booking_id),
+    INDEX idx_status (status),
+    UNIQUE KEY uq_provider_txn (gateway, provider_txn_id)
+  ) ENGINE=InnoDB;
+`,
 
   rating: (code) => `
     CREATE TABLE IF NOT EXISTS rating_${code} (
@@ -125,6 +129,18 @@ module.exports = {
       additional_info TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;
+  `,
+  media: (code) => `
+    CREATE TABLE IF NOT EXISTS media_${code} (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      type ENUM('image','video') NOT NULL,
+      category ENUM('home','pitch','facility','event','other') NOT NULL,
+      url VARCHAR(500) NOT NULL,
+      description TEXT,
+      pitch_id INT,
+      foreign key (pitch_id) references pitch_${code}(id) on delete set null,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;
   `
 };
