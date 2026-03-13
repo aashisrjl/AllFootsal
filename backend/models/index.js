@@ -38,7 +38,7 @@ db.Footsal = require("./footsal/footsalModel")(sequelize, DataTypes);
 db.Subscription = require("./footsal/subscriptionModel")(sequelize, DataTypes);
 db.Analytics = require("./footsal/analyticsModel")(sequelize, DataTypes);
 db.Payment = require("./footsal/paymentModel")(sequelize, DataTypes);
-
+db.FutsalPaymentConfig = require("./footsal/paymentConfigModel")(sequelize, DataTypes);
 
 // Futsal → Subscription
 db.Footsal.hasOne(db.Subscription, {
@@ -77,6 +77,16 @@ db.Footsal.hasMany(db.Payment, {
 });
 
 db.Payment.belongsTo(db.Footsal, {
+  foreignKey: "footsal_id"
+});
+
+// Futsal → Payment Config
+db.Footsal.hasOne(db.FutsalPaymentConfig, {
+  foreignKey: "footsal_id",
+  as: "paymentConfig"
+});
+
+db.FutsalPaymentConfig.belongsTo(db.Footsal, {
   foreignKey: "footsal_id"
 });
 

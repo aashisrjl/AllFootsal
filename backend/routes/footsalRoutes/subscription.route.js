@@ -1,6 +1,6 @@
 const express = require('express');
 const isFutsalAuthenticated = require('../../middleware/authMiddleware/futsalAuthenticated');
-const { addFutsalSubscription, getFutsalSubscription, addTrialSubscription, editFutsalSubscription, cancelFutsalSubscription, renewFutsalSubscription } = require('../../controllers/footsalControllers/subscriptionController/subscription.controller');
+const { addFutsalSubscription, getFutsalSubscription, addTrialSubscription, editFutsalSubscription, cancelFutsalSubscription, renewFutsalSubscription } = require('../../controllers/footsalControllers/subscription.controller');
 const router = express.Router()
 const { BASE_URL } = process.env
 
