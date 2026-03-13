@@ -68,6 +68,7 @@ const getFutsalbySubsciption_true = async (req,res)=>{
     })
 }
 
+
 module.exports = {
     getAllFutsal,
     getFutsalById,
