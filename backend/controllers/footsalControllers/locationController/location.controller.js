@@ -21,6 +21,12 @@ const getFutsalLocation = async (req, res) => {
   });
 };
 
+const getFutsalLocationByCode = async (req,res)=>{
+  
+}
+
+
+
 const postFutsalLocation = async (req, res) => {
   const futsalCode = req.futsalCode;
   const {
@@ -110,7 +116,7 @@ const editFutsalLocation = async(req,res)=>{
           longitude,
           full_address,
         ],
-        type: DataTypes.UPDATE,
+        type: QueryTypes.UPDATE,
       },
   )
   if(data.length < 1){
