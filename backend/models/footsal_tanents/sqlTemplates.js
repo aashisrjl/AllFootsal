@@ -52,6 +52,7 @@ payment: (code) => `
   CREATE TABLE IF NOT EXISTS payment_${code} (
     id INT AUTO_INCREMENT PRIMARY KEY,
     booking_id INT NOT NULL,
+    user_id INT NOT NULL,
     gateway ENUM('cash','khalti','esewa','bank_transfer') NOT NULL,
     provider_order_id VARCHAR(255),
     provider_txn_id VARCHAR(255),
@@ -62,6 +63,7 @@ payment: (code) => `
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_booking (booking_id),
+    INDEX idx_user (user_id),
     INDEX idx_status (status),
     UNIQUE KEY uq_provider_txn (gateway, provider_txn_id)
   ) ENGINE=InnoDB;
