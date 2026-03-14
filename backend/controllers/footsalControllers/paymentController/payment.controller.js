@@ -1,274 +1,705 @@
 
-const {sequelize, QueryTypes} = require("sequelize");
-const { createEsewaPayment } = require("../../../services/esewa/esewa.service");
-const { initiateKhaltiPayment, verifyKhaltiPayment } = require("../../../services/khalti/khalti.service");
+const crypto = require("crypto");
+const { QueryTypes } = require("sequelize");
+const { sequelize, FutsalPaymentConfig, Footsal } = require("../../../models");
+const {
+    createEsewaPayment_user_futsal
+} = require("../../../services/esewa/usersToFutsal.esewa.service");
+const {
+    initiateKhaltiPayment,
+    verifyKhaltiPayment
+} = require("../../../services/khalti/usersToFutsal.khalti.service");
 
-//by futsal 
-const getPayments = async (req,res)=>{
-    const futsalCode = req.futsalCode;
-    const payments = await sequelize.query(
-        `SELECT * FROM payments_${futsalCode}`,
-        {
-            type: QueryTypes.SELECT,
-        }
-    );
-    if(!payments[0]){
-        return res.status(400).json({
-            success:false,
-            message:"No payments found for this futsal"
-        })
+const VALID_GATEWAYS = new Set(["cash", "khalti", "esewa", "bank_transfer"]);
+const VALID_STATUSES = new Set(["pending", "success", "failed", "refunded"]);
+
+const normalizeTenantCode = (code) => {
+    const value = String(code || "").trim();
+    return /^\d+$/.test(value) ? value : null;
+};
+
+const paymentTableName = (code) => `payment_${code}`;
+const bookingTableName = (code) => `booking_${code}`;
+
+const extractSecretKey = (secretEncrypted) => {
+    if (!secretEncrypted) {
+        return null;
     }
-    res.status(200).json({
-        success:true,
-        message:"Payments fetch successfully",
-        data:payments
-    });
-}
 
-//by futsal and user information also by user_id
-const getPaymentById = async (req,res)=>{
-    const futsalCode = req.futsalCode;
-    const paymentId = req.params.paymentId;
-    const payment = await sequelize.query(
-        `SELECT * FROM payments_${futsalCode} WHERE id = ?`,
-        {
-            replacements: [paymentId],
-            type: QueryTypes.SELECT,
+    if (Buffer.isBuffer(secretEncrypted)) {
+        return secretEncrypted.toString("utf8").trim();
+    }
+
+    if (
+        typeof secretEncrypted === "object" &&
+        secretEncrypted.type === "Buffer" &&
+        Array.isArray(secretEncrypted.data)
+    ) {
+        return Buffer.from(secretEncrypted.data).toString("utf8").trim();
+    }
+
+    return String(secretEncrypted).trim();
+};
+
+const resolveTenantContext = async (req) => {
+    const tenant = req.tenant || {};
+    const body = req.body || {};
+    const params = req.params || {};
+
+    let futsalId = tenant.futsalId || req.futsalId || params.futsalId || body.futsalId;
+    let code = tenant.code || req.futsalCode || params.futsalCode || body.futsalCode;
+
+    code = normalizeTenantCode(code);
+
+    if (!code && Number.isInteger(Number(futsalId))) {
+        const futsal = await Footsal.findByPk(Number(futsalId), {
+            attributes: ["id", "futsalCode"]
+        });
+
+        if (futsal) {
+            futsalId = futsal.id;
+            code = normalizeTenantCode(futsal.futsalCode);
         }
-    );
+    }
+
+    if (!Number.isInteger(Number(futsalId)) && code) {
+        const futsal = await Footsal.findOne({
+            where: { futsalCode: Number(code) },
+            attributes: ["id", "futsalCode"]
+        });
+
+        if (futsal) {
+            futsalId = futsal.id;
+            code = normalizeTenantCode(futsal.futsalCode);
+        }
+    }
+
+    if (!Number.isInteger(Number(futsalId)) || !code) {
+        return null;
+    }
+
+    return {
+        futsalId: Number(futsalId),
+        code
+    };
+};
+
+const getGatewayConfig = async ({ futsalId, gateway }) => {
+    const config = await FutsalPaymentConfig.findOne({
+        where: {
+            futsalId,
+            gateway,
+            isActive: true
+        },
+        order: [["id", "DESC"]]
+    });
+
+    if (!config) {
+        return null;
+    }
+
+    return {
+        gateway: config.gateway,
+        publicKey: config.publicKey,
+        secretKey: extractSecretKey(config.secretEncrypted),
+        merchantCode: config.merchantCode,
+        isLive: Boolean(config.isLive)
+    };
+};
+
+const getUserBasicInfo = async (userId) => {
     const users = await sequelize.query(
-        `SELECT u.id, u.username, u.email, u.phoneNumber FROM users u
-         JOIN payments_${futsalCode} p ON u.id = p.user_id
-         WHERE p.id = ?`,
-        {
-            replacements: [paymentId],
-            type: QueryTypes.SELECT,
-        }
-    );
-    if(users[0]){
-        payment[0].user = users[0];
-    }
-
-    if(!payment[0]){
-        return res.status(400).json({
-            success:false,
-            message:"No payment found with this id for this futsal"
-        })
-    }
-    res.status(200).json({
-        success:true,
-        message:"Payment fetch successfully",
-        data:payment[0]
-    });
-}
-
-//by user
-const getUserPayments = async (req,res)=>{
-    const userId = req.userId;
-    const {code} = req.tanent;
-    const payments = await sequelize.query(
-        `SELECT * FROM payments_${code} WHERE user_id = ?`,
+        `SELECT username, email, phoneNumber FROM users WHERE id = ? LIMIT 1`,
         {
             replacements: [userId],
-            type: QueryTypes.SELECT,
-        }
-    );
-    res.status(200).json({
-        success:true,
-        message:"User payments fetch successfully",
-        data:payments
-    });
-}
-
-const createPayment = async (req,res)=>{
-    const userId=req.userId;
-    const {code} = req.tanent;
-    const {booking_id, gateway, provider_order_id, provider_txn_id} = req.body;
-
-    if(!booking_id || !gateway) {
-        return res.status(400).json({
-            success:false,
-            message:"booking_id and gateway are required"
-        })
-    }
-    if(!["cash","khalti","esewa","bank_transfer"].includes(gateway)){
-        return res.status(400).json({
-            success:false,
-            message:"Invalid payment gateway"
-        })
-    }
-
-    if((gateway === "khalti" || gateway === "esewa") && (!provider_order_id || !provider_txn_id)){
-        return res.status(400).json({
-            success:false,
-            message:"provider_order_id and provider_txn_id are required for khalti and esewa payments"
-        })
-    }
-
-    if(gateway === "cash" && (provider_order_id || provider_txn_id)){
-        return res.status(400).json({
-            success:false,
-            message:"provider_order_id and provider_txn_id should not be provided for cash payments"
-        })
-    }
-    
-     if(gateway === "bank_transfer" && (!provider_order_id || provider_txn_id)){
-        return res.status(400).json({
-            success:false,
-            message:"provider_order_id is required and provider_txn_id should not be provided for bank transfer payments"
-        })
-    }
-
-    if(gateway === "esewa"){
-        const esewaResponse = await createEsewaPayment({amount, provider_order_id, provider_txn_id});
-        if(!esewaResponse.success){
-            return res.status(400).json({
-                success:false,
-                message:"Esewa payment failed",
-                error: esewaResponse.error
-            })
-        }
-
-    }
-        if(gateway === "khalti"){
-        const khaltiResponse = await initiateKhaltiPayment({amount, provider_order_id, provider_txn_id});
-        if(!khaltiResponse.success){
-            return res.status(400).json({
-                success:false,
-                message:"Khalti payment failed",
-                error: khaltiResponse.error
-            })
-        }
-
-    }
-
-    const existingPayment = await sequelize.query(
-        `SELECT * FROM payments_${code} WHERE provider_txn_id = ? AND gateway = ?`,
-        {
-            replacements: [provider_txn_id, gateway],
-            type: QueryTypes.SELECT,
+            type: QueryTypes.SELECT
         }
     );
 
-    if(existingPayment[0]){
-        return res.status(400).json({
-            success:false,
-            message:"Payment with this provider_txn_id and gateway already exists"
-        })
-    }
+    return users[0] || {
+        username: "User",
+        email: "",
+        phoneNumber: ""
+    };
+};
 
-    const transaction_uuid = crypto.randomUUID();
-    const amount = req.body.amount || 0;
-    const remarks = req.body.remarks || null;
-
-    const payment = await Payment.create({
-      footsal_id: req.futsalId,
-      subscription_id: null, // You can link this to a subscription if needed
-      amount,
-      payment_method: gateway,
-      payment_status: "pending",
-      transaction_id: transaction_uuid,
-      remarks,
-    });
-
-    res.status(201).json({
-        success:true,
-        message:"Payment created successfully",
-        data:payment
-    });
-}
-
-const verifyPayment = async (req,res)=>{
+// by futsal
+const getPayments = async (req, res) => {
     try {
-        const {code} = req.tanent;
-        const paymentId = req.params.paymentId;
-        const payment = await sequelize.query(
-            `SELECT * FROM payments_${code} WHERE id = ?`,
-            {
-                replacements: [paymentId],
-                type: QueryTypes.SELECT,
-            }
-        );
-        if(!payment[0]){
+        const tenant = await resolveTenantContext(req);
+        if (!tenant) {
             return res.status(400).json({
-                success:false,
-                message:"No payment found with this id for this futsal"
-            })
-        }
-        if(payment[0].payment_status === "paid"){
-            return res.status(400).json({
-                success:false,
-                message:"Payment is already verified"
-            })
+                success: false,
+                message: "Valid futsal context is required"
+            });
         }
 
-        if(payment[0].payment_method === "khalti"){
-            const khaltiResponse = await verifyKhaltiPayment({amount: payment[0].amount, provider_order_id: payment[0].provider_order_id, provider_txn_id: payment[0].provider_txn_id});
-            if(!khaltiResponse.success){
-                return res.status(400).json({
-                    success:false,
-                    message:"Khalti payment verification failed",
-                    error: khaltiResponse.error
-                })
-            }
-             await sequelize.query(
-            `UPDATE payments_${code} SET status = 'paid' WHERE id = ?`,
+        const payments = await sequelize.query(
+            `SELECT * FROM ${paymentTableName(tenant.code)} ORDER BY created_at DESC`,
             {
-                replacements: [paymentId],
-                type: QueryTypes.UPDATE,
+                type: QueryTypes.SELECT
             }
         );
 
-        res.status(200).json({
-            success:true,
-            message:"Khalti Payment verified successfully"
+        return res.status(200).json({
+            success: true,
+            message: "Payments fetched successfully",
+            data: payments
         });
-        }
-    if(payment[0].payment_method === "esewa"){
-        const esewaResponse = await createEsewaPayment({amount: payment[0].amount, provider_order_id: payment[0].provider_order_id, provider_txn_id: payment[0].provider_txn_id});
-        if(!esewaResponse.success){
-            return res.status(400).json({
-                success:false,
-                message:"Esewa payment verification failed",
-                error: esewaResponse.error
-            })
-        }
-         await sequelize.query(
-            `UPDATE payments_${code} SET status = 'paid' WHERE id = ?`,
-            {
-                replacements: [paymentId],
-                type: QueryTypes.UPDATE,
-            }
-        );
-
-        res.status(200).json({
-            success:true,
-            message:"eSewa Payment verified successfully"
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
         });
     }
+};
 
-     await sequelize.query(
-            `UPDATE payments_${code} SET status = 'paid' WHERE id = ?`,
+// by futsal + user info
+const getPaymentById = async (req, res) => {
+    try {
+        const tenant = await resolveTenantContext(req);
+        if (!tenant) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid futsal context is required"
+            });
+        }
+
+        const paymentId = Number(req.params.paymentId);
+        if (!Number.isInteger(paymentId) || paymentId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid paymentId is required"
+            });
+        }
+
+        const rows = await sequelize.query(
+            `SELECT p.*, u.id AS userId, u.username, u.email, u.phoneNumber
+             FROM ${paymentTableName(tenant.code)} p
+             LEFT JOIN users u ON u.id = p.user_id
+             WHERE p.id = ?
+             LIMIT 1`,
             {
                 replacements: [paymentId],
-                type: QueryTypes.UPDATE,
+                type: QueryTypes.SELECT
             }
         );
 
-        res.status(200).json({
-            success:true,
-            message:"Payment verified successfully"
+        const row = rows[0];
+        if (!row) {
+            return res.status(404).json({
+                success: false,
+                message: "No payment found with this id"
+            });
+        }
+
+        const payment = {
+            ...row,
+            user: row.userId
+                ? {
+                        id: row.userId,
+                        username: row.username,
+                        email: row.email,
+                        phoneNumber: row.phoneNumber
+                    }
+                : null
+        };
+
+        delete payment.userId;
+        delete payment.username;
+        delete payment.email;
+        delete payment.phoneNumber;
+
+        return res.status(200).json({
+            success: true,
+            message: "Payment fetched successfully",
+            data: payment
         });
-}catch(err){
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: err.message,
-    });
-}
-}
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+};
 
+// by user
+const getUserPayments = async (req, res) => {
+    try {
+        const tenant = await resolveTenantContext(req);
+        if (!tenant) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid futsal context is required"
+            });
+        }
 
+        const userId = Number(req.userId || req.body?.userId || req.body?.user_id);
+        if (!Number.isInteger(userId) || userId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid userId is required"
+            });
+        }
+
+        const payments = await sequelize.query(
+            `SELECT * FROM ${paymentTableName(tenant.code)} WHERE user_id = ? ORDER BY created_at DESC`,
+            {
+                replacements: [userId],
+                type: QueryTypes.SELECT
+            }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "User payments fetched successfully",
+            data: payments
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+};
+
+const createPayment = async (req, res) => {
+    try {
+        const tenant = await resolveTenantContext(req);
+        if (!tenant) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid futsal context is required"
+            });
+        }
+
+        const userId = Number(req.userId || req.body?.userId || req.body?.user_id);
+        const bookingId = Number(req.body?.booking_id);
+        const gateway = String(req.body?.gateway || "").toLowerCase().trim();
+
+        if (!Number.isInteger(userId) || userId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid userId is required"
+            });
+        }
+
+        if (!Number.isInteger(bookingId) || bookingId <= 0 || !gateway) {
+            return res.status(400).json({
+                success: false,
+                message: "booking_id and gateway are required"
+            });
+        }
+
+        if (!VALID_GATEWAYS.has(gateway)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid payment gateway"
+            });
+        }
+
+        const booking = await sequelize.query(
+            `SELECT id, user_id, amount FROM ${bookingTableName(tenant.code)} WHERE id = ? LIMIT 1`,
+            {
+                replacements: [bookingId],
+                type: QueryTypes.SELECT
+            }
+        );
+
+        if (!booking[0]) {
+            return res.status(404).json({
+                success: false,
+                message: "Booking not found for this futsal"
+            });
+        }
+
+        if (Number(booking[0].user_id) !== userId) {
+            return res.status(403).json({
+                success: false,
+                message: "You can only pay for your own booking"
+            });
+        }
+
+        const amount = Number(req.body?.amount ?? booking[0].amount);
+        if (!Number.isFinite(amount) || amount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid amount is required"
+            });
+        }
+
+        let providerOrderId = req.body?.provider_order_id
+            ? String(req.body.provider_order_id).trim()
+            : null;
+        let providerTxnId = req.body?.provider_txn_id
+            ? String(req.body.provider_txn_id).trim()
+            : null;
+        let gatewayResponse = null;
+        let rawResponse = null;
+
+        if (gateway === "cash") {
+            if (providerOrderId || providerTxnId) {
+                return res.status(400).json({
+                    success: false,
+                    message: "provider_order_id and provider_txn_id should not be provided for cash payments"
+                });
+            }
+
+            providerOrderId = null;
+            providerTxnId = null;
+        } else if (gateway === "bank_transfer") {
+            if (!providerOrderId) {
+                return res.status(400).json({
+                    success: false,
+                    message: "provider_order_id is required for bank transfer payments"
+                });
+            }
+
+            if (providerTxnId) {
+                return res.status(400).json({
+                    success: false,
+                    message: "provider_txn_id should not be provided for bank transfer payments"
+                });
+            }
+
+            providerTxnId = null;
+        } else {
+            const paymentConfig = await getGatewayConfig({
+                futsalId: tenant.futsalId,
+                gateway
+            });
+
+            if (!paymentConfig) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Active ${gateway} payment configuration not found for this futsal`
+                });
+            }
+
+            if (!paymentConfig.secretKey) {
+                return res.status(400).json({
+                    success: false,
+                    message: `${gateway} secret key is missing in payment configuration`
+                });
+            }
+
+            const transactionUuid = crypto.randomUUID();
+            providerOrderId = transactionUuid;
+
+            if (gateway === "esewa") {
+                if (!paymentConfig.merchantCode) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "eSewa merchant code is missing in payment configuration"
+                    });
+                }
+
+                gatewayResponse = createEsewaPayment_user_futsal({
+                    amount,
+                    transactionUuid,
+                    merchantCode: paymentConfig.merchantCode,
+                    secretKey: paymentConfig.secretKey
+                });
+
+                rawResponse = gatewayResponse;
+            }
+
+            if (gateway === "khalti") {
+                const user = await getUserBasicInfo(userId);
+                const khaltiResponse = await initiateKhaltiPayment({
+                    amount,
+                    transactionUuid,
+                    user,
+                    secretKey: paymentConfig.secretKey
+                });
+
+                rawResponse = khaltiResponse;
+
+                if (!khaltiResponse?.payment_url || !khaltiResponse?.pidx) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Khalti payment initiation failed",
+                        error: khaltiResponse
+                    });
+                }
+
+                providerTxnId = khaltiResponse.pidx;
+                gatewayResponse = {
+                    payment_url: khaltiResponse.payment_url,
+                    pidx: khaltiResponse.pidx,
+                    expires_at: khaltiResponse.expires_at || null
+                };
+            }
+        }
+
+        if (providerTxnId) {
+            const existingPayment = await sequelize.query(
+                `SELECT id FROM ${paymentTableName(tenant.code)} WHERE provider_txn_id = ? AND gateway = ? LIMIT 1`,
+                {
+                    replacements: [providerTxnId, gateway],
+                    type: QueryTypes.SELECT
+                }
+            );
+
+            if (existingPayment[0]) {
+                return res.status(409).json({
+                    success: false,
+                    message: "Payment with this provider_txn_id and gateway already exists"
+                });
+            }
+        }
+
+        const insertResult = await sequelize.query(
+            `INSERT INTO ${paymentTableName(tenant.code)}
+            (booking_id, user_id, gateway, provider_order_id, provider_txn_id, amount, status, raw_response)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            {
+                replacements: [
+                    bookingId,
+                    userId,
+                    gateway,
+                    providerOrderId,
+                    providerTxnId,
+                    amount,
+                    "pending",
+                    rawResponse ? JSON.stringify(rawResponse) : null
+                ],
+                type: QueryTypes.INSERT
+            }
+        );
+
+        let paymentId = Array.isArray(insertResult) ? insertResult[0] : insertResult;
+
+        if (!paymentId && providerOrderId) {
+            const inserted = await sequelize.query(
+                `SELECT id FROM ${paymentTableName(tenant.code)} WHERE provider_order_id = ? AND gateway = ? ORDER BY id DESC LIMIT 1`,
+                {
+                    replacements: [providerOrderId, gateway],
+                    type: QueryTypes.SELECT
+                }
+            );
+            paymentId = inserted[0]?.id;
+        }
+
+        const payment = paymentId
+            ? await sequelize.query(
+                    `SELECT * FROM ${paymentTableName(tenant.code)} WHERE id = ?`,
+                    {
+                        replacements: [paymentId],
+                        type: QueryTypes.SELECT
+                    }
+                )
+            : [];
+
+        const responsePayload = {
+            success: true,
+            message: `${gateway} payment created successfully`,
+            data: payment[0] || null
+        };
+
+        if (gatewayResponse) {
+            responsePayload.gatewayResponse = gatewayResponse;
+        }
+
+        return res.status(201).json(responsePayload);
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+};
+
+const verifyPayment = async (req, res) => {
+    try {
+        const tenant = await resolveTenantContext(req);
+        if (!tenant) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid futsal context is required"
+            });
+        }
+
+        const paymentId = Number(req.params?.paymentId || req.body?.paymentId);
+        if (!Number.isInteger(paymentId) || paymentId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid paymentId is required"
+            });
+        }
+
+        const paymentRows = await sequelize.query(
+            `SELECT * FROM ${paymentTableName(tenant.code)} WHERE id = ? LIMIT 1`,
+            {
+                replacements: [paymentId],
+                type: QueryTypes.SELECT
+            }
+        );
+
+        const payment = paymentRows[0];
+        if (!payment) {
+            return res.status(404).json({
+                success: false,
+                message: "No payment found with this id"
+            });
+        }
+
+        if (payment.status === "success") {
+            return res.status(400).json({
+                success: false,
+                message: "Payment is already verified"
+            });
+        }
+
+        let nextStatus = "failed";
+        let providerTxnId = payment.provider_txn_id || null;
+        let verificationResponse = null;
+
+        if (payment.gateway === "khalti") {
+            const paymentConfig = await getGatewayConfig({
+                futsalId: tenant.futsalId,
+                gateway: "khalti"
+            });
+
+            if (!paymentConfig || !paymentConfig.secretKey) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Khalti payment configuration not found for this futsal"
+                });
+            }
+
+            const pidx = req.body?.pidx || payment.provider_txn_id;
+            if (!pidx) {
+                return res.status(400).json({
+                    success: false,
+                    message: "pidx is required for Khalti verification"
+                });
+            }
+
+            const khaltiResponse = await verifyKhaltiPayment({
+                pidx,
+                secretKey: paymentConfig.secretKey
+            });
+
+            verificationResponse = khaltiResponse;
+            providerTxnId = payment.provider_txn_id || pidx;
+
+            const khaltiStatus = String(khaltiResponse?.status || "").toLowerCase();
+            nextStatus = khaltiStatus === "completed" || khaltiStatus === "complete" ? "success" : "failed";
+        } else if (payment.gateway === "esewa") {
+            const paymentConfig = await getGatewayConfig({
+                futsalId: tenant.futsalId,
+                gateway: "esewa"
+            });
+
+            if (!paymentConfig) {
+                return res.status(400).json({
+                    success: false,
+                    message: "eSewa payment configuration not found for this futsal"
+                });
+            }
+
+            const encodedData = req.body?.data;
+            if (!encodedData) {
+                return res.status(400).json({
+                    success: false,
+                    message: "eSewa callback data is required"
+                });
+            }
+
+            let decodedData;
+            try {
+                decodedData = JSON.parse(Buffer.from(encodedData, "base64").toString("utf-8"));
+            } catch (decodeError) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid eSewa callback data"
+                });
+            }
+
+            verificationResponse = decodedData;
+
+            const callbackUuid = String(decodedData.transaction_uuid || "");
+            if (payment.provider_order_id && callbackUuid && payment.provider_order_id !== callbackUuid) {
+                return res.status(400).json({
+                    success: false,
+                    message: "eSewa transaction UUID mismatch"
+                });
+            }
+
+            const callbackAmount = Number(
+                decodedData.total_amount !== undefined ? decodedData.total_amount : decodedData.amount
+            );
+
+            if (Number.isFinite(callbackAmount) && Number(callbackAmount) !== Number(payment.amount)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "eSewa amount mismatch"
+                });
+            }
+
+            providerTxnId = decodedData.transaction_code
+                ? String(decodedData.transaction_code)
+                : payment.provider_txn_id;
+
+            nextStatus = String(decodedData.status || "").toUpperCase() === "COMPLETE" ? "success" : "failed";
+        } else {
+            const manualStatus = String(req.body?.status || "success").toLowerCase();
+            if (!VALID_STATUSES.has(manualStatus)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid payment status"
+                });
+            }
+
+            nextStatus = manualStatus;
+            verificationResponse = req.body?.raw_response || { manually_verified: true };
+        }
+
+        await sequelize.query(
+            `UPDATE ${paymentTableName(tenant.code)}
+             SET status = ?, provider_txn_id = ?, raw_response = ?, verified_at = ?
+             WHERE id = ?`,
+            {
+                replacements: [
+                    nextStatus,
+                    providerTxnId,
+                    verificationResponse ? JSON.stringify(verificationResponse) : payment.raw_response,
+                    nextStatus === "success" ? new Date() : null,
+                    paymentId
+                ],
+                type: QueryTypes.UPDATE
+            }
+        );
+
+        const updatedPayment = await sequelize.query(
+            `SELECT * FROM ${paymentTableName(tenant.code)} WHERE id = ? LIMIT 1`,
+            {
+                replacements: [paymentId],
+                type: QueryTypes.SELECT
+            }
+        );
+
+        return res.status(200).json({
+            success: nextStatus === "success",
+            message:
+                nextStatus === "success"
+                    ? "Payment verified successfully"
+                    : "Payment verification completed with non-success status",
+            data: updatedPayment[0]
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+};
 
 module.exports = {
     getPayments,
@@ -276,4 +707,4 @@ module.exports = {
     getUserPayments,
     createPayment,
     verifyPayment
-}
+};

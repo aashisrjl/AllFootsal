@@ -1,6 +1,8 @@
+const { Footsal } = require("../../models");
+
 module.exports = async function resolveFutsalTenant(req, res, next) {
   try {
-    const futsalId = Number(req.params.futsalId || req.body.futsalId);
+    const futsalId = Number(req.params.futsalId || req.body.futsalId || req.query.futsalId);
     if (!Number.isInteger(futsalId)) {
       return res.status(400).json({ message: "Invalid futsalId" });
     }
@@ -19,6 +21,7 @@ module.exports = async function resolveFutsalTenant(req, res, next) {
     }
 
     req.tenant = { futsalId: futsal.id, code };
+    req.tanent = req.tenant;
     next();
   } catch (err) {
     next(err);

@@ -15,7 +15,7 @@ router.post(
     );
 
 router.get(
-    `"/payment`,  // #swagger.tags=["Futsal/Payment"]
+    `/payment`,  // #swagger.tags=["Futsal/Payment"]
     isFutsalAuthenticated, 
     getPayments
 );
