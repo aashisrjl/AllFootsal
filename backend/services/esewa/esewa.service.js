@@ -32,6 +32,7 @@ const createEsewaPayment = (amount, transaction_uuid) => {
   };
 };
 
+
 module.exports = {
-  createEsewaPayment,
+  createEsewaPayment
 };
