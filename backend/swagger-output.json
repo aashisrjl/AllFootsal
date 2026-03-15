@@ -392,6 +392,22 @@
         }
       }
     },
+    "/auth/futsal/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/subscription": {
       "get": {
         "tags": [
@@ -641,10 +657,10 @@
             "schema": {
               "type": "object",
               "properties": {
-                "payment_method": {
+                "provider_order_id": {
                   "example": "any"
                 },
-                "remarks": {
+                "provider_txn_id": {
                   "example": "any"
                 }
               }
@@ -666,6 +682,9 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
           },
           "500": {
             "description": "Internal Server Error"
@@ -690,6 +709,9 @@
           "200": {
             "description": "OK"
           },
+          "400": {
+            "description": "Bad Request"
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -713,33 +735,6 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "purchase_order_id": {
-                  "example": "any"
-                },
-                "status": {
-                  "example": "any"
-                },
-                "payment_method": {
-                  "example": "any"
-                },
-                "transaction_uuid": {
-                  "example": "any"
-                },
-                "data": {
-                  "example": "any"
-                },
-                "pidx": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
