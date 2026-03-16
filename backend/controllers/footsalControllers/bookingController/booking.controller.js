@@ -1,0 +1,213 @@
+const { sequelize } = require("../../../models")
+const {QueryTypes} = require("sequelize");
+
+//by admin
+const getBookingsByAdmin = async (req,res) => {
+    const futsalCode = req.futsalCode;
+    // bookings, userId, pitchId, timeslotId
+    const bookings = await sequelize.query(
+        `SELECT b.*, u.username as user_name, p.name as pitch_name, t.start_time, t.end_time 
+         FROM booking_${futsalCode} b 
+         JOIN user_${futsalCode} u ON b.user_id = u.id 
+         JOIN pitch_${futsalCode} p ON b.pitch_id = p.id 
+         JOIN timeslot_${futsalCode} t ON b.timeslot_id = t.id`,
+        {
+            type: QueryTypes.SELECT,
+        }
+    );
+    if(bookings.length === 0){
+        return res.status(200).json({
+            success:true,
+            message:"No bookings found",
+            data:[]
+        })
+    }
+
+    res.status(200).json({
+        success:true,
+        message:"Bookings fetched successfully",
+        data:bookings
+    })
+}
+
+//user
+const getBookingsByUser = async (req,res) => {
+    const code = req.futsalCode || req.tenant?.code;
+    const userId = req.userId;
+
+    const bookings = await sequelize.query(
+        `SELECT b.*, p.name as pitch_name, t.start_time, t.end_time 
+         FROM booking_${code} b 
+         JOIN pitch_${code} p ON b.pitch_id = p.id 
+         JOIN timeslot_${code} t ON b.timeslot_id = t.id
+         WHERE b.user_id = ?`,
+        {
+            replacements: [userId],
+            type: QueryTypes.SELECT,
+        }
+    );
+
+        if(bookings.length === 0){
+        return res.status(200).json({
+            success:true,
+            message:"No bookings found for this user",
+            data:[]
+        })
+    }
+
+    res.status(200).json({
+        success:true,
+        message:"Bookings fetched successfully",
+        data:bookings
+    })
+}
+
+//user
+const cancelBooking = async (req,res) => {
+    const code = req.futsalCode || req.tenant?.code;
+    const userId = req.userId;
+    const bookingId = req.params.bookingId;
+
+    await sequelize.query(
+        `UPDATE booking_${code} SET status = 'cancelled' 
+         WHERE id = ? AND user_id = ?`,
+        {
+            replacements: [bookingId, userId],
+            type: QueryTypes.UPDATE,
+        }
+    );
+
+    res.status(200).json({
+        success:true,
+        message:"Booking cancelled successfully"
+    })
+}
+
+//admin can cancel any booking
+const cancelBookingByAdmin = async (req,res) => {
+    const code = req.futsalCode;
+    const bookingId = req.params.bookingId;
+
+    await sequelize.query(
+        `UPDATE booking_${code} SET status = 'cancelled' 
+         WHERE id = ?`,
+        {
+            replacements: [bookingId],
+            type: QueryTypes.UPDATE,
+        }
+    );
+
+    res.status(200).json({
+        success:true,
+        message:"Booking cancelled successfully by admin"
+    })
+}
+
+//user
+const deleteBookingByUser = async (req,res) => {
+    const code = req.futsalCode || req.tenant?.code;
+    const userId = req.userId;
+    const bookingId = req.params.bookingId;
+
+    await sequelize.query(
+        `DELETE FROM booking_${code} 
+         WHERE id = ? AND user_id = ?`,
+        {
+            replacements: [bookingId, userId],
+            type: QueryTypes.DELETE,
+        }
+    );
+
+    res.status(200).json({
+        success:true,
+        message:"Booking deleted successfully"
+    })
+}
+
+//admin
+const deleteBookingByAdmin = async (req,res) => {
+    const code = req.futsalCode;
+    const bookingId = req.params.bookingId;
+
+    await sequelize.query(
+        `DELETE FROM booking_${code} 
+         WHERE id = ?`,
+        {
+            replacements: [bookingId],
+            type: QueryTypes.DELETE,
+        }
+    );
+
+    res.status(200).json({
+        success:true,
+        message:"Booking deleted successfully by admin"
+    })
+}
+
+//admin dashboard stats
+const getBookingStats = async (req,res) => {
+    const code = req.futsalCode;
+    const stats = await sequelize.query(
+        `SELECT 
+            (SELECT COUNT(*) FROM booking_${code}) as total_bookings,
+            (SELECT COUNT(*) FROM booking_${code} WHERE status = 'confirmed') as confirmed_bookings,
+            (SELECT COUNT(*) FROM booking_${code} WHERE status = 'cancelled') as cancelled_bookings,
+            (SELECT COUNT(*) FROM booking_${code} WHERE status = 'completed') as completed_bookings`,
+        {
+            type: QueryTypes.SELECT,
+        }
+    );
+
+    res.status(200).json({
+        success:true,
+        message:"Booking stats fetched successfully",
+        data:stats[0]
+    })
+}
+
+//user create bokings -> payment ( after payment success then booking will be confirmed, otherwise it will be pending or cancelled based on payment status)
+const createBooking = async (req,res) => {
+    const code = req.futsalCode || req.tenant?.code;
+    const userId = req.userId;
+    const {pitch_id, timeslot_id, booking_date, amount, notes} = req.body;
+
+    if(!pitch_id || !timeslot_id || !booking_date || !amount){
+        return res.status(400).json({
+            success:false,
+            message:"pitch_id, timeslot_id, booking_date and amount are required"
+        })
+    }
+
+    try{
+    await sequelize.query(
+        `INSERT INTO booking_${code} (user_id, pitch_id, timeslot_id, booking_date, amount, notes) 
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        {
+            replacements: [userId, pitch_id, timeslot_id, booking_date, amount, notes],
+            type: QueryTypes.INSERT,
+        }
+    );
+}catch(err){
+    console.error("Error creating booking:", err);
+    return res.status(500).json({
+        success:false,
+        message:"Internal server in bookings"
+    })
+}
+
+    res.status(201).json({
+        success:true,
+        message:"Booking created successfully"
+    })
+}
+
+module.exports = {
+    getBookingsByAdmin,
+    getBookingsByUser,
+    cancelBooking,
+    cancelBookingByAdmin,
+    deleteBookingByUser,
+    deleteBookingByAdmin,
+    getBookingStats,
+    createBooking
+}

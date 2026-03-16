@@ -145,5 +145,19 @@ payment: (code) => `
       foreign key (pitch_id) references pitch_${code}(id) on delete set null,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;
+  `,
+  visitor: (code) => `
+    CREATE TABLE IF NOT EXISTS visitor_${code} (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NULL,
+      ip_hash CHAR(64) NULL,
+      user_agent VARCHAR(500) NULL,
+      visit_count INT NOT NULL DEFAULT 1,
+      first_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      INDEX idx_email (email),
+      INDEX idx_phone (phone),
+      UNIQUE KEY uq_session (session_id)
+    ) ENGINE=InnoDB;
   `
 };
