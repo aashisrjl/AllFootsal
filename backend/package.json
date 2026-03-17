@@ -35,7 +35,8 @@
     "redis": "^5.10.0",
     "sequelize": "^6.37.7",
     "stripe": "^12.18.0",
-    "swagger-autogen": "^2.23.7"
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "jest": "^29.6.2",
