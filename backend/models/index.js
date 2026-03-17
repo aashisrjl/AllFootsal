@@ -91,6 +91,43 @@ db.FutsalPaymentConfig.belongsTo(db.Footsal, {
 });
 
 
+//forum
+db.Forum = require("./forum/forumModel")(sequelize, DataTypes);
+db.ForumReply = require("./forum/forumReplyModel")(sequelize, DataTypes);
+db.ForumLike = require("./forum/forumLikeModel")(sequelize, DataTypes);
+
+// Forum → ForumReply
+db.Forum.hasMany(db.ForumReply, {
+  foreignKey: "forum_id",
+  as: "replies"
+});
+
+db.ForumReply.belongsTo(db.Forum, {
+  foreignKey: "forum_id"
+});
+
+// Forum → ForumLike
+db.Forum.hasMany(db.ForumLike, {
+  foreignKey: "forum_id",
+  as: "likes"
+});
+
+db.ForumLike.belongsTo(db.Forum, {
+  foreignKey: "forum_id"
+});
+
+// ForumReply → ForumLike
+db.ForumReply.hasMany(db.ForumLike, {
+  foreignKey: "reply_id",
+  as: "likes"
+});
+
+db.ForumLike.belongsTo(db.ForumReply, {
+  foreignKey: "reply_id"
+});
+
+
+
 
 
 db.sequelize.sync({ force: false }).then(() => {
