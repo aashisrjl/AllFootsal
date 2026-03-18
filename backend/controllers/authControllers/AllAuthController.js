@@ -14,6 +14,8 @@ const {
   FUTSAL_PASSWORD_SALT_ROUNDS
 } = process.env;
 
+
+
 //Login user api
 const Login = async (req, res) => {
   const { email, password, phoneNumber } = req.body;
@@ -246,6 +248,48 @@ const Logout = async (req, res) => {
 
   } catch (error) {
     console.error("Logout error:", error);
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
+
+//change password api
+
+const ChangePassword = async (req, res) => {
+  try {
+    const { newPassword, cNewPassword } = req.body;
+    const userId = req.user?.id;
+    if (!newPassword || !cNewPassword) {
+      return res.status(400).json({
+        error: "New password and confirm new password are required",
+      });
+    } else if (newPassword !== cNewPassword) {
+      return res.status(400).json({
+        error: "New password and confirm new password do not match",
+      });
+    } else if (userId) {
+      const user = await User.findByPk(userId); 
+      if (!user) {
+        return res.status(404).json({
+          error: "User not found",
+        });
+      } else {
+        user.password = await bcryptjs.hash(
+          newPassword,
+          parseInt(USER_PASSWORD_SALT_ROUNDS)
+        );
+        user.is_active = false; 
+        await user.save();
+        return res.status(200).json({
+          message: "Password changed successfully",
+        });
+      }
+
+  } 
+}
+  catch (error) {
+    console.error("Change password error:", error);
     return res.status(500).json({
       error: "Internal server error",
     });
