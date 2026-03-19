@@ -1,5 +1,5 @@
 //create 
-const {Forum} = require('../../models');
+const { Forum } = require('../../models');
 
 const createForum = async (req,res)=>{
     const {title, content,slug, category} = req.body;
