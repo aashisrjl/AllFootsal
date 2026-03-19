@@ -4,8 +4,8 @@ const { Forum } = require('../../models');
 const createForum = async (req,res)=>{
     const {title, content,slug, category} = req.body;
 
-    const userId = req.userId;
-    const futsalId = req.futsalId;
+    const userId = req?.userId;
+    const futsalId = req?.futsalId;
     try {
         const newForum = await Forum.create({
             title,
@@ -44,7 +44,7 @@ const getAllForums = async (req,res)=>{
 //get forum by userId
 
 const getForumsByUserId = async (req,res)=>{
-    const userId = req.userId;  
+    const userId = req?.userId;
     if(!userId){
         return res.status(400).json({
             success:false,
@@ -65,7 +65,7 @@ const getForumsByUserId = async (req,res)=>{
 
 //get forum by futsalId 
 const getForumsByFutsalId = async (req,res)=>{
-    const futsalId = req.futsalId;
+    const futsalId = req?.futsalId;
     if(!futsalId){
         return res.status(400).json({
             success:false,
