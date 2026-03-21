@@ -501,6 +501,7 @@ const deleteMediaByCategory = async (req, res) => {
   }
 };
 
+
 const deleteMediaById = async (req, res) => {
   try {
     const code = req.futsalCode || req.tanent?.code;
