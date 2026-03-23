@@ -1,6 +1,6 @@
 const { Footsal } = require("../../models");
 
-module.exports = async function resolveFutsalTenant(req, res, next) {
+const resolveFutsalTenant = async(req, res, next)=> {
   try {
     const futsalId = Number(req.params.futsalId || req.body.futsalId || req.query.futsalId);
     if (!Number.isInteger(futsalId)) {
@@ -27,3 +27,5 @@ module.exports = async function resolveFutsalTenant(req, res, next) {
     next(err);
   }
 };
+
+module.exports = resolveFutsalTenant
