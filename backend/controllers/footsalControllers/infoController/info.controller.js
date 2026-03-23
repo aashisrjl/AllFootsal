@@ -57,7 +57,7 @@ const createInfo = async (req, res) => {
 };
 
   const getInfo = async (req, res) => {
-    const code = req.futsalCode || req.tanent.code;
+    const code = req.futsalCode || req.tanent?.code;
     const info = await sequelize.query(
       `SELECT * FROM info_${code} ORDER BY created_at DESC LIMIT 1`,
       {
