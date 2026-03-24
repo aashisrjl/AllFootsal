@@ -5,18 +5,11 @@ const {
   getPaymentById,
   getUserPayments,
   verifyPayment,
-} = require("../../controllers/footsalControllers/paymentController/payment.controller");
-const isFutsalAuthenticated = require("../../middleware/authMiddleware/futsalAuthenticated");
-const isUserAuthenticated = require("../../middleware/authMiddleware/userAuthenticate");
-const resolveFutsalTenant = require("../../middleware/tanentMiddleware/tanent.middleware");
+} = require("../../../controllers/footsalControllers/paymentController/payment.controller");
+const isFutsalAuthenticated = require("../../../middleware/authMiddleware/futsalAuthenticated");
+const isUserAuthenticated = require("../../../middleware/authMiddleware/userAuthenticate");
+const resolveFutsalTenant = require("../../../middleware/tanentMiddleware/tanent.middleware");
 const router = express.Router();
-const {BASE_URL}  = process.env || "http://localhost:3000/api/v1";
-
-router.post(
-    `/payment-create`, // #swagger.tags=["Futsal/Payment"]
-    isFutsalAuthenticated,
-     createPayment
-    );
 
 router.get(
     `/payment`,  // #swagger.tags=["Futsal/Payment"]
@@ -39,9 +32,17 @@ router.get(
 );
 
 router.post(
-    `/payment-verify`, // #swagger.tags=["Futsal/Payment"]
-    isFutsalAuthenticated,
-     verifyPayment
-    );
+    `/futsal/:futsalId/payments/create`, // #swagger.tags=["Futsal/Payment"]
+    resolveFutsalTenant,
+    isUserAuthenticated,
+    createPayment
+);
+
+router.post(
+    `/futsal/:futsalId/payments/:paymentId/verify`, // #swagger.tags=["Futsal/Payment"]
+    resolveFutsalTenant,
+    isUserAuthenticated,
+    verifyPayment
+);
 
 module.exports = router;
