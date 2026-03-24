@@ -11,7 +11,13 @@ const uploadMedia = async (req, res) => {
       });
     }
 
-    const { media } = req.files || {};
+    // multer can provide either:
+    // - req.file (upload.single('media'))
+    // - req.files.media (upload.fields([{ name: 'media' }]) => array)
+    const media =
+      req.file ||
+      req.files?.media ||
+      (Array.isArray(req.files?.media) ? req.files.media[0] : null);
     const { category, description, pitchId } = req.body || {};
 
     if (!media) {
@@ -331,7 +337,10 @@ const uploadPitchMedia = async (req, res) => {
       });
     }
 
-    const { media } = req.files || {};
+    const media =
+      req.file ||
+      req.files?.media ||
+      (Array.isArray(req.files?.media) ? req.files.media[0] : null);
     const { description } = req.body || {};
 
     if (!media) {
@@ -402,7 +411,10 @@ const uploadFacilitiesMediaByPitchId = async (req, res) => {
       });
     }
 
-    const { media } = req.files || {};
+    const media =
+      req.file ||
+      req.files?.media ||
+      (Array.isArray(req.files?.media) ? req.files.media[0] : null);
     const { description } = req.body || {};
 
     if (!media) {

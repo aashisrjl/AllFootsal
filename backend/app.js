@@ -17,6 +17,16 @@ const PORT = process.env.SERVER_PORT || 3000;
 const authRoutes = require("./routes/authRoutes/authRoute");
 const subscriptionRoutes = require("./routes/footsalRoutes/subscription.route")
 const paymentRoutes = require("./routes/footsalRoutes/payment.route")
+const futsalRoutes = require("./routes/footsalRoutes/futsal.route");
+const infoRoutes = require("./routes/footsalRoutes/infoRoutes/info.routes");
+const pitchRoutes = require("./routes/footsalRoutes/pitch.route");
+const timeslotRoutes = require("./routes/footsalRoutes/timeslot.route");
+const ratingRoutes = require("./routes/footsalRoutes/rating.route");
+const mediaRoutes = require("./routes/footsalRoutes/media.route");
+const bookingRoutes = require("./routes/footsalRoutes/booking.route");
+const locationRoutes = require("./routes/footsalRoutes/location.route");
+const visitorsRoutes = require("./routes/footsalRoutes/visitors.route");
+const analyticsRoutes = require("./routes/footsalRoutes/analytics.route");
 
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
@@ -84,6 +94,16 @@ app.use(limiter);
 app.use(BASE_URL, authRoutes);
 app.use(BASE_URL, subscriptionRoutes)
 app.use(BASE_URL, paymentRoutes)
+app.use(BASE_URL, futsalRoutes)
+app.use(BASE_URL, infoRoutes)
+app.use(BASE_URL, pitchRoutes)
+app.use(BASE_URL, timeslotRoutes)
+app.use(BASE_URL, ratingRoutes)
+app.use(BASE_URL, mediaRoutes)
+app.use(BASE_URL, bookingRoutes)
+app.use(BASE_URL, locationRoutes)
+app.use(BASE_URL, visitorsRoutes)
+app.use(BASE_URL, analyticsRoutes)
 
 
 // Health check
