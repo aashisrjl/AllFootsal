@@ -27,6 +27,7 @@ const bookingRoutes = require("./routes/footsalRoutes/booking.route");
 const locationRoutes = require("./routes/footsalRoutes/location.route");
 const visitorsRoutes = require("./routes/footsalRoutes/visitors.route");
 const analyticsRoutes = require("./routes/footsalRoutes/analytics.route");
+const contactRoutes = require("./routes/footsalRoutes/contactRoutes/contact.route");
 
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
@@ -104,6 +105,7 @@ app.use(BASE_URL, bookingRoutes)
 app.use(BASE_URL, locationRoutes)
 app.use(BASE_URL, visitorsRoutes)
 app.use(BASE_URL, analyticsRoutes)
+app.use(BASE_URL, contactRoutes)
 
 
 // Health check
