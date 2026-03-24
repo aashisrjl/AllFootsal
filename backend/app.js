@@ -6,10 +6,10 @@ require('dotenv').config();
 const passport = require('./utils/passport/passport');
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger-output.json');
-const {User, Futsal,Subscription,Payment} = require("./models/index");
+const {BASE_URL, ADMIN_COOKIE_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD} = process.env
 
 
-const BASE_URL = process.env.BASE_URL
+
 const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
 
@@ -17,6 +17,17 @@ const PORT = process.env.SERVER_PORT || 3000;
 const authRoutes = require("./routes/authRoutes/authRoute");
 const subscriptionRoutes = require("./routes/footsalRoutes/subscription.route")
 const paymentRoutes = require("./routes/footsalRoutes/payment.route")
+const futsalRoutes = require("./routes/footsalRoutes/futsal.route");
+const infoRoutes = require("./routes/footsalRoutes/infoRoutes/info.routes");
+const pitchRoutes = require("./routes/footsalRoutes/pitch.route");
+const timeslotRoutes = require("./routes/footsalRoutes/timeslot.route");
+const ratingRoutes = require("./routes/footsalRoutes/rating.route");
+const mediaRoutes = require("./routes/footsalRoutes/media.route");
+const bookingRoutes = require("./routes/footsalRoutes/booking.route");
+const locationRoutes = require("./routes/footsalRoutes/location.route");
+const visitorsRoutes = require("./routes/footsalRoutes/visitors.route");
+const analyticsRoutes = require("./routes/footsalRoutes/analytics.route");
+const contactRoutes = require("./routes/footsalRoutes/contactRoutes/contact.route");
 
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
@@ -41,21 +52,21 @@ const router = AdminJSExpress.buildAuthenticatedRouter(
   {
     authenticate: async (email, password) => {
       if (
-        email === process.env.ADMIN_EMAIL &&
-        password === process.env.ADMIN_PASSWORD
+        email === ADMIN_EMAIL &&
+        password === ADMIN_PASSWORD
       ) {
         return { email }
       }
       return null
     },
     cookieName: 'adminjs',
-    cookiePassword: process.env.ADMIN_COOKIE_SECRET,
+    cookiePassword: ADMIN_COOKIE_SECRET,
   },
   null,
   {
     resave: false,
     saveUninitialized: true,
-    secret: process.env.ADMIN_COOKIE_SECRET,
+    secret: ADMIN_COOKIE_SECRET,
   }
 )
 
@@ -84,6 +95,17 @@ app.use(limiter);
 app.use(BASE_URL, authRoutes);
 app.use(BASE_URL, subscriptionRoutes)
 app.use(BASE_URL, paymentRoutes)
+app.use(BASE_URL, futsalRoutes)
+app.use(BASE_URL, infoRoutes)
+app.use(BASE_URL, pitchRoutes)
+app.use(BASE_URL, timeslotRoutes)
+app.use(BASE_URL, ratingRoutes)
+app.use(BASE_URL, mediaRoutes)
+app.use(BASE_URL, bookingRoutes)
+app.use(BASE_URL, locationRoutes)
+app.use(BASE_URL, visitorsRoutes)
+app.use(BASE_URL, analyticsRoutes)
+app.use(BASE_URL, contactRoutes)
 
 
 // Health check
