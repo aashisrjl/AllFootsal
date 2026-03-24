@@ -1,11 +1,11 @@
 const express = require("express");
-const isFutsalAuthenticated = require("../../middleware/authMiddleware/futsalAuthenticated");
-const resolveFutsalTenant = require("../../middleware/tanentMiddleware/tanent.middleware");
+const isFutsalAuthenticated = require("../../../middleware/authMiddleware/futsalAuthenticated");
+const resolveFutsalTenant = require("../../../middleware/tanentMiddleware/tanent.middleware");
 
 const {
   getVisitorsDetails,
   trackVisitor,
-} = require("../../controllers/footsalControllers/visitorsController/visitors.controller");
+} = require("../../../controllers/footsalControllers/visitorsController/visitors.controller");
 
 const router = express.Router();
 

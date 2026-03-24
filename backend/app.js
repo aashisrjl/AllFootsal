@@ -25,7 +25,7 @@ const ratingRoutes = require("./routes/footsalRoutes/rating.route");
 const mediaRoutes = require("./routes/footsalRoutes/media.route");
 const bookingRoutes = require("./routes/footsalRoutes/booking.route");
 const locationRoutes = require("./routes/footsalRoutes/location.route");
-const visitorsRoutes = require("./routes/footsalRoutes/visitors.route");
+const visitorsRoutes = require("./routes/footsalRoutes/visitorRoutes/visitors.route");
 const analyticsRoutes = require("./routes/footsalRoutes/analytics.route");
 const contactRoutes = require("./routes/footsalRoutes/contactRoutes/contact.route");
 
