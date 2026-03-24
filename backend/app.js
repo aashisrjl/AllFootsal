@@ -15,14 +15,14 @@ const PORT = process.env.SERVER_PORT || 3000;
 
 // Routes
 const authRoutes = require("./routes/authRoutes/authRoute");
-app.use(BASE_URL, subscriptionRoutes)
+app.use(BASE_URL, authRoutes)
 
 //futsal payment and subscription routes
 const subscriptionRoutes = require("./routes/footsalRoutes/subscription.route")
 const paymentRoutes = require("./routes/footsalRoutes/payment.route")
-app.use(BASE_URL, authRoutes)
 app.use(BASE_URL, subscriptionRoutes)
-app.use(BASE_URL, paymentRoutes)  
+app.use(BASE_URL, paymentRoutes)
+
 //forum routes
 const forumRoutes = require("./routes/forumRoutes/forum.routes")
 const forumReplyRoutes = require("./routes/forumRoutes/forumReply.routes")
@@ -36,6 +36,29 @@ const futsalRoutes = require("./routes/footsalRoutes/futsal.route")
 app.use(BASE_URL, futsalRoutes) 
 
 //tanents
+const analyticsRoutes = require("./routes/footsalRoutes/analyticsRoutes/analytics.route")
+const contactRoutes = require("./routes/footsalRoutes/contactRoutes/contact.route")
+const locationRoutes = require("./routes/footsalRoutes/locationRoutes/location.route")
+const ratingRoutes = require("./routes/footsalRoutes/ratingRoutes/rating.route")
+const bookingRoutes = require("./routes/footsalRoutes/bookingRoutes/booking.route")
+const infoRoutes = require("./routes/footsalRoutes/infoRoutes/info.route")
+const mediaRoutes = require("./routes/footsalRoutes/mediaRoutes/media.route")
+const paymentFutsalRoutes = require("./routes/footsalRoutes/paymentRoutes/payment.route")
+const pitchRoutes = require("./routes/footsalRoutes/pitchRoutes/pitch.route")
+const timeslotRoutes = require("./routes/footsalRoutes/timeSlotRoutes/timeSlot.route")
+const visitorRoutes = require("./routes/footsalRoutes/visitorRoutes/visitor.route")
+
+app.use(BASE_URL, analyticsRoutes)
+app.use(BASE_URL, contactRoutes)
+app.use(BASE_URL, locationRoutes)
+app.use(BASE_URL, ratingRoutes)
+app.use(BASE_URL, bookingRoutes)
+app.use(BASE_URL, infoRoutes)
+app.use(BASE_URL, mediaRoutes)
+app.use(BASE_URL, paymentFutsalRoutes)
+app.use(BASE_URL, pitchRoutes)
+app.use(BASE_URL, timeslotRoutes)
+app.use(BASE_URL, visitorRoutes)
 
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
