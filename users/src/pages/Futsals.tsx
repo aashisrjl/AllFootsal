@@ -1,13 +1,13 @@
 
 import React from "react";
-import Header from "@/components/Header";
+import Header from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import FacilityCard from "@/components/FacilityCard";
 import { facilities } from "@/data/mockData";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
-const Facilities = () => {
+const Futsals = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
 
   // Filter facilities based on search term
@@ -60,4 +60,4 @@ const Facilities = () => {
   );
 };
 
-export default Facilities;
+export default Futsals;
