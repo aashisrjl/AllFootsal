@@ -3,17 +3,19 @@ const { createForumReply, getRepliesByForumId, getRepliesByUserIdOrFutsalId } = 
 const router = express.Router()
 
 router.post(
-    '/forum/reply/create',
+    '/forum/reply/create', //#swagger.tags=['Forum Replies']
+    isBothAuthenticated,
     createForumReply
 )
 
 router.get(
-    '/forum/reply/:forumId',
+    '/forum/reply/:forumId', //#swagger.tags=['Forum Replies']
+    isBothAuthenticated,
     getRepliesByForumId
 )
 
 router.get(
-    '/forum/reply',
+    '/forum/reply', //#swagger.tags=['Forum Replies']
     isBothAuthenticated,
     getRepliesByUserIdOrFutsalId
 )
