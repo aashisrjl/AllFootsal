@@ -6,15 +6,18 @@ require('dotenv').config();
 const passport = require('./utils/passport/passport');
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger-output.json');
-const {User, Futsal,Subscription,Payment} = require("./models/index");
+const {BASE_URL, ADMIN_COOKIE_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD} = process.env
 
 
-const BASE_URL = process.env.BASE_URL
+
 const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
 
 // Routes
 const authRoutes = require("./routes/authRoutes/authRoute");
+app.use(BASE_URL, subscriptionRoutes)
+
+//futsal payment and subscription routes
 const subscriptionRoutes = require("./routes/footsalRoutes/subscription.route")
 const paymentRoutes = require("./routes/footsalRoutes/payment.route")
 app.use(BASE_URL, authRoutes)
@@ -57,21 +60,21 @@ const router = AdminJSExpress.buildAuthenticatedRouter(
   {
     authenticate: async (email, password) => {
       if (
-        email === process.env.ADMIN_EMAIL &&
-        password === process.env.ADMIN_PASSWORD
+        email === ADMIN_EMAIL &&
+        password === ADMIN_PASSWORD
       ) {
         return { email }
       }
       return null
     },
     cookieName: 'adminjs',
-    cookiePassword: process.env.ADMIN_COOKIE_SECRET,
+    cookiePassword: ADMIN_COOKIE_SECRET,
   },
   null,
   {
     resave: false,
     saveUninitialized: true,
-    secret: process.env.ADMIN_COOKIE_SECRET,
+    secret: ADMIN_COOKIE_SECRET,
   }
 )
 
@@ -95,7 +98,6 @@ const limiter = rateLimit({
   max: 100 // limit each IP to 100 requests per windowMs
 });
 app.use(limiter);
-
 
 
 // Health check
