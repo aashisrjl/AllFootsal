@@ -17,6 +17,22 @@ const PORT = process.env.SERVER_PORT || 3000;
 const authRoutes = require("./routes/authRoutes/authRoute");
 const subscriptionRoutes = require("./routes/footsalRoutes/subscription.route")
 const paymentRoutes = require("./routes/footsalRoutes/payment.route")
+app.use(BASE_URL, authRoutes)
+app.use(BASE_URL, subscriptionRoutes)
+app.use(BASE_URL, paymentRoutes)  
+//forum routes
+const forumRoutes = require("./routes/forumRoutes/forum.routes")
+const forumReplyRoutes = require("./routes/forumRoutes/forumReply.routes")
+const forumlikesRoutes = require("./routes/forumRoutes/forumLikes.routes")  
+app.use(BASE_URL, forumRoutes)
+app.use(BASE_URL, forumReplyRoutes)
+app.use(BASE_URL, forumlikesRoutes)
+
+//futsal routes
+const futsalRoutes = require("./routes/footsalRoutes/futsal.route")
+app.use(BASE_URL, futsalRoutes) 
+
+//tanents
 
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
@@ -80,10 +96,6 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// call routes
-app.use(BASE_URL, authRoutes);
-app.use(BASE_URL, subscriptionRoutes)
-app.use(BASE_URL, paymentRoutes)
 
 
 // Health check
