@@ -13,7 +13,7 @@ interface FacilityCardProps {
 const FacilityCard: React.FC<FacilityCardProps> = ({ facility }) => {
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md">
-      <Link to={`/facilities/${facility.id}`}>
+      <Link to={`/futsals/${facility.id}`}>
         <AspectRatio ratio={16 / 9}>
           <img
             src={facility.image}
