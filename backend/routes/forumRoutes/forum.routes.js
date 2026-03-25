@@ -30,13 +30,15 @@ router.get(
 )
 
 router.get(
-    '/forum/:category', // #swagger.tags=['Forum']
+    //query parameter?category=help
+    '/forums', // #swagger.tags=['Forum']
     isBothAuthenticated,
     getForumsByCategory
 )
 
 router.get(
-    '/forum/:id',// #swagger.tags=['Forum']
+    //params
+    '/forum/:forumId',// #swagger.tags=['Forum']
     isBothAuthenticated,
     getForumById
 )

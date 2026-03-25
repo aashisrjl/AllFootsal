@@ -4,13 +4,13 @@ const isBothAuthenticated = require("../../middleware/authMiddleware/bothAuthent
 const router = express.Router()
 
 router.post(
-    '/forum/reply/create', //#swagger.tags=['Forum Replies']
+    '/forum/:forumId/reply/create', //#swagger.tags=['Forum Replies']
     isBothAuthenticated,
     createForumReply
 )
 
 router.get(
-    '/forum/reply/:forumId', //#swagger.tags=['Forum Replies']
+    '/forum/:forumId/reply', //#swagger.tags=['Forum Replies']
     isBothAuthenticated,
     getRepliesByForumId
 )

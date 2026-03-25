@@ -6,12 +6,31 @@ require('dotenv').config();
 const passport = require('./utils/passport/passport');
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger-output.json');
-const {BASE_URL, ADMIN_COOKIE_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD} = process.env
-
-
+const { setupAdminPanel } = require('./config/adminConfig')
+const {CORS_ALLOWED_ORIGINS} = process.env
 
 const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
+
+// Core middleware (must be before routes)
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
+
+app.use(cors({
+  origin: CORS_ALLOWED_ORIGINS?.split(',') || '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE','PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// super admin operation using adminjs
+setupAdminPanel(app)
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
 
 // Routes
 const authRoutes = require("./routes/authRoutes/authRoute");
@@ -64,123 +83,6 @@ app.use('/api/v1/', visitorRoutes)
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 
-//super admin operation using adminjs
-const AdminJS = require('adminjs')
-const AdminJSExpress = require('@adminjs/express')
-const AdminJSSequelize = require('@adminjs/sequelize')
-const {
-  sequelize,
-  User,
-  Footsal,
-  Subscription,
-  Payment,
-  Forum,
-  ForumReply,
-  ForumLike,
-} = require('./models')
-
-AdminJS.registerAdapter(AdminJSSequelize)
-
-const adminJs = new AdminJS({
-  databases: [sequelize],
-  rootPath: '/admin',
-  dashboard:{
-    component: AdminJS.bundle('./components/dashboard-components.jsx'),
-    handler: async () => {
-      const [
-        totalUsers,
-        activeUsers,
-        totalFutsals,
-        activeSubscriptions,
-        totalForums,
-        totalReplies,
-        totalLikes,
-        monthlyRevenue,
-        recentPayments,
-      ] = await Promise.all([
-        User.count(),
-        User.count({ where: { isActive: true } }),
-        Footsal.count(),
-        Subscription.count({ where: { status: 'active' } }),
-        Forum.count(),
-        ForumReply.count(),
-        ForumLike.count(),
-        Payment.sum('amount', { where: { payment_status: 'completed' } }),
-        Payment.findAll({
-          limit: 5,
-          order: [['createdAt', 'DESC']],
-          attributes: ['id', 'amount', 'payment_status', 'payment_method', 'payment_date'],
-        }),
-      ])
-
-      return {
-        stats: {
-          totalUsers,
-          activeUsers,
-          totalFutsals,
-          activeSubscriptions,
-          totalForums,
-          totalReplies,
-          totalLikes,
-          monthlyRevenue: Number(monthlyRevenue || 0),
-        },
-        recentPayments: recentPayments.map((payment) => ({
-          id: payment.id,
-          amount: Number(payment.amount || 0),
-          status: payment.payment_status,
-          method: payment.payment_method,
-          date: payment.payment_date,
-        })),
-      }
-    },
-  }
-})
-
-// const router = AdminJSExpress.buildRouter(adminJs)
-const router = AdminJSExpress.buildAuthenticatedRouter(
-  adminJs,
-  {
-    authenticate: async (email, password) => {
-      if (
-        email === ADMIN_EMAIL &&
-        password === ADMIN_PASSWORD
-      ) {
-        return { email }
-      }
-      return null
-    },
-    cookieName: 'adminjs',
-    cookiePassword: ADMIN_COOKIE_SECRET,
-  },
-  null,
-  {
-    resave: false,
-    saveUninitialized: true,
-    secret: ADMIN_COOKIE_SECRET,
-  }
-)
-
-app.use(adminJs.options.rootPath, router)
-
-
-// Middleware
-app.use(helmet());
-app.use(cors(
-  origin => {
-    if (origin === 'http://localhost:3000' || origin === 'http://localhost:3001' || origin === 'http://localhost:3002' || origin === 'http://localhost:3003' || origin === 'http://localhost:5173') {
-      return true; // Allow requests from localhost:3000 and localhost:5173
-    }
-    return false; // Block requests from other origins
-  },
-  {
-    credentials: true, // Allow cookies to be sent with requests
-  }
-));
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(passport.initialize());
-
 // redis connection
 const { connectRedis } = require("./config/redisConfig");
 connectRedis();
@@ -205,6 +107,9 @@ app.get('/', (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
+  if (res.headersSent) {
+    return next(err);
+  }
   res.status(500).json({ 
     error: 'Something went wrong!',
     message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'

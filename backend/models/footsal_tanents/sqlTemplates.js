@@ -152,11 +152,12 @@ payment: (code) => `
       user_id INT NULL,
       ip_hash CHAR(64) NULL,
       user_agent VARCHAR(500) NULL,
+      session_id VARCHAR(255) NULL,
       visit_count INT NOT NULL DEFAULT 1,
       first_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_email (email),
-      INDEX idx_phone (phone),
+      INDEX idx_user_id (user_id),
+      INDEX idx_ip_hash (ip_hash),
       UNIQUE KEY uq_session (session_id)
     ) ENGINE=InnoDB;
   `
