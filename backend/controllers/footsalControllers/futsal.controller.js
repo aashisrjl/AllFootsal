@@ -1,7 +1,7 @@
 const { Footsal, Subscription } = require("../../models");
 
 const getAllFutsal = async (req,res)=>{
-    const futsals = await Futsal.find();
+    const futsals = await Footsal.findAll();
     if(!futsals[0]){
         return res.status(400).json({
             success:false,
@@ -17,7 +17,7 @@ const getAllFutsal = async (req,res)=>{
 
 const getFutsalById = async( req,res)=>{
     const {id} = req.params;
-    const futsal = await Futsal.findById(id);
+    const futsal = await Footsal.findByPk(id);
     if(!futsal){
         return res.status(400).json({
             success:false,

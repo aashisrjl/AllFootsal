@@ -6,7 +6,7 @@ async function createTenantTables(footsalCode) {
 
   const tableCreators = [
     'location', 'info', 'pitch', 'timeslot',
-    'booking', 'payment', 'rating', 'contact', 'analytics'
+    'booking', 'payment', 'rating', 'contact', 'analytics','media','visitor'
   ];
 
   for (const name of tableCreators) {
@@ -18,7 +18,7 @@ async function dropTenantTables(footsalCode) {
   const { sequelize } = db;
   const tables = [
     'analytics', 'contact', 'rating', 'payment',
-    'booking', 'timeslot', 'pitch', 'info', 'location'
+    'booking', 'timeslot', 'pitch', 'info', 'location', 'media', 'visitor'
   ];
 
   for (const name of tables) {

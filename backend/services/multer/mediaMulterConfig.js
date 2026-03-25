@@ -6,7 +6,7 @@ const storage = multer.diskStorage({
     cb(null, `${file.fieldname}-${Date.now()}.${ext}`);
   },
   destination: function (req, file, cb) {
-    cb(null, "./uploads");
+    cb(null, "../uploads");
   },
 });
 
@@ -21,4 +21,3 @@ const mediaUpload = multer({ storage, fileFilter });
 module.exports = {
   mediaUpload,
 };
-

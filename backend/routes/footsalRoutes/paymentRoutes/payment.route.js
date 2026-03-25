@@ -12,34 +12,34 @@ const resolveFutsalTenant = require("../../../middleware/tanentMiddleware/tanent
 const router = express.Router();
 
 router.get(
-    `/payment`,  // #swagger.tags=["Futsal/Payment"]
+    `/payment`,  // #swagger.tags=["Futsal/User/Tenant/Payment"]
     isFutsalAuthenticated, 
     getPayments
 );
 
 router.get(
-    `/payment/:paymentId`, // #swagger.tags=["Futsal/Payment"]
+    `/payment/:paymentId`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
     isFutsalAuthenticated,
     getPaymentById
 );
 
 // user side
 router.get(
-    `/futsal/:futsalId/payments/me`,
+    `/futsal/:futsalId/payments/me`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
     resolveFutsalTenant,
     isUserAuthenticated,
     getUserPayments
 );
 
 router.post(
-    `/futsal/:futsalId/payments/create`, // #swagger.tags=["Futsal/Payment"]
+    `/futsal/:futsalId/payments/create`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
     resolveFutsalTenant,
     isUserAuthenticated,
     createPayment
 );
 
 router.post(
-    `/futsal/:futsalId/payments/:paymentId/verify`, // #swagger.tags=["Futsal/Payment"]
+    `/futsal/:futsalId/payments/:paymentId/verify`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
     resolveFutsalTenant,
     isUserAuthenticated,
     verifyPayment

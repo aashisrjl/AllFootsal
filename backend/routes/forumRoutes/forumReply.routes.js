@@ -1,5 +1,6 @@
 const express = require("express")
 const { createForumReply, getRepliesByForumId, getRepliesByUserIdOrFutsalId } = require("../../controllers/forumControllers/forumReply.controller")
+const isBothAuthenticated = require("../../middleware/authMiddleware/bothAuthenticated")
 const router = express.Router()
 
 router.post(
