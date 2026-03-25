@@ -21,4 +21,3 @@ const mediaUpload = multer({ storage, fileFilter });
 module.exports = {
   mediaUpload,
 };
-
