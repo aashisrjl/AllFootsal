@@ -1,7 +1,7 @@
 const express = require("express");
-const isFutsalAuthenticated = require("../../middleware/authMiddleware/futsalAuthenticated");
-const resolveFutsalTenantWithToken = require("../../middleware/tanentMiddleware/resolveFutsalTenantWithToken");
-const { mediaUpload } = require("../../services/multer/mediaMulterConfig");
+const isFutsalAuthenticated = require("../../../middleware/authMiddleware/futsalAuthenticated");
+const resolveFutsalTenantWithToken = require("../../../middleware/tanentMiddleware/resolveFutsalTenantWithToken");
+const { mediaUpload } = require("../../../services/multer/mediaMulterConfig");
 
 const {
   uploadMedia,
@@ -15,13 +15,13 @@ const {
   uploadFacilitiesMediaByPitchId,
   deleteMediaByCategory,
   deleteMediaById,
-} = require("../../controllers/footsalControllers/mediaController/media.controller");
+} = require("../../../controllers/footsalControllers/mediaController/media.controller");
 
 const router = express.Router();
 
 // read (owner or user) - requires futsalId in URL
 router.get(
-  "/futsal/:futsalId/media/home",
+  "/futsal/:futsalId/media/home", // #swagger.tags = ['Futsal/Tenant/Media']
   resolveFutsalTenantWithToken,
   getHomeMedia
 );
@@ -31,41 +31,41 @@ router.get(
   getPitchMedia
 );
 router.get(
-  "/futsal/:futsalId/media/pitch/:pitchId",
+  "/futsal/:futsalId/media/pitch/:pitchId", // #swagger.tags = ['Futsal/Tenant/Media']
   resolveFutsalTenantWithToken,
   getPitchMediaById
 );
 router.get(
-  "/futsal/:futsalId/media/facility",
+  "/futsal/:futsalId/media/facility", // #swagger.tags = ['Futsal/Tenant/Media']
   resolveFutsalTenantWithToken,
   getFacilityMedia
 );
 router.get(
-  "/futsal/:futsalId/media/event",
+  "/futsal/:futsalId/media/event", // #swagger.tags = ['Futsal/Tenant/Media']
   resolveFutsalTenantWithToken,
   getEventMedia
 );
 router.get(
-  "/futsal/:futsalId/media/other",
+  "/futsal/:futsalId/media/other", // #swagger.tags = ['Futsal/Tenant/Media']
   resolveFutsalTenantWithToken,
   getOtherMedia
 );
 
 // owner uploads (use isFutsalAuthenticated => req.futsalCode)
 router.post(
-  "/futsal/media/upload",
+  "/futsal/media/upload", // #swagger.tags = ['Futsal/Tenant/Media']
   isFutsalAuthenticated,
   mediaUpload.single("media"),
   uploadMedia
 );
 router.post(
-  "/futsal/media/pitch/:pitchId/upload",
+  "/futsal/media/pitch/:pitchId/upload", // #swagger.tags = ['Futsal/Tenant/Media']
   isFutsalAuthenticated,
   mediaUpload.single("media"),
   uploadPitchMedia
 );
 router.post(
-  "/futsal/media/pitch/:pitchId/facility-upload",
+  "/futsal/media/pitch/:pitchId/facility-upload", // #swagger.tags=['Futsal/Tenant/Media']
   isFutsalAuthenticated,
   mediaUpload.single("media"),
   uploadFacilitiesMediaByPitchId
@@ -73,17 +73,17 @@ router.post(
 
 // owner deletes
 router.delete(
-  "/futsal/media/category/:category",
+  "/futsal/media/category/:category", // #swagger.tags = ['Futsal/Tenant/Media']
   isFutsalAuthenticated,
   deleteMediaByCategory
 );
 router.delete(
-  "/futsal/media/category/:category/pitch/:pitchId",
+  "/futsal/media/category/:category/pitch/:pitchId", // #swagger.tags = ['Futsal/Tenant/Media']
   isFutsalAuthenticated,
   deleteMediaByCategory
 );
 router.delete(
-  "/futsal/media/:id",
+  "/futsal/media/:id", // #swagger.tags = ['Futsal/Tenant/Media']
   isFutsalAuthenticated,
   deleteMediaById
 );

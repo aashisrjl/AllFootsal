@@ -15,25 +15,25 @@ const PORT = process.env.SERVER_PORT || 3000;
 
 // Routes
 const authRoutes = require("./routes/authRoutes/authRoute");
-app.use(BASE_URL, authRoutes)
+app.use('/api/v1/', authRoutes)
 
 //futsal payment and subscription routes
 const subscriptionRoutes = require("./routes/footsalRoutes/subscription.route")
 const paymentRoutes = require("./routes/footsalRoutes/payment.route")
-app.use(BASE_URL, subscriptionRoutes)
-app.use(BASE_URL, paymentRoutes)
+app.use('/api/v1/', subscriptionRoutes)
+app.use('/api/v1/', paymentRoutes)
 
 //forum routes
 const forumRoutes = require("./routes/forumRoutes/forum.routes")
 const forumReplyRoutes = require("./routes/forumRoutes/forumReply.routes")
-const forumlikesRoutes = require("./routes/forumRoutes/forumLikes.routes")  
-app.use(BASE_URL, forumRoutes)
-app.use(BASE_URL, forumReplyRoutes)
-app.use(BASE_URL, forumlikesRoutes)
+const forumlikesRoutes = require("./routes/forumRoutes/forumLike.routes")  
+app.use('/api/v1/', forumRoutes)
+app.use('/api/v1/', forumReplyRoutes)
+app.use('/api/v1/', forumlikesRoutes)
 
 //futsal routes
 const futsalRoutes = require("./routes/footsalRoutes/futsal.route")
-app.use(BASE_URL, futsalRoutes) 
+app.use('/api/v1/', futsalRoutes) 
 
 //tanents
 const analyticsRoutes = require("./routes/footsalRoutes/analyticsRoutes/analytics.route")
@@ -41,24 +41,24 @@ const contactRoutes = require("./routes/footsalRoutes/contactRoutes/contact.rout
 const locationRoutes = require("./routes/footsalRoutes/locationRoutes/location.route")
 const ratingRoutes = require("./routes/footsalRoutes/ratingRoutes/rating.route")
 const bookingRoutes = require("./routes/footsalRoutes/bookingRoutes/booking.route")
-const infoRoutes = require("./routes/footsalRoutes/infoRoutes/info.route")
+const infoRoutes = require("./routes/footsalRoutes/infoRoutes/info.routes")
 const mediaRoutes = require("./routes/footsalRoutes/mediaRoutes/media.route")
 const paymentFutsalRoutes = require("./routes/footsalRoutes/paymentRoutes/payment.route")
 const pitchRoutes = require("./routes/footsalRoutes/pitchRoutes/pitch.route")
-const timeslotRoutes = require("./routes/footsalRoutes/timeSlotRoutes/timeSlot.route")
-const visitorRoutes = require("./routes/footsalRoutes/visitorRoutes/visitor.route")
+const timeslotRoutes = require("./routes/footsalRoutes/timeslotsRoutes/timeslot.route")
+const visitorRoutes = require("./routes/footsalRoutes/visitorRoutes/visitors.route")
 
-app.use(BASE_URL, analyticsRoutes)
-app.use(BASE_URL, contactRoutes)
-app.use(BASE_URL, locationRoutes)
-app.use(BASE_URL, ratingRoutes)
-app.use(BASE_URL, bookingRoutes)
-app.use(BASE_URL, infoRoutes)
-app.use(BASE_URL, mediaRoutes)
-app.use(BASE_URL, paymentFutsalRoutes)
-app.use(BASE_URL, pitchRoutes)
-app.use(BASE_URL, timeslotRoutes)
-app.use(BASE_URL, visitorRoutes)
+app.use('/api/v1/', analyticsRoutes)
+app.use('/api/v1/', contactRoutes)
+app.use('/api/v1/', locationRoutes)
+app.use('/api/v1/', ratingRoutes)
+app.use('/api/v1/', bookingRoutes)
+app.use('/api/v1/', infoRoutes)
+app.use('/api/v1/', mediaRoutes)
+app.use('/api/v1/', paymentFutsalRoutes)
+app.use('/api/v1/', pitchRoutes)
+app.use('/api/v1/', timeslotRoutes)
+app.use('/api/v1/', visitorRoutes)
 
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
@@ -106,7 +106,18 @@ app.use(adminJs.options.rootPath, router)
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors(
+  origin => {
+    if (origin === 'http://localhost:3000' || origin === 'http://localhost:3001' || origin === 'http://localhost:3002' || origin === 'http://localhost:3003' || origin === 'http://localhost:5173') {
+      return true; // Allow requests from localhost:3000 and localhost:5173
+    }
+    return false; // Block requests from other origins
+  },
+  {
+    credentials: true, // Allow cookies to be sent with requests
+  }
+));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());

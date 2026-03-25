@@ -1,4 +1,3 @@
-const { QueryTypes } = require("sequelize");
 const {sequelize} = require("../../../models")
 const {QueryTypes} = require("sequelize");
 //by admin

@@ -17,7 +17,7 @@ router.get(
 )
 
 router.put(
-    '/futsal/info/:infoId', // #swagger.tags = ['Futsal/Tenanr/Info]
+    '/futsal/info/:infoId', // #swagger.tags = ['Futsal/Tenant/info']
     isFutsalAuthenticated,
     updateInfo
 )
