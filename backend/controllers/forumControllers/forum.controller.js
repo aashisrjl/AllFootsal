@@ -108,7 +108,12 @@ const getForumsByCategory = async (req,res)=>{
 
 //get forum by id
 const getForumById = async (req,res)=>{
-    const forumId = req.params.id;
+    const forumId = req.params.forumId;
+    if(!forumId){
+        return res.status(400).json({
+            success:false,
+            message:"Forum ID is required"});
+    }
     try {
         const forum = await Forum.findByPk(forumId);
         if(!forum){
@@ -130,8 +135,13 @@ const getForumById = async (req,res)=>{
 //get forum by slug
 const getForumBySlug = async (req,res)=>{
     const slug = req.params.slug;
+    if(!slug){
+        return res.status(400).json({
+            success:false,
+            message:"Slug is required"});
+    }
     try {
-        const forum = await Forum.findOne({where:{slug}});
+        const forum = await Forum.findAll({where:{slug}});
         if(!forum){
             return res.status(404).json({
                 success:false,

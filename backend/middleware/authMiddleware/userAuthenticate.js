@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const isUserAuthenticated = (req, res, next) => {
   try {
-    let token = req.cookies.utoken || req.headers.authorization?.split(" ")[1];
+    let token = req.cookies?.utoken || req.headers?.utoken;
     if (!token) {
       return res.status(401).json({ error: "Access token required" });
     }

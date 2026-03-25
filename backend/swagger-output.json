@@ -769,6 +769,16 @@
         "description": "",
         "parameters": [
           {
+            "name": "ftoken",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "utoken",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "authorization",
             "in": "header",
             "type": "string"
@@ -816,14 +826,32 @@
         "description": "",
         "parameters": [
           {
+            "name": "ftoken",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "utoken",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "authorization",
             "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "in": "query",
             "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "401": {
             "description": "Unauthorized"
@@ -840,13 +868,6 @@
           "Forum"
         ],
         "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -898,7 +919,7 @@
         }
       }
     },
-    "/api/v1/forum/{category}": {
+    "/api/v1/forum/{forumId}": {
       "get": {
         "tags": [
           "Forum"
@@ -906,19 +927,24 @@
         "description": "",
         "parameters": [
           {
-            "name": "category",
+            "name": "forumId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "authorization",
+            "name": "ftoken",
             "in": "header",
             "type": "string"
           },
           {
-            "name": "category",
-            "in": "query",
+            "name": "utoken",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "type": "string"
           }
         ],
@@ -928,38 +954,6 @@
           },
           "400": {
             "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/api/v1/forum/{id}": {
-      "get": {
-        "tags": [
-          "Forum"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
           },
           "401": {
             "description": "Unauthorized"
@@ -987,6 +981,16 @@
             "type": "string"
           },
           {
+            "name": "ftoken",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "utoken",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "authorization",
             "in": "header",
             "type": "string"
@@ -995,6 +999,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "401": {
             "description": "Unauthorized"
@@ -1008,13 +1015,29 @@
         }
       }
     },
-    "/api/v1/forum/reply/create": {
+    "/api/v1/forum/{forumId}/reply/create": {
       "post": {
         "tags": [
           "Forum Replies"
         ],
         "description": "",
         "parameters": [
+          {
+            "name": "forumId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "ftoken",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "utoken",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "authorization",
             "in": "header",
@@ -1046,7 +1069,7 @@
         }
       }
     },
-    "/api/v1/forum/reply/{forumId}": {
+    "/api/v1/forum/{forumId}/reply": {
       "get": {
         "tags": [
           "Forum Replies"
@@ -1057,6 +1080,16 @@
             "name": "forumId",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "ftoken",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "utoken",
+            "in": "header",
             "type": "string"
           },
           {
@@ -1085,6 +1118,16 @@
         ],
         "description": "",
         "parameters": [
+          {
+            "name": "ftoken",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "utoken",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "authorization",
             "in": "header",
@@ -1115,6 +1158,16 @@
         "description": "",
         "parameters": [
           {
+            "name": "ftoken",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "utoken",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "authorization",
             "in": "header",
             "type": "string"
@@ -1143,6 +1196,16 @@
         ],
         "description": "",
         "parameters": [
+          {
+            "name": "ftoken",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "utoken",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "authorization",
             "in": "header",
@@ -1176,6 +1239,16 @@
             "name": "forumId",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "ftoken",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "utoken",
+            "in": "header",
             "type": "string"
           },
           {
@@ -1715,11 +1788,6 @@
             "name": "futsalId",
             "in": "query",
             "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -1755,11 +1823,6 @@
           {
             "name": "futsalId",
             "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
             "type": "string"
           },
           {
@@ -1817,11 +1880,6 @@
             "type": "string"
           },
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
             "name": "body",
             "in": "body",
             "schema": {
@@ -1873,11 +1931,6 @@
           {
             "name": "futsalId",
             "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
             "type": "string"
           },
           {
@@ -2045,11 +2098,6 @@
             "name": "futsalId",
             "in": "query",
             "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -2085,11 +2133,6 @@
           {
             "name": "futsalId",
             "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
             "type": "string"
           },
           {
@@ -2167,11 +2210,6 @@
             "type": "string"
           },
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
             "name": "body",
             "in": "body",
             "schema": {
@@ -2225,11 +2263,6 @@
           {
             "name": "futsalId",
             "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
             "type": "string"
           },
           {
@@ -2978,11 +3011,6 @@
             "name": "futsalId",
             "in": "query",
             "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -3023,11 +3051,6 @@
           {
             "name": "futsalId",
             "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
             "type": "string"
           },
           {
@@ -3096,11 +3119,6 @@
           {
             "name": "futsalId",
             "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
             "type": "string"
           },
           {
