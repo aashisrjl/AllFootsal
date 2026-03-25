@@ -55,19 +55,19 @@ router.get(
 router.post(
   "/futsal/media/upload", // #swagger.tags = ['Futsal/Tenant/Media']
   isFutsalAuthenticated,
-  mediaUpload.single("media"),
+  mediaUpload.array("media"),
   uploadMedia
 );
 router.post(
   "/futsal/media/pitch/:pitchId/upload", // #swagger.tags = ['Futsal/Tenant/Media']
   isFutsalAuthenticated,
-  mediaUpload.single("media"),
+  mediaUpload.array("media"),
   uploadPitchMedia
 );
 router.post(
   "/futsal/media/pitch/:pitchId/facility-upload", // #swagger.tags=['Futsal/Tenant/Media']
   isFutsalAuthenticated,
-  mediaUpload.single("media"),
+  mediaUpload.array("media"),
   uploadFacilitiesMediaByPitchId
 );
 
