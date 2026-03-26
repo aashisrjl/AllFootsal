@@ -49,7 +49,7 @@ const getFutsalbySubsciption_true = async (req,res)=>{
         include:[
             {
                 model:Footsal,
-                as:"futsal",
+                as:"footsal",
                 attributes:["id","futsalCode","futsalName","email","phoneNumber","ownerName"]
             }
         ]

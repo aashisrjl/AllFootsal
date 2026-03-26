@@ -87,17 +87,19 @@ const getForumsByFutsalId = async (req,res)=>{
 
 //get forum by category
 const getForumsByCategory = async (req,res)=>{
-    const category = req.query.category;
+    const category = req.query?.category;
     if(!category){
         return res.status(400).json({
             success:false,
             message:"Category is required"});
     }
     try {
-        const forums = await Forum.findAll({where:{category}});
+        const forums = await Forum.findAll({
+            where:{category}
+        });
         res.status(200).json({  
             success:true,
-            message:"Forums fetched successfully",
+            message:"Forums fetched by Category successfully",
             data:forums
         });
     } catch (error) {

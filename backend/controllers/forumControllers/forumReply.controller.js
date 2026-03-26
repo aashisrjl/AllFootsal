@@ -54,12 +54,23 @@ const getRepliesByUserIdOrFutsalId = async (req,res)=>{
         });
     }
     try {
-        const replies = await ForumReply.findAll({where:{user_id:userId, footsal_id:futsalId}});
+        if(userId){
+        const userreplies = await ForumReply.findAll({where:{user_id:userId}});
         res.status(200).json({
             success:true,
             message:"Replies fetched successfully",
-            data:replies
+            data:userreplies
         });
+    }
+        if(futsalId){
+
+        const futsalReplies = await ForumReply.findAll({where:{futsal_id:futsalId}});
+        res.status(200).json({
+            success:true,
+            message:"Replies fetched successfully",
+            data:futsalReplies
+        });
+    }
     } catch (error) {
         console.error("Error fetching replies:", error);
         res.status(500).json({ error: "Failed to fetch replies" });

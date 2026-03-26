@@ -6,31 +6,35 @@ const createForumLike = async (req, res) => {
   const userId = req?.userId;
   const futsalId = req?.futsalId;
   //handle duplicated like by same user for same reply
+  if(userId){
   const existingLike = await ForumLike.findOne({
-    where: { reply_id: replyId, user_id: userId },
+    where: { forum_id: forumId, user_id: userId },
   });
   if (existingLike) {
     return res.status(400).json({
       success: false,
-      message: "You have already liked this reply",
+      message: "You have already liked this forum",
     });
   }
+}
 
+if(futsalId){
   const existingFutsalLike = await ForumLike.findOne({
-    where: { reply_id: replyId, footsal_id: futsalId },
+    where: { forum_id: forumId, futsal_id: futsalId },
   });
   if (existingFutsalLike) {
     return res.status(400).json({
       success: false,
-      message: "You have already liked this reply with the same futsal",
+      message: "You have already liked this forum with the same futsal",
     });
   }
+}
 
   try {
     const newLike = await ForumLike.create({
       forum_id: forumId,
       user_id: userId,
-      footsal_id: futsalId,
+      futsal_id: futsalId,
     });
     res.status(201).json({
       success: true,
@@ -52,6 +56,7 @@ const createReplyLike = async (req, res) => {
   const futsalId = req?.futsalId;
 
   //handle duplicated like by same user for same reply
+  if(userId){
   const existingLike = await ForumLike.findOne({
     where: { reply_id: replyId, user_id: userId },
   });
@@ -61,9 +66,11 @@ const createReplyLike = async (req, res) => {
       message: "You have already liked this reply",
     });
   }
+}
 
+if(futsalId){
   const existingFutsalLike = await ForumLike.findOne({
-    where: { reply_id: replyId, footsal_id: futsalId },
+    where: { reply_id: replyId, futsal_id: futsalId },
   });
   if (existingFutsalLike) {
     return res.status(400).json({
@@ -71,12 +78,12 @@ const createReplyLike = async (req, res) => {
       message: "You have already liked this reply with the same futsal",
     });
   }
-
+}
   try {
     const newLike = await ForumLike.create({
       reply_id: replyId,
       user_id: userId,
-      footsal_id: futsalId,
+      futsal_id: futsalId,
     });
     res.status(201).json({
       success: true,

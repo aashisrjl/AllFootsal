@@ -8,12 +8,12 @@ router.get(
 )
 
 router.get(
-    '/futsals/:id', // #swagger.tags = ['Futsal']
+    '/futsal/:id', // #swagger.tags = ['Futsal']
     getFutsalById
 )
 
 router.get(
-    '/futsals', // #swagger.tags = ['Futsal']
+    '/futsals/subscription', // #swagger.tags = ['Futsal']
     getFutsalbySubsciption_true
 )
 

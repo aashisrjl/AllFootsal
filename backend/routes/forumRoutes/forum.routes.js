@@ -31,7 +31,7 @@ router.get(
 
 router.get(
     //query parameter?category=help
-    '/forums', // #swagger.tags=['Forum']
+    '/forum', // #swagger.tags=['Forum']
     isBothAuthenticated,
     getForumsByCategory
 )
@@ -44,7 +44,7 @@ router.get(
 )
 
 router.get(
-    '/forum/:slug',// #swagger.tags=['Forum']
+    '/forum/slug/:slug',// #swagger.tags=['Forum']
     isBothAuthenticated,
     getForumBySlug
 )
