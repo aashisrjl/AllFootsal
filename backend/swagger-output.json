@@ -392,6 +392,153 @@
         }
       }
     },
+    "/api/v1/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/user/profile/": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "example": "any"
+                },
+                "email": {
+                  "example": "any"
+                },
+                "phoneNumber": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/users/profile/image": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/v1/subscription": {
       "get": {
         "tags": [
@@ -769,21 +916,6 @@
         "description": "",
         "parameters": [
           {
-            "name": "ftoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "utoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
             "name": "body",
             "in": "body",
             "schema": {
@@ -824,34 +956,9 @@
           "Forum"
         ],
         "description": "",
-        "parameters": [
-          {
-            "name": "ftoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "utoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "category",
-            "in": "query",
-            "type": "string"
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
           },
           "401": {
             "description": "Unauthorized"
@@ -919,6 +1026,28 @@
         }
       }
     },
+    "/api/v1/forum": {
+      "get": {
+        "tags": [
+          "Forum"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/api/v1/forum/{forumId}": {
       "get": {
         "tags": [
@@ -930,21 +1059,6 @@
             "name": "forumId",
             "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "ftoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "utoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
             "type": "string"
           }
         ],
@@ -967,7 +1081,7 @@
         }
       }
     },
-    "/api/v1/forum/{slug}": {
+    "/api/v1/forum/slug/{slug}": {
       "get": {
         "tags": [
           "Forum"
@@ -978,21 +1092,6 @@
             "name": "slug",
             "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "ftoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "utoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
             "type": "string"
           }
         ],
@@ -1026,21 +1125,6 @@
             "name": "forumId",
             "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "ftoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "utoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
             "type": "string"
           },
           {
@@ -1081,21 +1165,6 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "ftoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "utoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -1111,29 +1180,12 @@
         }
       }
     },
-    "/api/v1/forum/reply": {
+    "/api/v1/forum-reply": {
       "get": {
         "tags": [
           "Forum Replies"
         ],
         "description": "",
-        "parameters": [
-          {
-            "name": "ftoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "utoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -1150,7 +1202,7 @@
         }
       }
     },
-    "/api/v1/forum/create/like": {
+    "/api/v1/forum/{forumId}/create/like": {
       "post": {
         "tags": [
           "Forum/Like"
@@ -1158,18 +1210,9 @@
         "description": "",
         "parameters": [
           {
-            "name": "ftoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "utoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
+            "name": "forumId",
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],
@@ -1189,7 +1232,7 @@
         }
       }
     },
-    "/api/v1/forum/reply/create/like": {
+    "/api/v1/forum/reply/{replyId}/create/like": {
       "post": {
         "tags": [
           "Forum/Like"
@@ -1197,18 +1240,9 @@
         "description": "",
         "parameters": [
           {
-            "name": "ftoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "utoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
+            "name": "replyId",
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],
@@ -1240,20 +1274,32 @@
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           },
-          {
-            "name": "ftoken",
-            "in": "header",
-            "type": "string"
+          "401": {
+            "description": "Unauthorized"
           },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/forum/reply/likes/{replyId}": {
+      "get": {
+        "tags": [
+          "Forum/Like"
+        ],
+        "description": "",
+        "parameters": [
           {
-            "name": "utoken",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
+            "name": "replyId",
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],
@@ -1286,7 +1332,7 @@
         }
       }
     },
-    "/api/v1/futsals/{id}": {
+    "/api/v1/futsal/{id}": {
       "get": {
         "tags": [
           "Futsal"
@@ -1310,7 +1356,7 @@
         }
       }
     },
-    "/api/v1/futsals": {
+    "/api/v1/futsals/subscription": {
       "get": {
         "tags": [
           "Futsal"
@@ -1322,6 +1368,154 @@
           },
           "400": {
             "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/api/v1/super-admin/tenants": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/super-admin/tenants/{futsalCode}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "futsalCode",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/super-admin/tenants/{futsalCode}/create": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "futsalCode",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/super-admin/tenants/create/{futsalCode}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "futsalCode",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/super-admin/tenants/{futsalCode}/drop": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "futsalCode",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/super-admin/tenants/drop/{futsalCode}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "futsalCode",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }

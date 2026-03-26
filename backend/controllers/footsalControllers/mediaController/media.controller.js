@@ -1,5 +1,7 @@
 const { sequelize } = require("../../../models");
 const { QueryTypes } = require("sequelize");
+const fs = require("fs");
+const { uploadToCloudinary } = require("../../../services/cloudinary/cloudinary.service");
 
 const uploadMedia = async (req, res) => {
   try {
@@ -56,7 +58,15 @@ const uploadMedia = async (req, res) => {
       });
     }
 
-    const mediaUrl = media.path;
+    const cloudinaryResult = await uploadToCloudinary(media.path, {
+      folder: `allfutsal/media/${code}`,
+      resource_type: mediaType === "video" ? "video" : "image",
+    });
+    const mediaUrl = cloudinaryResult.secure_url;
+
+    if (media.path && fs.existsSync(media.path)) {
+      fs.unlinkSync(media.path);
+    }
 
     const newMedia = await sequelize.query(
       `INSERT INTO media_${code} (type, category, description, pitch_id, url)
@@ -362,7 +372,15 @@ const uploadPitchMedia = async (req, res) => {
       });
     }
 
-    const mediaUrl = media.path;
+    const cloudinaryResult = await uploadToCloudinary(media.path, {
+      folder: `allfutsal/media/${code}/pitch`,
+      resource_type: mediaType === "video" ? "video" : "image",
+    });
+    const mediaUrl = cloudinaryResult.secure_url;
+
+    if (media.path && fs.existsSync(media.path)) {
+      fs.unlinkSync(media.path);
+    }
 
     const newMedia = await sequelize.query(
       `INSERT INTO media_${code} (type, category, description, pitch_id, url)
@@ -436,7 +454,15 @@ const uploadFacilitiesMediaByPitchId = async (req, res) => {
       });
     }
 
-    const mediaUrl = media.path;
+    const cloudinaryResult = await uploadToCloudinary(media.path, {
+      folder: `allfutsal/media/${code}/facility`,
+      resource_type: mediaType === "video" ? "video" : "image",
+    });
+    const mediaUrl = cloudinaryResult.secure_url;
+
+    if (media.path && fs.existsSync(media.path)) {
+      fs.unlinkSync(media.path);
+    }
 
     const newMedia = await sequelize.query(
       `INSERT INTO media_${code} (type, category, description, pitch_id, url)
