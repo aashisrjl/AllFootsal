@@ -39,4 +39,5 @@ router.delete(
   "/super-admin/tenants/drop/:futsalCode", // #swagger.tags=['SuperAdmin']
   dropTenantForFutsalCode
 );
+
 module.exports = router;
