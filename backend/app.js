@@ -54,6 +54,10 @@ app.use('/api/v1/', forumlikesRoutes)
 const futsalRoutes = require("./routes/footsalRoutes/futsal.route")
 app.use('/api/v1/', futsalRoutes) 
 
+// super admin tenant operations
+const superAdminTenantRoutes = require("./routes/adminRoutes/superAdminTenant.route")
+app.use('/api/v1/', superAdminTenantRoutes)
+
 //tanents
 const analyticsRoutes = require("./routes/footsalRoutes/analyticsRoutes/analytics.route")
 const contactRoutes = require("./routes/footsalRoutes/contactRoutes/contact.route")
