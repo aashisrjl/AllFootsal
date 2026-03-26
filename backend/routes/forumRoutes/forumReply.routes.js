@@ -16,7 +16,7 @@ router.get(
 )
 
 router.get(
-    '/forum/reply', //#swagger.tags=['Forum Replies']
+    '/forum-reply', //#swagger.tags=['Forum Replies']
     isBothAuthenticated,
     getRepliesByUserIdOrFutsalId
 )

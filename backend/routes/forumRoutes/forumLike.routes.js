@@ -4,25 +4,25 @@ const isBothAuthenticated = require('../../middleware/authMiddleware/bothAuthent
 const router = express.Router()
 
 router.post(
-    '/forum/create/like', // #swagger.tags=['Forum/Like']
+    '/forum/:forumId/create/like', // #swagger.tags=['Forum/Like']
     isBothAuthenticated,
     createForumLike
 )
 
 router.post(
-    'forum/reply/create/like', // #swagger.tags=['Forum/Like']
+    '/forum/reply/:replyId/create/like', // #swagger.tags=['Forum/Like']
     isBothAuthenticated,
     createReplyLike
 )
 
 router.get(
-    'forum/likes/:forumId', // #swagger.tags=['Forum/Like']
+    '/forum/likes/:forumId', // #swagger.tags=['Forum/Like']
     isBothAuthenticated,
     countLikesByForumId
 )
 
 router.get(
-    'forum/likes/:forumId', // #swagger.tags=['Forum/Like']
+    '/forum/reply/likes/:replyId', // #swagger.tags=['Forum/Like']
     isBothAuthenticated,
     countLikesByReplyId
 )
