@@ -18,11 +18,24 @@ async function dropTenantTables(footsalCode) {
   const { sequelize } = db;
   const tables = [
     'analytics', 'contact', 'rating', 'payment',
-    'booking', 'timeslot', 'pitch', 'info', 'location', 'media', 'visitor'
+    'booking', 'timeslot', 'media', 'pitch', 'info', 'location', 'visitor'
   ];
 
-  for (const name of tables) {
-    await sequelize.query(`DROP TABLE IF EXISTS ${name}_${footsalCode}`);
+  const dialect = sequelize.getDialect();
+  const shouldToggleFkChecks = dialect === 'mysql' || dialect === 'mariadb';
+
+  try {
+    if (shouldToggleFkChecks) {
+      await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+    }
+
+    for (const name of tables) {
+      await sequelize.query(`DROP TABLE IF EXISTS ${name}_${footsalCode}`);
+    }
+  } finally {
+    if (shouldToggleFkChecks) {
+      await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
+    }
   }
 }
 

@@ -78,7 +78,9 @@ const setupAdminPanel = (app) => {
 		adminJs,
 		{
 			authenticate: async (email, password) => {
-				if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+				// Support multiple admin emails separated by commas
+				const adminEmails = ADMIN_EMAIL.split(',').map((e) => e.trim())
+				if (adminEmails.includes(email) && password === ADMIN_PASSWORD) {
 					return { email }
 				}
 				return null

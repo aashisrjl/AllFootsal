@@ -2,11 +2,32 @@ const { User } = require("../../models");
 const fs = require('fs');
 const path = require('path');
 const { upload } = require('../../services/multer/multerConfig');
+const { uploadToCloudinary } = require('../../services/cloudinary/cloudinary.service');
+
+const resolveStoredImagePath = (storedValue) => {
+    if (!storedValue) return null;
+
+    try {
+        if (storedValue.startsWith('http://') || storedValue.startsWith('https://')) {
+            const parsed = new URL(storedValue);
+            const fileName = path.basename(parsed.pathname);
+            return path.join(__dirname, '../../uploads', fileName);
+        }
+    } catch (error) {
+    }
+
+    if (storedValue.includes('/uploads/') || storedValue.includes('\\uploads\\')) {
+        const fileName = path.basename(storedValue);
+        return path.join(__dirname, '../../uploads', fileName);
+    }
+
+    return storedValue;
+};
 
 
 // by futsal owner
 const getAllUsers = async (req, res) => {
-  const users = await User.find();
+  const users = await User.findAll();
   if (users.length === 0) {
     return res.status(200).json({
       success: false,
@@ -87,37 +108,54 @@ const updateProfile = async (req,res)=>{
 
 // update profile image
 const updateProfileImage = async (req,res)=>{
-    const userId = req.userId;
-    const user = await User.findByPk(userId);
-    if(!user){
-        return res.status(404).json({
-            success: false,
-            message: "user not found",
-            data: null,
+    try {
+        const userId = req.userId;
+        const user = await User.findByPk(userId);
+        if(!user){
+            return res.status(404).json({
+                success: false,
+                message: "user not found",
+                data: null,
+            });
+        }
+        if(!req.file){
+            return res.status(400).json({
+                success: false,
+                message: "image is required",
+                data: null,
+            });
+        }
+
+        const cloudinaryResult = await uploadToCloudinary(req.file.path, {
+            folder: 'allfutsal/profile',
+            resource_type: 'image'
         });
-    }
-    if(user.profileImage){
-        fs.unlinkSync(user.profileImage);
-        fs.rmdirSync('./uploads');
-    }
 
-    const { image } = req.files;
-    if(!image){
-        return res.status(400).json({
-            success: false,
-            message: "image is required",
-            data: null,
+        const existingProfileImagePath = resolveStoredImagePath(user.profileImage);
+        if(existingProfileImagePath && fs.existsSync(existingProfileImagePath)){
+            fs.unlinkSync(existingProfileImagePath);
+        }
+
+        user.profileImage = cloudinaryResult.secure_url;
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "profile image updated successfully",
+            data: user,
         });
+    } catch (error) {
+        const errorMessage = error?.message || error?.error?.message || JSON.stringify(error);
+        return res.status(500).json({
+            success: false,
+            message: "failed to upload profile image",
+            error: errorMessage,
+        });
+    } finally {
+        if (req.file?.path && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
     }
-
-    user.profileImage = image.path;
-    await user.save();
-
-    return res.status(200).json({
-        success: true,
-        message: "profile image updated successfully",
-        data: user,
-    });
 }
 
 // delete profile image
@@ -132,10 +170,14 @@ const deleteProfileImage = async (req,res)=>{
         });
     }
 
+    const existingProfileImagePath = resolveStoredImagePath(user.profileImage);
     user.profileImage = null;  
     await user.save();
-    fs.unlinkSync(user.profileImage);
-    fs.rmdirSync('./uploads');
+
+    if(existingProfileImagePath && fs.existsSync(existingProfileImagePath)){
+        fs.unlinkSync(existingProfileImagePath);
+    }
+
     return res.status(200).json({
         success: true,
         message: "profile image deleted successfully",

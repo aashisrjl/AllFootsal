@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 require('dotenv').config();
 const passport = require('./utils/passport/passport');
 const swaggerUi = require('swagger-ui-express');
@@ -31,10 +32,14 @@ setupAdminPanel(app)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(express.static("./uploads/"));
 
 // Routes
 const authRoutes = require("./routes/authRoutes/authRoute");
 app.use('/api/v1/', authRoutes)
+const userRoutes = require("./routes/usersRoutes/users.routes")
+app.use('/api/v1/', userRoutes)
 
 //futsal payment and subscription routes
 const subscriptionRoutes = require("./routes/footsalRoutes/subscription.route")
@@ -53,6 +58,10 @@ app.use('/api/v1/', forumlikesRoutes)
 //futsal routes
 const futsalRoutes = require("./routes/footsalRoutes/futsal.route")
 app.use('/api/v1/', futsalRoutes) 
+
+// super admin tenant operations
+const superAdminTenantRoutes = require("./routes/adminRoutes/superAdminTenant.route")
+app.use('/api/v1/', superAdminTenantRoutes)
 
 //tanents
 const analyticsRoutes = require("./routes/footsalRoutes/analyticsRoutes/analytics.route")
