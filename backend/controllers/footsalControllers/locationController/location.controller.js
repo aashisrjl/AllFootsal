@@ -1,5 +1,5 @@
 const { QueryTypes, where, DataTypes } = require("sequelize");
-const { sequelize, Futsal } = require("../../../models");
+const { sequelize, Footsal } = require("../../../models");
 
 //by futsal
 const getFutsalLocation = async (req, res) => {
@@ -35,7 +35,7 @@ const postFutsalLocation = async (req, res) => {
     full_address,
   } = req.body;
 
-  if (!district || !adresss || !city || !longitude || !latitude) {
+  if (!district || !address || !city || !longitude || !latitude) {
     return res.status(400).json({
       success: false,
       message:
@@ -132,7 +132,19 @@ const editFutsalLocation = async(req,res)=>{
 }
 
 const getFutsalLocationByUser = async(req,res)=>{
-  const {code} = req.tanent;
+  const futsalId = req.params.futsalId;
+  const futsal = await Footsal.findOne({
+    where: { id: futsalId }
+  });
+  
+  if (!futsal) {
+    return res.status(404).json({
+      success: false,
+      message: "Futsal not found",
+    });
+  }
+  
+  const code = futsal.futsalCode;
   const futsalLocation = await sequelize.query(
     `SELECT * FROM location_${code}`,
     {

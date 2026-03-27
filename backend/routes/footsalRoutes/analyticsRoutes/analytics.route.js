@@ -6,7 +6,7 @@ const { getAnalytics } = require("../../../controllers/footsalControllers/analyt
 const router = express.Router();
 
 router.get(
-    "/futsal/analytics", // #swagger.tags = ['Futsal/Tenant/Analytics']
+    "/futsal/analytics/fetch", // #swagger.tags = ['Futsal/Tenant/Analytics']
     isFutsalAuthenticated,
      getAnalytics
     );

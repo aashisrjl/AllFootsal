@@ -14,7 +14,7 @@ const resolveFutsalTenantWithToken = async (req, res, next) => {
   if (!req.futsalCode) {
     try {
       const token =
-        req.cookies?.ftoken || req.headers.authorization?.split(" ")[1];
+        req.cookies?.ftoken || req.headers?.ftoken || req.headers.authorization?.split(" ")[1];
       if (token) {
         const decoded = jwt.verify(token, process.env.JWT_SECRET_FUTSAL);
         if (decoded?.role === "futsal") {
