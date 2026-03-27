@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const isFutsalAuthenticated = (req, res, next) => {
   try {
-    let ftoken = req.cookies?.ftoken || req.headers?.ftoken;
+    let ftoken = req.cookies?.ftoken || req.headers?.ftoken || req.headers.authorization?.split(" ")[1];
     // ✅ handle Authorization header
     if (!ftoken && req.headers.authorization) {
         const authHeader = req.headers.authorization;

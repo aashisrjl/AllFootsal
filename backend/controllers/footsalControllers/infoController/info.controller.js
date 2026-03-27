@@ -1,4 +1,4 @@
-const { sequelize } = require("../../../models");
+const { sequelize, Footsal } = require("../../../models");
 const { QueryTypes } = require("sequelize");
 
 const createInfo = async (req, res) => {
@@ -57,7 +57,20 @@ const createInfo = async (req, res) => {
 };
 
   const getInfo = async (req, res) => {
-    const code = req.futsalCode || req.tanent?.code;
+    const futsalId = req.params.futsalId;
+    const futsal = await Footsal.findAll({
+      where: { id: futsalId },
+      attributes: ["futsalCode"],
+    });
+    
+    if (futsal.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Futsal not found",
+      });
+    }
+    
+    const code = futsal[0].futsalCode;
     const info = await sequelize.query(
       `SELECT * FROM info_${code} ORDER BY created_at DESC LIMIT 1`,
       {

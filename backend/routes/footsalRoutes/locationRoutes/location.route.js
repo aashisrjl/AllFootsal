@@ -27,7 +27,7 @@ router.put(
 
 // by user
 router.get(
-  "/futsal/:futsalId/location", // #swagger.tags = ['Futsal/Tenant/Location']
+  "/futsal/:futsalId/location/", // #swagger.tags = ['Futsal/Tenant/Location']
   resolveFutsalTenant,
   getFutsalLocationByUser
 );
