@@ -1,6 +1,6 @@
 const express = require("express");
 const isFutsalAuthenticated = require("../../../middleware/authMiddleware/futsalAuthenticated");
-const resolveFutsalTenant = require("../../../middleware/tanentMiddleware/tanent.middleware");
+const optionalUserAuth = require("../../../middleware/authMiddleware/optionalUserAuth");
 
 const {
   getVisitorsDetails,
@@ -11,7 +11,7 @@ const router = express.Router();
 
 // owner/admin
 router.get(
-  "/futsal/visitors", // #swagger.tags=['Futsal/tenant/visitor']
+  "/futsal-visitors", // #swagger.tags=['Futsal/tenant/visitor']
    isFutsalAuthenticated,
     getVisitorsDetails
   );
@@ -19,7 +19,7 @@ router.get(
 // track a visitor (user auth optional)
 router.post(
   "/futsal/:futsalId/visitors/track",  // #swagger.tags=['Futsal/tenant/visitor']
-  resolveFutsalTenant,
+  optionalUserAuth,
   trackVisitor
 );
 

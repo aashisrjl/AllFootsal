@@ -3,6 +3,26 @@ const { QueryTypes } = require("sequelize");
 const fs = require("fs");
 const { uploadToCloudinary } = require("../../../services/cloudinary/cloudinary.service");
 
+const getUploadedMediaFiles = (req) => {
+  if (Array.isArray(req.files) && req.files.length > 0) return req.files;
+  if (Array.isArray(req.files?.media) && req.files.media.length > 0) return req.files.media;
+  if (req.file) return [req.file];
+  if (req.files?.media) return [req.files.media];
+  return [];
+};
+
+const getMediaType = (mimetype = "") => {
+  if (mimetype.startsWith("image/")) return "image";
+  if (mimetype.startsWith("video/")) return "video";
+  return null;
+};
+
+const safeDeleteLocalFile = (filePath) => {
+  if (filePath && fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
+};
+
 const uploadMedia = async (req, res) => {
   try {
     const code = req.futsalCode || req.tanent?.code;
@@ -13,16 +33,10 @@ const uploadMedia = async (req, res) => {
       });
     }
 
-    // multer can provide either:
-    // - req.file (upload.single('media'))
-    // - req.files.media (upload.fields([{ name: 'media' }]) => array)
-    const media =
-      req.file ||
-      req.files?.media ||
-      (Array.isArray(req.files?.media) ? req.files.media[0] : null);
+    const mediaFiles = getUploadedMediaFiles(req);
     const { category, description, pitchId } = req.body || {};
 
-    if (!media) {
+    if (!mediaFiles.length) {
       return res.status(400).json({
         success: false,
         message: "media is required",
@@ -32,19 +46,6 @@ const uploadMedia = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "category is required",
-      });
-    }
-
-    // validate the media type
-    let mediaType = null;
-    if (media.mimetype?.startsWith("image/")) {
-      mediaType = "image";
-    } else if (media.mimetype?.startsWith("video/")) {
-      mediaType = "video";
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "invalid media type",
       });
     }
 
@@ -58,35 +59,49 @@ const uploadMedia = async (req, res) => {
       });
     }
 
-    const cloudinaryResult = await uploadToCloudinary(media.path, {
-      folder: `allfutsal/media/${code}`,
-      resource_type: mediaType === "video" ? "video" : "image",
-    });
-    const mediaUrl = cloudinaryResult.secure_url;
+    const uploaded = [];
 
-    if (media.path && fs.existsSync(media.path)) {
-      fs.unlinkSync(media.path);
-    }
-
-    const newMedia = await sequelize.query(
-      `INSERT INTO media_${code} (type, category, description, pitch_id, url)
-       VALUES (:mediaType, :category, :description, :pitchId, :mediaUrl)`,
-      {
-        replacements: {
-          mediaType,
-          category,
-          description: description ?? null,
-          pitchId: normalizedPitchId,
-          mediaUrl,
-        },
-        type: QueryTypes.INSERT,
+    for (const media of mediaFiles) {
+      const mediaType = getMediaType(media.mimetype);
+      if (!mediaType) {
+        return res.status(400).json({
+          success: false,
+          message: "invalid media type",
+        });
       }
-    );
+
+      const cloudinaryResult = await uploadToCloudinary(media.path, {
+        folder: `allfutsal/media/${code}`,
+        resource_type: mediaType === "video" ? "video" : "image",
+      });
+
+      safeDeleteLocalFile(media.path);
+
+      await sequelize.query(
+        `INSERT INTO media_${code} (type, category, description, pitch_id, url)
+         VALUES (:mediaType, :category, :description, :pitchId, :mediaUrl)`,
+        {
+          replacements: {
+            mediaType,
+            category,
+            description: description ?? null,
+            pitchId: normalizedPitchId,
+            mediaUrl: cloudinaryResult.secure_url,
+          },
+          type: QueryTypes.INSERT,
+        }
+      );
+
+      uploaded.push(cloudinaryResult.secure_url);
+    }
 
     return res.status(200).json({
       success: true,
       message: "media uploaded successfully",
-      data: newMedia,
+      data: {
+        uploadedCount: uploaded.length,
+        urls: uploaded,
+      },
     });
   } catch (error) {
     return res.status(500).json({
@@ -347,59 +362,58 @@ const uploadPitchMedia = async (req, res) => {
       });
     }
 
-    const media =
-      req.file ||
-      req.files?.media ||
-      (Array.isArray(req.files?.media) ? req.files.media[0] : null);
+    const mediaFiles = getUploadedMediaFiles(req);
     const { description } = req.body || {};
 
-    if (!media) {
+    if (!mediaFiles.length) {
       return res.status(400).json({
         success: false,
         message: "media is required",
       });
     }
 
-    let mediaType = null;
-    if (media.mimetype?.startsWith("image/")) {
-      mediaType = "image";
-    } else if (media.mimetype?.startsWith("video/")) {
-      mediaType = "video";
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "invalid media type",
-      });
-    }
+    const uploaded = [];
 
-    const cloudinaryResult = await uploadToCloudinary(media.path, {
-      folder: `allfutsal/media/${code}/pitch`,
-      resource_type: mediaType === "video" ? "video" : "image",
-    });
-    const mediaUrl = cloudinaryResult.secure_url;
-
-    if (media.path && fs.existsSync(media.path)) {
-      fs.unlinkSync(media.path);
-    }
-
-    const newMedia = await sequelize.query(
-      `INSERT INTO media_${code} (type, category, description, pitch_id, url)
-       VALUES (:mediaType, 'pitch', :description, :pitchId, :mediaUrl)`,
-      {
-        replacements: {
-          mediaType,
-          description: description ?? null,
-          pitchId,
-          mediaUrl,
-        },
-        type: QueryTypes.INSERT,
+    for (const media of mediaFiles) {
+      const mediaType = getMediaType(media.mimetype);
+      if (!mediaType) {
+        return res.status(400).json({
+          success: false,
+          message: "invalid media type",
+        });
       }
-    );
+
+      const cloudinaryResult = await uploadToCloudinary(media.path, {
+        folder: `allfutsal/media/${code}/pitch`,
+        resource_type: mediaType === "video" ? "video" : "image",
+      });
+
+      safeDeleteLocalFile(media.path);
+
+      await sequelize.query(
+        `INSERT INTO media_${code} (type, category, description, pitch_id, url)
+         VALUES (:mediaType, 'pitch', :description, :pitchId, :mediaUrl)`,
+        {
+          replacements: {
+            mediaType,
+            description: description ?? null,
+            pitchId,
+            mediaUrl: cloudinaryResult.secure_url,
+          },
+          type: QueryTypes.INSERT,
+        }
+      );
+
+      uploaded.push(cloudinaryResult.secure_url);
+    }
 
     return res.status(200).json({
       success: true,
       message: "pitch media uploaded successfully",
-      data: newMedia,
+      data: {
+        uploadedCount: uploaded.length,
+        urls: uploaded,
+      },
     });
   } catch (error) {
     return res.status(500).json({
@@ -429,59 +443,58 @@ const uploadFacilitiesMediaByPitchId = async (req, res) => {
       });
     }
 
-    const media =
-      req.file ||
-      req.files?.media ||
-      (Array.isArray(req.files?.media) ? req.files.media[0] : null);
+    const mediaFiles = getUploadedMediaFiles(req);
     const { description } = req.body || {};
 
-    if (!media) {
+    if (!mediaFiles.length) {
       return res.status(400).json({
         success: false,
         message: "media is required",
       });
     }
 
-    let mediaType = null;
-    if (media.mimetype?.startsWith("image/")) {
-      mediaType = "image";
-    } else if (media.mimetype?.startsWith("video/")) {
-      mediaType = "video";
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "invalid media type",
-      });
-    }
+    const uploaded = [];
 
-    const cloudinaryResult = await uploadToCloudinary(media.path, {
-      folder: `allfutsal/media/${code}/facility`,
-      resource_type: mediaType === "video" ? "video" : "image",
-    });
-    const mediaUrl = cloudinaryResult.secure_url;
-
-    if (media.path && fs.existsSync(media.path)) {
-      fs.unlinkSync(media.path);
-    }
-
-    const newMedia = await sequelize.query(
-      `INSERT INTO media_${code} (type, category, description, pitch_id, url)
-       VALUES (:mediaType, 'facility', :description, :pitchId, :mediaUrl)`,
-      {
-        replacements: {
-          mediaType,
-          description: description ?? null,
-          pitchId,
-          mediaUrl,
-        },
-        type: QueryTypes.INSERT,
+    for (const media of mediaFiles) {
+      const mediaType = getMediaType(media.mimetype);
+      if (!mediaType) {
+        return res.status(400).json({
+          success: false,
+          message: "invalid media type",
+        });
       }
-    );
+
+      const cloudinaryResult = await uploadToCloudinary(media.path, {
+        folder: `allfutsal/media/${code}/facility`,
+        resource_type: mediaType === "video" ? "video" : "image",
+      });
+
+      safeDeleteLocalFile(media.path);
+
+      await sequelize.query(
+        `INSERT INTO media_${code} (type, category, description, pitch_id, url)
+         VALUES (:mediaType, 'facility', :description, :pitchId, :mediaUrl)`,
+        {
+          replacements: {
+            mediaType,
+            description: description ?? null,
+            pitchId,
+            mediaUrl: cloudinaryResult.secure_url,
+          },
+          type: QueryTypes.INSERT,
+        }
+      );
+
+      uploaded.push(cloudinaryResult.secure_url);
+    }
 
     return res.status(200).json({
       success: true,
       message: "facility media uploaded successfully",
-      data: newMedia,
+      data: {
+        uploadedCount: uploaded.length,
+        urls: uploaded,
+      },
     });
   } catch (error) {
     return res.status(500).json({

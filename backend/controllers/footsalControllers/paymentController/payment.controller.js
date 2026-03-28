@@ -12,6 +12,7 @@ const {
 
 const VALID_GATEWAYS = new Set(["cash", "khalti", "esewa", "bank_transfer"]);
 const VALID_STATUSES = new Set(["pending", "success", "failed", "refunded"]);
+const CONFIG_GATEWAYS = new Set(["khalti", "esewa"]);
 
 const normalizeTenantCode = (code) => {
     const value = String(code || "").trim();
@@ -121,6 +122,219 @@ const getUserBasicInfo = async (userId) => {
         email: "",
         phoneNumber: ""
     };
+};
+
+const parseBoolean = (value, defaultValue = false) => {
+    if (value === undefined || value === null) return defaultValue;
+    if (typeof value === "boolean") return value;
+    if (typeof value === "number") return value === 1;
+    const normalized = String(value).toLowerCase().trim();
+    return normalized === "true" || normalized === "1" || normalized === "yes";
+};
+
+const maskSecret = (secret) => {
+    if (!secret) return null;
+    const value = String(secret);
+    if (value.length <= 4) return "****";
+    return `${"*".repeat(value.length - 4)}${value.slice(-4)}`;
+};
+
+// by futsal owner
+const getPaymentConfigs = async (req, res) => {
+    try {
+        const tenant = await resolveTenantContext(req);
+        if (!tenant) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid futsal context is required"
+            });
+        }
+
+        const gatewayParam = req.params?.gateway ? String(req.params.gateway).toLowerCase().trim() : null;
+        if (gatewayParam && !CONFIG_GATEWAYS.has(gatewayParam)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid gateway. Allowed: esewa, khalti"
+            });
+        }
+
+        const whereClause = gatewayParam
+            ? { futsalId: tenant.futsalId, gateway: gatewayParam }
+            : { futsalId: tenant.futsalId };
+
+        const rows = await FutsalPaymentConfig.findAll({
+            where: whereClause,
+            order: [["gateway", "ASC"]]
+        });
+
+        const data = rows.map((row) => ({
+            id: row.id,
+            futsalId: row.futsalId,
+            gateway: row.gateway,
+            publicKey: row.publicKey,
+            merchantCode: row.merchantCode,
+            isActive: Boolean(row.isActive),
+            isLive: Boolean(row.isLive),
+            secretKeyMasked: maskSecret(extractSecretKey(row.secretEncrypted)),
+            createdAt: row.created_at,
+            updatedAt: row.updated_at,
+        }));
+
+        if (!gatewayParam) {
+            return res.status(200).json({
+                success: true,
+                message: "Payment configs fetched successfully",
+                data,
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Payment config fetched successfully",
+            data: data[0] || null,
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+};
+
+// by futsal owner
+const upsertPaymentConfig = async (req, res) => {
+    try {
+        const tenant = await resolveTenantContext(req);
+        if (!tenant) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid futsal context is required"
+            });
+        }
+
+        const gateway = String(req.body?.gateway || "").toLowerCase().trim();
+        const secretKey = req.body?.secretKey ? String(req.body.secretKey).trim() : "";
+        const publicKey = req.body?.publicKey ? String(req.body.publicKey).trim() : null;
+        const merchantCode = req.body?.merchantCode ? String(req.body.merchantCode).trim() : null;
+        const isActive = parseBoolean(req.body?.isActive, true);
+        const isLive = parseBoolean(req.body?.isLive, false);
+
+        if (!CONFIG_GATEWAYS.has(gateway)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid gateway. Allowed: esewa, khalti"
+            });
+        }
+
+        if (!secretKey) {
+            return res.status(400).json({
+                success: false,
+                message: "secretKey is required"
+            });
+        }
+
+        if (gateway === "esewa" && !merchantCode) {
+            return res.status(400).json({
+                success: false,
+                message: "merchantCode is required for eSewa"
+            });
+        }
+
+        const payload = {
+            publicKey,
+            secretEncrypted: Buffer.from(secretKey),
+            merchantCode: gateway === "esewa" ? merchantCode : null,
+            isActive,
+            isLive,
+        };
+
+        let config = await FutsalPaymentConfig.findOne({
+            where: {
+                futsalId: tenant.futsalId,
+                gateway,
+            },
+        });
+
+        if (!config) {
+            config = await FutsalPaymentConfig.create({
+                futsalId: tenant.futsalId,
+                gateway,
+                ...payload,
+            });
+        } else {
+            await config.update(payload);
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Payment config saved successfully",
+            data: {
+                id: config.id,
+                futsalId: config.futsalId,
+                gateway: config.gateway,
+                publicKey: config.publicKey,
+                merchantCode: config.merchantCode,
+                isActive: Boolean(config.isActive),
+                isLive: Boolean(config.isLive),
+                secretKeyMasked: maskSecret(extractSecretKey(config.secretEncrypted)),
+            },
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+};
+
+// by futsal owner
+const disablePaymentConfig = async (req, res) => {
+    try {
+        const tenant = await resolveTenantContext(req);
+        if (!tenant) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid futsal context is required"
+            });
+        }
+
+        const gateway = String(req.params?.gateway || "").toLowerCase().trim();
+        if (!CONFIG_GATEWAYS.has(gateway)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid gateway. Allowed: esewa, khalti"
+            });
+        }
+
+        const config = await FutsalPaymentConfig.findOne({
+            where: {
+                futsalId: tenant.futsalId,
+                gateway,
+            },
+        });
+
+        if (!config) {
+            return res.status(404).json({
+                success: false,
+                message: "Payment config not found",
+            });
+        }
+
+        await config.update({ isActive: false });
+
+        return res.status(200).json({
+            success: true,
+            message: "Payment config disabled successfully",
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
 };
 
 // by futsal
@@ -589,7 +803,13 @@ const verifyPayment = async (req, res) => {
             providerTxnId = payment.provider_txn_id || pidx;
 
             const khaltiStatus = String(khaltiResponse?.status || "").toLowerCase();
-            nextStatus = khaltiStatus === "completed" || khaltiStatus === "complete" ? "success" : "failed";
+            if (khaltiStatus === "completed" || khaltiStatus === "complete") {
+                nextStatus = "success";
+            } else if (khaltiStatus === "pending" || khaltiStatus === "initiated") {
+                nextStatus = "pending";
+            } else {
+                nextStatus = "failed";
+            }
         } else if (payment.gateway === "esewa") {
             const paymentConfig = await getGatewayConfig({
                 futsalId: tenant.futsalId,
@@ -603,8 +823,8 @@ const verifyPayment = async (req, res) => {
                 });
             }
 
-            const encodedData = req.body?.data;
-            if (!encodedData) {
+            const callbackData = req.body?.data;
+            if (!callbackData) {
                 return res.status(400).json({
                     success: false,
                     message: "eSewa callback data is required"
@@ -612,9 +832,18 @@ const verifyPayment = async (req, res) => {
             }
 
             let decodedData;
-            try {
-                decodedData = JSON.parse(Buffer.from(encodedData, "base64").toString("utf-8"));
-            } catch (decodeError) {
+            if (typeof callbackData === "string") {
+                try {
+                    decodedData = JSON.parse(Buffer.from(callbackData, "base64").toString("utf-8"));
+                } catch (decodeError) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Invalid eSewa callback data"
+                    });
+                }
+            } else if (typeof callbackData === "object" && callbackData !== null) {
+                decodedData = callbackData;
+            } else {
                 return res.status(400).json({
                     success: false,
                     message: "Invalid eSewa callback data"
@@ -706,5 +935,8 @@ module.exports = {
     getPaymentById,
     getUserPayments,
     createPayment,
-    verifyPayment
+    verifyPayment,
+    getPaymentConfigs,
+    upsertPaymentConfig,
+    disablePaymentConfig,
 };

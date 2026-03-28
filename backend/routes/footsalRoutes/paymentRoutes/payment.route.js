@@ -5,10 +5,12 @@ const {
   getPaymentById,
   getUserPayments,
   verifyPayment,
+    getPaymentConfigs,
+    upsertPaymentConfig,
+    disablePaymentConfig,
 } = require("../../../controllers/footsalControllers/paymentController/payment.controller");
 const isFutsalAuthenticated = require("../../../middleware/authMiddleware/futsalAuthenticated");
 const isUserAuthenticated = require("../../../middleware/authMiddleware/userAuthenticate");
-const resolveFutsalTenant = require("../../../middleware/tanentMiddleware/tanent.middleware");
 const router = express.Router();
 
 router.get(
@@ -23,24 +25,46 @@ router.get(
     getPaymentById
 );
 
+// futsal payment configuration
+router.get(
+    `/futsal/payment-config`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
+    isFutsalAuthenticated,
+    getPaymentConfigs
+);
+
+router.get(
+    `/futsal/payment-config/:gateway`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
+    isFutsalAuthenticated,
+    getPaymentConfigs
+);
+
+router.post(
+    `/futsal/payment-config`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
+    isFutsalAuthenticated,
+    upsertPaymentConfig
+);
+
+router.delete(
+    `/futsal/payment-config/:gateway`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
+    isFutsalAuthenticated,
+    disablePaymentConfig
+);
+
 // user side
 router.get(
     `/futsal/:futsalId/payments/me`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
-    resolveFutsalTenant,
     isUserAuthenticated,
     getUserPayments
 );
 
 router.post(
     `/futsal/:futsalId/payments/create`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
-    resolveFutsalTenant,
     isUserAuthenticated,
     createPayment
 );
 
 router.post(
     `/futsal/:futsalId/payments/:paymentId/verify`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
-    resolveFutsalTenant,
     isUserAuthenticated,
     verifyPayment
 );
