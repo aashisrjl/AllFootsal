@@ -89,8 +89,9 @@ const editFutsalLocation = async(req,res)=>{
   } = req.body;
 
   const ifExitFutsalLocation = await sequelize.query(
-    `SELECT * FROM location_${futsalCode} WHERE id=${locationId}`,{
-        type: DataTypes.SELECT
+    `SELECT * FROM location_${futsalCode} WHERE id = ?`,{
+        replacements: [locationId],
+        type: QueryTypes.SELECT
     }
   )
   if(!ifExitFutsalLocation[0]){
@@ -101,9 +102,10 @@ const editFutsalLocation = async(req,res)=>{
   }
 
 
-  const data = await sequelize.query(
-    `UPDATE TABLE location_${futsalCode} (district,address,city,postal_code,latitude,longitude,full_address)
-    values (?,?,?,?,?,?,?) WHERE id=${locationId}`,{
+  const [_, updateMeta] = await sequelize.query(
+    `UPDATE location_${futsalCode}
+    SET district = ?, address = ?, city = ?, postal_code = ?, latitude = ?, longitude = ?, full_address = ?
+    WHERE id = ?`,{
          replacements: [
           district,
           address,
@@ -112,11 +114,13 @@ const editFutsalLocation = async(req,res)=>{
           latitude,
           longitude,
           full_address,
+          locationId,
         ],
-        type: QueryTypes.UPDATE,
       },
   )
-  if(data.length < 1){
+
+  const affectedRows = typeof updateMeta === "number" ? updateMeta : updateMeta?.affectedRows;
+  if(!affectedRows){
     return res.status(400).json({
         success: false,
         message: "can't update location data"
@@ -125,7 +129,9 @@ const editFutsalLocation = async(req,res)=>{
   res.status(200).json({
     success: true,
     message: "location updated successfully",
-    data
+    data: {
+      affectedRows,
+    }
 
   })
 
@@ -133,18 +139,31 @@ const editFutsalLocation = async(req,res)=>{
 
 const getFutsalLocationByUser = async(req,res)=>{
   const futsalId = req.params.futsalId;
-  const futsal = await Footsal.findOne({
-    where: { id: futsalId }
-  });
-  
-  if (!futsal) {
-    return res.status(404).json({
-      success: false,
-      message: "Futsal not found",
+  let code = req.tenant?.code || req.tanent?.code;
+
+  if (!code) {
+    const futsal = await Footsal.findOne({
+      where: { id: futsalId }
     });
+
+    if (!futsal) {
+      const futsalByCode = await Footsal.findOne({
+        where: { futsalCode: futsalId }
+      });
+
+      if (!futsalByCode) {
+        return res.status(404).json({
+          success: false,
+          message: "Futsal not found",
+        });
+      }
+
+      code = futsalByCode.futsalCode;
+    } else {
+      code = futsal.futsalCode;
+    }
   }
-  
-  const code = futsal.futsalCode;
+
   const futsalLocation = await sequelize.query(
     `SELECT * FROM location_${code}`,
     {

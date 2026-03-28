@@ -7,9 +7,16 @@ const resolveFutsalTenant = async(req, res, next)=> {
       return res.status(400).json({ message: "Invalid futsalId" });
     }
 
-    const futsal = await Footsal.findByPk(futsalId, {
+    let futsal = await Footsal.findByPk(futsalId, {
       attributes: ["id", "futsalCode", "isActive"]
     });
+
+    if (!futsal) {
+      futsal = await Footsal.findOne({
+        where: { futsalCode: futsalId },
+        attributes: ["id", "futsalCode", "isActive"],
+      });
+    }
 
     if (!futsal || !futsal.isActive) {
       return res.status(404).json({ message: "Futsal not found" });
