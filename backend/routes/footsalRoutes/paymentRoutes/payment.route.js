@@ -8,7 +8,6 @@ const {
 } = require("../../../controllers/footsalControllers/paymentController/payment.controller");
 const isFutsalAuthenticated = require("../../../middleware/authMiddleware/futsalAuthenticated");
 const isUserAuthenticated = require("../../../middleware/authMiddleware/userAuthenticate");
-const resolveFutsalTenant = require("../../../middleware/tanentMiddleware/tanent.middleware");
 const router = express.Router();
 
 router.get(
@@ -26,21 +25,18 @@ router.get(
 // user side
 router.get(
     `/futsal/:futsalId/payments/me`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
-    resolveFutsalTenant,
     isUserAuthenticated,
     getUserPayments
 );
 
 router.post(
     `/futsal/:futsalId/payments/create`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
-    resolveFutsalTenant,
     isUserAuthenticated,
     createPayment
 );
 
 router.post(
     `/futsal/:futsalId/payments/:paymentId/verify`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
-    resolveFutsalTenant,
     isUserAuthenticated,
     verifyPayment
 );
