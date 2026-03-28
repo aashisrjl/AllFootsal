@@ -1,14 +1,28 @@
-const { sequelize } = require("../../../models")
+const { sequelize, Footsal } = require("../../../models")
 const {QueryTypes} = require("sequelize");
+
+const resolveBookingTenantCode = async (req) => {
+    const codeFromReq = req.futsalCode || req.tenant?.code || req.tanent?.code;
+    if (codeFromReq) return codeFromReq;
+
+    const futsalId = req.params?.futsalId;
+    if (!futsalId) return null;
+
+    const futsal = await Footsal.findOne({ where: { id: futsalId } });
+    if (futsal?.futsalCode) return futsal.futsalCode;
+
+    const futsalByCode = await Footsal.findOne({ where: { futsalCode: futsalId } });
+    return futsalByCode?.futsalCode || null;
+}
 
 //by admin
 const getBookingsByAdmin = async (req,res) => {
-    const futsalCode = req.futsalCode;
+    const futsalCode = req?.futsalCode;
     // bookings, userId, pitchId, timeslotId
     const bookings = await sequelize.query(
         `SELECT b.*, u.username as user_name, p.name as pitch_name, t.start_time, t.end_time 
          FROM booking_${futsalCode} b 
-         JOIN user_${futsalCode} u ON b.user_id = u.id 
+         JOIN users u ON b.user_id = u.id 
          JOIN pitch_${futsalCode} p ON b.pitch_id = p.id 
          JOIN timeslot_${futsalCode} t ON b.timeslot_id = t.id`,
         {
@@ -32,8 +46,15 @@ const getBookingsByAdmin = async (req,res) => {
 
 //user
 const getBookingsByUser = async (req,res) => {
-    const code = req.futsalCode || req.tenant?.code;
+    const code = await resolveBookingTenantCode(req);
     const userId = req.userId;
+
+    if (!code) {
+        return res.status(404).json({
+            success: false,
+            message: "Futsal not found",
+        });
+    }
 
     const bookings = await sequelize.query(
         `SELECT b.*, p.name as pitch_name, t.start_time, t.end_time 
@@ -64,9 +85,16 @@ const getBookingsByUser = async (req,res) => {
 
 //user
 const cancelBooking = async (req,res) => {
-    const code = req.futsalCode || req.tenant?.code;
+    const code = await resolveBookingTenantCode(req);
     const userId = req.userId;
     const bookingId = req.params.bookingId;
+
+    if (!code) {
+        return res.status(404).json({
+            success: false,
+            message: "Futsal not found",
+        });
+    }
 
     await sequelize.query(
         `UPDATE booking_${code} SET status = 'cancelled' 
@@ -105,9 +133,16 @@ const cancelBookingByAdmin = async (req,res) => {
 
 //user
 const deleteBookingByUser = async (req,res) => {
-    const code = req.futsalCode || req.tenant?.code;
+    const code = await resolveBookingTenantCode(req);
     const userId = req.userId;
     const bookingId = req.params.bookingId;
+
+    if (!code) {
+        return res.status(404).json({
+            success: false,
+            message: "Futsal not found",
+        });
+    }
 
     await sequelize.query(
         `DELETE FROM booking_${code} 
@@ -167,9 +202,16 @@ const getBookingStats = async (req,res) => {
 
 //user create bokings -> payment ( after payment success then booking will be confirmed, otherwise it will be pending or cancelled based on payment status)
 const createBooking = async (req,res) => {
-    const code = req.futsalCode || req.tenant?.code;
+    const code = await resolveBookingTenantCode(req);
     const userId = req.userId;
     const {pitch_id, timeslot_id, booking_date, amount, notes} = req.body;
+
+    if (!code) {
+        return res.status(404).json({
+            success: false,
+            message: "Futsal not found",
+        });
+    }
 
     if(!pitch_id || !timeslot_id || !booking_date || !amount){
         return res.status(400).json({

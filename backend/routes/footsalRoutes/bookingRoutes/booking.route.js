@@ -8,7 +8,7 @@ const router = express.Router();
 
 // admin (owner)
 router.get(
-  "/futsal/bookings", // #swagger.tags = ['Futsal/Tenant/Bookings']
+  "/futsal-bookings", // #swagger.tags = ['Futsal/Tenant/Bookings']
    isFutsalAuthenticated,
     getBookingsByAdmin
   );
@@ -34,28 +34,24 @@ router.delete(
 // user
 router.get(
   "/futsal/:futsalId/bookings", // #swagger.tags = ['Futsal/Tenant/Bookings']
-  resolveFutsalTenant,
   isUserAuthenticated,
   getBookingsByUser
 );
 
 router.post(
   "/futsal/:futsalId/bookings", // #swagger.tags = ['Futsal/Tenant/Bookings']
-  resolveFutsalTenant,
   isUserAuthenticated,
   createBooking
 );
 
 router.patch(
   "/futsal/:futsalId/bookings/:bookingId/cancel", // #swagger.tags = ['Futsal/Tenant/Bookings']
-  resolveFutsalTenant,
   isUserAuthenticated,
   cancelBooking
 );
 
 router.delete(
   "/futsal/:futsalId/bookings/:bookingId", // #swagger.tags = ['Futsal/Tenant/Bookings']
-  resolveFutsalTenant,
   isUserAuthenticated,
   deleteBookingByUser
 );
