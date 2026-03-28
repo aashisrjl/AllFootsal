@@ -3,9 +3,25 @@ const {Forum} = require('../../models');
 
 const createForum = async (req,res)=>{
     const {title, content,slug, category} = req.body;
-
+     
+    if(!title || !content || !slug || !category){
+        return res.status(400).json({
+            success:false,
+            message:"Title, content, slug and category are required"});
+    }
     const userId = req.userId;
+    if(!userId) {
+        return res.status(400).json({
+            success:false,
+            message:"User ID is required"});
+    }
     const futsalId = req.futsalId;
+    if(!futsalId) {
+        return res.status(400).json({
+            success:false,
+            message:"Futsal ID is required"});
+    }
+
     try {
         const newForum = await Forum.create({
             title,
@@ -15,11 +31,13 @@ const createForum = async (req,res)=>{
             user_id: userId,
             futsal_id: futsalId
         });
+
         res.status(201).json({
             success:true,
             message:"Forum created successfully",
             data:newForum
         });
+
     } catch (error) {
         console.error("Error creating forum:", error);
         res.status(500).json({ error: "Failed to create forum" });
@@ -30,6 +48,11 @@ const createForum = async (req,res)=>{
 const getAllForums = async (req,res)=>{
     try {
         const forums = await Forum.findAll();
+        if(forums.length === 0){
+            return res.status(404).json({
+                success:false,
+                message:"No forums found"});
+        }
         res.status(200).json({
             success: true,
             message: "Forums fetched successfully",
@@ -52,6 +75,11 @@ const getForumsByUserId = async (req,res)=>{
     }
     try {
         const forums = await Forum.findAll({where:{user_id:userId}});
+        if(forums.length === 0){
+            return res.status(404).json({
+                success:false,
+                message:"No forums found for this user"});
+        }
         res.status(200).json({  
             success:true,
             message:"Forums fetched successfully",
@@ -73,6 +101,11 @@ const getForumsByFutsalId = async (req,res)=>{
     }
     try {
         const forums = await Forum.findAll({where:{futsal_id:futsalId}});
+        if(forums.length === 0){
+            return res.status(404).json({
+                success:false,
+                message:"No forums found for this futsal"});
+        }
         res.status(200).json({  
             success:true,
             message:"Forums fetched successfully",
@@ -95,6 +128,11 @@ const getForumsByCategory = async (req,res)=>{
     }
     try {
         const forums = await Forum.findAll({where:{category}});
+        if(forums.length === 0){
+            return res.status(404).json({
+                success:false,
+                message:"No forums found for this category"});
+        }
         res.status(200).json({  
             success:true,
             message:"Forums fetched successfully",
@@ -109,6 +147,11 @@ const getForumsByCategory = async (req,res)=>{
 //get forum by id
 const getForumById = async (req,res)=>{
     const forumId = req.params.id;
+    if(!forumId){
+        return res.status(400).json({
+            success:false,
+            message:"Forum ID is required"});
+    }
     try {
         const forum = await Forum.findByPk(forumId);
         if(!forum){
@@ -130,6 +173,11 @@ const getForumById = async (req,res)=>{
 //get forum by slug
 const getForumBySlug = async (req,res)=>{
     const slug = req.params.slug;
+    if(!slug){
+        return res.status(400).json({
+            success:false,
+            message:"Forum slug is required"});
+    }
     try {
         const forum = await Forum.findOne({where:{slug}});
         if(!forum){
