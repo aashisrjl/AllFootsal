@@ -1,27 +1,11 @@
 //create 
-const {Forum} = require('../../models');
+const { Forum } = require('../../models');
 
 const createForum = async (req,res)=>{
     const {title, content,slug, category} = req.body;
-     
-    if(!title || !content || !slug || !category){
-        return res.status(400).json({
-            success:false,
-            message:"Title, content, slug and category are required"});
-    }
-    const userId = req.userId;
-    if(!userId) {
-        return res.status(400).json({
-            success:false,
-            message:"User ID is required"});
-    }
-    const futsalId = req.futsalId;
-    if(!futsalId) {
-        return res.status(400).json({
-            success:false,
-            message:"Futsal ID is required"});
-    }
 
+    const userId = req?.userId;
+    const futsalId = req?.futsalId;
     try {
         const newForum = await Forum.create({
             title,
@@ -67,7 +51,7 @@ const getAllForums = async (req,res)=>{
 //get forum by userId
 
 const getForumsByUserId = async (req,res)=>{
-    const userId = req.userId;  
+    const userId = req?.userId;
     if(!userId){
         return res.status(400).json({
             success:false,
@@ -93,7 +77,7 @@ const getForumsByUserId = async (req,res)=>{
 
 //get forum by futsalId 
 const getForumsByFutsalId = async (req,res)=>{
-    const futsalId = req.futsalId;
+    const futsalId = req?.futsalId;
     if(!futsalId){
         return res.status(400).json({
             success:false,
@@ -120,7 +104,7 @@ const getForumsByFutsalId = async (req,res)=>{
 
 //get forum by category
 const getForumsByCategory = async (req,res)=>{
-    const category = req.query.category;
+    const category = req.query?.category;
     if(!category){
         return res.status(400).json({
             success:false,
@@ -135,7 +119,7 @@ const getForumsByCategory = async (req,res)=>{
         }
         res.status(200).json({  
             success:true,
-            message:"Forums fetched successfully",
+            message:"Forums fetched by Category successfully",
             data:forums
         });
     } catch (error) {
@@ -146,7 +130,7 @@ const getForumsByCategory = async (req,res)=>{
 
 //get forum by id
 const getForumById = async (req,res)=>{
-    const forumId = req.params.id;
+    const forumId = req.params.forumId;
     if(!forumId){
         return res.status(400).json({
             success:false,
@@ -179,7 +163,7 @@ const getForumBySlug = async (req,res)=>{
             message:"Forum slug is required"});
     }
     try {
-        const forum = await Forum.findOne({where:{slug}});
+        const forum = await Forum.findAll({where:{slug}});
         if(!forum){
             return res.status(404).json({
                 success:false,

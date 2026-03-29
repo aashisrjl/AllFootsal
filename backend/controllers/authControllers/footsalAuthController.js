@@ -1,7 +1,7 @@
 const { FOOTSAL_PASSWORD_SALT_ROUNDS } = process.env;
 const { redisClient } = require("../../config/redisConfig");
 const { Footsal, User } = require("../../models");
-const createTenantTables = require("../../models/footsal_tanents/createTenantTables");
+const { createTenantTables } = require("../../models/footsal_tanents/createTenantTables");
 const { generateOTP } = require("../../utils/otpGenerator/otpGenerator");
 const sendOtp = require("../../utils/sendOtp/sendOtp");
 const bcrypt = require("bcryptjs");
@@ -51,15 +51,15 @@ module.exports = RegisterFootsal = async (req, res) => {
 
   // create new footsal
   const newFootsal = await Footsal.create({
-    footsalCode: futsal_code,
-    footsalName,
+    futsalCode: futsal_code,
+    futsalName: footsalName,
     ownerName,
     email,
     password: hashedPassword,
     phoneNumber,
   });
 
-  // await createTenantTables(newFootsal.footsalCode);
+  await createTenantTables(newFootsal.futsalCode);
 
   // Generate otp code
   const otp = generateOTP(6);
@@ -82,8 +82,8 @@ module.exports = RegisterFootsal = async (req, res) => {
     message: "Footsal registered successfully",
     footsal: {
       id: newFootsal.id,
-      footsalCode: newFootsal.footsalCode,
-      footsalName: newFootsal.footsalName,
+      futsalCode: newFootsal.footsalCode,
+      futsalName: newFootsal.footsalName,
       ownerName: newFootsal.ownerName,
       email: newFootsal.email,
       phoneNumber: newFootsal.phoneNumber,

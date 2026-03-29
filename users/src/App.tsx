@@ -8,7 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { BookingProvider } from "@/contexts/BookingContext";
 
 import Index from "./pages/Index";
-import Facilities from "./pages/Facilities";
+import Facilities from "./pages/Futsals";
 import FacilityDetails from "./pages/FacilityDetails";
 import Login from "./pages/Login";
 import UserBookings from "./pages/UserBookings";
@@ -24,6 +24,7 @@ import Pricing from "./pages/Pricing";
 import Forum from "./pages/Forum";
 import FootsalAuthRegister from "./pages/FootsalAuthRegister";
 import Subscription from "./pages/Subscription";
+import Futsals from "./pages/Futsals";
 
 const queryClient = new QueryClient();
 
@@ -37,8 +38,8 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              {/* <Route path="/facilities" element={<Facilities />} />
-              <Route path="/facilities/:id" element={<FacilityDetails />} /> */}
+              <Route path="/futsals" element={<Futsals />} />
+              <Route path="/futsals/:id" element={<FacilityDetails />} />
               <Route path="/auth/login" element={<Login />} />
               <Route path="/auth/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/reset-password" element={<ResetPassword />} />

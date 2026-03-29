@@ -49,6 +49,26 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
+
+    //settings
+    notifications: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    darkMode: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+
+    // For password reset
+    resetPasswordToken: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    resetPasswordExpires: {
+      type: DataTypes.DATE,
+      allowNull: true
+    }
   });
 
   return User;

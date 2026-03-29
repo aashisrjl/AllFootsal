@@ -1,15 +1,22 @@
 const { Footsal } = require("../../models");
 
-module.exports = async function resolveFutsalTenant(req, res, next) {
+const resolveFutsalTenant = async(req, res, next)=> {
   try {
     const futsalId = Number(req.params.futsalId || req.body.futsalId || req.query.futsalId);
     if (!Number.isInteger(futsalId)) {
       return res.status(400).json({ message: "Invalid futsalId" });
     }
 
-    const futsal = await Footsal.findByPk(futsalId, {
+    let futsal = await Footsal.findByPk(futsalId, {
       attributes: ["id", "futsalCode", "isActive"]
     });
+
+    if (!futsal) {
+      futsal = await Footsal.findOne({
+        where: { futsalCode: futsalId },
+        attributes: ["id", "futsalCode", "isActive"],
+      });
+    }
 
     if (!futsal || !futsal.isActive) {
       return res.status(404).json({ message: "Futsal not found" });
@@ -27,3 +34,5 @@ module.exports = async function resolveFutsalTenant(req, res, next) {
     next(err);
   }
 };
+
+module.exports = resolveFutsalTenant

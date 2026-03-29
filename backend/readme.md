@@ -1,4 +1,4 @@
-# Goal Futsal Nepal Booking Backend
+# AllFutsal - Futsal management and Bookings  Backend
 
 This is the backend server for Goal Futsal Nepal Booking, supporting user, admin, and futsal management. Built with Node.js, Express, and MariaDB, it provides RESTful APIs for booking, user management, payments, and facility administration.
 
@@ -192,9 +192,9 @@ This is the easiest way to run the entire stack including database and PHPMyAdmi
    - Backend API: http://localhost:3000
    - Health Check: http://localhost:3000/health
    - PHPMyAdmin: http://localhost:8080
-     - Server: `db`
-     - Username: `footsal_user`
-     - Password: `root`
+     - Server: `futsal-db`
+     - Username: `root`
+     - Password: ``
 
 4. **View logs:**
    ```bash
@@ -359,3 +359,4 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 ## License
 [MIT](LICENSE)
+

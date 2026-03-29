@@ -1,11 +1,37 @@
-const {sequelize} = require('../../../models');
+const {sequelize, Footsal} = require('../../../models');
 const {QueryTypes} = require('sequelize');
 const crypto = require("crypto");
 
 
 // track visitor by user id or ip address and user agent
 const trackVisitor = async (req, res) => {
-  const { code } = req.tanent;
+  const futsalId = req.params.futsalId;
+  let code = req?.tanent?.code || req?.tenant?.code;
+
+  // If code not set by middleware, resolve futsal by ID or code
+  if (!code) {
+    const futsal = await Footsal.findOne({
+      where: { id: futsalId }
+    });
+
+    if (!futsal) {
+      const futsalByCode = await Footsal.findOne({
+        where: { futsalCode: futsalId }
+      });
+
+      if (!futsalByCode) {
+        return res.status(404).json({
+          success: false,
+          message: "Futsal not found"
+        });
+      }
+
+      code = futsalByCode.futsalCode;
+    } else {
+      code = futsal.futsalCode;
+    }
+  }
+
   const userId = req.userId || null;
   const ip = (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || req.socket.remoteAddress || "";
   const ipHash = ip ? crypto.createHash("sha256").update(ip).digest("hex") : null;

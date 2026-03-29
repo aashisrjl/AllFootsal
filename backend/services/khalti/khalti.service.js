@@ -1,4 +1,4 @@
-const KHALTI_SECRET_KEY =process.env.KHALTI_SECRET_KEY || "824b228b3d7c4a1eb4dce1f4e1f70559";
+const KHALTI_SECRET_KEY =process.env.KHALTI_SECRET_KEY
 
 const KHALTI_GATEWAY_URL ="https://a.khalti.com/api/v2/epayment/initiate/";
 
