@@ -2,13 +2,23 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { User, AuthState } from "@/types";
 import { toast } from "@/components/ui/use-toast";
-import { API } from "@/lib/authApi";
+import {
+  loginUser,
+  loginFutsal,
+  registerUser as registerUserApi,
+  registerFutsal as registerFutsalApi,
+  googleLogin as googleLoginApi,
+  logoutUser,
+  verifyOtp as verifyOtpApi,
+} from "@/lib/authApi";
 
 interface AuthContextType extends AuthState {
-  login: (email: string, password: string) => Promise<boolean>;
-  registerUser: (name: string,email: string,phone: string,password: string,confirmPassword: string) => Promise<void>;
+  login: (identifier: string, password: string) => Promise<boolean>;
+  loginFootsal: (identifier: string, password: string) => Promise<boolean>;
+  registerUser: (username: string,email: string,phoneNumber: string,password: string,confirmPassword: string) => Promise<void>;
   logout: () => Promise<void>;
-  registerFootsal: (name: string, email: string, password: string) => Promise<boolean>;
+  registerFootsal: (footsalName: string, ownerName: string, ownerEmail: string, email: string, password: string, phoneNumber: string) => Promise<boolean>;
+  verifyOtp: (email: string, otp: string) => Promise<boolean>;
   //googleLOgin
   googleLogin: (token: string) => Promise<void>;
 }
@@ -23,16 +33,62 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   });
 
 
-const login = async (email: string, password: string): Promise<boolean> => {
+const mapUser = (rawUser: any): User => {
+  return {
+    id: String(rawUser?.id ?? rawUser?._id ?? ""),
+    name: rawUser?.name ?? rawUser?.username ?? rawUser?.ownerName ?? "User",
+    email: rawUser?.email ?? "",
+    role: rawUser?.role ?? "user",
+  };
+};
+
+const login = async (identifier: string, password: string): Promise<boolean> => {
   try {
     setAuthState((prev) => ({ ...prev, isLoading: true }));
 
-    const res = await API.post("/auth/login", {
-      email,
-      password,
+    const payload = identifier.includes("@")
+      ? { email: identifier, password }
+      : { phoneNumber: identifier, password };
+
+    const res = await loginUser(payload);
+
+    const user = mapUser(res.user);
+
+    setAuthState({
+      user,
+      isAuthenticated: true,
+      isLoading: false,
     });
 
-    const user = res.data.user;
+    toast({
+      title: "Login successful",
+      description: `Welcome back, ${user.name}!`,
+    });
+
+    return true;
+  } catch (err: any) {
+    setAuthState((prev) => ({ ...prev, isLoading: false }));
+
+    toast({
+      title: "Login failed",
+      description: err.response?.data?.message || "Invalid credentials",
+      variant: "destructive",
+    });
+
+    return false;
+  }
+};
+
+const loginFootsal = async (identifier: string, password: string): Promise<boolean> => {
+  try {
+    setAuthState((prev) => ({ ...prev, isLoading: true }));
+
+    const payload = identifier.includes("@")
+      ? { email: identifier, password }
+      : { phoneNumber: identifier, password };
+
+    const res = await loginFutsal(payload);
+    const user = mapUser(res.user);
 
     setAuthState({
       user,
@@ -60,7 +116,7 @@ const login = async (email: string, password: string): Promise<boolean> => {
 };
 
 const logout = async () => {
-  await API.post("/auth/logout"); // backend clears cookie
+  await logoutUser();
 
   setAuthState({
     user: null,
@@ -74,24 +130,24 @@ const logout = async () => {
 };
 
 const registerUser = async (
-  name: string,
+  username: string,
   email: string,
-  phone: string,
+  phoneNumber: string,
   password: string,
   confirmPassword: string
 ): Promise<void> => {
   try {
     setAuthState((prev) => ({ ...prev, isLoading: true }));
 
-    const res = await API.post("/auth/register", {
-      name,
-      email,
-      phone,
+    const res = await registerUserApi({
+      username,
       password,
+      email,
       confirmPassword,
+      phoneNumber,
     });
 
-    const user = res.data.user;
+    const user = mapUser(res.user);
 
     setAuthState({
       user,
@@ -118,8 +174,8 @@ const googleLogin = async (token: string): Promise<void> => {
   try {
     setAuthState((prev) => ({ ...prev, isLoading: true }));
 
-    const res = await API.post("/auth/google-login", { token });
-    const user = res.data.user;
+    const res = await googleLoginApi(token);
+    const user = mapUser(res.user);
 
     setAuthState({
       user,
@@ -142,17 +198,27 @@ const googleLogin = async (token: string): Promise<void> => {
   }
 };
 
- const registerFootsal = async (name: string, email: string, password: string): Promise<boolean> => {
+ const registerFootsal = async (
+  footsalName: string,
+  ownerName: string,
+  ownerEmail: string,
+  email: string,
+  password: string,
+  phoneNumber: string
+): Promise<boolean> => {
   try {
     setAuthState((prev) => ({ ...prev, isLoading: true }));
 
-    const res = await API.post("/auth/register-futsal", {
-      name,
+    const res = await registerFutsalApi({
+      footsalName,
+      ownerName,
+      ownerEmail,
       email,
       password,
+      phoneNumber,
     });
 
-    const user = res.data.user;
+    const user = mapUser(res.user);
 
     setAuthState({
       user,
@@ -179,8 +245,29 @@ const googleLogin = async (token: string): Promise<void> => {
   }
 };
 
+const verifyOtp = async (email: string, otp: string): Promise<boolean> => {
+  try {
+    await verifyOtpApi(email, otp);
+
+    toast({
+      title: "OTP Verified",
+      description: "Verification successful.",
+    });
+
+    return true;
+  } catch (err: any) {
+    toast({
+      title: "Verification Failed",
+      description: err.response?.data?.message || "The OTP entered is incorrect or expired.",
+      variant: "destructive",
+    });
+
+    return false;
+  }
+};
+
   return (
-    <AuthContext.Provider value={{ ...authState, login, logout, registerFootsal,registerUser,googleLogin }}>
+    <AuthContext.Provider value={{ ...authState, login, loginFootsal, logout, registerFootsal, registerUser, verifyOtp, googleLogin }}>
       {children}
     </AuthContext.Provider>
   );

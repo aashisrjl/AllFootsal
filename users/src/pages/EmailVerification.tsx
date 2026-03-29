@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { AuthBackground, logo_transparent, OTPIllustration } from '@/assets/images';
+import { verifyOtp } from '@/lib/authApi';
 
 // NOTE: Since this must be a single, self-contained file, the external image imports
 // are replaced with local placeholder constants, similar to the previous version.
@@ -123,8 +124,7 @@ const EmailVerification: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call to verify OTP
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await verifyOtp(email, otp);
       
       // On successful verification: Since the next step is removed, we redirect or show success.
       toast({ title: "OTP Verified", description: "Verification successful. Redirecting to login...", });
