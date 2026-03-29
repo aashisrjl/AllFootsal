@@ -22,6 +22,7 @@ app.use(
 
 app.use(cors({
   origin: CORS_ALLOWED_ORIGINS?.split(',') || '*',
+   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE','PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));

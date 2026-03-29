@@ -15,7 +15,7 @@ import {
 interface AuthContextType extends AuthState {
   login: (identifier: string, password: string) => Promise<boolean>;
   loginFootsal: (identifier: string, password: string) => Promise<boolean>;
-  registerUser: (username: string,email: string,phoneNumber: string,password: string,confirmPassword: string) => Promise<void>;
+  registerUser: (username: string,email: string,phoneNumber: string,password: string,confirmPassword: string) => Promise<boolean>;
   logout: () => Promise<void>;
   registerFootsal: (footsalName: string, ownerName: string, ownerEmail: string, email: string, password: string, phoneNumber: string) => Promise<boolean>;
   verifyOtp: (email: string, otp: string) => Promise<boolean>;
@@ -135,7 +135,7 @@ const registerUser = async (
   phoneNumber: string,
   password: string,
   confirmPassword: string
-): Promise<void> => {
+): Promise<boolean> => {
   try {
     setAuthState((prev) => ({ ...prev, isLoading: true }));
 
@@ -159,6 +159,8 @@ const registerUser = async (
       title: "Registration successful",
       description: `Welcome, ${user.name}!`,
     });
+
+    return true;
   } catch (err: any) {
     setAuthState((prev) => ({ ...prev, isLoading: false }));
 
@@ -167,6 +169,8 @@ const registerUser = async (
       description: err.response?.data?.message || "Error",
       variant: "destructive",
     });
+
+    return false;
   }
 };
 

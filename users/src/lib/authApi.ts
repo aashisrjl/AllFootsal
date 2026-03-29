@@ -66,7 +66,7 @@ export const logoutUser = async () => {
 
 // OTP VERIFY API (same for user and futsal)
 export const verifyOtp = async (email: string, otp: string) => {
-  const res = await API.post(`/api/auth/verify-otp?email=${encodeURIComponent(email)}`, {
+  const res = await API.post(`/auth/verify-otp?email=${encodeURIComponent(email)}`, {
     otp,
   });
   return res.data;
