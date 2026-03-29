@@ -1,15 +1,26 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { User, AuthState } from "@/types";
-import { users } from "@/data/mockData";
 import { toast } from "@/components/ui/use-toast";
+import {
+  loginUser,
+  loginFutsal,
+  registerUser as registerUserApi,
+  registerFutsal as registerFutsalApi,
+  googleLogin as googleLoginApi,
+  logoutUser,
+  verifyOtp as verifyOtpApi,
+} from "@/lib/authApi";
 
 interface AuthContextType extends AuthState {
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  registerFootsal: (name: string, email: string, password: string) => Promise<boolean>;
-  //google
-  
+  login: (identifier: string, password: string) => Promise<boolean>;
+  loginFootsal: (identifier: string, password: string) => Promise<boolean>;
+  registerUser: (username: string,email: string,phoneNumber: string,password: string,confirmPassword: string) => Promise<boolean>;
+  logout: () => Promise<void>;
+  registerFootsal: (footsalName: string, ownerName: string, ownerEmail: string, email: string, password: string, phoneNumber: string) => Promise<boolean>;
+  verifyOtp: (email: string, otp: string) => Promise<boolean>;
+  //googleLOgin
+  googleLogin: (token: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,84 +32,246 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     isLoading: false,
   });
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    setAuthState((prev) => ({ ...prev, isLoading: true }));
-    
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    // Mock authentication logic - in a real app, this would verify with a backend
-    const user = users.find((u) => u.email === email);
-    
-    if (user) {
-      setAuthState({
-        user,
-        isAuthenticated: true,
-        isLoading: false,
-      });
-      
-      toast({
-        title: "Login successful",
-        description: `Welcome back, ${user.name}!`,
-      });
-      
-      return true;
-    } else {
-      setAuthState((prev) => ({ ...prev, isLoading: false }));
-      
-      toast({
-        title: "Login failed",
-        description: "Invalid email or password. Please try again.",
-        variant: "destructive",
-      });
-      
-      return false;
-    }
-  };
 
-  const logout = () => {
-    setAuthState({
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-    });
-    
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out.",
-    });
+const mapUser = (rawUser: any): User => {
+  return {
+    id: String(rawUser?.id ?? rawUser?._id ?? ""),
+    name: rawUser?.name ?? rawUser?.username ?? rawUser?.ownerName ?? "User",
+    email: rawUser?.email ?? "",
+    role: rawUser?.role ?? "user",
   };
+};
 
-  const registerFootsal = async (name: string, email: string, password: string): Promise<boolean> => {
+const login = async (identifier: string, password: string): Promise<boolean> => {
+  try {
     setAuthState((prev) => ({ ...prev, isLoading: true }));
-    
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    // Mock registration logic
-    const newUser: User = {
-      id: Date.now().toString(),
-      name,
-      email,
-      role: "footsal",
-    };
-    
+
+    const payload = identifier.includes("@")
+      ? { email: identifier, password }
+      : { phoneNumber: identifier, password };
+
+    const res = await loginUser(payload);
+
+    const user = mapUser(res.user);
+
     setAuthState({
-      user: newUser,
+      user,
       isAuthenticated: true,
       isLoading: false,
     });
-    
+
+    toast({
+      title: "Login successful",
+      description: `Welcome back, ${user.name}!`,
+    });
+
+    return true;
+  } catch (err: any) {
+    setAuthState((prev) => ({ ...prev, isLoading: false }));
+
+    toast({
+      title: "Login failed",
+      description: err.response?.data?.message || "Invalid credentials",
+      variant: "destructive",
+    });
+
+    return false;
+  }
+};
+
+const loginFootsal = async (identifier: string, password: string): Promise<boolean> => {
+  try {
+    setAuthState((prev) => ({ ...prev, isLoading: true }));
+
+    const payload = identifier.includes("@")
+      ? { email: identifier, password }
+      : { phoneNumber: identifier, password };
+
+    const res = await loginFutsal(payload);
+    const user = mapUser(res.user);
+
+    setAuthState({
+      user,
+      isAuthenticated: true,
+      isLoading: false,
+    });
+
+    toast({
+      title: "Login successful",
+      description: `Welcome back, ${user.name}!`,
+    });
+
+    return true;
+  } catch (err: any) {
+    setAuthState((prev) => ({ ...prev, isLoading: false }));
+
+    toast({
+      title: "Login failed",
+      description: err.response?.data?.message || "Invalid credentials",
+      variant: "destructive",
+    });
+
+    return false;
+  }
+};
+
+const logout = async () => {
+  await logoutUser();
+
+  setAuthState({
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+  });
+
+  toast({
+    title: "Logged out",
+  });
+};
+
+const registerUser = async (
+  username: string,
+  email: string,
+  phoneNumber: string,
+  password: string,
+  confirmPassword: string
+): Promise<boolean> => {
+  try {
+    setAuthState((prev) => ({ ...prev, isLoading: true }));
+
+    const res = await registerUserApi({
+      username,
+      password,
+      email,
+      confirmPassword,
+      phoneNumber,
+    });
+
+    const user = mapUser(res.user);
+
+    setAuthState({
+      user,
+      isAuthenticated: true,
+      isLoading: false,
+    });
+
     toast({
       title: "Registration successful",
-      description: `Welcome, ${name}! Please select a subscription plan.`,
+      description: `Welcome, ${user.name}!`,
     });
-    
+
     return true;
-  };
+  } catch (err: any) {
+    setAuthState((prev) => ({ ...prev, isLoading: false }));
+
+    toast({
+      title: "Registration failed",
+      description: err.response?.data?.message || "Error",
+      variant: "destructive",
+    });
+
+    return false;
+  }
+};
+
+const googleLogin = async (token: string): Promise<void> => {
+  try {
+    setAuthState((prev) => ({ ...prev, isLoading: true }));
+
+    const res = await googleLoginApi(token);
+    const user = mapUser(res.user);
+
+    setAuthState({
+      user,
+      isAuthenticated: true,
+      isLoading: false,
+    });
+
+    toast({
+      title: "Login successful",
+      description: `Welcome back, ${user.name}!`,
+    });
+  } catch (err: any) {
+    setAuthState((prev) => ({ ...prev, isLoading: false }));
+
+    toast({
+      title: "Google login failed",
+      description: err.response?.data?.message || "Unable to login with Google",
+      variant: "destructive",
+    });
+  }
+};
+
+ const registerFootsal = async (
+  footsalName: string,
+  ownerName: string,
+  ownerEmail: string,
+  email: string,
+  password: string,
+  phoneNumber: string
+): Promise<boolean> => {
+  try {
+    setAuthState((prev) => ({ ...prev, isLoading: true }));
+
+    const res = await registerFutsalApi({
+      footsalName,
+      ownerName,
+      ownerEmail,
+      email,
+      password,
+      phoneNumber,
+    });
+
+    const user = mapUser(res.user);
+
+    setAuthState({
+      user,
+      isAuthenticated: true,
+      isLoading: false,
+    });
+
+    toast({
+      title: "Registration successful",
+      description: `Welcome, ${user.name}!`,
+    });
+
+    return true;
+  } catch (err: any) {
+    setAuthState((prev) => ({ ...prev, isLoading: false }));
+
+    toast({
+      title: "Registration failed",
+      description: err.response?.data?.message || "Error",
+      variant: "destructive",
+    });
+
+    return false;
+  }
+};
+
+const verifyOtp = async (email: string, otp: string): Promise<boolean> => {
+  try {
+    await verifyOtpApi(email, otp);
+
+    toast({
+      title: "OTP Verified",
+      description: "Verification successful.",
+    });
+
+    return true;
+  } catch (err: any) {
+    toast({
+      title: "Verification Failed",
+      description: err.response?.data?.message || "The OTP entered is incorrect or expired.",
+      variant: "destructive",
+    });
+
+    return false;
+  }
+};
 
   return (
-    <AuthContext.Provider value={{ ...authState, login, logout, registerFootsal }}>
+    <AuthContext.Provider value={{ ...authState, login, loginFootsal, logout, registerFootsal, registerUser, verifyOtp, googleLogin }}>
       {children}
     </AuthContext.Provider>
   );

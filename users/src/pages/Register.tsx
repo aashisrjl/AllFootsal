@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { LogIn, ArrowLeft } from "lucide-react";
 import {
   AuthBackground,
@@ -17,6 +18,7 @@ import { FaGoogle, FaFacebookF } from "react-icons/fa";
 const Register = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { registerUser } = useAuth();
 
   const [step, setStep] = useState(1); // step 1 = info, step 2 = password
   const [isLoading, setIsLoading] = useState(false);
@@ -46,29 +48,27 @@ const Register = () => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      // Simulate API to register basic info
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
       toast({
-        title: "Info Saved",
-        description: "Now set your password to complete registration.",
-      });
-
-      setStep(2); // show password fields
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to save info. Try again.",
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
+      return;
     }
+
+    // Just move to step 2, no API call at this stage
+    toast({
+      title: "Info Saved",
+      description: "Now set your password to complete registration.",
+    });
+
+    setStep(2); // show password fields
   };
 
-  // Step 2 - submit password
+  // Step 2 - submit password and complete registration
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -81,23 +81,33 @@ const Register = () => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      // Simulate API to save password and complete registration
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
+    if (formData.password.length < 6) {
       toast({
-        title: "Registration Successful",
-        description: "Welcome to AllFutsal! You can now log in.",
-      });
-
-      navigate("/auth/verify-email", { state: { email: formData.email } });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to complete registration. Try again.",
+        title: "Weak Password",
+        description: "Password must be at least 6 characters.",
         variant: "destructive",
       });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Call registerUser API with mapped field names
+      const success = await registerUser(
+        formData.fullName,     // username
+        formData.email,        // email
+        formData.phone,        // phoneNumber
+        formData.password,     // password
+        formData.confirmPassword // confirmPassword
+      );
+
+      // Only navigate on successful registration
+      if (success) {
+        navigate("/auth/verify-email", { state: { email: formData.email } });
+      }
+    } catch (error) {
+      // Error handling is done in the context, just catch silently here
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
