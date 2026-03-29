@@ -15,11 +15,13 @@ const createForum = async (req,res)=>{
             user_id: userId,
             futsal_id: futsalId
         });
+
         res.status(201).json({
             success:true,
             message:"Forum created successfully",
             data:newForum
         });
+
     } catch (error) {
         console.error("Error creating forum:", error);
         res.status(500).json({ error: "Failed to create forum" });
@@ -30,6 +32,11 @@ const createForum = async (req,res)=>{
 const getAllForums = async (req,res)=>{
     try {
         const forums = await Forum.findAll();
+        if(forums.length === 0){
+            return res.status(404).json({
+                success:false,
+                message:"No forums found"});
+        }
         res.status(200).json({
             success: true,
             message: "Forums fetched successfully",
@@ -52,6 +59,11 @@ const getForumsByUserId = async (req,res)=>{
     }
     try {
         const forums = await Forum.findAll({where:{user_id:userId}});
+        if(forums.length === 0){
+            return res.status(404).json({
+                success:false,
+                message:"No forums found for this user"});
+        }
         res.status(200).json({  
             success:true,
             message:"Forums fetched successfully",
@@ -73,6 +85,11 @@ const getForumsByFutsalId = async (req,res)=>{
     }
     try {
         const forums = await Forum.findAll({where:{futsal_id:futsalId}});
+        if(forums.length === 0){
+            return res.status(404).json({
+                success:false,
+                message:"No forums found for this futsal"});
+        }
         res.status(200).json({  
             success:true,
             message:"Forums fetched successfully",
@@ -94,9 +111,12 @@ const getForumsByCategory = async (req,res)=>{
             message:"Category is required"});
     }
     try {
-        const forums = await Forum.findAll({
-            where:{category}
-        });
+        const forums = await Forum.findAll({where:{category}});
+        if(forums.length === 0){
+            return res.status(404).json({
+                success:false,
+                message:"No forums found for this category"});
+        }
         res.status(200).json({  
             success:true,
             message:"Forums fetched by Category successfully",
@@ -140,7 +160,7 @@ const getForumBySlug = async (req,res)=>{
     if(!slug){
         return res.status(400).json({
             success:false,
-            message:"Slug is required"});
+            message:"Forum slug is required"});
     }
     try {
         const forum = await Forum.findAll({where:{slug}});
