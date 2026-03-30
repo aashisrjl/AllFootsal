@@ -5,35 +5,59 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
-import { FaGoogle } from "react-icons/fa";
+import { LogIn, ArrowLeft } from "lucide-react";
 import {
-  AuthImage,
   AuthBackground,
   logo_transparent,
   RegisterIllustration,
 } from "@/assets/images";
 
 const FootsalAuthRegister = () => {
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [phone, setPhone] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
-  const { registerFootsalWithGoogle } = useAuth(); // useAuth should have google register logic
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { registerFootsal } = useAuth();
 
-  const handleGoogleRegister = async () => {
-    if (!name || !username || !phone) {
+  const [step, setStep] = useState(1); // step 1 = futsal info, step 2 = credentials
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    footsalName: "",
+    ownerName: "",
+    ownerEmail: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phoneNumber: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  // Step 1 - submit futsal info
+  const handleInfoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.footsalName || !formData.ownerName || !formData.ownerEmail || !formData.phoneNumber) {
       toast({
         title: "Missing Fields",
-        description: "Please fill in all fields before continuing with Google.",
+        description: "Please fill all required fields.",
         variant: "destructive",
       });
       return;
     }
 
-    if (!/^\d{10}$/.test(phone)) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.ownerEmail)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid owner email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!/^[0-9]{10}$/.test(formData.phoneNumber)) {
       toast({
         title: "Invalid Phone",
         description: "Please enter a valid 10-digit phone number.",
@@ -42,37 +66,70 @@ const FootsalAuthRegister = () => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      // 🔹 First trigger Google Auth
-      const googleUser = await registerFootsalWithGoogle();
+    toast({
+      title: "Info Saved",
+      description: "Now set your credentials to complete registration.",
+    });
+    setStep(2);
+  };
 
-      if (googleUser) {
-        // 🔹 Combine Google user info with manual fields
-        const userData = {
-          futsalName: name,
-          username,
-          phone,
-          googleEmail: googleUser.email,
-          googleId: googleUser.id,
-        };
+  // Step 2 - submit credentials and register
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-        // Send userData to your backend API to complete registration
-        // e.g. await api.post("/futsal/register", userData);
-
-        toast({
-          title: "Registration Successful",
-          description: "Welcome to AllFutsal!",
-        });
-
-        navigate("/subscription");
-      }
-    } catch (error) {
+    if (!formData.email || !formData.password) {
       toast({
-        title: "Google Registration Failed",
-        description: "Please try again later.",
+        title: "Missing Fields",
+        description: "Please enter email and password.",
         variant: "destructive",
       });
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "Password and confirm password must match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast({
+        title: "Weak Password",
+        description: "Password must be at least 6 characters.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid futsal account email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const success = await registerFootsal(
+        formData.footsalName,
+        formData.ownerName,
+        formData.ownerEmail,
+        formData.email,
+        formData.password,
+        formData.phoneNumber
+      );
+
+      if (success) {
+        navigate("/auth/verify-email", { state: { email: formData.email } });
+      }
+    } catch (error) {
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -100,79 +157,154 @@ const FootsalAuthRegister = () => {
             </div>
 
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Register Your Futsal
+              {step === 1 ? "Register Your Futsal" : "Set Your Credentials"}
             </h2>
             <p className="text-gray-600 mb-6">
-              Enter your futsal details and continue with Google to verify.
+              {step === 1
+                ? "Enter your futsal and owner details."
+                : "Set up your futsal account credentials."}
             </p>
 
-            <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="name">
-                  Futsal Name <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Enter your futsal name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  className="h-11 focus-visible:ring-green-500"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="username">
-                  Username <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Choose a username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  className="h-11 focus-visible:ring-green-500"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">
-                  Phone Number <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="Enter phone number"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  required
-                  className="h-11 focus-visible:ring-green-500"
-                />
-              </div>
-
-              {/* Google Register Button */}
-              <Button
-                type="button"
-                disabled={isLoading}
-                onClick={handleGoogleRegister}
-                className="w-full h-11 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg flex items-center justify-center"
-              >
-                <FaGoogle className="mr-2 text-white text-lg" />
-                {isLoading ? "Connecting..." : "Continue with Google"}
-              </Button>
-
-              <p className="text-center text-sm text-gray-600 mt-4">
-                Already have an account?{" "}
-                <a
-                  href="/auth/login"
-                  className="text-green-600 font-medium hover:underline"
+            <div className="mb-3">
+              {step === 2 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setStep(1)}
+                  className="text-green-600 hover:text-green-700 bg-green-200 p-3 flex items-center"
                 >
-                  Login
-                </a>
-              </p>
-            </form>
+                  <ArrowLeft className="h-4 w-4 mr-1" /> Back
+                </Button>
+              )}
+            </div>
+
+            {step === 1 ? (
+              <form onSubmit={handleInfoSubmit} className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="footsalName">
+                    Futsal Name <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="footsalName"
+                    type="text"
+                    placeholder="Enter your futsal name"
+                    value={formData.footsalName}
+                    onChange={handleChange}
+                    required
+                    className="h-11 focus-visible:ring-green-500"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="ownerName">
+                    Owner Name <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="ownerName"
+                    type="text"
+                    placeholder="Enter owner full name"
+                    value={formData.ownerName}
+                    onChange={handleChange}
+                    required
+                    className="h-11 focus-visible:ring-green-500"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="ownerEmail">
+                    Owner Email <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="ownerEmail"
+                    type="email"
+                    placeholder="Enter owner email"
+                    value={formData.ownerEmail}
+                    onChange={handleChange}
+                    required
+                    className="h-11 focus-visible:ring-green-500"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="phoneNumber">
+                    Phone Number <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="phoneNumber"
+                    type="tel"
+                    placeholder="Enter 10-digit phone number"
+                    value={formData.phoneNumber}
+                    onChange={handleChange}
+                    required
+                    className="h-11 focus-visible:ring-green-500"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-11 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg"
+                >
+                  {isLoading ? "Processing..." : "Next"}
+                </Button>
+              </form>
+            ) : (
+              <form onSubmit={handleCredentialsSubmit} className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="email">
+                    Futsal Account Email <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter futsal account email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="h-11 focus-visible:ring-green-500"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password">
+                    Password <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Create password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    className="h-11 focus-visible:ring-green-500"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">
+                    Confirm Password <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="Confirm password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                    className="h-11 focus-visible:ring-green-500"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-11 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg"
+                >
+                  <LogIn className="mr-2 h-4 w-4" />
+                  {isLoading ? "Registering..." : "Register"}
+                </Button>
+              </form>
+            )}
           </div>
 
           {/* Right Side Image */}

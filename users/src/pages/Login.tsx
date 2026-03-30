@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import ReCAPTCHA from "react-google-recaptcha";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { LogIn } from "lucide-react";
@@ -19,26 +18,13 @@ import {
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [captchaVerified, setCaptchaVerified] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleCaptcha = (value) => {
-    if (value) setCaptchaVerified(true);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!captchaVerified) {
-      toast({
-        title: "Captcha Required",
-        description: "Please verify you’re not a robot.",
-        variant: "destructive",
-      });
-      return;
-    }
     setIsLoading(true);
     try {
       const success = await login(email, password);
@@ -86,12 +72,12 @@ const Login = () => {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="email">
-                  Email <span className="text-red-500">*</span>
+                  Email or Phone <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="email"
-                  type="email"
-                  placeholder="Enter Email"
+                  type="text"
+                  placeholder="Enter email or phone number"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -121,13 +107,6 @@ const Login = () => {
                 >
                   Forgot Password?
                 </a>
-              </div>
-
-              <div className="flex justify-center">
-                <ReCAPTCHA
-                  sitekey="YOUR_RECAPTCHA_SITE_KEY"
-                  onChange={handleCaptcha}
-                />
               </div>
 
               <Button
