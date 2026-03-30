@@ -1,6 +1,6 @@
 import pandas as pd
 import random
-from datetime import datetime, timedelta
+from pathlib import Path
 
 # Extended review sentences
 positive_reviews = [
@@ -58,58 +58,90 @@ negative_reviews = [
     "Very unhygienic changing rooms and poor court condition.",
     "Terrible experience, the staff was rude and unprofessional."
 ]
+TOTAL_RECORDS = 1000
+SEED = 42
 
-futsal_centers = [
-    "FC001", "FC002", "FC003", "FC004", "FC005",
-    "FC006", "FC007", "FC008", "FC009", "FC010",
-    "FC011", "FC012", "FC013", "FC014", "FC015"
+positive_contexts = [
+    "Booked for an evening game and everything was ready on time.",
+    "Played with friends on the weekend and everyone enjoyed it.",
+    "Warm-up area and changing rooms were clean and organized.",
+    "Online booking confirmation was quick and accurate.",
+    "Staff guided us well before and after the match.",
 ]
 
-def random_date(start_year=2024, end_year=2026):
-    start = datetime(start_year, 1, 1)
-    end = datetime(end_year, 3, 28)
-    delta = end - start
-    random_days = random.randint(0, delta.days)
-    random_seconds = random.randint(0, 86400)
-    return (start + timedelta(
-        days=random_days, 
-        seconds=random_seconds
-    )).strftime("%Y-%m-%d %H:%M:%S")
+negative_contexts = [
+    "Booked in advance but had to wait too long.",
+    "We faced issues during check-in and support was slow.",
+    "Changing rooms and wash areas were not properly cleaned.",
+    "The playing surface felt unsafe for fast movements.",
+    "Our session timing was not managed properly.",
+]
 
-# Generate dataset
-data = []
-for i in range(1, 1001):
-    sentiment = random.choice(["Positive", "Negative"])
-    
+intensifiers = ["Honestly", "Overall", "In my opinion", "From our experience", "Personally"]
+
+
+def build_review(rng: random.Random, sentiment: str) -> str:
     if sentiment == "Positive":
-        review = random.choice(positive_reviews)
-        rating = random.randint(4, 5)
-        sentiment_score = round(random.uniform(0.65, 1.00), 2)
+        base = rng.choice(positive_reviews)
+        context = rng.choice(positive_contexts)
     else:
-        review = random.choice(negative_reviews)
-        rating = random.randint(1, 2)
-        sentiment_score = round(random.uniform(0.00, 0.40), 2)
+        base = rng.choice(negative_reviews)
+        context = rng.choice(negative_contexts)
 
-    data.append({
-        "id": i,
-        "user_id": f"U{random.randint(1, 300):04d}",
-        "futsal_center_id": random.choice(futsal_centers),
-        "rating": rating,
-        "review": review,
-        "sentiment_score": sentiment_score,
-        "sentiment_label": sentiment,
-        "created_at": random_date()
-    })
+    intro = rng.choice(intensifiers)
+    return f"{intro}, {base} {context}"
 
-df = pd.DataFrame(data)
 
-# Save to CSV
-df.to_csv("./dataset/futsal_reviews_dataset.csv", index=False)
+def generate_dataset(total_records: int = TOTAL_RECORDS, seed: int = SEED) -> pd.DataFrame:
+    rng = random.Random(seed)
 
-# Summary
-print("Dataset generated successfully!")
-print(f"Total Records : {len(df)}")
-print(f"Positive Reviews: {len(df[df['sentiment_label'] == 'Positive'])}")
-print(f"Negative Reviews: {len(df[df['sentiment_label'] == 'Negative'])}")
-print("\nSample Records:")
-print(df.head(10).to_string())
+    positive_count = total_records // 2
+    negative_count = total_records - positive_count
+    labels = ["Positive"] * positive_count + ["Negative"] * negative_count
+    rng.shuffle(labels)
+
+    data = []
+    for i, sentiment in enumerate(labels, start=1):
+        if sentiment == "Positive":
+            rating = rng.randint(4, 5)
+        else:
+            rating = rng.randint(1, 2)
+
+        data.append(
+            {
+                "id": i,
+                "user_id": f"U{rng.randint(1, 300):04d}",
+                "rating": rating,
+                "review": build_review(rng, sentiment),
+                "sentiment_label": sentiment,
+            }
+        )
+
+    df = pd.DataFrame(data)
+
+    if df["review"].isna().any() or df["sentiment_label"].isna().any():
+        raise ValueError("Generated dataset contains null values.")
+
+    return df
+
+
+def save_dataset(df: pd.DataFrame) -> Path:
+    output_dir = Path(__file__).resolve().parent / "dataset"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_file = output_dir / "futsal_reviews_dataset.csv"
+    df.to_csv(output_file, index=False)
+    return output_file
+
+
+if __name__ == "__main__":
+    dataset = generate_dataset()
+    output_path = save_dataset(dataset)
+
+    print("Dataset generated successfully!")
+    print(f"Saved to: {output_path}")
+    print(f"Total Records : {len(dataset)}")
+    print(f"Positive Reviews: {len(dataset[dataset['sentiment_label'] == 'Positive'])}")
+    print(f"Negative Reviews: {len(dataset[dataset['sentiment_label'] == 'Negative'])}")
+    print(f"Unique Review Texts: {dataset['review'].nunique()}")
+    print("\nSample Records:")
+    print(dataset.head(10).to_string())
