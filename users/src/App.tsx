@@ -27,7 +27,6 @@ import FootsalAuthRegister from "./pages/FootsalAuthRegister";
 import Subscription from "./pages/Subscription";
 import Futsals from "./pages/Futsals";
 import UserProfileInfo from "./pages/UserProfileInfo";
-import PublicProfile from "./pages/PublicProfile";
 
 const queryClient = new QueryClient();
 
@@ -58,7 +57,6 @@ const App = () => (
               <Route path="/forum/:id" element={<ForumDetails />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/profile" element={<UserProfileInfo />} />
-              <Route path="/user/:id" element={<PublicProfile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
