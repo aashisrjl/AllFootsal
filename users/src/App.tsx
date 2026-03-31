@@ -25,6 +25,7 @@ import Forum from "./pages/Forum";
 import FootsalAuthRegister from "./pages/FootsalAuthRegister";
 import Subscription from "./pages/Subscription";
 import Futsals from "./pages/Futsals";
+import UserProfileInfo from "./pages/UserProfileInfo";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/forum" element={<Forum />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/profile" element={<UserProfileInfo />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

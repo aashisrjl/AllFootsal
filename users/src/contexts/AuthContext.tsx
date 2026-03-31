@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, AuthState } from "@/types";
 import { toast } from "@/components/ui/use-toast";
 import {
@@ -11,12 +11,14 @@ import {
   logoutUser,
   verifyOtp as verifyOtpApi,
 } from "@/lib/authApi";
+import { getProfile } from "@/lib/userApi";
 
 interface AuthContextType extends AuthState {
   login: (identifier: string, password: string) => Promise<boolean>;
   loginFootsal: (identifier: string, password: string) => Promise<boolean>;
   registerUser: (username: string,email: string,phoneNumber: string,password: string,confirmPassword: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  setCurrentUser: (user: User) => void;
   registerFootsal: (footsalName: string, ownerName: string, ownerEmail: string, email: string, password: string, phoneNumber: string) => Promise<boolean>;
   verifyOtp: (email: string, otp: string) => Promise<boolean>;
   //googleLOgin
@@ -29,18 +31,46 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     isAuthenticated: false,
-    isLoading: false,
+    isLoading: true,
   });
-
 
 const mapUser = (rawUser: any): User => {
   return {
     id: String(rawUser?.id ?? rawUser?._id ?? ""),
     name: rawUser?.name ?? rawUser?.username ?? rawUser?.ownerName ?? "User",
     email: rawUser?.email ?? "",
+    phoneNumber: rawUser?.phoneNumber ?? "",
+    profileImage: rawUser?.profileImage ?? "",
     role: rawUser?.role ?? "user",
   };
 };
+
+const setCurrentUser = (user: User) => {
+  setAuthState((prev) => ({
+    ...prev,
+    user,
+    isAuthenticated: true,
+  }));
+};
+
+useEffect(() => {
+  let isActive = true;
+
+  const bootstrapAuth = async () => {
+    try {
+      const profileRes = await getProfile(); // cookie sent automatically
+      const user = mapUser(profileRes?.data);
+      if (!isActive) return;
+      setAuthState({ user, isAuthenticated: true, isLoading: false });
+    } catch {
+      if (!isActive) return;
+      setAuthState({ user: null, isAuthenticated: false, isLoading: false });
+    }
+  };
+
+  bootstrapAuth();
+  return () => { isActive = false; };
+}, []);
 
 const login = async (identifier: string, password: string): Promise<boolean> => {
   try {
@@ -52,7 +82,7 @@ const login = async (identifier: string, password: string): Promise<boolean> => 
 
     const res = await loginUser(payload);
 
-    const user = mapUser(res.user);
+    const user = mapUser(res?.user ?? res?.data);
 
     setAuthState({
       user,
@@ -88,7 +118,7 @@ const loginFootsal = async (identifier: string, password: string): Promise<boole
       : { phoneNumber: identifier, password };
 
     const res = await loginFutsal(payload);
-    const user = mapUser(res.user);
+    const user = mapUser(res?.user ?? res?.data);
 
     setAuthState({
       user,
@@ -116,7 +146,11 @@ const loginFootsal = async (identifier: string, password: string): Promise<boole
 };
 
 const logout = async () => {
-  await logoutUser();
+  try {
+    await logoutUser();
+  } catch (err) {
+    console.error("Logout API error:", err);
+  }
 
   setAuthState({
     user: null,
@@ -124,9 +158,20 @@ const logout = async () => {
     isLoading: false,
   });
 
+  try {
+    localStorage.removeItem("utoken");
+  } catch {
+    return;
+  }
+
   toast({
-    title: "Logged out",
+    title: "Logged out successfully",
   });
+
+  // Force hard reload to clear all cookies and browser state
+  setTimeout(() => {
+    window.location.href = "/";
+  }, 500);
 };
 
 const registerUser = async (
@@ -147,7 +192,7 @@ const registerUser = async (
       phoneNumber,
     });
 
-    const user = mapUser(res.user);
+    const user = mapUser(res?.user ?? res?.data);
 
     setAuthState({
       user,
@@ -179,7 +224,7 @@ const googleLogin = async (token: string): Promise<void> => {
     setAuthState((prev) => ({ ...prev, isLoading: true }));
 
     const res = await googleLoginApi(token);
-    const user = mapUser(res.user);
+    const user = mapUser(res?.user ?? res?.data);
 
     setAuthState({
       user,
@@ -222,7 +267,7 @@ const googleLogin = async (token: string): Promise<void> => {
       phoneNumber,
     });
 
-    const user = mapUser(res.user);
+    const user = mapUser(res?.user ?? res?.data);
 
     setAuthState({
       user,
@@ -271,7 +316,7 @@ const verifyOtp = async (email: string, otp: string): Promise<boolean> => {
 };
 
   return (
-    <AuthContext.Provider value={{ ...authState, login, loginFootsal, logout, registerFootsal, registerUser, verifyOtp, googleLogin }}>
+    <AuthContext.Provider value={{ ...authState, login, loginFootsal, logout, setCurrentUser, registerFootsal, registerUser, verifyOtp, googleLogin }}>
       {children}
     </AuthContext.Provider>
   );

@@ -52,6 +52,8 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  phoneNumber?: string;
+  profileImage?: string;
   role: "user" | "admin" | "footsal";
 }
 
