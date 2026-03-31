@@ -1,4 +1,4 @@
-import { API } from "@/lib/authApi";
+import { API } from "./authApi";
 
 export type UserProfileApiData = {
 	id: number | string;
@@ -21,16 +21,19 @@ type UserProfileResponse = {
 	data: UserProfileApiData;
 };
 
+//get single user by id
 export const getUserById = async (id: string | number): Promise<UserProfileResponse> => {
 	const res = await API.get(`/users/${id}`);
 	return res.data;
 };
 
+// get loggged in user profile
 export const getProfile = async (): Promise<UserProfileResponse> => {
 	const res = await API.get("/user/profile/");
 	return res.data;
 };
 
+//update profile informastion
 export const updateProfile = async (payload: {
 	username?: string;
 	email?: string;
@@ -40,6 +43,7 @@ export const updateProfile = async (payload: {
 	return res.data;
 };
 
+// update profile image for user
 export const updateProfileImage = async (imageFile: File): Promise<UserProfileResponse> => {
 	const formData = new FormData();
 	formData.append("image", imageFile);
@@ -53,11 +57,13 @@ export const updateProfileImage = async (imageFile: File): Promise<UserProfileRe
 	return res.data;
 };
 
+// remove user profile
 export const deleteProfileImage = async (): Promise<UserProfileResponse> => {
 	const res = await API.delete("/users/profile/image");
 	return res.data;
 };
 
+//change user password
 export const changePassword = async (payload: {
 	newPassword: string;
 	cNewPassword: string;

@@ -22,10 +22,12 @@ import Register from "./pages/Register";
 import EmailVerification from "./pages/EmailVerification";
 import Pricing from "./pages/Pricing";
 import Forum from "./pages/Forum";
+import ForumDetails from "./pages/ForumDetails";
 import FootsalAuthRegister from "./pages/FootsalAuthRegister";
 import Subscription from "./pages/Subscription";
 import Futsals from "./pages/Futsals";
 import UserProfileInfo from "./pages/UserProfileInfo";
+import PublicProfile from "./pages/PublicProfile";
 
 const queryClient = new QueryClient();
 
@@ -53,8 +55,10 @@ const App = () => (
               {/* <Route path="/admin" element={<AdminDashboard />} /> */}
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/forum" element={<Forum />} />
+              <Route path="/forum/:id" element={<ForumDetails />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/profile" element={<UserProfileInfo />} />
+              <Route path="/user/:id" element={<PublicProfile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
