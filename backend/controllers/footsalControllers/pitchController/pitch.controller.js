@@ -1,9 +1,17 @@
 const { QueryTypes } = require("sequelize");
-const { sequelize } = require("../../../models");
+const { sequelize, Footsal } = require("../../../models");
 
 //by admin and user
 const getPitches = async (req, res) => {
-  const code = req.futsalCode || req.tanent?.code;
+  const id = req.params.futsalId;
+  const futsal = await Footsal.findByPk(id);
+  if (!futsal) {
+    return res.status(404).json({
+      success: false,
+      message: "futsal not found",
+    });
+  }
+  const code = futsal.futsalCode;
  // pitches with media
   const pitches = await sequelize.query(
     ` SELECT p.*, m.url as media_url FROM pitch_${code} p LEFT JOIN media_${code} m ON p.id = m.pitch_id AND m.type='pitch'`,

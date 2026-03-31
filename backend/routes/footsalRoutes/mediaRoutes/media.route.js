@@ -17,6 +17,7 @@ const {
   deleteMediaById,
   getMediaBycategory,
 } = require("../../../controllers/footsalControllers/mediaController/media.controller");
+const resolveFutsalTenant = require("../../../middleware/tanentMiddleware/tanent.middleware");
 
 const router = express.Router();
 
@@ -30,7 +31,6 @@ router.get(
 // get media by category
 router.get(
   "/futsal/:futsalId/media/", // #swagger.tags = ['Futsal/Tenant/Media']
-  resolveFutsalTenantWithToken,
   getMediaBycategory
 );
 router.get(

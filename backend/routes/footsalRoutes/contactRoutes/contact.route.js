@@ -22,7 +22,8 @@ router.post(
 router.get(
   "/futsal/contact", // #swagger.tags = ['Futsal/Tenant/Contact']
    isFutsalAuthenticated, 
-   getContacts); 
+   getContacts
+  ); 
 router.patch(
   "/futsal/contact/:contactId/read", // #swagger.tags = ['Futsal/Tenant/Contact']
   isFutsalAuthenticated,

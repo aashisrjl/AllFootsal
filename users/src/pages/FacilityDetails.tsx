@@ -14,6 +14,14 @@ import { MapPin, Star, Clock, ArrowLeft, Loader2, CheckCircle2 } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
+const safelyParse = (str: string) => {
+  try {
+    return JSON.parse(str);
+  } catch {
+    return [];
+  }
+};
+
 const FacilityDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -41,14 +49,25 @@ const FacilityDetails = () => {
   const parsedFacilities = info?.facilities ? safelyParse(info.facilities) : ["Drinking water", "Bathroom"];
   const parsedHours = info?.operating_hours ? safelyParse(info.operating_hours) : ["6:00 AM - 10:00 PM"];
 
+  const pitchesArray = pitchesData?.data || [];
+  
   // Merge live API tenant details into the mapping schema
   const dynamicFacility = futsal ? {
-    id: futsal.id,
+    id: String(futsal.id),
     name: futsal.futsalName || "Unknown Futsal Tenant",
     location: loc ? `${loc.address || ''}, ${loc.city || ''}` : "Unknown Location",
     description: info?.additional_info || "Premium Futsal arena matching strictly maintained grounds standards.",
-    image: mediaObj?.media_url || "https://images.unsplash.com/photo-1574629810360-7efbb1925846?q=80&w=1200",
-    pitches: pitchesData?.data || [],
+    image: mediaObj?.url || mediaObj?.media_url || "https://images.unsplash.com/photo-1574629810360-7efbb1925846?q=80&w=1200",
+    pitches: pitchesArray.map((p: any) => ({
+      id: String(p.id),
+      name: p.name || `Pitch ${p.id}`,
+      facilityId: String(futsal.id),
+      pricePerHour: Number(p.price_per_hour || 1000),
+      isEnabled: Boolean(p.is_active),
+      image: p.media_url || "https://images.unsplash.com/photo-1551946596-ce3ebc2efd97?q=80&w=800",
+      isUnderMaintenance: p.is_active === 0,
+      maintenanceReason: ""
+    })),
     rating: 5.0,
     reviews: 0,
     operating_hours: parsedHours,
@@ -56,20 +75,22 @@ const FacilityDetails = () => {
   } : null;
 
   // Find selected pitch
-  const selectedPitch = dynamicFacility?.pitches.find((p: any) => String(p.id) === selectedPitchId);
+  const selectedPitch = dynamicFacility?.pitches.find((p: any) => String(p.id) === String(selectedPitchId));
 
   // Handle pitch selection
   const handleSelectPitch = (pitchId: string) => {
     setSelectedPitchId(pitchId);
-    fetchAvailableTimeSlots(pitchId, selectedDate);
+    if (dynamicFacility?.id) {
+       fetchAvailableTimeSlots(String(dynamicFacility.id), pitchId, selectedDate);
+    }
   };
 
   // Fetch available time slots when date changes
   useEffect(() => {
-    if (selectedPitchId) {
-      fetchAvailableTimeSlots(selectedPitchId, selectedDate);
+    if (selectedPitchId && dynamicFacility?.id) {
+      fetchAvailableTimeSlots(String(dynamicFacility.id), selectedPitchId, selectedDate);
     }
-  }, [selectedDate, selectedPitchId, fetchAvailableTimeSlots]);
+  }, [selectedDate, selectedPitchId, dynamicFacility?.id]);
 
   if (isPageLoading) {
     return (
@@ -195,7 +216,7 @@ const FacilityDetails = () => {
                 </div>
                 <div>
                   <BookingSummary
-                    facilityId={dynamicFacility.id}
+                    facilityId={String(dynamicFacility.id)}
                     facilityName={dynamicFacility.name}
                     pitchName={selectedPitch.name || `Pitch #${selectedPitch.id}`}
                     pricePerHour={selectedPitch.pricePerHour || 1000}

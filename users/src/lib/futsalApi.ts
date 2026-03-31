@@ -60,6 +60,18 @@ export const getFutsalMedia = async (id: number | string, category: string = 'ho
 
 // get futsal pitches 
 export const getFutsalPitches = async (id: number | string) => {
-    const res = await API.get(`/futsal/${id}/pitch/`);
+    const res = await API.get(`/futsal/${id}/pitches/`);
+    return res.data;
+};
+
+// get futsal timeslots
+export const getFutsalTimeSlots = async (futsalId: number | string, pitchId: number | string, dayOfWeek: number) => {
+    const res = await API.get(`/futsal/${futsalId}/timeslots?pitch_id=${pitchId}&day_of_week=${dayOfWeek}`);
+    return res.data;
+};
+
+// get futsal ratings
+export const getFutsalRatings = async (id: number | string) => {
+    const res = await API.get(`/futsal/${id}/ratings`);
     return res.data;
 };
