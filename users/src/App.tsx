@@ -48,7 +48,7 @@ const App = () => (
               <Route path="/auth/register/footsal" element={<FootsalAuthRegister />} />
               <Route path="/subscription" element={<Subscription />} />
 
-              {/* <Route path="/bookings" element={<UserBookings />} /> */}
+              <Route path="/bookings" element={<UserBookings />} />
               {/* <Route path="/admin" element={<AdminDashboard />} /> */}
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/forum" element={<Forum />} />
