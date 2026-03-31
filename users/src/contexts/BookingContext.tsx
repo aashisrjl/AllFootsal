@@ -1,15 +1,13 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { Booking, TimeSlot } from "@/types";
 import { 
-  getAvailableTimeSlots, 
   createBooking as createBookingAPI,
   getUserBookings as getUserBookingsAPI,
   getAllBookings as getAllBookingsAPI,
   updateBookingStatus as updateBookingStatusAPI,
-  facilities,
-  pitches
 } from "@/data/mockData";
 import { toast } from "@/components/ui/use-toast";
+import { getFutsalTimeSlots } from "@/lib/futsalApi";
 
 interface BookingContextType {
   selectedDate: string;
@@ -20,7 +18,7 @@ interface BookingContextType {
   setSelectedDate: (date: string) => void;
   setSelectedPitchId: (pitchId: string | null) => void;
   selectTimeSlot: (timeSlotId: string | null) => void;
-  fetchAvailableTimeSlots: (pitchId: string, date: string) => void;
+  fetchAvailableTimeSlots: (facilityId: string, pitchId: string, date: string) => Promise<void>;
   createBooking: (
     userId: string,
     facilityId: string,
@@ -42,26 +40,37 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([]);
   const [userBookings, setUserBookings] = useState<Booking[]>([]);
 
-  const fetchAvailableTimeSlots = (pitchId: string, date: string) => {
-    const timeSlots = getAvailableTimeSlots(pitchId, date);
-    
-    // Check if the pitch or its facility is under maintenance
-    const pitch = pitches.find(p => p.id === pitchId);
-    const facility = pitch ? facilities.find(f => f.id === pitch.facilityId) : null;
-    
-    if (pitch?.isUnderMaintenance || facility?.isUnderMaintenance) {
-      // If under maintenance, mark all slots as unavailable
-      setAvailableTimeSlots([]);
+  const fetchAvailableTimeSlots = async (facilityId: string, pitchId: string, date: string) => {
+    try {
+      const d = new Date(date);
+      const dayOfWeek = d.getDay() + 1; // Maps JS getDay (0=Sun, 6=Sat) to MySQL DAYOFWEEK (1=Sun, 7=Sat)
       
+      const res = await getFutsalTimeSlots(facilityId, pitchId, dayOfWeek);
+      const slotsArray = res.timeslots || [];
+      
+      const formattedSlots: TimeSlot[] = slotsArray.map((t: any) => ({
+        id: String(t.id),
+        pitchId: String(t.pitch_id),
+        facilityId: facilityId,
+        startTime: t.start_time.substring(0, 5), // "07:00:00" -> "07:00"
+        endTime: t.end_time.substring(0, 5),
+        date: date,
+        isBooked: t.is_available === 0,
+        isEnabled: true
+      }));
+
+      // Sort chronological
+      formattedSlots.sort((a, b) => a.startTime.localeCompare(b.startTime));
+      
+      setAvailableTimeSlots(formattedSlots);
+    } catch (err: any) {
+      setAvailableTimeSlots([]);
+      console.error(err);
       toast({
-        title: "Maintenance in Progress",
-        description: pitch?.isUnderMaintenance 
-          ? pitch.maintenanceReason || "This pitch is currently under maintenance."
-          : facility?.maintenanceReason || "This facility is currently under maintenance.",
-        variant: "destructive",
+        title: "Schedule Unavailable",
+        description: "Could not retrieve available time slots for this date.",
+        variant: "destructive"
       });
-    } else {
-      setAvailableTimeSlots(timeSlots);
     }
   };
 
@@ -99,7 +108,9 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
     );
 
     // Refresh available time slots
-    fetchAvailableTimeSlots(selectedPitchId, selectedDate);
+    if (selectedPitchId) {
+       fetchAvailableTimeSlots(facilityId, selectedPitchId, selectedDate);
+    }
     
     // Reset selection
     setSelectedTimeSlotId(null);

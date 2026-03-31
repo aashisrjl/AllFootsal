@@ -14,7 +14,6 @@ const router = express.Router();
 // by admin and user (read)
 router.get(
   "/futsal/:futsalId/pitches", // #swagger.tags = ['Futsal/Tenant/Pitch']
-  resolveFutsalTenantWithToken,
   getPitches
 );
 

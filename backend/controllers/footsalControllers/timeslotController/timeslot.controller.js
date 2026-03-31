@@ -1,8 +1,26 @@
-const {sequelize} = require("../../../models")
+const {sequelize, Footsal} = require("../../../models")
 const {QueryTypes} = require("sequelize");
 //by admin
-const getTimeslot = (req,res)=>{
-    const code = req.futsalCode || req.tanent.code;
+const getTimeslot = async(req,res)=>{
+    const id = req.params.futsalId;
+    if(!id){
+        return res.status(400).json({
+            error: "futsalId is required"
+        });
+    }
+    const futsal = await Footsal.findByPk(id);
+    if(!futsal){
+        return res.status(404).json({
+            error: "futsal not found"
+        });
+    }
+    const code = futsal.futsalCode;
+
+    if(!code){
+        return res.status(400).json({
+            error: "futsal code is required"
+        });
+    }
     const {pitch_id, day_of_week} = req.query;
 
     if(!pitch_id || day_of_week === undefined){
@@ -23,7 +41,7 @@ const getTimeslot = (req,res)=>{
     });
 }
 
-const createTimeslot = (req,res)=>{
+const createTimeslot = async(req,res)=>{
     const futsalCode = req.futsalCode;
         let {pitch_id, day_of_week, start_time, end_time, price, is_available} = req.body;
 
@@ -54,7 +72,7 @@ const createTimeslot = (req,res)=>{
         }
 
     const query = `INSERT INTO timeslot_${futsalCode} (pitch_id, day_of_week, start_time, end_time, price, is_available) VALUES (:pitch_id, :day_of_week, :start_time, :end_time, :price, :is_available)`;
-    sequelize.query(query, {
+    await sequelize.query(query, {
         replacements: { pitch_id, day_of_week, start_time, end_time, price, is_available },
         type: QueryTypes.INSERT,
     })
@@ -67,13 +85,13 @@ const createTimeslot = (req,res)=>{
     });
 }
 
-const updateTimeslot = (req,res)=>{
+const updateTimeslot = async(req,res)=>{
     const futsalCode = req.futsalCode;
     const timeslotId = req.params.id;
     const {pitch_id, day_of_week, start_time, end_time, price, is_available} = req.body;
 
     const query = `UPDATE timeslot_${futsalCode} SET pitch_id = :pitch_id, day_of_week = :day_of_week, start_time = :start_time, end_time = :end_time, price = :price, is_available = :is_available WHERE id = :timeslotId`;
-    sequelize.query(query, {
+    await sequelize.query(query, {
         replacements: { pitch_id, day_of_week, start_time, end_time, price, is_available, timeslotId },
         type: QueryTypes.UPDATE,
     })
@@ -86,12 +104,12 @@ const updateTimeslot = (req,res)=>{
     });
 }
 
-const deleteTimeslot = (req,res)=>{
+const deleteTimeslot = async(req,res)=>{
     const futsalCode = req.futsalCode;
     const timeslotId = req.params.id;
 
     const query = `DELETE FROM timeslot_${futsalCode} WHERE id = :timeslotId`;
-    sequelize.query(query, {
+    await sequelize.query(query, {
         replacements: { timeslotId },
         type: QueryTypes.DELETE,
     })

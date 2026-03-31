@@ -13,6 +13,10 @@ const {CORS_ALLOWED_ORIGINS} = process.env
 const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
 
+//cookie-parser
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
 // Core middleware (must be before routes)
 app.use(
   helmet({

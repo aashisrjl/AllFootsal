@@ -1,7 +1,7 @@
 
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
+import Header from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import BookingCard from "@/components/BookingCard";
 import { useAuth } from "@/contexts/AuthContext";

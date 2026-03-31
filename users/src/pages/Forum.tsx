@@ -1,101 +1,147 @@
 import React, { useState } from "react";
-import { MessageCircle, Users, Tag, Clock, ThumbsUp, Lock } from "lucide-react";
+import { MessageCircle, Users, Tag, Clock, ThumbsUp, Lock, Loader2 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
 import Header from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { 
+  getAllForums, 
+  getForumsByCategory, 
+  createForum, 
+  countLikesByForumId, 
+  createForumLike, 
+  ForumApiData 
+} from "@/lib/forumApi";
+import { ForumUserSnippet } from "@/components/ForumUserSnippet";
 
-interface Thread {
-  id: number;
-  title: string;
-  category: "Announcements" | "General" | "Help";
-  author: string;
-  replies: number;
-  lastActivity: string;
-  isLocked?: boolean;
-}
-
-const mockThreads: Thread[] = [
-  {
-    id: 1,
-    title: "Welcome to the AllFutsal Community 👋",
-    category: "Announcements",
-    author: "AllFutsal Team",
-    replies: 18,
-    lastActivity: "2 hours ago",
-  },
-  {
-    id: 2,
-    title: "Looking for players this Saturday in Kathmandu",
-    category: "General",
-    author: "Ramesh",
-    replies: 7,
-    lastActivity: "1 hour ago",
-  },
-  {
-    id: 3,
-    title: "Best futsal venues with late-night slots?",
-    category: "General",
-    author: "Priya",
-    replies: 12,
-    lastActivity: "5 hours ago",
-  },
-  {
-    id: 4,
-    title: "Unable to complete payment for booking",
-    category: "Help",
-    author: "Sujan",
-    replies: 3,
-    lastActivity: "10 minutes ago",
-  },
-  {
-    id: 5,
-    title: "Official: Community Rules & Fair Play Guidelines",
-    category: "Announcements",
-    author: "Moderator",
-    replies: 0,
-    lastActivity: "1 day ago",
-    isLocked: true,
-  },
-];
-
-const categoryColors: Record<Thread["category"], string> = {
-  Announcements: "bg-emerald-500/15 text-emerald-300 border-emerald-400/40",
+const categoryColors: Record<string, string> = {
+  Announcement: "bg-emerald-500/15 text-emerald-300 border-emerald-400/40",
   General: "bg-sky-500/10 text-sky-200 border-sky-400/40",
   Help: "bg-amber-500/15 text-amber-200 border-amber-400/40",
 };
 
-const Forum: React.FC = () => {
-  const [activeFilter, setActiveFilter] = useState<"All" | Thread["category"]>("All");
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<Thread["category"]>("General");
-  const [content, setContent] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [infoMessage, setInfoMessage] = useState<string | null>(null);
+const getCategoryColor = (category: string) => {
+  return categoryColors[category] || categoryColors["General"];
+};
 
-  const filteredThreads =
-    activeFilter === "All"
-      ? mockThreads
-      : mockThreads.filter((t) => t.category === activeFilter);
+const ForumCard: React.FC<{ thread: ForumApiData }> = ({ thread }) => {
+  const queryClient = useQueryClient();
+  
+  const { data: likesRes } = useQuery({
+    queryKey: ['forumLikes', thread.id],
+    queryFn: () => countLikesByForumId(thread.id)
+  });
+  
+  const likeMutation = useMutation({
+    mutationFn: () => createForumLike(thread.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['forumLikes', thread.id] });
+    }
+  });
+
+  const likesData = likesRes?.data;
+  const likesCount = Array.isArray(likesData) ? likesData.length : (typeof likesData === 'number' ? likesData : 0);
+
+  return (
+    <article className="flex flex-col sm:flex-row gap-3 sm:gap-4 px-4 sm:px-5 py-4 hover:bg-slate-900/80 transition border-b border-slate-800/50 last:border-0">
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <span
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[0.7rem] font-semibold uppercase tracking-[0.16em] ${getCategoryColor(
+              thread.category
+            )}`}
+          >
+            <Tag className="h-3 w-3" />
+            {thread.category}
+          </span>
+          {thread.is_locked && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-900 border border-slate-700 text-[0.7rem] text-slate-300">
+              <Lock className="h-3 w-3" />
+              Locked
+            </span>
+          )}
+        </div>
+        <Link to={`/forum/${thread.id}`}>
+          <h3 className="mt-2 text-sm sm:text-base font-semibold text-slate-50 line-clamp-2 hover:text-emerald-400 hover:underline transition-colors block shrink-0">
+            {thread.title}
+          </h3>
+        </Link>
+        <div className="mt-1.5 flex items-center gap-2 text-slate-400 text-xs">
+          Started by 
+          <ForumUserSnippet userId={thread.user_id} futsalId={thread.futsal_id} size="sm" />
+        </div>
+      </div>
+      <div className="flex items-end sm:items-center gap-4 text-xs text-slate-400 mt-2 sm:mt-0">
+        <div className="flex flex-col items-start sm:items-end gap-1.5 min-w-[100px]">
+          <button 
+            onClick={(e) => { e.preventDefault(); likeMutation.mutate(); }}
+            disabled={likeMutation.isPending}
+            className="inline-flex items-center gap-1.5 text-slate-400 bg-slate-900 border border-slate-700 rounded-full px-2.5 py-1 hover:text-emerald-400 hover:border-emerald-500/50 transition-colors"
+          >
+            <ThumbsUp className={`h-3 w-3 ${likeMutation.isPending ? 'animate-bounce text-emerald-400' : ''}`} />
+            <span className="font-medium">{likesCount} Likes</span>
+          </button>
+          <div className="flex items-center gap-3 mt-1">
+            <span className="inline-flex items-center gap-1 text-[0.7rem]">
+              <MessageCircle className="h-3 w-3 text-sky-400" />
+              {thread.views_count} views
+            </span>
+            <span className="inline-flex items-center gap-1 text-[0.7rem]">
+              <Clock className="h-3 w-3 text-slate-500" />
+              {new Date(thread.createdAt).toLocaleDateString()}
+            </span>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+};
+
+const Forum: React.FC = () => {
+  const [activeFilter, setActiveFilter] = useState<"All" | string>("All");
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState<string>("General");
+  const [content, setContent] = useState("");
+  const [infoMessage, setInfoMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
+
+  const queryClient = useQueryClient();
+
+  // Fetch forums based on active filter
+  const { data: forumsResponse, isLoading } = useQuery({
+    queryKey: ["forums", activeFilter],
+    queryFn: () => (activeFilter === "All" ? getAllForums() : getForumsByCategory(activeFilter)),
+  });
+
+  const forumsList: ForumApiData[] = forumsResponse?.data || [];
+
+  // Submit new forum topic
+  const createForumMutation = useMutation({
+    mutationFn: createForum,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["forums"] });
+      queryClient.invalidateQueries({ queryKey: ["forums", "All"] });
+      queryClient.invalidateQueries({ queryKey: ["forums", category] });
+      setTitle("");
+      setCategory("General");
+      setContent("");
+      setInfoMessage({ type: "success", text: "Your topic has been posted successfully!" });
+      setTimeout(() => setInfoMessage(null), 3500);
+    },
+    onError: () => {
+      setInfoMessage({ type: "error", text: "Failed to post topic. Please try again later." });
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) {
-      setInfoMessage("Please add a title and some details before posting.");
+      setInfoMessage({ type: "error", text: "Please add a title and some details before posting." });
       return;
     }
 
-    setSubmitting(true);
     setInfoMessage(null);
-
-    setTimeout(() => {
-      setSubmitting(false);
-      setTitle("");
-      setCategory("General");
-      setContent("");
-      setInfoMessage(
-        "Your topic has been created! In a real app it would now appear in the list for all members."
-      );
-    }, 1200);
+    createForumMutation.mutate({ title, content, category });
   };
 
   return (
@@ -166,17 +212,14 @@ const Forum: React.FC = () => {
                   Latest Topics
                 </h2>
                 <div className="flex gap-2 text-xs sm:text-sm">
-                  {(["All", "Announcements", "General", "Help"] as const).map((filter) => (
+                  {(["All", "Announcement", "General", "Help"] as const).map((filter) => (
                     <button
                       key={filter}
-                      onClick={() =>
-                        setActiveFilter(filter === "All" ? "All" : filter)
-                      }
-                      className={`px-3 py-1.5 rounded-full border text-xs sm:text-[0.8rem] transition ${
-                        activeFilter === filter
+                      onClick={() => setActiveFilter(filter)}
+                      className={`px-3 py-1.5 rounded-full border text-xs sm:text-[0.8rem] transition ${activeFilter === filter
                           ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow-md"
                           : "bg-slate-900/60 border-slate-700 text-slate-300 hover:border-emerald-300/60"
-                      }`}
+                        }`}
                     >
                       {filter}
                     </button>
@@ -184,50 +227,22 @@ const Forum: React.FC = () => {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 divide-y divide-slate-800 shadow-xl overflow-hidden">
-                {filteredThreads.map((thread) => (
-                  <article
-                    key={thread.id}
-                    className="flex flex-col sm:flex-row gap-3 sm:gap-4 px-4 sm:px-5 py-4 hover:bg-slate-900/80 transition"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[0.7rem] font-semibold uppercase tracking-[0.16em] ${
-                            categoryColors[thread.category]
-                          }`}
-                        >
-                          <Tag className="h-3 w-3" />
-                          {thread.category}
-                        </span>
-                        {thread.isLocked && (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-900 border border-slate-700 text-[0.7rem] text-slate-300">
-                            <Lock className="h-3 w-3" />
-                            Locked
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="mt-2 text-sm sm:text-base font-semibold text-slate-50 line-clamp-2">
-                        {thread.title}
-                      </h3>
-                      <p className="mt-1 text-xs text-slate-400">
-                        Started by <span className="font-medium">{thread.author}</span>
-                      </p>
-                    </div>
-                    <div className="flex items-end sm:items-center gap-4 text-xs text-slate-400">
-                      <div className="flex flex-col items-start sm:items-end gap-1">
-                        <span className="inline-flex items-center gap-1">
-                          <MessageCircle className="h-3.5 w-3.5 text-emerald-300" />
-                          {thread.replies} replies
-                        </span>
-                        <span className="inline-flex items-center gap-1">
-                          <Clock className="h-3.5 w-3.5 text-slate-400" />
-                          {thread.lastActivity}
-                        </span>
-                      </div>
-                    </div>
-                  </article>
-                ))}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 divide-y divide-slate-800 shadow-xl overflow-hidden min-h-[300px]">
+                {isLoading ? (
+                  <div className="flex flex-col items-center justify-center p-12 text-slate-400 gap-3">
+                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+                    <p className="text-sm">Loading topics...</p>
+                  </div>
+                ) : forumsList.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center p-12 text-slate-400 gap-3">
+                    <MessageCircle className="h-10 w-10 text-slate-600" />
+                    <p className="text-sm">No topics found in this category.</p>
+                  </div>
+                ) : (
+                  forumsList.map((thread) => (
+                    <ForumCard key={thread.id} thread={thread} />
+                  ))
+                )}
               </div>
             </section>
 
@@ -240,59 +255,63 @@ const Forum: React.FC = () => {
                 </h2>
                 <form className="space-y-3" onSubmit={handleSubmit}>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-slate-300">
-                      Title
-                    </label>
+                    <label className="text-xs font-medium text-slate-300">Title</label>
                     <input
                       type="text"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder="What would you like to discuss?"
-                      className="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      className="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                      disabled={createForumMutation.isPending}
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-slate-300">
-                      Category
-                    </label>
+                    <label className="text-xs font-medium text-slate-300">Category</label>
                     <select
                       value={category}
-                      onChange={(e) =>
-                        setCategory(e.target.value as Thread["category"])
-                      }
-                      className="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                      disabled={createForumMutation.isPending}
                     >
                       <option value="General">General</option>
-                      <option value="Announcements">Announcements</option>
+                      <option value="Announcement">Announcement</option>
                       <option value="Help">Help</option>
                     </select>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-slate-300">
-                      Details
-                    </label>
+                    <label className="text-xs font-medium text-slate-300">Details</label>
                     <textarea
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       rows={4}
                       placeholder="Share context, times, venue details, or what you’re looking for..."
-                      className="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
+                      className="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none transition-colors"
+                      disabled={createForumMutation.isPending}
                     />
                   </div>
 
                   {infoMessage && (
-                    <p className="text-xs text-emerald-300">{infoMessage}</p>
+                    <p
+                      className={`text-xs font-medium ${
+                        infoMessage.type === "error" ? "text-rose-400" : "text-emerald-400"
+                      }`}
+                    >
+                      {infoMessage.text}
+                    </p>
                   )}
 
                   <button
                     type="submit"
-                    disabled={submitting}
+                    disabled={createForumMutation.isPending}
                     className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 text-slate-950 font-semibold text-sm py-2.5 mt-1 hover:bg-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed transition shadow-lg shadow-emerald-500/25"
                   >
-                    {submitting ? (
-                      "Posting..."
+                    {createForumMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Posting...
+                      </>
                     ) : (
                       <>
                         <ThumbsUp className="h-4 w-4" />
@@ -304,9 +323,7 @@ const Forum: React.FC = () => {
               </div>
 
               <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-5 sm:p-6 space-y-3 text-xs sm:text-sm text-slate-300 backdrop-blur">
-                <h3 className="text-sm font-semibold text-slate-100">
-                  Forum tips
-                </h3>
+                <h3 className="text-sm font-semibold text-slate-100">Forum tips</h3>
                 <ul className="space-y-1.5">
                   <li>• Use descriptive titles so others can help quickly.</li>
                   <li>• Add location and preferred time when looking for players.</li>
@@ -325,4 +342,3 @@ const Forum: React.FC = () => {
 };
 
 export default Forum;
-

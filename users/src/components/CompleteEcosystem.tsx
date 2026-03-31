@@ -91,8 +91,8 @@ export default function CompleteEcosystem() {
               size="lg"
               className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
               onClick={() => {
-                const el = document.getElementById("ecosystem");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
+                // navigate to /forum
+                window.location.href = "/forum";
               }}
             >
               Get started
