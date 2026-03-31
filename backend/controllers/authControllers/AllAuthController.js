@@ -11,7 +11,8 @@ const {
   TOKEN_EXPIRATION_FUTSAL,
   JWT_SECRET_FUTSAL,
   USER_PASSWORD_SALT_ROUNDS,
-  FUTSAL_PASSWORD_SALT_ROUNDS
+  FUTSAL_PASSWORD_SALT_ROUNDS,
+  NODE_ENV
 } = process.env;
 
 
@@ -83,7 +84,14 @@ const Login = async (req, res) => {
 
     res.cookie("utoken", usertoken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    // remove futsal token if exists
+    res.clearCookie("ftoken", {
+      httpOnly: true,
+      secure: NODE_ENV === "production",
       sameSite: "lax",
     });
 
@@ -138,7 +146,14 @@ const Login = async (req, res) => {
     // Set cookie
     res.cookie("ftoken", futsaltoken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    // remove user token if exists
+    res.clearCookie("utoken", {
+      httpOnly: true,
+      secure: NODE_ENV === "production",
       sameSite: "lax",
     });
 
@@ -234,7 +249,7 @@ const Logout = async (req, res) => {
         res.clearCookie("utoken", {
           path: "/",
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: NODE_ENV === "production",
     sameSite: "lax",
   });
     }
@@ -247,7 +262,7 @@ const Logout = async (req, res) => {
       res.clearCookie("ftoken", {
         path: "/",
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: NODE_ENV === "production",
     sameSite: "lax",
   });
     }

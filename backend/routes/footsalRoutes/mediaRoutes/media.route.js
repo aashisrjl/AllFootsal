@@ -15,6 +15,7 @@ const {
   uploadFacilitiesMediaByPitchId,
   deleteMediaByCategory,
   deleteMediaById,
+  getMediaBycategory,
 } = require("../../../controllers/footsalControllers/mediaController/media.controller");
 
 const router = express.Router();
@@ -24,6 +25,13 @@ router.get(
   "/futsal/:futsalId/media/home", // #swagger.tags = ['Futsal/Tenant/Media']
   resolveFutsalTenantWithToken,
   getHomeMedia
+);
+
+// get media by category
+router.get(
+  "/futsal/:futsalId/media/", // #swagger.tags = ['Futsal/Tenant/Media']
+  resolveFutsalTenantWithToken,
+  getMediaBycategory
 );
 router.get(
   "/futsal/:futsalId/media/pitch",

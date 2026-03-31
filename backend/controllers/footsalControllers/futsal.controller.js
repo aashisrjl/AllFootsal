@@ -68,9 +68,26 @@ const getFutsalbySubsciption_true = async (req,res)=>{
     })
 }
 
+const getFutsalProfile = async (req,res)=>{
+    const futsalId = req.futsalId;
+    const futsal = await Footsal.findByPk(futsalId);
+    if(!futsal){
+        return res.status(400).json({
+            success:false,
+            message:"No futsal found with this id"
+        })
+    }
+    res.status(200).json({
+        success:true,
+        message:"Futsal profile fetch successfully",
+        data:futsal
+    })
+}
+
 
 module.exports = {
     getAllFutsal,
     getFutsalById,
     getFutsalbySubsciption_true,
+    getFutsalProfile
 }
