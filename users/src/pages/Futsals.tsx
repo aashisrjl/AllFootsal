@@ -3,15 +3,37 @@ import React from "react";
 import Header from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import FacilityCard from "@/components/FacilityCard";
-import { facilities } from "@/data/mockData";
+import { useQuery } from "@tanstack/react-query";
+import { getAllFutsals } from "@/lib/futsalApi";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
 const Futsals = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
 
+  const { data, isLoading } = useQuery({
+    queryKey: ['futsals'],
+    queryFn: getAllFutsals
+  });
+
+  const fetchedFacilities = data?.data || [];
+  
+  // Transform base futsal data into expected Facility format for the Card
+  const dynamicFacilities = fetchedFacilities.map((f: any) => ({
+    id: String(f.id),
+    name: f.futsalName || "Unknown Futsal",
+    location: "Nepal", // Extend API to include joined location later
+    description: "Experience professional futsal matches near you.",
+    image: "https://images.unsplash.com/photo-1574629810360-7efbb1925846?q=80&w=800&auto=format&fit=crop", 
+    pitches: [],
+    rating: 5.0,
+    reviews: 0,
+    isUnderMaintenance: f.isActive === false,
+    maintenanceReason: "Inactive Tenant"
+  }));
+
   // Filter facilities based on search term
-  const filteredFacilities = facilities.filter((facility) =>
+  const filteredFacilities = dynamicFacilities.filter((facility: any) =>
     facility.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     facility.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -36,9 +58,14 @@ const Futsals = () => {
           </div>
           
           {/* Facilities Grid */}
-          {filteredFacilities.length > 0 ? (
+          {isLoading ? (
+            <div className="flex justify-center items-center py-24 text-gray-500">
+               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mr-3"></div>
+               Loading Futsals...
+            </div>
+          ) : filteredFacilities.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredFacilities.map((facility) => (
+              {filteredFacilities.map((facility: any) => (
                 <FacilityCard key={facility.id} facility={facility} />
               ))}
             </div>

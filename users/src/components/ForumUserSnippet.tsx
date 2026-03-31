@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getUserById } from '@/lib/userApi';
+import { getFutsalById } from '@/lib/futsalApi';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Shield, Mail, Phone, User as UserIcon, ShieldCheck } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription, DialogHeader } from '@/components/ui/dialog';
@@ -18,10 +19,16 @@ export const ForumUserSnippet: React.FC<ForumUserSnippetProps> = ({
   size = 'sm',
   isOp 
 }) => {
-  const { data: userResponse, isLoading } = useQuery({
+  const { data: userResponse, isLoading: isUserLoading } = useQuery({
     queryKey: ['user', userId],
     queryFn: () => getUserById(userId as number),
     enabled: !!userId,
+  });
+
+  const { data: futsalResponse, isLoading: isFutsalLoading } = useQuery({
+    queryKey: ['futsal', futsalId],
+    queryFn: () => getFutsalById(futsalId as number),
+    enabled: !!futsalId && !userId, // Fetch futsal only if it is a pure futsal post without user_id
   });
 
   const getSizes = () => {
@@ -34,22 +41,9 @@ export const ForumUserSnippet: React.FC<ForumUserSnippetProps> = ({
   };
   const sizes = getSizes();
 
-  if (futsalId && !userId) {
-    return (
-      <div className={`flex items-center gap-3 ${sizes.padding}`}>
-         <div className={`${sizes.avatar} rounded-full bg-slate-800 flex items-center justify-center border border-slate-700 shadow-sm shrink-0`}>
-           <Shield className="h-1/2 w-1/2 text-emerald-400" />
-         </div>
-         <div className="flex flex-col">
-           <span className={`font-semibold text-emerald-100 ${sizes.text}`}>
-             Futsal #{futsalId}
-           </span>
-         </div>
-      </div>
-    );
-  }
+  const isLoading = isUserLoading || isFutsalLoading;
 
-  if (isLoading || !userId) {
+  if (isLoading || (!userId && !futsalId)) {
     return (
        <div className={`flex items-center gap-2 ${sizes.padding}`}>
          <div className={`${sizes.avatar} rounded-full bg-slate-800 animate-pulse border border-slate-700 shrink-0`} />
@@ -58,10 +52,13 @@ export const ForumUserSnippet: React.FC<ForumUserSnippetProps> = ({
     );
   }
 
-  const profile = userResponse?.data;
-  if (!profile) return <span className="text-slate-500 text-xs">Unknown User</span>;
+  const profile = userResponse?.data || futsalResponse?.data;
+  if (!profile) return <span className="text-slate-500 text-xs px-2">Unknown {futsalId ? 'Futsal' : 'User'}</span>;
 
-  const displayName = profile.username;
+  // Type bridging between user and futsal shapes
+  const p = profile as any;
+  const displayName = p.username || p.futsalName || p.ownerName || `Futsal #${futsalId}`;
+  const displayRole = p.role || 'futsal';
   const initial = displayName.charAt(0).toUpperCase();
 
   return (
@@ -119,7 +116,7 @@ export const ForumUserSnippet: React.FC<ForumUserSnippetProps> = ({
                 <h2 className="text-2xl font-extrabold text-slate-50 tracking-tight">{displayName}</h2>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 text-[0.7rem] font-semibold text-emerald-400 uppercase tracking-wider mt-2.5">
                   <ShieldCheck className="h-3 w-3" />
-                  {profile.role} User
+                  {displayRole} User
                 </span>
               </div>
 

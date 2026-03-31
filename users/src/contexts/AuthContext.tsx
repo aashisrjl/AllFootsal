@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 const mapUser = (rawUser: any): User => {
   return {
     id: String(rawUser?.id ?? rawUser?._id ?? ""),
-    name: rawUser?.name ?? rawUser?.username ?? rawUser?.ownerName ?? "User",
+    name: rawUser?.futsalName ?? rawUser?.name ?? rawUser?.username ?? rawUser?.ownerName ?? "User",
     email: rawUser?.email ?? "",
     phoneNumber: rawUser?.phoneNumber ?? "",
     profileImage: rawUser?.profileImage ?? "",
@@ -63,8 +63,16 @@ useEffect(() => {
       if (!isActive) return;
       setAuthState({ user, isAuthenticated: true, isLoading: false });
     } catch {
-      if (!isActive) return;
-      setAuthState({ user: null, isAuthenticated: false, isLoading: false });
+      try {
+        const { getFutsalProfile } = await import('@/lib/futsalApi');
+        const futsalRes = await getFutsalProfile();
+        const user = mapUser(futsalRes?.data);
+        if (!isActive) return;
+        setAuthState({ user, isAuthenticated: true, isLoading: false });
+      } catch {
+        if (!isActive) return;
+        setAuthState({ user: null, isAuthenticated: false, isLoading: false });
+      }
     }
   };
 

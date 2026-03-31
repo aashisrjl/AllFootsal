@@ -1,14 +1,12 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { useAuth } from "@/contexts/AuthContext";
-import { Navigate, useNavigate } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import {
   deleteProfileImage,
@@ -18,6 +16,10 @@ import {
   changePassword,
   type UserProfileApiData,
 } from "@/lib/userApi";
+import { 
+  User, Info, Settings, Edit3, Calendar, MessageSquare, Lock, LogOut, 
+  Phone, Mail, Upload, Trash2, Loader2, ShieldCheck, ChevronRight
+} from "lucide-react";
 
 type ProfileSection = "data" | "info" | "settings" | "edit" | "bookings" | "forums" | "changePassword" | "logout";
 
@@ -32,6 +34,7 @@ const UserProfileInfo = () => {
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isDeletingImage, setIsDeletingImage] = useState(false);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  
   const [formValues, setFormValues] = useState({
     username: "",
     email: "",
@@ -43,15 +46,21 @@ const UserProfileInfo = () => {
   });
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-  // ✅ useEffect BEFORE any conditional return
   useEffect(() => {
-    if (!isAuthenticated || !user) return; // guard inside, not outside
+    if (user && ((user.role as string) === 'futsal' || user.role === 'footsal')) {
+      window.location.replace("http://localhost:3002/settings");
+      return;
+    }
+
+    if (!isAuthenticated || !user) return;
 
     const loadProfile = async () => {
       try {
         setIsFetchingProfile(true);
         const res = await getProfile();
+        
         setProfile(res.data);
+        
         setCurrentUser({
           id: String(res.data.id),
           name: res.data.username,
@@ -60,6 +69,7 @@ const UserProfileInfo = () => {
           profileImage: res.data.profileImage || "",
           role: res.data.role,
         });
+        
         setFormValues({
           username: res.data?.username || "",
           email: res.data?.email || "",
@@ -77,7 +87,7 @@ const UserProfileInfo = () => {
     };
 
     loadProfile();
-  }, [isAuthenticated, user?.id]);
+  }, [isAuthenticated, user?.id, user?.role]);
 
   const displayName = useMemo(() => profile?.username || user?.name, [profile?.username, user?.name]);
   const displayEmail = useMemo(() => profile?.email || user?.email, [profile?.email, user?.email]);
@@ -85,11 +95,11 @@ const UserProfileInfo = () => {
   const displayImage = profile?.profileImage || "";
   const initial = displayName?.trim()?.charAt(0)?.toUpperCase() || "U";
 
-  // ✅ All conditional returns AFTER all hooks
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Checking session...</p>
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-4 text-slate-400">
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+        <p>Checking session...</p>
       </div>
     );
   }
@@ -100,8 +110,9 @@ const UserProfileInfo = () => {
 
   if (isFetchingProfile) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading profile...</p>
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-4 text-slate-400">
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+        <p>Loading profile...</p>
       </div>
     );
   }
@@ -207,7 +218,6 @@ const UserProfileInfo = () => {
   };
 
   const handlePasswordChange = async () => {
-    // Validation
     if (!passwordForm.newPassword || !passwordForm.cNewPassword) {
       toast({
         title: "Validation error",
@@ -216,7 +226,6 @@ const UserProfileInfo = () => {
       });
       return;
     }
-
     if (passwordForm.newPassword !== passwordForm.cNewPassword) {
       toast({
         title: "Passwords do not match",
@@ -225,7 +234,6 @@ const UserProfileInfo = () => {
       });
       return;
     }
-
     if (passwordForm.newPassword.length < 6) {
       toast({
         title: "Password too short",
@@ -250,7 +258,6 @@ const UserProfileInfo = () => {
       setPasswordForm({ newPassword: "", cNewPassword: "" });
       setActiveSection("data");
 
-      // Logout after successful password change
       setTimeout(() => {
         logout();
       }, 1500);
@@ -281,351 +288,347 @@ const UserProfileInfo = () => {
     }
   };
 
-  if (isFetchingProfile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading profile...</p>
-      </div>
-    );
-  }
+  const menuItems = [
+    { id: "data", label: "Profile Data", icon: User },
+    { id: "info", label: "Account Info", icon: Info },
+    { id: "settings", label: "Settings", icon: Settings },
+    { id: "edit", label: "Edit Profile", icon: Edit3 },
+    { id: "bookings", label: "My Bookings", icon: Calendar },
+    { id: "forums", label: "My Forums", icon: MessageSquare },
+    { id: "changePassword", label: "Password", icon: Lock },
+    { id: "logout", label: "Logout", icon: LogOut, danger: true },
+  ];
 
   const renderProfileSection = () => {
     if (activeSection === "bookings") {
       return (
-        <Card>
-          <CardHeader>
-            <CardTitle>My Bookings</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground">View and manage your futsal bookings.</p>
-            <Button onClick={() => navigate("/bookings")}>View All Bookings</Button>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-slate-50">My Bookings</h2>
+          <p className="text-slate-400 text-sm">View and manage your futsal match bookings and timeslots.</p>
+          <button 
+            onClick={() => navigate("/bookings")}
+            className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-5 py-2.5 rounded-xl font-semibold transition-colors shadow-lg shadow-emerald-500/20"
+          >
+            <Calendar className="h-4 w-4" />
+            View All Bookings
+          </button>
+        </div>
       );
     }
 
     if (activeSection === "forums") {
       return (
-        <Card>
-          <CardHeader>
-            <CardTitle>My Forums</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground">Visit the futsal forums and discussion board.</p>
-            <Button onClick={() => navigate("/forum")}>Go to Forums</Button>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-slate-50">My Forums</h2>
+          <p className="text-slate-400 text-sm">Visit the futsal forums and participate in the community discussion board.</p>
+          <button 
+            onClick={() => navigate("/forum")}
+            className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-5 py-2.5 rounded-xl font-semibold transition-colors shadow-lg shadow-emerald-500/20"
+          >
+            <MessageSquare className="h-4 w-4" />
+            Go to Forums
+          </button>
+        </div>
       );
     }
 
     if (activeSection === "changePassword") {
       return (
-        <Card>
-          <CardHeader>
-            <CardTitle>Change Password</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground">Update your password to keep your account secure.</p>
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-slate-50">Security & Password</h2>
+          <p className="text-slate-400 text-sm">Update your password to keep your Futsal account secure.</p>
 
-            <div className="space-y-2">
-              <Label htmlFor="new-password">New Password</Label>
+          <div className="space-y-5 mt-6 max-w-md">
+            <div className="space-y-2.5">
+              <Label htmlFor="new-password" className="text-slate-300">New Password</Label>
               <Input
                 id="new-password"
                 type="password"
                 placeholder="Enter new password"
                 value={passwordForm.newPassword}
-                onChange={(e) =>
-                  setPasswordForm((prev) => ({
-                    ...prev,
-                    newPassword: e.target.value,
-                  }))
-                }
+                onChange={(e) => setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))}
+                className="bg-slate-950 border-slate-700/80 text-slate-100 placeholder:text-slate-600 focus-visible:ring-emerald-500"
               />
-              <p className="text-xs text-muted-foreground">Minimum 6 characters</p>
+              <p className="text-[0.7rem] text-slate-500">Minimum 6 characters required.</p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm Password</Label>
+            <div className="space-y-2.5">
+              <Label htmlFor="confirm-password" className="text-slate-300">Confirm Password</Label>
               <Input
                 id="confirm-password"
                 type="password"
-                placeholder="Confirm new password"
+                placeholder="Repeat new password"
                 value={passwordForm.cNewPassword}
-                onChange={(e) =>
-                  setPasswordForm((prev) => ({
-                    ...prev,
-                    cNewPassword: e.target.value,
-                  }))
-                }
+                onChange={(e) => setPasswordForm((prev) => ({ ...prev, cNewPassword: e.target.value }))}
+                className="bg-slate-950 border-slate-700/80 text-slate-100 placeholder:text-slate-600 focus-visible:ring-emerald-500"
               />
             </div>
 
-            <Button onClick={handlePasswordChange} disabled={isChangingPassword} className="w-full">
-              {isChangingPassword ? "Changing Password..." : "Change Password"}
-            </Button>
-          </CardContent>
-        </Card>
+            <button 
+              onClick={handlePasswordChange} 
+              disabled={isChangingPassword} 
+              className="w-full inline-flex justify-center items-center gap-2 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 px-5 py-2.5 rounded-xl font-semibold transition-colors shadow-lg shadow-emerald-500/20"
+            >
+              {isChangingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
+              {isChangingPassword ? "Saving..." : "Change Password"}
+            </button>
+          </div>
+        </div>
       );
     }
 
     if (activeSection === "logout") {
       return (
-        <Card>
-          <CardHeader>
-            <CardTitle>Logout</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground">Are you sure you want to logout?</p>
-            <Button onClick={handleLogout} disabled={isLoggingOut} variant="destructive">
-              {isLoggingOut ? "Logging out..." : "Confirm Logout"}
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-rose-400">Account Logout</h2>
+          <p className="text-slate-400 text-sm">Are you sure you want to end your current session?</p>
+          <button 
+            onClick={handleLogout} 
+            disabled={isLoggingOut} 
+            className="inline-flex justify-center items-center gap-2 bg-rose-500/20 hover:bg-rose-500 text-rose-300 hover:text-rose-50 border border-rose-500/30 disabled:opacity-50 px-6 py-2.5 rounded-xl font-semibold transition-all shadow-lg"
+          >
+            {isLoggingOut ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
+            {isLoggingOut ? "Logging out..." : "Confirm Logout"}
+          </button>
+        </div>
       );
     }
 
-    if (activeSection === "data") {
+    if (activeSection === "edit") {
       return (
-        <Card>
-          <CardHeader className="items-center">
-            <Avatar className="h-20 w-20">
-              <AvatarImage src={displayImage} alt={displayName} />
-              <AvatarFallback className="bg-green-600 text-white text-2xl">{initial}</AvatarFallback>
-            </Avatar>
-            <CardTitle className="mt-3">{displayName}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Name</p>
-                <p className="font-medium">{displayName}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Email</p>
-                <p className="font-medium">{displayEmail}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Phone Number</p>
-                <p className="font-medium">{profile?.phoneNumber || "-"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Role</p>
-                <p className="font-medium capitalize">{displayRole}</p>
-              </div>
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-slate-50">Edit Profile</h2>
+          <p className="text-slate-400 text-sm">Modify your core account information here.</p>
+
+          <div className="space-y-5 mt-6 max-w-md">
+            <div className="space-y-2.5">
+              <Label htmlFor="name" className="text-slate-300">Name / Username</Label>
+              <Input
+                id="name"
+                value={formValues.username}
+                onChange={(e) => setFormValues((prev) => ({ ...prev, username: e.target.value }))}
+                className="bg-slate-950 border-slate-700/80 text-slate-100 focus-visible:ring-emerald-500"
+              />
             </div>
 
-            <div className="space-y-3 pt-2">
-              <Label htmlFor="profile-image">Profile Image</Label>
+            <div className="space-y-2.5">
+              <Label htmlFor="email" className="text-slate-300">Email Address</Label>
               <Input
-                id="profile-image"
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0] || null;
-                  setSelectedImageFile(file);
-                }}
+                id="email"
+                type="email"
+                value={formValues.email}
+                onChange={(e) => setFormValues((prev) => ({ ...prev, email: e.target.value }))}
+                className="bg-slate-950 border-slate-700/80 text-slate-100 focus-visible:ring-emerald-500"
               />
-              <div className="flex flex-wrap gap-3">
-                <Button onClick={handleProfileImageUpload} disabled={!selectedImageFile || isUploadingImage}>
-                  {isUploadingImage ? "Uploading..." : "Upload Image"}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleProfileImageDelete}
-                  disabled={isDeletingImage || !displayImage}
-                >
-                  {isDeletingImage ? "Removing..." : "Delete Image"}
-                </Button>
-              </div>
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="space-y-2.5">
+              <Label htmlFor="phoneNumber" className="text-slate-300">Phone Number</Label>
+              <Input
+                id="phoneNumber"
+                value={formValues.phoneNumber}
+                onChange={(e) => setFormValues((prev) => ({ ...prev, phoneNumber: e.target.value }))}
+                className="bg-slate-950 border-slate-700/80 text-slate-100 focus-visible:ring-emerald-500"
+              />
+            </div>
+
+            <button 
+              onClick={handleProfileUpdate} 
+              disabled={isSavingProfile}
+              className="w-full inline-flex justify-center items-center gap-2 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 px-5 py-2.5 rounded-xl font-semibold transition-colors shadow-lg shadow-emerald-500/20"
+            >
+               {isSavingProfile ? <Loader2 className="h-4 w-4 animate-spin" /> : <Edit3 className="h-4 w-4" />}
+               {isSavingProfile ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
+        </div>
       );
     }
 
     if (activeSection === "info") {
       return (
-        <Card>
-          <CardHeader>
-            <CardTitle>Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground">User ID</p>
-              <p className="font-medium break-all">{profile?.id ?? user.id}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Account Type</p>
-              <p className="font-medium capitalize">{displayRole}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Primary Contact</p>
-              <p className="font-medium">{displayEmail}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Created At</p>
-              <p className="font-medium">{profile?.createdAt ? new Date(profile.createdAt).toLocaleString() : "-"}</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-8">
+           <h2 className="text-2xl font-bold text-slate-50">Account Information</h2>
+           
+           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-slate-900/40 p-6 rounded-2xl border border-slate-800/80">
+              <div className="space-y-1.5">
+                 <div className="flex items-center gap-2 text-slate-400 text-sm">
+                    <User className="h-4 w-4" /> User ID
+                 </div>
+                 <p className="font-semibold text-slate-200 text-lg break-all">{profile?.id ?? user.id}</p>
+              </div>
+              <div className="space-y-1.5">
+                 <div className="flex items-center gap-2 text-slate-400 text-sm">
+                    <ShieldCheck className="h-4 w-4" /> Account Type
+                 </div>
+                 <p className="font-semibold text-slate-200 text-lg capitalize">{displayRole}</p>
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                 <div className="flex items-center gap-2 text-slate-400 text-sm">
+                    <Calendar className="h-4 w-4" /> Created At
+                 </div>
+                 <p className="font-semibold text-slate-200 text-lg">
+                    {profile?.createdAt ? new Date(profile.createdAt).toLocaleString() : "-"}
+                 </p>
+              </div>
+           </div>
+        </div>
       );
     }
 
     if (activeSection === "settings") {
       return (
-        <Card>
-          <CardHeader>
-            <CardTitle>Settings</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label htmlFor="email-notifications">Email Notifications</Label>
-                <p className="text-sm text-muted-foreground">Receive booking and account updates via email.</p>
+        <div className="space-y-8">
+          <h2 className="text-2xl font-bold text-slate-50">System Settings</h2>
+          
+          <div className="space-y-6">
+            <div className="flex items-start sm:items-center justify-between bg-slate-900/40 p-5 rounded-2xl border border-slate-800/80">
+              <div className="space-y-1 pr-6">
+                <Label htmlFor="email-notifications" className="text-base text-slate-200">Email Notifications</Label>
+                <p className="text-sm text-slate-500">Receive booking and account updates via email.</p>
               </div>
-              <Switch id="email-notifications" checked={Boolean(profile?.notifications)} disabled />
+              <Switch id="email-notifications" checked={Boolean(profile?.notifications)} disabled className="data-[state=checked]:bg-emerald-500" />
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label htmlFor="dark-mode">Dark Mode</Label>
-                <p className="text-sm text-muted-foreground">Your backend dark mode preference.</p>
+            <div className="flex items-start sm:items-center justify-between bg-slate-900/40 p-5 rounded-2xl border border-slate-800/80">
+              <div className="space-y-1 pr-6">
+                <Label htmlFor="dark-mode" className="text-base text-slate-200">Dark Mode</Label>
+                <p className="text-sm text-slate-500">Your core interface preference is automatically dark.</p>
               </div>
-              <Switch id="dark-mode" checked={Boolean(profile?.darkMode)} disabled />
+              <Switch id="dark-mode" checked={true} disabled className="data-[state=checked]:bg-emerald-500" />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       );
     }
 
+    // Default "data" view
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Edit Profile</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={formValues.username}
-              onChange={(e) =>
-                setFormValues((prev) => ({
-                  ...prev,
-                  username: e.target.value,
-                }))
-              }
-            />
+      <div className="space-y-8">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 bg-slate-900/40 p-6 rounded-3xl border border-slate-800/80">
+          <Avatar className="h-28 w-28 border-4 border-slate-800 shadow-xl shrink-0">
+            <AvatarImage src={displayImage} alt={displayName} />
+             <AvatarFallback className="bg-emerald-600/20 text-emerald-400 text-4xl font-bold">
+                {initial}
+             </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col justify-center text-center sm:text-left">
+            <h2 className="text-3xl font-extrabold text-slate-50 tracking-tight">{displayName}</h2>
+            <div className="mt-2.5 flex flex-wrap justify-center sm:justify-start gap-3">
+               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950 border border-slate-800 text-[0.7rem] font-semibold text-emerald-400 uppercase tracking-wider">
+                  <ShieldCheck className="h-3 w-3" />
+                  {displayRole}
+               </span>
+               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950 border border-slate-800 text-[0.7rem] font-semibold text-slate-300 uppercase tracking-wider">
+                  <Mail className="h-3 w-3" />
+                  {displayEmail}
+               </span>
+            </div>
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formValues.email}
-              onChange={(e) =>
-                setFormValues((prev) => ({
-                  ...prev,
-                  email: e.target.value,
-                }))
-              }
-            />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+           <div className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800/50 space-y-1">
+             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Full Name</p>
+             <p className="font-medium text-slate-200">{displayName}</p>
+           </div>
+           <div className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800/50 space-y-1">
+             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Primary Email</p>
+             <p className="font-medium text-slate-200 truncate">{displayEmail}</p>
+           </div>
+           <div className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800/50 space-y-1 sm:col-span-2">
+             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mobile Number</p>
+             <p className="font-medium text-slate-200">{profile?.phoneNumber || "Not provided"}</p>
+           </div>
+        </div>
+
+        <div className="space-y-4 pt-6 border-t border-slate-800/80">
+          <Label htmlFor="profile-image" className="text-sm text-slate-300 font-semibold block">Update Profile Picture</Label>
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+             <Input
+               id="profile-image"
+               type="file"
+               accept="image/*"
+               className="max-w-[250px] bg-slate-950 border-slate-700/80 text-slate-300 file:text-emerald-400 file:font-semibold file:bg-slate-900 file:border-0 hover:file:text-emerald-300 cursor-pointer"
+               onChange={(e) => {
+                 const file = e.target.files?.[0] || null;
+                 setSelectedImageFile(file);
+               }}
+             />
+             <div className="flex gap-3">
+               <button 
+                 onClick={handleProfileImageUpload} 
+                 disabled={!selectedImageFile || isUploadingImage}
+                 className="inline-flex items-center gap-2 bg-emerald-500/20 hover:bg-emerald-500 hover:text-slate-950 text-emerald-300 border border-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+               >
+                 {isUploadingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                 Upload
+               </button>
+               <button
+                 onClick={handleProfileImageDelete}
+                 disabled={isDeletingImage || !displayImage}
+                 className="inline-flex items-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 disabled:opacity-30 disabled:cursor-not-allowed px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+               >
+                 {isDeletingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                 Remove
+               </button>
+             </div>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phoneNumber">Phone Number</Label>
-            <Input
-              id="phoneNumber"
-              value={formValues.phoneNumber}
-              onChange={(e) =>
-                setFormValues((prev) => ({
-                  ...prev,
-                  phoneNumber: e.target.value,
-                }))
-              }
-            />
-          </div>
-
-          <Button onClick={handleProfileUpdate} disabled={isSavingProfile}>
-            {isSavingProfile ? "Saving..." : "Save Changes"}
-          </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50">
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 py-12">
-        <div className="max-w-5xl mx-auto space-y-6">
-          <h1 className="text-3xl font-bold">My Profile</h1>
+      <main className="flex-1 container mx-auto px-4 py-16 pt-24">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Your Dashboard</h1>
+             <p className="text-slate-400 mt-2 text-sm sm:text-base">Manage your Futsal identity, match preferences, and security settings.</p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="md:col-span-1 h-fit">
-              <CardContent className="pt-6 space-y-2">
-                <Button
-                  variant={activeSection === "data" ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => setActiveSection("data")}
-                >
-                  Profile Data
-                </Button>
-                <Button
-                  variant={activeSection === "info" ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => setActiveSection("info")}
-                >
-                  Info
-                </Button>
-                <Button
-                  variant={activeSection === "settings" ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => setActiveSection("settings")}
-                >
-                  Settings
-                </Button>
-                <Button
-                  variant={activeSection === "edit" ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => setActiveSection("edit")}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant={activeSection === "bookings" ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => setActiveSection("bookings")}
-                >
-                  Bookings
-                </Button>
-                <Button
-                  variant={activeSection === "forums" ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => setActiveSection("forums")}
-                >
-                  My Forums
-                </Button>
-                <Button
-                  variant={activeSection === "changePassword" ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => setActiveSection("changePassword")}
-                >
-                  Change Password
-                </Button>
-                <Button
-                  variant={activeSection === "logout" ? "destructive" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => setActiveSection("logout")}
-                >
-                  Logout
-                </Button>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+            {/* Sidebar Navigation */}
+            <aside className="bg-slate-900/60 border border-slate-800 shadow-xl rounded-3xl p-5 backdrop-blur h-fit space-y-1.5 flex flex-col">
+               {menuItems.map((item) => {
+                 const Icon = item.icon;
+                 const isActive = activeSection === item.id;
+                 const isDanger = item.danger;
+                 
+                 let btnClasses = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ";
+                 if (isActive) {
+                    btnClasses += isDanger 
+                       ? "bg-rose-500/15 text-rose-400 border border-rose-500/30 shadow-sm" 
+                       : "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-sm";
+                 } else {
+                    btnClasses += isDanger
+                       ? "text-slate-400 hover:bg-rose-500/10 hover:text-rose-400 border border-transparent"
+                       : "text-slate-400 hover:bg-slate-800/70 hover:text-slate-200 border border-transparent";
+                 }
 
-            <div className="md:col-span-3">{renderProfileSection()}</div>
+                 return (
+                   <button
+                     key={item.id}
+                     onClick={() => setActiveSection(item.id as ProfileSection)}
+                     className={btnClasses}
+                   >
+                     <Icon className={`h-5 w-5 ${isActive && !isDanger ? 'text-emerald-400' : isActive && isDanger ? 'text-rose-400' : ''}`} />
+                     {item.label}
+                     {isActive && <ChevronRight className="h-4 w-4 ml-auto opacity-70" />}
+                   </button>
+                 );
+               })}
+            </aside>
+
+            {/* Main Content Pane */}
+            <section className="bg-slate-900/60 border border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-3xl p-6 sm:p-10 backdrop-blur relative overflow-hidden min-h-[60vh]">
+              <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-emerald-500 via-sky-500 to-emerald-500 opacity-50" />
+              {renderProfileSection()}
+            </section>
+
           </div>
         </div>
       </main>
