@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const userRegister = require("./../../controllers/authControllers/userAuthController");
 const RegisterFootsal = require("./../../controllers/authControllers/footsalAuthController");
-const { VerifyOtp, Login, Logout, forgotPassword, changeForgotPassword } = require("../../controllers/authControllers/AllAuthController");
+const { VerifyOtp, Login, Logout, forgotPassword, changeForgotPassword, ChangePassword } = require("../../controllers/authControllers/AllAuthController");
 const generateJwt = require("../../utils/jwt/generateJwt");
 const passport = require("passport");
+const isUserAuthenticated = require("../../middleware/authMiddleware/userAuthenticate");
 const {NODE_ENV,BASE_URL} = process.env;
 
 
@@ -14,6 +15,13 @@ const {NODE_ENV,BASE_URL} = process.env;
 router.post(
   `/auth/user/register`, // #swagger.tags = ['Auth/User']
    userRegister); 
+
+// user login
+router.patch(
+  '/auth/change-password', // #swagger.tags = ['Auth/User']
+  isUserAuthenticated,
+  ChangePassword
+);
 
 router.post(
   `/auth/user/login`  // #swagger.tags = ['Auth/User']

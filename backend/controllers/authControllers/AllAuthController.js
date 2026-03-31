@@ -84,7 +84,7 @@ const Login = async (req, res) => {
     res.cookie("utoken", usertoken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
     });
 
     // Return user data and token
@@ -139,7 +139,7 @@ const Login = async (req, res) => {
     res.cookie("ftoken", futsaltoken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
     });
 
     // Return footsal data and token
@@ -220,8 +220,8 @@ const VerifyOtp = async (req, res) => {
 //logout api
 const Logout = async (req, res) => {
   try {
-    const utoken = req.cookies.utoken;
-    const ftoken = req.cookies.ftoken;
+    const utoken = req.cookies.utoken || req.headers.utoken;
+    const ftoken = req.cookies.ftoken || req.headers.ftoken;
 
     const userId = req.user?.id;
     const futsalId = req.futsal?.id;
@@ -231,7 +231,12 @@ const Logout = async (req, res) => {
         { is_active: false },
         { where: { id: userId } }
       );
-      res.clearCookie("utoken");
+        res.clearCookie("utoken", {
+          path: "/",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
     }
 
     if (ftoken && futsalId) {
@@ -239,7 +244,12 @@ const Logout = async (req, res) => {
         { is_active: false },
         { where: { id: futsalId } }
       );
-      res.clearCookie("ftoken");
+      res.clearCookie("ftoken", {
+        path: "/",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
     }
 
     return res.status(200).json({
@@ -260,6 +270,7 @@ const ChangePassword = async (req, res) => {
   try {
     const { newPassword, cNewPassword } = req.body;
     const userId = req.user?.id;
+
     if (!newPassword || !cNewPassword) {
       return res.status(400).json({
         error: "New password and confirm new password are required",
@@ -416,5 +427,6 @@ module.exports = AllAuthController = {
   Logout,
   Login,
   forgotPassword,
-  changeForgotPassword
+  changeForgotPassword,
+  ChangePassword
 };
