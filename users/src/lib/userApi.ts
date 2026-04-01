@@ -72,3 +72,9 @@ export const changePassword = async (payload: {
 	return res.data;
 };
 
+// get all bookings globally
+export const getUserBookings = async (): Promise<any> => {
+	const res = await API.get("/user/bookings");
+	return res.data;
+};
+

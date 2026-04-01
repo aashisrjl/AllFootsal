@@ -185,11 +185,71 @@ const deleteProfileImage = async (req,res)=>{
     });
 }
 
+// get all user bookings across all tenant shards
+const getMyAllBookings = async (req, res) => {
+    const userId = req.userId;
+    const { Footsal, sequelize } = require("../../models");
+    const { QueryTypes } = require("sequelize");
+
+    try {
+        const futsals = await Footsal.findAll();
+        let globalBookings = [];
+
+        for (const futsal of futsals) {
+            const code = futsal.futsalCode;
+            try {
+                // If the table doesn't exist, this query will throw an error and be caught
+                const bookings = await sequelize.query(
+                    `SELECT b.*, p.name as pitch_name, t.start_time, t.end_time 
+                     FROM booking_${code} b 
+                     JOIN pitch_${code} p ON b.pitch_id = p.id 
+                     JOIN timeslot_${code} t ON b.timeslot_id = t.id
+                     WHERE b.user_id = ?`, 
+                    { replacements: [userId], type: QueryTypes.SELECT }
+                );
+
+                if (bookings && bookings.length > 0) {
+                    bookings.forEach(b => {
+                        b.facilityId = String(futsal.id);
+                        b.futsal_name = futsal.futsalName;
+                        b.pitchId = String(b.pitch_id);
+                        b.date = b.booking_date;
+                        b.startTime = b.start_time;
+                        b.endTime = b.end_time;
+                        b.totalPrice = b.amount;
+                        b.status = b.status || 'pending';
+                        b.pitchName = b.pitch_name;
+                    });
+                    globalBookings = globalBookings.concat(bookings);
+                }
+            } catch (err) {
+                // Silently skip if table doesn't exist for a specific futsal
+            }
+        }
+
+        // Sort dynamically (newest bookings first)
+        globalBookings.sort((a, b) => new Date(b.booking_date) - new Date(a.booking_date));
+
+        return res.status(200).json({
+            success: true,
+            message: "User booking history fetched successfully",
+            data: globalBookings,
+        });
+    } catch (err) {
+        console.error("Error fetching global user bookings:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to compile booking history"
+        });
+    }
+};
+
 module.exports = {
     getAllUsers,
     getUserById,
     getProfile,
     updateProfile,
     updateProfileImage,
-    deleteProfileImage
+    deleteProfileImage,
+    getMyAllBookings
 }
