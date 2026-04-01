@@ -52,12 +52,6 @@ const mockUsers: User[] = [
     role: "admin"
   },
   {
-    id: "user4",
-    name: "Staff Member",
-    email: "staff@example.com",
-    role: "staff"
-  },
-  {
     id: "user5",
     name: "Regular User",
     email: "user@example.com",

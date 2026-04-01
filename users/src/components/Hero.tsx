@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, CalendarDays, MapPin, ShieldCheck, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const container: any = {
   hidden: { opacity: 0, y: 18 },
@@ -17,6 +18,7 @@ const item: any = {
 };
 
 export default function Hero() {
+  const navigate = useNavigate();
   return (
     <section
       id="home"
@@ -64,11 +66,11 @@ export default function Hero() {
                   size="lg"
                   className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
                   onClick={() => {
-                    const element = document.getElementById("ecosystem");
-                    if (element) element.scrollIntoView({ behavior: "smooth" });
+                    // goto localhost:3002
+                    navigate('/auth/register/footsal')
                   }}
                 >
-                  Explore the ecosystem
+                  Register Your Futsal
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
 
@@ -77,11 +79,11 @@ export default function Hero() {
                   variant="secondary"
                   className="bg-white/10 text-white hover:bg-white/15 border border-white/15 backdrop-blur"
                   onClick={() => {
-                    const element = document.getElementById("faq");
-                    if (element) element.scrollIntoView({ behavior: "smooth" });
+                    // goto localhost:3002
+                    window.location.href = "http://localhost:3002";
                   }}
                 >
-                  How it works
+                  Futsal Admin
                 </Button>
               </motion.div>
 
@@ -168,11 +170,10 @@ export default function Hero() {
                     <Button
                       className="bg-white text-slate-900 hover:bg-white/90"
                       onClick={() => {
-                        const element = document.getElementById("platforms");
-                        if (element) element.scrollIntoView({ behavior: "smooth" });
+                        navigate("/futsals");
                       }}
                     >
-                      See platforms
+                      See Futsals
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>

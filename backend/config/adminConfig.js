@@ -12,7 +12,7 @@ const {
 	ForumLike,
 } = require('../models')
 
-const { ADMIN_COOKIE_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD } = process.env
+const { ADMIN_COOKIE_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD,ADMIN_FRONTEND_URL } = process.env
 
 AdminJS.registerAdapter(AdminJSSequelize)
 
@@ -67,7 +67,7 @@ const buildDashboardHandler = async () => {
 const setupAdminPanel = (app) => {
 	const adminJs = new AdminJS({
 		databases: [sequelize],
-		rootPath: '/admin',
+		rootPath: ADMIN_FRONTEND_URL,
 		dashboard: {
 			component: AdminJS.bundle('../components/dashboard-components.jsx'),
 			handler: buildDashboardHandler,

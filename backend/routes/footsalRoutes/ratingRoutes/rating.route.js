@@ -1,5 +1,5 @@
 const express = require("express");
-const { getRatings, deleteRatingByAdmin, getRatingByUser, postRating, updateRating, deleteRating } = require("../../../controllers/footsalControllers/ratingController/rating.controller");
+const { getRatings, deleteRatingByAdmin, getRatingByUser, postRating, updateRating, deleteRating, getRatingByfutsalId } = require("../../../controllers/footsalControllers/ratingController/rating.controller");
 const isFutsalAuthenticated = require("../../../middleware/authMiddleware/futsalAuthenticated");
 const isUserAuthenticated = require("../../../middleware/authMiddleware/userAuthenticate");
 
@@ -12,6 +12,11 @@ router.get(
   isFutsalAuthenticated,
    getRatings
 );
+
+router.get(
+  "/futsal/:futsalId/ratings", // #swagger.tags = ['Futsal/Tenant/Ratings']
+  getRatingByfutsalId
+)
 
 router.delete(
   "/futsal/ratings/:ratingId", // #swagger.tags = ['Futsal/Tenant/Ratings']

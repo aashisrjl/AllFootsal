@@ -1,4 +1,4 @@
-const { sequelize } = require("../../../models");
+const { sequelize, Footsal } = require("../../../models");
 const { QueryTypes } = require("sequelize");
 const fs = require("fs");
 const { uploadToCloudinary } = require("../../../services/cloudinary/cloudinary.service");
@@ -592,11 +592,57 @@ const deleteMediaById = async (req, res) => {
     });
   }
 };
+const getMediaBycategory = async (req, res) => {
+  try {
+    const id = req.params?.futsalId;
+    const futsal = await Footsal.findOne({
+      where: { id },
+    });
+    const code = futsal?.futsalCode || req.tanent?.code;
 
+    if (!code) {
+      return res.status(400).json({
+        success: false,
+        message: "futsal code is required",
+      });
+    } 
+    const category = req.query?.category;
+    if (!category) {
+      return res.status(400).json({
+        success: false,
+        message: "category is required",
+      });
+    }
 
+    const media = await sequelize.query(
+      `SELECT * FROM media_${code} WHERE category = :category`,
+      {
+        replacements: { category },
+        type: QueryTypes.SELECT,
+      }
+    );
 
+    if (!media || media.length < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "media not found for this category",
+      });
+    }
 
-
+    return res.status(200).json({
+      success: true,
+      message: "media fetch successfully",
+      data: media,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+}
+  
 module.exports = {
   uploadMedia,
   getHomeMedia,
@@ -609,4 +655,5 @@ module.exports = {
   uploadFacilitiesMediaByPitchId,
   deleteMediaByCategory,
   deleteMediaById,
+  getMediaBycategory
 };

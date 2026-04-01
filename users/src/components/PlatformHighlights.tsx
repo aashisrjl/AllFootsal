@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
 import { Building, Layout, Smartphone } from "lucide-react";
+import user_page from "@/assets/ui-img/users.png";
+import owner_page from "@/assets/ui-img/futsal-owner.png";
+import admin_page from "@/assets/ui-img/admin.png";
 
 export default function PlatformHighlights() {
   return (
@@ -19,7 +22,8 @@ export default function PlatformHighlights() {
             One ecosystem, three portals
           </h2>
           <p className="mt-4 text-base sm:text-lg text-slate-600 max-w-3xl mx-auto">
-            A tailored experience for players, venue owners, and administrators — with consistent design and powerful tools.
+            A tailored experience for players, venue owners, and administrators
+            — with consistent design and powerful tools.
           </p>
         </motion.div>
 
@@ -40,14 +44,16 @@ export default function PlatformHighlights() {
                     <span className="h-3 w-3 rounded-full bg-yellow-400/80" />
                     <span className="h-3 w-3 rounded-full bg-green-400/80" />
                   </div>
-                  <div className="text-xs font-semibold text-slate-500">Player Portal</div>
-                </div>
-                <div className="p-10 h-[22rem] flex items-center justify-center bg-gradient-to-br from-emerald-500 to-emerald-600">
-                  <div className="text-white text-center">
-                    <Smartphone className="mx-auto mb-4 h-16 w-16" />
-                    <p className="text-2xl sm:text-3xl font-bold">Book in seconds</p>
-                    <p className="mt-2 text-white/85">Real‑time availability and instant confirmation.</p>
+                  <div className="text-xs font-semibold text-slate-500">
+                    Player Portal
                   </div>
+                </div>
+                <div className="h-[22rem] flex items-center justify-center bg-gradient-to-br from-emerald-500 to-emerald-600">
+                  <img
+                    src={user_page}
+                    alt="Player Portal"
+                    className="h-full w-full object-cover object-top"
+                  />
                 </div>
               </div>
             </motion.div>
@@ -57,13 +63,18 @@ export default function PlatformHighlights() {
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
+              transition={{
+                duration: 0.65,
+                ease: [0.16, 1, 0.3, 1],
+                delay: 0.05,
+              }}
             >
               <h3 className="text-2xl sm:text-3xl font-bold text-slate-900">
                 NepFootsal Player Portal
               </h3>
               <p className="mt-3 text-slate-600 text-base sm:text-lg">
-                Find nearby futsals, compare slots, and reserve confidently — designed for speed on mobile.
+                Find nearby futsals, compare slots, and reserve confidently —
+                designed for speed on mobile.
               </p>
 
               <ul className="mt-6 space-y-3">
@@ -73,7 +84,10 @@ export default function PlatformHighlights() {
                   "Location-based discovery",
                   "Reviews and ratings",
                 ].map((t) => (
-                  <li key={t} className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-3">
+                  <li
+                    key={t}
+                    className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-3"
+                  >
                     <span className="mt-0.5 h-5 w-5 rounded-full bg-emerald-500/15 text-emerald-800 flex items-center justify-center text-xs font-bold">
                       ✓
                     </span>
@@ -96,7 +110,8 @@ export default function PlatformHighlights() {
                 NepFootsal Owner Portal
               </h3>
               <p className="mt-3 text-slate-600 text-base sm:text-lg">
-                A clean dashboard to manage pitches, schedules, payments, and day‑to‑day operations.
+                A clean dashboard to manage pitches, schedules, payments, and
+                day‑to‑day operations.
               </p>
 
               <ul className="mt-6 space-y-3">
@@ -106,7 +121,10 @@ export default function PlatformHighlights() {
                   "On-site QR for easy payments",
                   "Subscription and renewal tracking",
                 ].map((t) => (
-                  <li key={t} className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-3">
+                  <li
+                    key={t}
+                    className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-3"
+                  >
                     <span className="mt-0.5 h-5 w-5 rounded-full bg-sky-600/15 text-sky-800 flex items-center justify-center text-xs font-bold">
                       ✓
                     </span>
@@ -120,7 +138,11 @@ export default function PlatformHighlights() {
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
+              transition={{
+                duration: 0.65,
+                ease: [0.16, 1, 0.3, 1],
+                delay: 0.05,
+              }}
             >
               <div className="rounded-3xl border border-slate-200/70 bg-white shadow-sm hover:shadow-xl transition-shadow overflow-hidden">
                 <div className="p-6 sm:p-7 border-b border-slate-200/60 flex items-center justify-between">
@@ -129,14 +151,16 @@ export default function PlatformHighlights() {
                     <span className="h-3 w-3 rounded-full bg-yellow-400/80" />
                     <span className="h-3 w-3 rounded-full bg-green-400/80" />
                   </div>
-                  <div className="text-xs font-semibold text-slate-500">Owner Portal</div>
-                </div>
-                <div className="p-10 h-[22rem] flex items-center justify-center bg-gradient-to-br from-sky-600 to-cyan-600">
-                  <div className="text-white text-center">
-                    <Building className="mx-auto mb-4 h-16 w-16" />
-                    <p className="text-2xl sm:text-3xl font-bold">Operate smoothly</p>
-                    <p className="mt-2 text-white/85">Schedules, payments, and insights in one view.</p>
+                  <div className="text-xs font-semibold text-slate-500">
+                    Owner Portal
                   </div>
+                </div>
+                <div className="h-[22rem] flex items-center justify-center bg-gradient-to-br from-sky-600 to-cyan-600">
+                  <img
+                    src={owner_page}
+                    alt="Owner Portal"
+                    className="h-full w-full object-cover object-top"
+                  />
                 </div>
               </div>
             </motion.div>
@@ -158,14 +182,16 @@ export default function PlatformHighlights() {
                     <span className="h-3 w-3 rounded-full bg-yellow-400/80" />
                     <span className="h-3 w-3 rounded-full bg-green-400/80" />
                   </div>
-                  <div className="text-xs font-semibold text-slate-500">Admin Dashboard</div>
-                </div>
-                <div className="p-10 h-[22rem] flex items-center justify-center bg-gradient-to-br from-violet-600 to-purple-600">
-                  <div className="text-white text-center">
-                    <Layout className="mx-auto mb-4 h-16 w-16" />
-                    <p className="text-2xl sm:text-3xl font-bold">Run the platform</p>
-                    <p className="mt-2 text-white/85">Visibility across venues, users, and performance.</p>
+                  <div className="text-xs font-semibold text-slate-500">
+                    Admin Dashboard
                   </div>
+                </div>
+                <div className="h-[22rem] flex items-center justify-center bg-gradient-to-br from-violet-600 to-purple-600">
+                  <img
+                    src={admin_page}
+                    alt="Admin Dashboard"
+                    className="h-full w-full object-cover object-top"
+                  />
                 </div>
               </div>
             </motion.div>
@@ -175,13 +201,18 @@ export default function PlatformHighlights() {
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
+              transition={{
+                duration: 0.65,
+                ease: [0.16, 1, 0.3, 1],
+                delay: 0.05,
+              }}
             >
               <h3 className="text-2xl sm:text-3xl font-bold text-slate-900">
                 NepFootsal Admin Dashboard
               </h3>
               <p className="mt-3 text-slate-600 text-base sm:text-lg">
-                Tools for administrators to keep the ecosystem healthy and growing.
+                Tools for administrators to keep the ecosystem healthy and
+                growing.
               </p>
 
               <ul className="mt-6 space-y-3">
@@ -191,7 +222,10 @@ export default function PlatformHighlights() {
                   "Analyze booking data by region",
                   "AI-powered review summarization",
                 ].map((t) => (
-                  <li key={t} className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-3">
+                  <li
+                    key={t}
+                    className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-3"
+                  >
                     <span className="mt-0.5 h-5 w-5 rounded-full bg-violet-600/15 text-violet-800 flex items-center justify-center text-xs font-bold">
                       ✓
                     </span>

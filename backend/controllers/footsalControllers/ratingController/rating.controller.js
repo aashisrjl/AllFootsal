@@ -253,6 +253,41 @@ const getRatingByUser = async (req, res) => {
     });
   }
 };
+const getRatingByfutsalId = async (req, res) => {
+  const futsalId = req.params.futsalId;
+  const futsal = await Footsal.findByPk(futsalId);
+  if (!futsal) {
+    return res.status(404).json({
+      success: false,
+      message: "Futsal not found",
+      data: null,
+    });
+  }
+  const code = futsal.futsalCode;
+  const ratings = await sequelize.query(
+    `SELECT r.id, r.rating, r.review, r.created_at AS createdAt, u.username AS reviewerName
+     FROM rating_${code} r
+     JOIN users u ON r.user_id = u.id
+     ORDER BY r.created_at DESC`,
+    {
+      type: QueryTypes.SELECT,
+    }
+  );
+
+  if (!ratings[0]) {
+    return res.status(200).json({
+      success: true,
+      message: "No ratings found for this futsal",
+      data: [],
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "Ratings fetched successfully",
+    data: ratings,
+  });
+}
 
 module.exports = {
   getRatings,
@@ -261,4 +296,5 @@ module.exports = {
   updateRating,
   deleteRating,
   deleteRatingByAdmin,
+  getRatingByfutsalId
 };

@@ -2,12 +2,15 @@ import { logo_transparent, DashboardBanner } from "@/assets/images";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated, user, isLoading } = useAuth();
 
   // Detect scroll
   useEffect(() => {
@@ -19,7 +22,7 @@ export default function Navigation() {
   // Detect if user is on home page
   const isHome = location.pathname === "/" || location.pathname === "/home";
 
-  const scrollToSection = (id) => {
+  const scrollToSection = (id: string) => {
     if (!isHome) {
       navigate("/#" + id);
       return;
@@ -43,6 +46,9 @@ export default function Navigation() {
       ? "text-white hover:text-green-600"
       : "text-white hover:text-green-300"
     : "text-white hover:text-green-600";
+
+  const userInitial = user?.name?.trim()?.charAt(0)?.toUpperCase() || "U";
+  const avatarFallbackClass = isHome && !isScrolled ? "bg-white/20 text-white" : "bg-green-600 text-white";
 
   return (
     <nav
@@ -89,24 +95,42 @@ export default function Navigation() {
             >
               Forum
             </button>
-            <button
-              onClick={() => navigate("/auth/login")}
-              className={`font-medium transition ${linkColor}`}
-            >
-              Login
-            </button>
-            <button
-              onClick={() => navigate("/auth/register")}
-              className={`font-medium transition ${linkColor} bg-green-600 rounded-lg px-4 py-1 text-white hover:bg-blue-500`}
-            >
-              Register
-            </button>
-            <button
+
+              <button
               onClick={() => navigate("/contact")}
               className={`font-medium transition ${linkColor}`}
             >
               Contact Us
             </button>
+
+            {isLoading ? null : isAuthenticated ? (
+              <button
+                onClick={() => navigate("/profile")}
+                className="flex items-center gap-2 outline-none"
+              >
+                <Avatar className="h-10 w-10 border border-white/20">
+                  <AvatarFallback className={avatarFallbackClass}>{userInitial}</AvatarFallback>
+                </Avatar>
+                <span className={`font-medium transition ${linkColor}`}>
+                  {user?.name || "Profile"}
+                </span>
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => navigate("/auth/login")}
+                  className={`font-medium transition ${linkColor}`}
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => navigate("/auth/register")}
+                  className={`font-medium transition ${linkColor} bg-green-600 rounded-lg px-4 py-1 text-white hover:bg-blue-500`}
+                >
+                  Register
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -135,18 +159,34 @@ export default function Navigation() {
             >
               Forum
             </button>
-            <button
-              onClick={() => navigate("/auth/login")}
-              className="block w-full text-left py-2 text-gray-700 hover:text-green-600"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => navigate("/auth/register")}
-              className="block w-full text-left py-2 text-white bg-green-600 hover:bg-blue-600 rounded-md"
-            >
-              Register
-            </button>
+            {isLoading ? null : isAuthenticated ? (
+              <>
+                <button
+                  onClick={() => {
+                    navigate("/profile");
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full text-left py-2 text-gray-700 hover:text-green-600"
+                >
+                  Profile
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => navigate("/auth/login")}
+                  className="block w-full text-left py-2 text-gray-700 hover:text-green-600"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => navigate("/auth/register")}
+                  className="block w-full text-left py-2 text-white bg-green-600 hover:bg-blue-600 rounded-md"
+                >
+                  Register
+                </button>
+              </>
+            )}
             <button
               onClick={() => navigate("/contact")}
               className="block w-full text-left py-2 text-gray-700 hover:text-green-600"

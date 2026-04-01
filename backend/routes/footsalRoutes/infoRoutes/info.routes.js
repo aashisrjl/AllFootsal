@@ -12,7 +12,6 @@ router.post(
 
 router.get(
     '/futsal/:futsalId/info/', // #swagger.tags=["Futsal/Tenant/info"]
-    resolveFutsalTenantWithToken,
     getInfo
 )
 
