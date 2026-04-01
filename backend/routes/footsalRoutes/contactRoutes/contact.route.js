@@ -8,13 +8,14 @@ const {
   markContactAsRead,
   deleteContact,
 } = require("../../../controllers/footsalControllers/contactController/contact.controller");
+const isUserAuthenticated = require("../../../middleware/authMiddleware/userAuthenticate");
 
 const router = express.Router();
 
 // user/public -> send contact message to specific futsal
 router.post(
   "/futsal/:futsalId/contact", // #swagger.tags = ['Futsal/Tenant/Contact']
-  resolveFutsalTenant,
+  isUserAuthenticated,
   createContact
 );
 

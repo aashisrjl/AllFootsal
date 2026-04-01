@@ -1,10 +1,41 @@
-const { sequelize } = require("../../../models");
+const { sequelize, User, Footsal } = require("../../../models");
 const { QueryTypes } = require("sequelize");
 
 // user/public -> create contact message for a futsal
 const createContact = async (req, res) => {
   try {
-    const code = req.tanent?.code || req.tenant?.code || req.futsalCode;
+    const futsalId = req.params?.futsalId;
+    if (!futsalId) {
+      return res.status(400).json({
+        success: false,
+        message: "futsalId is required",
+      });
+    }
+
+    const userId = req.userId;
+    if (!futsalId) {
+      return res.status(400).json({
+        success: false,
+        message: "futsalId is required",
+      });
+    }
+
+    const futsal = await Footsal.findOne({ where: { id: futsalId } });
+    if (!futsal) {
+      return res.status(404).json({
+        success: false,
+        message: "Futsal not found",
+      });
+    }
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const code = futsal.futsalCode;
     if (!code) {
       return res.status(400).json({
         success: false,
@@ -12,11 +43,12 @@ const createContact = async (req, res) => {
       });
     }
 
-    const { name, email, phone, message } = req.body || {};
-    if (!name || !message) {
+
+    const { message } = req.body || {};
+    if (!message) {
       return res.status(400).json({
         success: false,
-        message: "name and message are required",
+        message: "message is required",
       });
     }
 
@@ -25,9 +57,9 @@ const createContact = async (req, res) => {
        VALUES (:name, :email, :phone, :message, :isRead)`,
       {
         replacements: {
-          name,
-          email: email || null,
-          phone: phone || null,
+          name: user.username || "Anonymous",
+          email: user.email || null,
+          phone: user.phoneNumber || null,
           message,
           isRead: false,
         },
