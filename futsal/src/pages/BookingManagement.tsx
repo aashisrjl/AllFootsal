@@ -12,6 +12,7 @@ const BookingManagement = () => {
     try {
       setLoading(true);
       const res = await api.get('/futsal-bookings');
+      console.log(res.data);
       if (res.data.success) {
         const mapped = res.data.data.map((b: any) => ({
           id: b.id,
@@ -50,10 +51,10 @@ const BookingManagement = () => {
 
   // Filter bookings by status and selectedDate (if date filtering is desired)
   const filteredBookings = bookings.filter(booking => {
-     let match = true;
-     if (statusFilter !== 'all') match = match && booking.status === statusFilter;
-     // match = match && booking.date === selectedDate; 
-     return match;
+    let match = true;
+    if (statusFilter !== 'all') match = match && booking.status === statusFilter;
+    // match = match && booking.date === selectedDate; 
+    return match;
   });
 
   const getStatusIcon = (status: string) => {
@@ -88,8 +89,8 @@ const BookingManagement = () => {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-           <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Booking Management</h1>
-           <p className="text-slate-400 mt-1 text-sm font-medium">Manage reservations and daily schedules.</p>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Booking Management</h1>
+          <p className="text-slate-400 mt-1 text-sm font-medium">Manage reservations and daily schedules.</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -136,11 +137,11 @@ const BookingManagement = () => {
       <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl overflow-hidden flex flex-col pt-1">
         <div className="p-6 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h3 className="text-xl font-bold text-white tracking-tight">Today's Schedule</h3>
-          
+
           <div className="flex items-center space-x-3 bg-slate-950/60 p-1.5 rounded-xl border border-slate-800 shadow-inner">
             <Filter className="h-4 w-4 text-emerald-400 ml-3 shrink-0" />
-            <select 
-              value={statusFilter} 
+            <select
+              value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="bg-transparent text-sm font-bold text-slate-200 pr-5 py-1 border-none focus:outline-none focus:ring-0 cursor-pointer appearance-none w-full"
             >
@@ -152,15 +153,15 @@ const BookingManagement = () => {
             </select>
           </div>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-800/80">
             <thead className="bg-slate-900/60 border-b border-slate-800">
               <tr>
                 {["Customer Info", "Pitch", "Time Slot", "Status", "Price", "Actions"].map((th) => (
-                   <th key={th} className="px-6 py-4 text-left text-[11px] font-black tracking-widest text-slate-500 uppercase">
-                     {th}
-                   </th>
+                  <th key={th} className="px-6 py-4 text-left text-[11px] font-black tracking-widest text-slate-500 uppercase">
+                    {th}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -177,7 +178,7 @@ const BookingManagement = () => {
                     <span className="bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700">{booking.pitch}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-400">
-                    <span className="flex items-center gap-2"><Clock className="w-3.5 h-3.5 text-slate-500"/> {booking.time}</span>
+                    <span className="flex items-center gap-2"><Clock className="w-3.5 h-3.5 text-slate-500" /> {booking.time}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -209,10 +210,10 @@ const BookingManagement = () => {
             </tbody>
           </table>
           {filteredBookings.length === 0 && (
-             <div className="p-12 text-center flex flex-col items-center justify-center border-t border-slate-800/80">
-               <Calendar className="w-12 h-12 text-slate-700 mb-4" />
-               <p className="text-slate-400 font-bold text-lg">No bookings found for this filter.</p>
-               <p className="text-slate-500 text-sm mt-1">Try selecting a different status or date.</p>
+            <div className="p-12 text-center flex flex-col items-center justify-center border-t border-slate-800/80">
+              <Calendar className="w-12 h-12 text-slate-700 mb-4" />
+              <p className="text-slate-400 font-bold text-lg">No bookings found for this filter.</p>
+              <p className="text-slate-500 text-sm mt-1">Try selecting a different status or date.</p>
             </div>
           )}
         </div>

@@ -15,6 +15,7 @@ interface AuthContextType {
   futsalProfile: FutsalProfile | null;
   loading: boolean;
   refreshProfile: () => Promise<void>;
+  login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -41,6 +42,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const login = async (credentials: { email: string; password: string }) => {
+    try {
+      setLoading(true);
+      const res = await api.post('/auth/futsal/login', credentials);
+      
+      // Axios directly throws on non-2xx status codes, so if we reach here, it succeeded assuming the backend follows REST
+      if (res.data.futsal) {
+        setFutsalProfile(res.data.futsal);
+      } else {
+        throw new Error('Login failed: Invalid response format');
+      }
+    } catch (error: any) {
+      console.error('Login failed', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = async () => {
     try {
       await api.post('/auth/logout');
@@ -55,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ futsalProfile, loading, refreshProfile: fetchProfile, logout }}>
+    <AuthContext.Provider value={{ futsalProfile, loading, refreshProfile: fetchProfile, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
