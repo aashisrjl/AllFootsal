@@ -3,19 +3,18 @@ import { useParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PitchCard from "@/components/PitchCard";
-import TimeSlotPicker from "@/components/TimeSlotPicker";
-import BookingSummary from "@/components/BookingSummary";
 import { useQuery } from "@tanstack/react-query";
-import { getFutsalById, getFutsalInfo, getFutsalLocation, getFutsalMedia, getFutsalPitches } from "@/lib/futsalApi";
+import { getFutsalById, getFutsalInfo, getFutsalLocation, getFutsalMedia, getFutsalPitches, sendContactMessage, getFutsalRatings } from "@/lib/futsalApi";
 import { useBooking } from "@/contexts/BookingContext";
-import { MapPin, Star, Clock, ArrowLeft, Loader2, CheckCircle2, Phone, Mail, CalendarDays, Navigation2 } from "lucide-react";
+import { MapPin, Star, Clock, ArrowLeft, Loader2, CheckCircle2, Phone, Mail, CalendarDays, Navigation2, Facebook, Instagram, Globe, Send, MessageSquare, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const safelyParse = (str: string) => {
   try {
     return JSON.parse(str);
   } catch {
-    return [];
+    return null;
   }
 };
 
@@ -48,6 +47,8 @@ const LocalNav = ({ name }: { name: string }) => {
           <Button variant="link" onClick={() => handleScroll('about')} className={`text-sm font-semibold transition-colors px-0 ${active === 'about' ? 'text-emerald-600' : 'text-slate-600 hover:text-emerald-500'}`}>About</Button>
           <Button variant="link" onClick={() => handleScroll('gallery')} className={`text-sm font-semibold transition-colors px-0 ${active === 'gallery' ? 'text-emerald-600' : 'text-slate-600 hover:text-emerald-500'}`}>Gallery</Button>
           <Button variant="link" onClick={() => handleScroll('pitches')} className={`text-sm font-semibold transition-colors px-0 ${active === 'pitches' ? 'text-emerald-600' : 'text-slate-600 hover:text-emerald-500'}`}>Pitches</Button>
+          <Button variant="link" onClick={() => handleScroll('reviews')} className={`text-sm font-semibold transition-colors px-0 ${active === 'reviews' ? 'text-emerald-600' : 'text-slate-600 hover:text-emerald-500'}`}>Reviews</Button>
+          <Button variant="link" onClick={() => handleScroll('contact')} className={`text-sm font-semibold transition-colors px-0 ${active === 'contact' ? 'text-emerald-600' : 'text-slate-600 hover:text-emerald-500'}`}>Contact</Button>
           <Button variant="ghost" onClick={() => handleScroll('location')} className={`text-sm font-semibold transition-colors flex items-center gap-1.5 ${active === 'location' ? 'text-emerald-600 bg-emerald-50' : 'text-slate-600 hover:text-emerald-600 hover:bg-emerald-50'}`}>
             <Navigation2 className="h-4 w-4" /> Location
           </Button>
@@ -108,7 +109,7 @@ const FullWidthMap = ({ latitude, longitude, address }: { latitude?: string | nu
   const mapUrl = `https://maps.google.com/maps?q=${finalQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 
   return (
-    <div id="location" className="w-full h-[60vh] min-h-[500px] bg-slate-200 relative scroll-mt-16 group mt-16">
+    <div id="location" className="w-full h-[60vh] min-h-[500px] bg-slate-200 relative scroll-mt-16 group">
       <div className="absolute inset-0 z-10 pointer-events-none shadow-[inset_0_10px_20px_rgba(0,0,0,0.05)]"></div>
       <iframe
         width="100%"
@@ -141,34 +142,39 @@ const FullWidthMap = ({ latitude, longitude, address }: { latitude?: string | nu
 const FacilityDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const {
-    selectedDate,
-    selectedPitchId,
-    setSelectedPitchId,
-    availableTimeSlots,
-    fetchAvailableTimeSlots
-  } = useBooking();
+
+  const [contactMessage, setContactMessage] = useState("");
+  const [isSendingContact, setIsSendingContact] = useState(false);
 
   const { data: baseData, isLoading: baseLoading } = useQuery({ queryKey: ['futsal-base', id], queryFn: () => getFutsalById(id as string), enabled: !!id });
   const { data: infoData, isLoading: infoLoading } = useQuery({ queryKey: ['futsal-info', id], queryFn: () => getFutsalInfo(id as string), enabled: !!id });
   const { data: locData, isLoading: locLoading } = useQuery({ queryKey: ['futsal-loc', id], queryFn: () => getFutsalLocation(id as string), enabled: !!id });
-  const { data: mediaData, isLoading: mediaLoading } = useQuery({ queryKey: ['futsal-media', id], queryFn: () => getFutsalMedia(id as string, 'home'), enabled: !!id });
+  const { data: homeMediaData, isLoading: homeMediaLoading } = useQuery({ queryKey: ['futsal-media-home', id], queryFn: () => getFutsalMedia(id as string, 'home'), enabled: !!id });
+  const { data: facilityMediaData, isLoading: facilityMediaLoading } = useQuery({ queryKey: ['futsal-media-facility', id], queryFn: () => getFutsalMedia(id as string, 'facility'), enabled: !!id });
   const { data: pitchesData, isLoading: pitchesLoading } = useQuery({ queryKey: ['futsal-pitches', id], queryFn: () => getFutsalPitches(id as string), enabled: !!id });
+  const { data: ratingsData, isLoading: ratingsLoading } = useQuery({ queryKey: ['futsal-ratings', id], queryFn: () => getFutsalRatings(id as string), enabled: !!id });
 
-  const isPageLoading = baseLoading || infoLoading || locLoading || mediaLoading || pitchesLoading;
+  const isPageLoading = baseLoading || infoLoading || locLoading || homeMediaLoading || pitchesLoading || facilityMediaLoading || ratingsLoading;
 
   const futsal = baseData?.data;
   const info = infoData?.data?.[0];
   const loc = locData?.data?.[0];
+  const reviews = ratingsData?.data?.slice(0, 5) || [];
   
-  const allMedia = mediaData?.data || [];
-  const imageUrls = allMedia.map((m: any) => m.url || m.media_url).filter(Boolean);
-  if (imageUrls.length === 0) {
-    imageUrls.push("https://images.unsplash.com/photo-1574629810360-7efbb1925846?q=80&w=1200");
+  // Collect images
+  const allHomeMedia = homeMediaData?.data || [];
+  const homeImageUrls = allHomeMedia.map((m: any) => m.url || m.media_url).filter(Boolean);
+  if (homeImageUrls.length === 0) {
+    homeImageUrls.push("https://images.unsplash.com/photo-1574629810360-7efbb1925846?q=80&w=1200");
   }
 
-  const parsedFacilities = info?.facilities ? safelyParse(info.facilities) : ["Drinking water", "Bathroom", "Parking"];
-  const parsedHours = info?.operating_hours ? safelyParse(info.operating_hours) : ["6:00 AM - 10:00 PM"];
+  const allFacilityMedia = facilityMediaData?.data || [];
+  const facilityImageUrls = allFacilityMedia.map((m: any) => m.url || m.media_url).filter(Boolean);
+
+  const parsedFacilities = info?.facilities ? safelyParse(info.facilities) || [] : ["Drinking water", "Bathroom", "Parking"];
+  const parsedHours = info?.operating_hours ? safelyParse(info.operating_hours) || ["6:00 AM - 10:00 PM"] : ["6:00 AM - 10:00 PM"];
+  const socialLinks = info?.social_links ? safelyParse(info.social_links) : null;
+
   const pitchesArray = pitchesData?.data || [];
   
   const dynamicFacility = futsal ? {
@@ -176,12 +182,15 @@ const FacilityDetails = () => {
     name: futsal.futsalName || "Unknown Futsal Tenant",
     location: loc ? `${loc.address || ''}, ${loc.city || ''}`.replace(/^,\s*/, '') : "Location not provided",
     description: info?.additional_info || "Premium Futsal arena matching strictly maintained grounds standards and top-tier facilities for the best playing experience.",
-    images: imageUrls,
-    coverImage: imageUrls[0],
+    images: homeImageUrls,
+    coverImage: homeImageUrls[0],
     latitude: loc?.latitude,
     longitude: loc?.longitude,
     contactPhone: futsal.phoneNumber || "+977-9800000000",
     contactEmail: futsal.email || "contact@futsal.com",
+    establishedYear: info?.established_year,
+    websiteUrl: info?.website_url,
+    parkingInfo: info?.parking_info,
     pitches: pitchesArray.map((p: any) => ({
       id: String(p.id),
       name: p.name || `Pitch ${p.id}`,
@@ -197,27 +206,24 @@ const FacilityDetails = () => {
     amenities: parsedFacilities
   } : null;
 
-  const selectedPitch = dynamicFacility?.pitches.find((p: any) => String(p.id) === String(selectedPitchId));
-
   const handleSelectPitch = (pitchId: string) => {
-    setSelectedPitchId(pitchId);
-    if (dynamicFacility?.id) {
-       fetchAvailableTimeSlots(String(dynamicFacility.id), pitchId, selectedDate);
-    }
-    setTimeout(() => {
-      document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+    navigate(`/futsals/${id}/bookings?pitch=${pitchId}`);
   };
 
-  const scrollToPitches = () => {
-    document.getElementById('pitches')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
-  useEffect(() => {
-    if (selectedPitchId && dynamicFacility?.id) {
-      fetchAvailableTimeSlots(String(dynamicFacility.id), selectedPitchId, selectedDate);
+  const handleSendContactMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactMessage.trim() || !id) return;
+    setIsSendingContact(true);
+    try {
+      await sendContactMessage(id as string, contactMessage);
+      toast.success("Message sent successfully to the futsal administration!");
+      setContactMessage("");
+    } catch(error) {
+      toast.error("Failed to send message. Please log in or try again later.");
+    } finally {
+      setIsSendingContact(false);
     }
-  }, [selectedDate, selectedPitchId, dynamicFacility?.id]);
+  };
 
   if (isPageLoading) {
     return (
@@ -250,8 +256,6 @@ const FacilityDetails = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 font-sans selection:bg-emerald-500 selection:text-white">
-      {/* Replaced Global Header inside the main view to keep structure clean, but using a custom one might be cleaner. We kept Global Header, but added LocalNav below it. */}
-      {/* The user wants it to look like a specific landing page, so global header is included, but LocalNav creates the anchor scrolling. */}
       <Header />
       <LocalNav name={dynamicFacility.name} />
 
@@ -283,7 +287,7 @@ const FacilityDetails = () => {
               
               <div className="flex flex-col sm:flex-row flex-wrap items-center gap-4">
                 <Button 
-                  onClick={scrollToPitches}
+                  onClick={() => navigate(`/futsals/${id}/bookings`)}
                   className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white border-none h-14 px-10 rounded-full shadow-xl shadow-emerald-500/30 font-bold text-lg transition-transform hover:-translate-y-1"
                 >
                   <CalendarDays className="mr-2 h-6 w-6" /> Book Your Slot Now
@@ -301,10 +305,12 @@ const FacilityDetails = () => {
                   <Button
                     variant="outline"
                     className="flex-1 sm:flex-none border-white/30 bg-white/5 hover:bg-white hover:text-emerald-900 text-white backdrop-blur-md h-14 px-6 rounded-full transition-all group"
-                    onClick={() => window.location.href = `mailto:${dynamicFacility.contactEmail}`}
+                    onClick={() => {
+                      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
                   >
-                    <Mail className="h-5 w-5 md:mr-2 group-hover:scale-110 transition-transform" />
-                    <span className="hidden md:inline">Email Us</span>
+                    <MessageSquare className="h-5 w-5 md:mr-2 group-hover:scale-110 transition-transform" />
+                    <span className="hidden md:inline">Message Us</span>
                   </Button>
                 </div>
               </div>
@@ -315,9 +321,8 @@ const FacilityDetails = () => {
         {/* ABOUT & INFO SECTION */}
         <section id="about" className="py-24 bg-white scroll-mt-16">
           <div className="container mx-auto px-4 md:px-6 max-w-7xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
               
-              {/* Left text column */}
               <div className="space-y-8">
                 <div>
                   <h4 className="text-emerald-600 font-bold tracking-wider uppercase text-sm mb-3">About The Facility</h4>
@@ -330,48 +335,98 @@ const FacilityDetails = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex items-start gap-4 transition-transform hover:-translate-y-1">
-                    <div className="bg-emerald-100 p-3 rounded-2xl text-emerald-600">
-                      <Clock className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-800 mb-1">Operating Hours</h4>
-                      <p className="text-slate-600 text-sm font-medium">{dynamicFacility.operating_hours[0] || "6:00 AM - 10:00 PM"}</p>
-                    </div>
+                  <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-2 transition-transform hover:-translate-y-1">
+                    <Clock className="h-6 w-6 text-emerald-500 mb-2" />
+                    <h4 className="font-bold text-slate-800">Operating Hours</h4>
+                    <p className="text-slate-600 font-medium">
+                      {Array.isArray(dynamicFacility.operating_hours) ? dynamicFacility.operating_hours.join(", ") : dynamicFacility.operating_hours}
+                    </p>
                   </div>
-                  <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex items-start gap-4 transition-transform hover:-translate-y-1">
-                    <div className="bg-emerald-100 p-3 rounded-2xl text-emerald-600">
-                      <Star className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-800 mb-1">Avg. Rating</h4>
-                      <p className="text-slate-600 text-sm font-medium">{dynamicFacility.rating} out of 5 ({dynamicFacility.reviews})</p>
-                    </div>
+                  <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-2 transition-transform hover:-translate-y-1">
+                    <Star className="h-6 w-6 text-emerald-500 mb-2" />
+                    <h4 className="font-bold text-slate-800">Avg. Rating</h4>
+                    <p className="text-slate-600 font-medium">{dynamicFacility.rating} out of 5 ({dynamicFacility.reviews})</p>
                   </div>
+                  {dynamicFacility.establishedYear && (
+                    <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-2 transition-transform hover:-translate-y-1">
+                      <Clock className="h-6 w-6 text-emerald-500 mb-2" />
+                      <h4 className="font-bold text-slate-800">Established</h4>
+                      <p className="text-slate-600 font-medium">{dynamicFacility.establishedYear}</p>
+                    </div>
+                  )}
+                  {dynamicFacility.parkingInfo && (
+                    <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-2 transition-transform hover:-translate-y-1">
+                      <CheckCircle2 className="h-6 w-6 text-emerald-500 mb-2" />
+                      <h4 className="font-bold text-slate-800">Parking</h4>
+                      <p className="text-slate-600 font-medium">{dynamicFacility.parkingInfo}</p>
+                    </div>
+                  )}
                 </div>
+
+                {/* Social Links rendering */}
+                {(socialLinks || dynamicFacility.websiteUrl) && (
+                  <div className="pt-6 border-t border-slate-100">
+                    <h4 className="text-slate-800 font-bold mb-4">Connect with us:</h4>
+                    <div className="flex gap-4">
+                      {socialLinks?.facebook && (
+                        <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 rounded-2xl text-slate-600 hover:text-[#1877F2] hover:bg-slate-100 transition-colors shadow-sm border border-slate-100">
+                          <Facebook className="h-6 w-6"/>
+                        </a>
+                      )}
+                      {socialLinks?.instagram && (
+                        <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 rounded-2xl text-slate-600 hover:text-[#E4405F] hover:bg-slate-100 transition-colors shadow-sm border border-slate-100">
+                          <Instagram className="h-6 w-6"/>
+                        </a>
+                      )}
+                      {socialLinks?.tiktok && (
+                        <a href={socialLinks.tiktok} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 rounded-2xl text-slate-600 hover:text-black hover:bg-slate-100 transition-colors shadow-sm border border-slate-100 font-bold">
+                          TK
+                        </a>
+                      )}
+                      {dynamicFacility.websiteUrl && (
+                        <a href={dynamicFacility.websiteUrl} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 rounded-2xl text-slate-600 hover:text-emerald-500 hover:bg-slate-100 transition-colors shadow-sm border border-slate-100">
+                          <Globe className="h-6 w-6"/>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Right Amenities Box using glass effect and vibrant bg */}
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-400 to-teal-300 rounded-[3rem] transform rotate-3 scale-105 opacity-20 blur-xl blur"></div>
-                <div className="bg-white/80 backdrop-blur-2xl p-10 md:p-12 rounded-[3rem] border border-white/50 shadow-2xl relative z-10">
-                  <h3 className="font-extrabold text-2xl mb-8 text-slate-800 flex items-center gap-3">
-                    <CheckCircle2 className="h-8 w-8 text-emerald-500" /> Premium Amenities
-                  </h3>
-                  <div className="flex flex-col gap-5">
-                    {dynamicFacility.amenities.length > 0 ? dynamicFacility.amenities.map((amenity: string, idx: number) => (
-                      <div key={idx} className="flex items-center gap-4 group">
-                        <div className="h-10 w-10 rounded-full bg-emerald-50 flex items-center justify-center border border-emerald-100 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300 text-emerald-600">
-                          <CheckCircle2 className="h-5 w-5" />
-                        </div>
-                        <span className="text-lg text-slate-700 font-semibold">{amenity}</span>
+              {/* Facilities Visualized Block */}
+              <div className="bg-slate-50 p-8 md:p-12 rounded-[3rem] border border-slate-100 shadow-inner">
+                <div className="mb-8">
+                  <h3 className="font-extrabold text-3xl mb-4 text-slate-800">Top-Notch Facilities</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {dynamicFacility.amenities.map((amenity: string, idx: number) => (
+                      <span key={idx} className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-xl text-emerald-700 font-medium shadow-sm border border-emerald-100/60 transition-transform hover:-translate-y-0.5">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                        {amenity}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Horizontal scrolling facility images */}
+                <div className="relative">
+                  <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory pt-2 scrollbar-none" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    {facilityImageUrls.length > 0 ? facilityImageUrls.map((img: string, i: number) => (
+                      <div key={i} className="min-w-[260px] sm:min-w-[320px] h-[240px] rounded-3xl overflow-hidden snap-center shrink-0 shadow-md border border-white relative group">
+                        <img src={img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Facility detail" />
+                        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500"></div>
                       </div>
                     )) : (
-                      <p className="text-slate-500">No amenities documented yet.</p>
+                      <div className="w-full h-[240px] bg-white rounded-3xl flex items-center justify-center text-slate-400 border border-slate-200">
+                        <div className="text-center">
+                          <CheckCircle2 className="h-8 w-8 mx-auto mb-2 opacity-20" />
+                          <p>No special facility photos</p>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
         </section>
@@ -395,7 +450,7 @@ const FacilityDetails = () => {
             <div className="text-center max-w-2xl mx-auto mb-16">
               <h4 className="text-emerald-600 font-bold tracking-wider uppercase text-sm mb-3">Reserve Your Spot</h4>
               <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-6">Available Pitches</h2>
-              <p className="text-slate-500 text-lg">Select a pitch to view available time slots and confirm your booking instantly.</p>
+              <p className="text-slate-500 text-lg">Select a pitch to navigate to the booking gateway.</p>
             </div>
             
             {dynamicFacility.pitches.length > 0 ? (
@@ -418,37 +473,101 @@ const FacilityDetails = () => {
               </div>
             )}
 
-            {/* Booking Flow active section */}
-            {selectedPitchId && selectedPitch && (
-              <div id="booking-section" className="mt-16 bg-white p-8 md:p-12 rounded-[3rem] border border-emerald-100 shadow-[0_20px_60px_-15px_rgba(16,185,129,0.15)] scroll-mt-24 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-                <div className="relative z-10">
-                  <div className="flex items-center gap-4 mb-10">
-                    <div className="h-14 w-14 bg-emerald-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                      <CalendarDays className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <h4 className="text-emerald-600 font-semibold tracking-wide text-sm mb-1 uppercase">Booking Flow</h4>
-                      <h2 className="text-3xl font-bold text-slate-900">Reserve {selectedPitch.name || `Pitch #${selectedPitch.id}`}</h2>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 xl:grid-cols-3 gap-12">
-                    <div className="xl:col-span-2 bg-slate-50/50 p-8 rounded-3xl border border-slate-100 shadow-sm">
-                      <TimeSlotPicker timeSlots={availableTimeSlots} />
-                    </div>
-                    <div className="xl:col-span-1">
-                      <BookingSummary
-                        facilityId={String(dynamicFacility.id)}
-                        facilityName={dynamicFacility.name}
-                        pitchName={selectedPitch.name || `Pitch #${selectedPitch.id}`}
-                        pricePerHour={selectedPitch.pricePerHour || 1000}
-                      />
-                    </div>
-                  </div>
-                </div>
+            <div className="flex justify-center mt-12">
+                <Button 
+                  onClick={() => navigate(`/futsals/${id}/bookings`)}
+                  className="bg-slate-900 hover:bg-emerald-600 text-white border-none h-14 px-10 rounded-full shadow-lg font-bold text-lg transition-transform hover:-translate-y-1"
+                >
+                  Go to Booking Portal
+                </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* REVIEWS SECTION */}
+        <section id="reviews" className="py-24 bg-slate-50 scroll-mt-16 relative overflow-hidden">
+          <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+              <div>
+                <h4 className="text-emerald-500 font-bold tracking-wider uppercase text-sm mb-3">Player Feedback</h4>
+                <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">Recent Reviews</h2>
               </div>
-            )}
+              <Button onClick={() => navigate(`/futsals/${id}/reviews`)} variant="outline" className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-full px-6 h-12 font-bold">
+                See All Reviews
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {reviews.length > 0 ? reviews.map((review: any) => (
+                <div key={review.id} className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col gap-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-400">
+                                <User className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-slate-800">{review.reviewerName || 'Anonymous'}</h4>
+                                <p className="text-xs text-slate-500">{new Date(review.createdAt || Date.now()).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-1 bg-yellow-50 px-2.5 py-1 rounded-full border border-yellow-100 text-yellow-600 font-bold items-center text-sm">
+                            <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+                            <span>{review.rating}.0</span>
+                        </div>
+                    </div>
+                    <p className="text-slate-600 leading-relaxed text-sm">
+                        "{review.review}"
+                    </p>
+                </div>
+              )) : (
+                <div className="col-span-full p-12 text-center bg-white rounded-3xl border border-slate-100">
+                    <p className="text-slate-500 text-lg">There are no reviews yet for this facility. Be the first to leave one via the portal.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* CONTACT SECTION */}
+        <section id="contact" className="py-24 bg-slate-900 scroll-mt-16 relative overflow-hidden">
+          {/* Decorative background blurs */}
+          <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+            <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-[100px] transform -translate-y-1/2"></div>
+            <div className="absolute top-1/2 right-1/4 w-[500px] h-[500px] bg-emerald-900/40 rounded-full blur-[120px] transform -translate-y-1/2"></div>
+          </div>
+          
+          <div className="container mx-auto px-4 md:px-6 max-w-4xl relative z-10">
+            <div className="text-center mb-12">
+              <h4 className="text-emerald-400 font-bold tracking-wider uppercase text-sm mb-3">Get In Touch</h4>
+              <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">Send a Direct Message</h2>
+              <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+                Have a question about {dynamicFacility.name}? Use the form below to send a direct message to the administration team.
+              </p>
+            </div>
+            
+            <div className="max-w-2xl mx-auto">
+              <form onSubmit={handleSendContactMessage} className="bg-white/10 p-8 md:p-12 rounded-[2.5rem] backdrop-blur-xl border border-white/20 shadow-2xl">
+                <div className="mb-6 z-20 relative">
+                  <label htmlFor="message" className="block text-sm font-semibold text-slate-300 mb-3 ml-2">Your Message</label>
+                  <textarea
+                    id="message"
+                    rows={5}
+                    className="w-full rounded-3xl bg-black/40 border border-white/10 text-white placeholder-slate-500 p-6 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all resize-none shadow-inner"
+                    placeholder="Ask us anything about the facility, bulk bookings, or general inquiries..."
+                    value={contactMessage}
+                    onChange={(e) => setContactMessage(e.target.value)}
+                    required
+                  ></textarea>
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-bold text-lg transition-transform hover:-translate-y-1 shadow-lg shadow-emerald-500/20"
+                  disabled={isSendingContact}
+                >
+                  {isSendingContact ? <Loader2 className="h-6 w-6 animate-spin" /> : <><Send className="mr-2 h-5 w-5" /> Send Message</>}
+                </Button>
+              </form>
+            </div>
           </div>
         </section>
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, getUserById, getProfile, updateProfile, updateProfileImage, deleteProfileImage } = require('../../controllers/usersControllers/userController');
+const { getAllUsers, getUserById, getProfile, updateProfile, updateProfileImage, deleteProfileImage, getMyAllBookings } = require('../../controllers/usersControllers/userController');
 const isBothAuthenticated = require('../../middleware/authMiddleware/bothAuthenticated');
 const isUserAuthenticated = require('../../middleware/authMiddleware/userAuthenticate');
 const { upload } = require('../../services/multer/multerConfig');
@@ -40,6 +40,12 @@ router.delete(
     '/users/profile/image', // #swagger.tags=['Users']
     isUserAuthenticated, 
     deleteProfileImage
+);
+
+router.get(
+    '/user/bookings', // #swagger.tags=['Users']
+    isUserAuthenticated,
+    getMyAllBookings
 );
 
 module.exports = router;
