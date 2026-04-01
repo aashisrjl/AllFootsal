@@ -190,7 +190,7 @@ def generate_dataset(total_records=TOTAL_RECORDS, seed=SEED):
 
 
 def save_dataset(df):
-    output_dir = Path(__file__).resolve().parent / "dataset"
+    output_dir = Path(__file__).resolve().parent / "raw"
     output_dir.mkdir(parents=True, exist_ok=True)
     file_path = output_dir / "futsal_reviews_dataset.csv"
 
