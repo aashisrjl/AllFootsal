@@ -1,26 +1,83 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { DollarSign, TrendingUp, Calendar, CreditCard } from 'lucide-react';
+import api from '../lib/api';
 
 const Revenue = () => {
-  const revenueData = {
-    today: 420,
-    week: 2940,
-    month: 12600,
-    year: 156000
-  };
+  const [revenueData, setRevenueData] = useState({ today: 0, week: 0, month: 0, year: 0 });
+  const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
+  const [monthlyBreakdown, setMonthlyBreakdown] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const recentTransactions = [
-    { id: 1, customer: 'John Smith', amount: 50, time: '14:30', pitch: 'Pitch A', method: 'Card' },
-    { id: 2, customer: 'Team Alpha', amount: 90, time: '16:00', pitch: 'Pitch B', method: 'Cash' },
-    { id: 3, customer: 'Mike Johnson', amount: 45, time: '18:30', pitch: 'Pitch A', method: 'Card' },
-    { id: 4, customer: 'Sarah Wilson', amount: 40, time: '20:00', pitch: 'Pitch C', method: 'Online' },
-  ];
+  useEffect(() => {
+    const fetchRevenueMetrics = async () => {
+      try {
+        setLoading(true);
+        const [analyticsRes, bookingsRes] = await Promise.all([
+          api.get('/futsal/analytics/fetch').catch(() => null),
+          api.get('/futsal-bookings').catch(() => null)
+        ]);
+        
+        // Use total revenue safely
+        const totalRev = analyticsRes?.data?.data?.totalRevenue || 0;
 
-  const monthlyBreakdown = [
-    { pitch: 'Pitch A', bookings: 89, revenue: 4450, utilization: 85 },
-    { pitch: 'Pitch B', bookings: 72, revenue: 3240, utilization: 68 },
-    { pitch: 'Pitch C', bookings: 54, revenue: 2160, utilization: 52 },
-  ];
+        if (bookingsRes?.data?.success) {
+           const bookings = bookingsRes.data.data;
+           
+           // Simple calculations for demo
+           const todayRev = bookings.reduce((sum: number, b: any) => sum + (b.amount || 0), 0) * 0.05; // mock based on total for now
+           const weekRev = todayRev * 7;
+           const monthRev = todayRev * 30;
+
+           setRevenueData({
+             today: Math.floor(todayRev),
+             week: Math.floor(weekRev),
+             month: Math.floor(monthRev),
+             year: parseInt(totalRev, 10)
+           });
+
+           // Recent Transactions
+           const recent = bookings.slice(0, 5).map((b: any) => ({
+             id: b.id,
+             customer: b.user_name || 'Guest',
+             amount: b.amount,
+             time: `${b.start_time || ''}`,
+             pitch: b.pitch_name,
+             method: b.payment_status || 'Card'
+           }));
+           setRecentTransactions(recent);
+
+           // Breakdown 
+           const breakdownMap: any = {};
+           bookings.forEach((b: any) => {
+             if (!breakdownMap[b.pitch_name]) {
+               breakdownMap[b.pitch_name] = { pitch: b.pitch_name, bookings: 0, revenue: 0, utilization: 0 };
+             }
+             breakdownMap[b.pitch_name].bookings += 1;
+             breakdownMap[b.pitch_name].revenue += b.amount || 0;
+           });
+           
+           const breakdownArray = Object.values(breakdownMap).map((item: any) => ({
+             ...item,
+             utilization: Math.min(100, Math.floor(Math.random() * 40 + 40)) // mock utilization
+           }));
+           setMonthlyBreakdown(breakdownArray);
+        }
+      } catch (error) {
+        console.error('Failed to fetch revenue stats', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRevenueMetrics();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="w-8 h-8 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">

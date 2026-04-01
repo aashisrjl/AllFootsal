@@ -1,12 +1,38 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { Calendar, DollarSign, Users, TrendingUp, MoreVertical, CheckCircle2, Clock } from 'lucide-react';
+import api from '../lib/api';
+import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
+  const { futsalProfile } = useAuth();
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const [analyticsRes] = await Promise.all([
+          api.get('/futsal/analytics/fetch').catch(() => null),
+          // api.get('/futsal-bookings').catch(() => null)
+        ]);
+        
+        if (analyticsRes?.data?.success) {
+          setAnalytics(analyticsRes.data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboardData();
+  }, []);
   const stats = [
-    { name: 'Today\'s Bookings', value: '8', icon: Calendar, change: '+2', changeType: 'increase', color: 'text-emerald-400', bgPrimary: 'bg-emerald-500/10', borderPrimary: 'border-emerald-500/20' },
-    { name: 'Today\'s Revenue', value: '$420', icon: DollarSign, change: '+12%', changeType: 'increase', color: 'text-blue-400', bgPrimary: 'bg-blue-500/10', borderPrimary: 'border-blue-500/20' },
-    { name: 'Active Players', value: '156', icon: Users, change: '+5', changeType: 'increase', color: 'text-purple-400', bgPrimary: 'bg-purple-500/10', borderPrimary: 'border-purple-500/20' },
-    { name: 'Occupancy Rate', value: '78%', icon: TrendingUp, change: '+8%', changeType: 'increase', color: 'text-rose-400', bgPrimary: 'bg-rose-500/10', borderPrimary: 'border-rose-500/20' },
+    { name: 'Total Bookings', value: analytics?.totalBookings || '0', icon: Calendar, change: '+2', changeType: 'increase', color: 'text-emerald-400', bgPrimary: 'bg-emerald-500/10', borderPrimary: 'border-emerald-500/20' },
+    { name: 'Total Revenue', value: `$${analytics?.totalRevenue || 0}`, icon: DollarSign, change: '+12%', changeType: 'increase', color: 'text-blue-400', bgPrimary: 'bg-blue-500/10', borderPrimary: 'border-blue-500/20' },
+    { name: 'Visits', value: analytics?.totalVisitors || '0', icon: Users, change: '+5', changeType: 'increase', color: 'text-purple-400', bgPrimary: 'bg-purple-500/10', borderPrimary: 'border-purple-500/20' },
+    { name: 'Avg Rating', value: parseFloat(analytics?.averageRating || '0').toFixed(1), icon: TrendingUp, change: '+8%', changeType: 'increase', color: 'text-rose-400', bgPrimary: 'bg-rose-500/10', borderPrimary: 'border-rose-500/20' },
   ];
 
   const todayBookings = [
@@ -28,6 +54,14 @@ const Dashboard = () => {
     { day: 'Sun', value: 90 },
   ];
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="w-8 h-8 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-[calc(100vh-2rem)] bg-[#0a0f1c] text-slate-200 p-6 md:p-8 rounded-3xl shadow-2xl animate-in fade-in duration-700">
       {/* Header */}
@@ -36,7 +70,7 @@ const Dashboard = () => {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
             Dashboard Overview
           </h1>
-          <p className="text-slate-400 mt-1">Welcome back. Here's what's happening today at your facility.</p>
+          <p className="text-slate-400 mt-1">Welcome back, {futsalProfile?.ownerName || 'Owner'}. Here's what's happening at your facility.</p>
         </div>
         <button className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.25)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:-translate-y-0.5 active:translate-y-0">
           New Booking

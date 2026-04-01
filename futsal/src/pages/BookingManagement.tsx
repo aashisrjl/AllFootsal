@@ -1,18 +1,60 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar, Search, Filter, CheckCircle, XCircle, Clock, ChevronDown } from 'lucide-react';
+import api from '../lib/api';
 
 const BookingManagement = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const bookings = [
-    { id: 1, customerName: 'John Smith', pitch: 'Pitch A', date: '2024-01-20', time: '10:00 - 11:00', status: 'confirmed', price: 50, phone: '+1 (555) 123-4567' },
-    { id: 2, customerName: 'Team Alpha', pitch: 'Pitch B', date: '2024-01-20', time: '14:00 - 15:00', status: 'pending', price: 45, phone: '+1 (555) 987-6543' },
-    { id: 3, customerName: 'Mike Johnson', pitch: 'Pitch A', date: '2024-01-20', time: '16:00 - 17:00', status: 'completed', price: 50, phone: '+1 (555) 456-7890' },
-    { id: 4, customerName: 'Sarah Wilson', pitch: 'Pitch C', date: '2024-01-20', time: '18:00 - 19:00', status: 'cancelled', price: 40, phone: '+1 (555) 321-0987' },
-  ];
+  const fetchBookings = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get('/futsal-bookings');
+      if (res.data.success) {
+        const mapped = res.data.data.map((b: any) => ({
+          id: b.id,
+          customerName: b.user_name || 'Guest',
+          pitch: b.pitch_name,
+          date: b.booking_date ? new Date(b.booking_date).toISOString().split('T')[0] : 'N/A',
+          time: `${b.start_time || ''} - ${b.end_time || ''}`,
+          status: b.status || 'pending',
+          price: b.amount || 0,
+          phone: b.phone || 'N/A'
+        }));
+        setBookings(mapped);
+      }
+    } catch (error) {
+      console.error('Failed to fetch bookings', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const filteredBookings = statusFilter === 'all' ? bookings : bookings.filter(booking => booking.status === statusFilter);
+  useEffect(() => {
+    fetchBookings();
+  }, []);
+
+  const handleCancelBooking = async (id: number) => {
+    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
+    try {
+      // Optimistic
+      setBookings(bookings.map(b => b.id === id ? { ...b, status: 'cancelled' } : b));
+      await api.patch(`/futsal/bookings/${id}/cancel`);
+    } catch (error) {
+      console.error('Failed to cancel booking', error);
+      fetchBookings(); // revert
+    }
+  };
+
+  // Filter bookings by status and selectedDate (if date filtering is desired)
+  const filteredBookings = bookings.filter(booking => {
+     let match = true;
+     if (statusFilter !== 'all') match = match && booking.status === statusFilter;
+     // match = match && booking.date === selectedDate; 
+     return match;
+  });
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -33,6 +75,14 @@ const BookingManagement = () => {
       default: return 'bg-slate-800 text-slate-400 border-slate-700';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="w-8 h-8 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -144,11 +194,11 @@ const BookingManagement = () => {
                     {booking.status === 'pending' && (
                       <div className="flex gap-2">
                         <button className="bg-emerald-500/10 text-emerald-400 px-3 py-1.5 rounded-lg border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all">Confirm</button>
-                        <button className="bg-rose-500/10 text-rose-400 px-3 py-1.5 rounded-lg border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all">Reject</button>
+                        <button onClick={() => handleCancelBooking(booking.id)} className="bg-rose-500/10 text-rose-400 px-3 py-1.5 rounded-lg border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all">Reject</button>
                       </div>
                     )}
                     {booking.status === 'confirmed' && (
-                      <button className="bg-blue-500/10 text-blue-400 px-3 py-1.5 rounded-lg border border-blue-500/20 hover:bg-blue-500 hover:text-white transition-all">Mark Complete</button>
+                      <button onClick={() => handleCancelBooking(booking.id)} className="bg-rose-500/10 text-rose-400 px-3 py-1.5 rounded-lg border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all mr-2">Cancel</button>
                     )}
                     {booking.status !== 'pending' && booking.status !== 'confirmed' && (
                       <button className="text-slate-400 hover:text-white underline decoration-slate-600 underline-offset-4 transition-colors">Details</button>

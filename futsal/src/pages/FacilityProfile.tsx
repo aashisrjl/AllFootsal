@@ -1,11 +1,13 @@
-import React from 'react';
 import { Building2, MapPin, Clock, Star, Edit, Phone, Mail } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const FacilityProfile = () => {
+  const { futsalProfile } = useAuth();
+
   const facility = {
-    name: 'Elite Sports Arena',
-    location: '123 Sports Street, Downtown City',
-    description: 'Premium futsal facility with state-of-the-art pitches and modern amenities. Dedicated to providing the best amateur sports experience.',
+    name: futsalProfile?.futsalName || 'Elite Sports Arena',
+    location: (futsalProfile as any)?.location || 'Not specified',
+    description: (futsalProfile as any)?.description || 'Premium futsal facility with state-of-the-art pitches and modern amenities.',
     rating: 4.8,
     reviews: 156,
     amenities: ['Parking', 'Changing Rooms', 'Cafeteria', 'Equipment Rental', 'Wi-Fi'],
@@ -14,8 +16,8 @@ const FacilityProfile = () => {
       weekends: '7:00 AM - 12:00 AM'
     },
     contact: {
-      phone: '+1 (555) 123-4567',
-      email: 'info@elitesportsarena.com'
+      phone: futsalProfile?.phoneNumber || '+1 (555) 123-4567',
+      email: futsalProfile?.email || 'info@elitesportsarena.com'
     }
   };
 
