@@ -220,22 +220,75 @@ const createBooking = async (req,res) => {
         })
     }
 
-    try{
-    await sequelize.query(
-        `INSERT INTO booking_${code} (user_id, pitch_id, timeslot_id, booking_date, amount, notes) 
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        {
-            replacements: [userId, pitch_id, timeslot_id, booking_date, amount, notes],
-            type: QueryTypes.INSERT,
+    try {
+        // 1. Verify Timeslot Existence and Association
+        const timeslotCheck = await sequelize.query(
+            `SELECT * FROM timeslot_${code} WHERE id = ? AND pitch_id = ?`,
+            {
+                replacements: [timeslot_id, pitch_id],
+                type: QueryTypes.SELECT
+            }
+        );
+        
+        if (timeslotCheck.length === 0) {
+            return res.status(400).json({ success: false, message: "Invalid timeslot for this pitch." });
         }
-    );
-}catch(err){
-    console.error("Error creating booking:", err);
-    return res.status(500).json({
-        success:false,
-        message:"Internal server in bookings"
-    })
-}
+
+        const reqSlot = timeslotCheck[0];
+
+        // 2. Double-Booking Protection: No one can book an already booked confirmed/pending slot
+        const existingSlot = await sequelize.query(
+            `SELECT * FROM booking_${code} 
+             WHERE pitch_id = ? AND timeslot_id = ? AND booking_date = ? AND status != 'cancelled'`,
+            {
+                replacements: [pitch_id, timeslot_id, booking_date],
+                type: QueryTypes.SELECT
+            }
+        );
+
+        if (existingSlot.length > 0) {
+            return res.status(400).json({ success: false, message: "This slot is already booked by another user." });
+        }
+
+        // 3. Simultaneous Booking Prevention: Ensure user's existing bookings don't overlap with this time
+        const userActiveBookings = await sequelize.query(
+            `SELECT b.*, t.start_time, t.end_time 
+             FROM booking_${code} b
+             JOIN timeslot_${code} t ON b.timeslot_id = t.id
+             WHERE b.user_id = ? AND b.booking_date = ? AND b.status != 'cancelled'`,
+             {
+                 replacements: [userId, booking_date],
+                 type: QueryTypes.SELECT
+             }
+        );
+
+        const requestedStart = reqSlot.start_time;
+        const requestedEnd = reqSlot.end_time;
+
+        const isOverlapping = userActiveBookings.some(booking => {
+            return (requestedStart < booking.end_time && requestedEnd > booking.start_time);
+        });
+
+        if (isOverlapping) {
+             return res.status(400).json({ success: false, message: "You already have a booking that overlaps with this time." });
+        }
+
+        // Insert validated booking
+        await sequelize.query(
+            `INSERT INTO booking_${code} (user_id, pitch_id, timeslot_id, booking_date, amount, notes) 
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            {
+                replacements: [userId, pitch_id, timeslot_id, booking_date, amount, notes],
+                type: QueryTypes.INSERT,
+            }
+        );
+    } catch(err) {
+        console.error("Error creating booking:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error during booking creation."
+        });
+    }
 
     res.status(201).json({
         success:true,

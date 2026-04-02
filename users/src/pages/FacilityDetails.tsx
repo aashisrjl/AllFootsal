@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import FutsalNavigation from "@/components/FutsalNavigation";
-import Footer from "@/components/Footer";
+import FutsalFooter from "@/components/FutsalFooter";
 import PitchCard from "@/components/PitchCard";
 import { useQuery } from "@tanstack/react-query";
 import { getFutsalById, getFutsalInfo, getFutsalLocation, getFutsalMedia, getFutsalPitches, sendContactMessage, getFutsalRatings, getEventMedia } from "@/lib/futsalApi";
@@ -64,17 +64,17 @@ const FacilityDetails = () => {
   const [contactMessage, setContactMessage] = useState("");
   const [isSendingContact, setIsSendingContact] = useState(false);
 
-  const { data: baseData, isLoading: baseLoading } = useQuery({ queryKey: ['futsal-base', id], queryFn: () => getFutsalById(id as string), enabled: !!id });
-  const { data: infoData, isLoading: infoLoading } = useQuery({ queryKey: ['futsal-info', id], queryFn: () => getFutsalInfo(id as string), enabled: !!id });
-  const { data: locData, isLoading: locLoading } = useQuery({ queryKey: ['futsal-loc', id], queryFn: () => getFutsalLocation(id as string), enabled: !!id });
-  const { data: homeMediaData, isLoading: homeMediaLoading } = useQuery({ queryKey: ['futsal-media-home', id], queryFn: () => getFutsalMedia(id as string, 'home'), enabled: !!id });
-  const { data: facilityMediaData, isLoading: facilityMediaLoading } = useQuery({ queryKey: ['futsal-media-facility', id], queryFn: () => getFutsalMedia(id as string, 'facility'), enabled: !!id });
-  const { data: eventMediaData, isLoading: eventLoading } = useQuery({ queryKey: ['futsal-media-event', id], queryFn: () => getEventMedia(id as string), enabled: !!id });
-  const { data: pitchMediaData } = useQuery({ queryKey: ['futsal-media-pitch', id], queryFn: () => getFutsalMedia(id as string, 'pitch'), enabled: !!id });
-  const { data: pitchesData, isLoading: pitchesLoading } = useQuery({ queryKey: ['futsal-pitches', id], queryFn: () => getFutsalPitches(id as string), enabled: !!id });
-  const { data: ratingsData, isLoading: ratingsLoading } = useQuery({ queryKey: ['futsal-ratings', id], queryFn: () => getFutsalRatings(id as string), enabled: !!id });
+  const { data: baseData, isLoading: baseLoading } = useQuery({ queryKey: ['futsal-base', id], queryFn: () => getFutsalById(id as string), enabled: !!id, retry: false });
+  const { data: infoData, isLoading: infoLoading } = useQuery({ queryKey: ['futsal-info', id], queryFn: () => getFutsalInfo(id as string), enabled: !!id, retry: false });
+  const { data: locData, isLoading: locLoading } = useQuery({ queryKey: ['futsal-loc', id], queryFn: () => getFutsalLocation(id as string), enabled: !!id, retry: false });
+  const { data: homeMediaData, isLoading: homeMediaLoading } = useQuery({ queryKey: ['futsal-media-home', id], queryFn: () => getFutsalMedia(id as string, 'home'), enabled: !!id, retry: false });
+  const { data: facilityMediaData, isLoading: facilityMediaLoading } = useQuery({ queryKey: ['futsal-media-facility', id], queryFn: () => getFutsalMedia(id as string, 'facility'), enabled: !!id, retry: false });
+  const { data: eventMediaData, isLoading: eventLoading } = useQuery({ queryKey: ['futsal-media-event', id], queryFn: () => getEventMedia(id as string), enabled: !!id, retry: false });
+  const { data: pitchMediaData } = useQuery({ queryKey: ['futsal-media-pitch', id], queryFn: () => getFutsalMedia(id as string, 'pitch'), enabled: !!id, retry: false });
+  const { data: pitchesData, isLoading: pitchesLoading } = useQuery({ queryKey: ['futsal-pitches', id], queryFn: () => getFutsalPitches(id as string), enabled: !!id, retry: false });
+  const { data: ratingsData, isLoading: ratingsLoading } = useQuery({ queryKey: ['futsal-ratings', id], queryFn: () => getFutsalRatings(id as string), enabled: !!id, retry: false });
 
-  const isPageLoading = baseLoading || infoLoading || locLoading || homeMediaLoading || pitchesLoading || facilityMediaLoading || ratingsLoading || eventLoading;
+  const isPageLoading = baseLoading || infoLoading || locLoading || pitchesLoading || homeMediaLoading;
 
   const futsal = baseData?.data;
   const info = infoData?.data?.[0];
@@ -168,7 +168,7 @@ const FacilityDetails = () => {
         <FutsalNavigation />
         <Loader2 className="h-10 w-10 animate-spin text-emerald-500 my-auto" />
         <p className="my-auto text-slate-500 font-semibold mt-0">Loading Futsal Booking Environment...</p>
-        <Footer />
+        <FutsalFooter />
       </div>
     );
   }
@@ -186,7 +186,7 @@ const FacilityDetails = () => {
             </Button>
           </div>
         </div>
-        <Footer />
+        <FutsalFooter />
       </div>
     );
   }
@@ -535,7 +535,7 @@ const FacilityDetails = () => {
 
       </main>
 
-      <Footer />
+      <FutsalFooter />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import FutsalNavigation from "@/components/FutsalNavigation";
-import Footer from "@/components/Footer";
+import FutsalFooter from "@/components/FutsalFooter";
 import { useQuery } from "@tanstack/react-query";
 import { getFutsalMedia, getEventMedia, getFutsalById } from "@/lib/futsalApi";
 import { Loader2, ArrowLeft, Maximize2, X, Filter } from "lucide-react";
@@ -15,29 +15,32 @@ const FutsalGallery = () => {
     const [selectedImage, setSelectedImage] = useState<{url: string, category: string} | null>(null);
 
     // Fetch details for header
-    const { data: baseData } = useQuery({ queryKey: ['futsal-base', id], queryFn: () => getFutsalById(id as string), enabled: !!id });
+    const { data: baseData, isLoading: baseLoading } = useQuery({ queryKey: ['futsal-base', id], queryFn: () => getFutsalById(id as string), enabled: !!id, retry: false });
     const futsalName = baseData?.data?.futsalName || "Futsal Facility";
 
     // Fetch media categories
     const { data: homeMediaData, isLoading: homeLoading } = useQuery({ 
         queryKey: ['futsal-media-home', id], 
         queryFn: () => getFutsalMedia(id as string, 'home'), 
-        enabled: !!id 
+        enabled: !!id,
+        retry: false
     });
     
     const { data: facilityMediaData, isLoading: facilityLoading } = useQuery({ 
         queryKey: ['futsal-media-facility', id], 
         queryFn: () => getFutsalMedia(id as string, 'facility'), 
-        enabled: !!id 
+        enabled: !!id,
+        retry: false
     });
 
     const { data: eventMediaData, isLoading: eventLoading } = useQuery({ 
         queryKey: ['futsal-media-event', id], 
         queryFn: () => getEventMedia(id as string), 
-        enabled: !!id 
+        enabled: !!id,
+        retry: false
     });
     
-    const isLoading = homeLoading || facilityLoading || eventLoading;
+    const isLoading = baseLoading || homeLoading || facilityLoading || eventLoading;
 
     // Process maps
     const formatMedia = (mediaArray: any[], categoryName: string) => {
@@ -65,7 +68,7 @@ const FutsalGallery = () => {
             <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
                 <FutsalNavigation name="Loading Gallery..." />
                 <Loader2 className="h-10 w-10 animate-spin text-emerald-500 my-auto" />
-                <Footer />
+                <FutsalFooter />
             </div>
         );
     }
@@ -152,7 +155,7 @@ const FutsalGallery = () => {
                 )}
             </main>
 
-            <Footer />
+            <FutsalFooter />
 
             {/* Lightbox / Selected Image Modal */}
             {selectedImage && (
