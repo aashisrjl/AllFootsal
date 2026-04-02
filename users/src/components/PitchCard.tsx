@@ -2,11 +2,9 @@ import React from "react";
 import { Pitch } from "@/types";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Lightbulb, Map, Zap, CloudLightning, Sun } from "lucide-react";
+import { CalendarDays, Map, Sun } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useBooking } from "@/contexts/BookingContext";
-import { useQuery } from "@tanstack/react-query";
-import { getPitchesMedia } from "@/lib/futsalApi";
 
 interface PitchCardProps {
   pitch: Pitch;
@@ -17,15 +15,6 @@ const PitchCard: React.FC<PitchCardProps> = ({ pitch, onSelectPitch }) => {
   const { selectedPitchId } = useBooking();
   const isSelected = selectedPitchId === pitch.id;
 
-  const { data: mediaData, isLoading } = useQuery({
-      queryKey: ['pitch-media', pitch.facilityId, pitch.id],
-      queryFn: () => getPitchesMedia(pitch.facilityId, pitch.id),
-      enabled: !!pitch.facilityId && !!pitch.id
-  });
-
-  const mediaUrls = Array.isArray(mediaData) ? mediaData : mediaData?.data;
-  const pitchImage = mediaUrls?.[0]?.url || mediaUrls?.[0]?.media_url || pitch.image || "https://images.unsplash.com/photo-1551946596-ce3ebc2efd97?q=80&w=800";
-
   return (
     <Card className={`overflow-hidden transition-all duration-300 group ${
         isSelected 
@@ -35,21 +24,15 @@ const PitchCard: React.FC<PitchCardProps> = ({ pitch, onSelectPitch }) => {
       
       <div className="relative">
         <AspectRatio ratio={4 / 3}>
-            {isLoading ? (
-                <div className="w-full h-full bg-slate-100 animate-pulse flex items-center justify-center text-slate-300">
-                    <CalendarDays className="h-8 w-8 opacity-20" />
-                </div>
-            ) : (
-                <img
-                    src={pitchImage}
-                    alt={pitch.name}
-                    className={`object-cover w-full h-full transition-transform duration-700 ${isSelected ? '' : 'group-hover:scale-105'}`}
-                />
-            )}
+            <img
+                src={pitch.image}
+                alt={pitch.name}
+                className={`object-cover w-full h-full transition-transform duration-700 ${isSelected ? '' : 'group-hover:scale-105'}`}
+            />
         </AspectRatio>
 
         {/* Floating tags */}
-        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
             {pitch.is_active === false && (
                 <span className="px-2.5 py-1 bg-red-500/90 backdrop-blur-md text-white text-xs font-bold rounded-full shadow-sm flex items-center gap-1">
                     Maintenance
@@ -75,10 +58,10 @@ const PitchCard: React.FC<PitchCardProps> = ({ pitch, onSelectPitch }) => {
                 {(pitch.pitch_type || pitch.surface_type) && (
                     <div className="flex items-center gap-1.5 mt-1.5 text-slate-500 text-sm font-medium">
                         {pitch.pitch_type && (
-                            <span className="bg-slate-100 px-2 py-0.5 rounded-md text-slate-600">{pitch.pitch_type}</span>
+                            <span className="bg-slate-100 px-2.5 py-0.5 rounded-md text-slate-600">{pitch.pitch_type}</span>
                         )}
                         {pitch.surface_type && (
-                            <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md flex items-center gap-1">
+                            <span className="bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-md flex items-center gap-1">
                                 <Map className="h-3 w-3" /> {pitch.surface_type}
                             </span>
                         )}
@@ -88,7 +71,7 @@ const PitchCard: React.FC<PitchCardProps> = ({ pitch, onSelectPitch }) => {
             
         </div>
         
-        <div className="flex items-center gap-1 mt-4 p-3 bg-emerald-50 rounded-xl">
+        <div className="flex items-center gap-1 mt-4 p-3 bg-emerald-50 rounded-xl border border-emerald-100/50">
             <div className="text-emerald-700 font-black text-lg">
                 NPR {pitch.pricePerHour}
             </div>

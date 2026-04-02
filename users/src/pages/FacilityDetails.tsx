@@ -70,6 +70,7 @@ const FacilityDetails = () => {
   const { data: homeMediaData, isLoading: homeMediaLoading } = useQuery({ queryKey: ['futsal-media-home', id], queryFn: () => getFutsalMedia(id as string, 'home'), enabled: !!id });
   const { data: facilityMediaData, isLoading: facilityMediaLoading } = useQuery({ queryKey: ['futsal-media-facility', id], queryFn: () => getFutsalMedia(id as string, 'facility'), enabled: !!id });
   const { data: eventMediaData, isLoading: eventLoading } = useQuery({ queryKey: ['futsal-media-event', id], queryFn: () => getEventMedia(id as string), enabled: !!id });
+  const { data: pitchMediaData } = useQuery({ queryKey: ['futsal-media-pitch', id], queryFn: () => getFutsalMedia(id as string, 'pitch'), enabled: !!id });
   const { data: pitchesData, isLoading: pitchesLoading } = useQuery({ queryKey: ['futsal-pitches', id], queryFn: () => getFutsalPitches(id as string), enabled: !!id });
   const { data: ratingsData, isLoading: ratingsLoading } = useQuery({ queryKey: ['futsal-ratings', id], queryFn: () => getFutsalRatings(id as string), enabled: !!id });
 
@@ -101,6 +102,8 @@ const FacilityDetails = () => {
 
   const pitchesArray = pitchesData?.data || [];
 
+  const pitchMediaArray = pitchMediaData?.data || [];
+
   const dynamicFacility = futsal ? {
     id: String(futsal.id),
     name: futsal.futsalName || "Unknown Futsal Tenant",
@@ -115,20 +118,25 @@ const FacilityDetails = () => {
     establishedYear: info?.established_year,
     websiteUrl: info?.website_url,
     parkingInfo: info?.parking_info,
-    pitches: pitchesArray.map((p: any) => ({
-      id: String(p.id),
-      name: p.name || `Pitch ${p.id}`,
-      facilityId: String(futsal.id),
-      pricePerHour: Number(p.price_per_hour || 1000),
-      isEnabled: Boolean(p.is_active ?? 1),
-      image: p.media_url || "https://images.unsplash.com/photo-1551946596-ce3ebc2efd97?q=80&w=800",
-      isUnderMaintenance: p.is_active === 0,
-      pitch_type: p.pitch_type,
-      surface_type: p.surface_type,
-      lighting: p.lighting,
-      indoor: p.indoor,
-      is_active: p.is_active
-    })),
+    pitches: pitchesArray.map((p: any) => {
+      const pitchImageObj = pitchMediaArray.find((media: any) => String(media.pitch_id) === String(p.id));
+      const pitchImage = pitchImageObj?.url || pitchImageObj?.media_url || p.media_url || "https://images.unsplash.com/photo-1551946596-ce3ebc2efd97?q=80&w=800";
+      
+      return {
+        id: String(p.id),
+        name: p.name || `Pitch ${p.id}`,
+        facilityId: String(futsal.id),
+        pricePerHour: Number(p.price_per_hour || 1000),
+        isEnabled: Boolean(p.is_active ?? 1),
+        image: pitchImage,
+        isUnderMaintenance: p.is_active === 0,
+        pitch_type: p.pitch_type,
+        surface_type: p.surface_type,
+        lighting: p.lighting,
+        indoor: p.indoor,
+        is_active: p.is_active
+      };
+    }),
     rating: 4.8,
     reviews: 124,
     operating_hours: parsedHours,
