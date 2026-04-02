@@ -47,14 +47,14 @@ export default function Navigation() {
       : "text-white hover:text-green-300"
     : "text-white hover:text-green-600";
 
+  const userImg = user?.profileImage;
   const userInitial = user?.name?.trim()?.charAt(0)?.toUpperCase() || "U";
   const avatarFallbackClass = isHome && !isScrolled ? "bg-white/20 text-white" : "bg-green-600 text-white";
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled ? "shadow-md" : ""
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? "shadow-md" : ""
+        }`}
       style={{
         backgroundImage:
           isHome && !isScrolled
@@ -96,11 +96,11 @@ export default function Navigation() {
               Forum
             </button>
 
-              <button
+            <button
               onClick={() => navigate("/contact")}
               className={`font-medium transition ${linkColor}`}
             >
-              Contact Us
+              Contact
             </button>
 
             {isLoading ? null : isAuthenticated ? (
@@ -108,8 +108,13 @@ export default function Navigation() {
                 onClick={() => navigate("/profile")}
                 className="flex items-center gap-2 outline-none"
               >
-                <Avatar className="h-10 w-10 border border-white/20">
-                  <AvatarFallback className={avatarFallbackClass}>{userInitial}</AvatarFallback>
+                <Avatar className="h-12 w-12 border border-white/20">
+                  {userImg ? (
+                    <img src={userImg} alt="User" className="h-full w-full object-cover" />
+                  ) : (
+                    <AvatarFallback className={avatarFallbackClass}>{userInitial}</AvatarFallback>
+                  )}
+
                 </Avatar>
                 <span className={`font-medium transition ${linkColor}`}>
                   {user?.name || "Profile"}
