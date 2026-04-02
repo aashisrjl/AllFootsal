@@ -1,5 +1,5 @@
-
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ interface BookingCardProps {
 const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
   const { cancelBooking } = useBooking();
   const { user } = useAuth();
+  const navigate = useNavigate();
   
   // Natively extracted from our JOIN mapped Live APIs!
   const facilityName = (booking as any).futsal_name || "Facility";
@@ -92,9 +93,17 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
           <p className="text-green-600 font-semibold">NPR {booking.totalPrice}</p>
         </div>
       </CardContent>
-      <CardFooter className="flex gap-2">
+      <CardFooter className="flex flex-col sm:flex-row flex-wrap gap-2">
+        <Button 
+            variant="default" 
+            className="w-full sm:flex-1 bg-slate-900 flex items-center gap-2"
+            onClick={() => navigate(`/bookings/${booking.id}`)}
+        >
+            <ExternalLink className="h-4 w-4" />
+            View Details
+        </Button>
         {booking.status === "confirmed" && (
-          <Button variant="outline" className="w-full flex items-center gap-2">
+          <Button variant="outline" className="w-full sm:flex-1 flex items-center gap-2">
             <ExternalLink className="h-4 w-4" />
             Get Directions
           </Button>
@@ -105,11 +114,11 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
         {canBeCancelled && (
           <Button 
             variant="outline" 
-            className="w-full text-red-600 border-red-200 hover:bg-red-50 flex items-center gap-2"
+            className="w-full sm:flex-1 text-red-600 border-red-200 hover:bg-red-50 flex items-center justify-center gap-2"
             onClick={handleCancel}
           >
             <X className="h-4 w-4" />
-            Cancel Booking
+            Cancel
           </Button>
         )}
       </CardFooter>

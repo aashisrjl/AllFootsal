@@ -134,7 +134,7 @@ const Login = () => {
                 variant="outline"
                 className="w-auto h-11 border-gray-300 flex items-center justify-center hover:bg-gray-50"
                 onClick={() => {
-                  window.location.href = "https://accounts.google.com/signin";
+                  window.location.href = "http://localhost:3000/api/v1/auth/user/google";
                 }}
               >
                 <FaGoogle className="mr-3 text-red-500 text-lg" />
@@ -144,7 +144,7 @@ const Login = () => {
                 variant="outline"
                 className="w-auto h-11 border-gray-300 flex items-center justify-center hover:bg-gray-50"
                 onClick={() => {
-                  window.location.href = "https://www.facebook.com/login.php";
+                  window.location.href = "http://localhost:3000/api/v1/auth/user/facebook";
                 }}
               >
                 <FaFacebookF className="mr-3 text-blue-600 text-lg" />

@@ -52,7 +52,17 @@ export const registerFutsal = async (data: FutsalRegisterPayload) => {
 };
 
 export const googleLogin = async (token: string) => {
-  const res = await API.post("/auth/google-login", { token });
+  const res = await API.get("/auth/user/google", { token });
+  return res.data;
+};
+
+export const facebookLogin = async (token: string) => {
+  const res = await API.get("/auth/user/facebook", { token });
+  return res.data;
+};
+
+export const googleLoginFutsal = async (token: string) => {
+  const res = await API.get("/auth/futsal/google", { token });
   return res.data;
 };
 

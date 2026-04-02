@@ -12,6 +12,7 @@ import Facilities from "./pages/Futsals";
 import FacilityDetails from "./pages/FacilityDetails";
 import Login from "./pages/Login";
 import UserBookings from "./pages/UserBookings";
+import BookingDetails from "./pages/BookingDetails";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
 import About from "./pages/About";
@@ -57,6 +58,7 @@ const App = () => (
               <Route path="/subscription" element={<Subscription />} />
 
               <Route path="/bookings" element={<UserBookings />} />
+              <Route path="/bookings/:id" element={<BookingDetails />} />
               {/* <Route path="/admin" element={<AdminDashboard />} /> */}
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/forum" element={<Forum />} />

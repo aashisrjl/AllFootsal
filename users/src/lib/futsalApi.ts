@@ -132,6 +132,11 @@ export const verifyPayment = async (futsalId: number | string, paymentId: number
     return res.data;
 };
 
+export const getPaymentByBookingId = async (futsalId: number | string, bookingId: number | string) => {
+    const res = await API.get(`/futsal/${futsalId}/bookings/${bookingId}/payment`);
+    return res.data;
+};
+
 // ratings (user specific)
 export const getMyRating = async (futsalId: number | string) => {
     const res = await API.get(`/futsal/${futsalId}/ratings/me`);

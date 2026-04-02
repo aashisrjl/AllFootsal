@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import FutsalNavigation from "@/components/FutsalNavigation";
-import Footer from "@/components/Footer";
+import FutsalFooter from "@/components/FutsalFooter";
 import { useQuery } from "@tanstack/react-query";
 import { getFutsalRatings, getFutsalById } from "@/lib/futsalApi";
 import { ArrowLeft, Loader2, Star, User } from "lucide-react";
@@ -11,24 +11,21 @@ const FutsalReviews = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
-    const { data: ratingsData, isLoading } = useQuery({
-        queryKey: ['futsal-ratings', id],
-        queryFn: () => getFutsalRatings(id as string),
-        enabled: !!id
-    });
-    
-    const { data: baseData } = useQuery({ queryKey: ['futsal-base', id], queryFn: () => getFutsalById(id as string), enabled: !!id });
+    const { data: baseData, isLoading: baseLoading } = useQuery({ queryKey: ['futsal-base', id], queryFn: () => getFutsalById(id as string), enabled: !!id, retry: false });
+    const { data: ratingsData, isLoading: ratingsLoading } = useQuery({ queryKey: ['futsal-ratings', id], queryFn: () => getFutsalRatings(id as string), enabled: !!id, retry: false });
     const futsalName = baseData?.data?.futsalName || "Loading...";
 
     const reviews = ratingsData?.data || [];
 
+    const isLoading = baseLoading || ratingsLoading;
+
     if (isLoading) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
-                <FutsalNavigation name={futsalName} />
-                <Loader2 className="h-10 w-10 animate-spin text-emerald-500 my-auto" />
-                <Footer />
-            </div>
+            <FutsalNavigation name="Loading Reviews..." />
+            <Loader2 className="h-10 w-10 animate-spin text-emerald-500 my-auto" />
+            <FutsalFooter />
+        </div>
         );
     }
 
@@ -74,7 +71,7 @@ const FutsalReviews = () => {
                     )}
                 </div>
             </main>
-            <Footer />
+            <FutsalFooter />
         </div>
     );
 };

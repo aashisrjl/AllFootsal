@@ -8,6 +8,7 @@ const {
     getPaymentConfigs,
     upsertPaymentConfig,
     disablePaymentConfig,
+    getPaymentByBookingId
 } = require("../../../controllers/footsalControllers/paymentController/payment.controller");
 const isFutsalAuthenticated = require("../../../middleware/authMiddleware/futsalAuthenticated");
 const isUserAuthenticated = require("../../../middleware/authMiddleware/userAuthenticate");
@@ -55,6 +56,12 @@ router.get(
     `/futsal/:futsalId/payments/me`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
     isUserAuthenticated,
     getUserPayments
+);
+
+router.get(
+    `/futsal/:futsalId/bookings/:bookingId/payment`, // #swagger.tags=["Futsal/Tenant/User/Payment"]
+    isUserAuthenticated,
+    getPaymentByBookingId
 );
 
 router.post(

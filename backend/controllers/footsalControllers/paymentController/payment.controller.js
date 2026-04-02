@@ -480,6 +480,86 @@ const getUserPayments = async (req, res) => {
     }
 };
 
+// by user
+const getPaymentByBookingId = async (req, res) => {
+    try {
+        const tenant = await resolveTenantContext(req);
+        if (!tenant) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid futsal context is required"
+            });
+        }
+
+        const userId = Number(req.userId || req.body?.userId || req.body?.user_id);
+        const bookingId = Number(req.params.bookingId);
+
+        if (!Number.isInteger(userId) || userId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid userId is required"
+            });
+        }
+
+        if (!Number.isInteger(bookingId) || bookingId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid bookingId is required"
+            });
+        }
+
+        const rows = await sequelize.query(
+            `SELECT p.*, u.id AS userId, u.username, u.email, u.phoneNumber
+             FROM ${paymentTableName(tenant.code)} p
+             LEFT JOIN users u ON u.id = p.user_id
+             WHERE p.booking_id = ? AND p.user_id = ?
+             ORDER BY p.created_at DESC
+             LIMIT 1`,
+            {
+                replacements: [bookingId, userId],
+                type: QueryTypes.SELECT
+            }
+        );
+
+        const row = rows[0];
+        if (!row) {
+            return res.status(404).json({
+                success: false,
+                message: "No payment found for this booking"
+            });
+        }
+
+        const payment = {
+            ...row,
+            user: row.userId
+                ? {
+                        id: row.userId,
+                        username: row.username,
+                        email: row.email,
+                        phoneNumber: row.phoneNumber
+                    }
+                : null
+        };
+
+        delete payment.userId;
+        delete payment.username;
+        delete payment.email;
+        delete payment.phoneNumber;
+
+        return res.status(200).json({
+            success: true,
+            message: "Booking payment fetched successfully",
+            data: payment
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+};
+
 const createPayment = async (req, res) => {
     try {
         const tenant = await resolveTenantContext(req);
@@ -936,6 +1016,7 @@ module.exports = {
     getUserPayments,
     createPayment,
     verifyPayment,
+    getPaymentByBookingId,
     getPaymentConfigs,
     upsertPaymentConfig,
     disablePaymentConfig,
