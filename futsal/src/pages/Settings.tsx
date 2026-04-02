@@ -1,13 +1,45 @@
+import { useState, useEffect } from 'react';
 import { Settings as SettingsIcon, User, Bell, Shield, CreditCard, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import api from '../lib/api';
 
 const Settings = () => {
-  const { futsalProfile } = useAuth();
+  const { futsalProfile, refreshProfile } = useAuth();
   
-  // Split ownerName into first and last name if possible
-  const ownerNames = futsalProfile?.ownerName?.split(' ') || ['Owner', ''];
-  const firstName = ownerNames[0];
-  const lastName = ownerNames.slice(1).join(' ');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+
+  useEffect(() => {
+    if (futsalProfile) {
+      const ownerNames = futsalProfile.ownerName?.split(' ') || ['Owner', ''];
+      setFirstName(ownerNames[0] || '');
+      setLastName(ownerNames.slice(1).join(' ') || '');
+      setEmail(futsalProfile.email || '');
+      setPhone(futsalProfile.phoneNumber || '');
+    }
+  }, [futsalProfile]);
+
+  const handleUpdateProfile = async () => {
+    try {
+      setIsSaving(true);
+      setSuccessMsg('');
+      const ownerName = `${firstName} ${lastName}`.trim();
+      await api.patch('/futsals-profile', { ownerName, email, phoneNumber: phone });
+      await refreshProfile();
+      setSuccessMsg('Profile updated successfully!');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (error) {
+      console.error('Failed to update profile', error);
+      alert('Failed to update profile.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between mb-8">
@@ -55,31 +87,34 @@ const Settings = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">First Name</label>
-                  <input type="text" defaultValue={firstName} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
                 </div>
                 <div>
                   <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Last Name</label>
-                  <input type="text" defaultValue={lastName} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div>
                   <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Email Address</label>
-                  <input type="email" defaultValue={futsalProfile?.email || 'N/A'} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
                 </div>
                 <div>
                   <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Phone Number</label>
-                  <input type="tel" defaultValue={futsalProfile?.phoneNumber || 'N/A'} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
                 </div>
               </div>
-              <div className="pt-4 flex justify-end gap-3 mt-4">
-                <button className="px-6 py-2.5 bg-transparent text-slate-400 border border-slate-700 font-bold rounded-xl hover:bg-slate-800 hover:text-white transition-all shadow-sm">
-                  Cancel
-                </button>
-                <button className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all flex items-center hover:-translate-y-0.5 active:translate-y-0">
-                  <Check className="w-4 h-4 mr-2" />
-                  Save Changes
-                </button>
+              <div className="pt-4 flex justify-between items-center gap-3 mt-4">
+                <span className="text-sm font-bold text-emerald-400">{successMsg}</span>
+                <div className="flex gap-3">
+                  <button className="px-6 py-2.5 bg-transparent text-slate-400 border border-slate-700 font-bold rounded-xl hover:bg-slate-800 hover:text-white transition-all shadow-sm">
+                    Cancel
+                  </button>
+                  <button onClick={handleUpdateProfile} disabled={isSaving} className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all flex items-center hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50">
+                    <Check className="w-4 h-4 mr-2" />
+                    {isSaving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

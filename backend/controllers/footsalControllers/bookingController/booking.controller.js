@@ -151,6 +151,26 @@ const confirmBookingByAdmin = async (req,res) => {
     })
 }
 
+//admin can unconfirm any booking
+const unconfirmBookingByAdmin = async (req,res) => {
+    const code = req.futsalCode;
+    const bookingId = req.params.bookingId;
+
+    await sequelize.query(
+        `UPDATE booking_${code} SET status = 'pending' 
+         WHERE id = ?`,
+        {
+            replacements: [bookingId],
+            type: QueryTypes.UPDATE,
+        }
+    );
+
+    res.status(200).json({
+        success:true,
+        message:"Booking unconfirmed successfully by admin"
+    })
+}
+
 //user
 const deleteBookingByUser = async (req,res) => {
     const code = await resolveBookingTenantCode(req);
@@ -269,6 +289,7 @@ module.exports = {
     cancelBooking,
     cancelBookingByAdmin,
     confirmBookingByAdmin,
+    unconfirmBookingByAdmin,
     deleteBookingByUser,
     deleteBookingByAdmin,
     getBookingStats,

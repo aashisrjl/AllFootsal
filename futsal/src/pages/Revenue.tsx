@@ -6,6 +6,7 @@ const Revenue = () => {
   const [revenueData, setRevenueData] = useState({ today: 0, week: 0, month: 0, year: 0 });
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
   const [monthlyBreakdown, setMonthlyBreakdown] = useState<any[]>([]);
+  const [weeklyChart, setWeeklyChart] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,10 +24,25 @@ const Revenue = () => {
         if (bookingsRes?.data?.success) {
            const bookings = bookingsRes.data.data;
            
-           // Simple calculations for demo
-           const todayRev = bookings.reduce((sum: number, b: any) => sum + (b.amount || 0), 0) * 0.05; // mock based on total for now
-           const weekRev = todayRev * 7;
-           const monthRev = todayRev * 30;
+           const todayString = new Date().toISOString().split('T')[0];
+           
+           const dWeek = new Date(); dWeek.setDate(dWeek.getDate() - 7);
+           const weekString = dWeek.toISOString().split('T')[0];
+           
+           const dMonth = new Date(); dMonth.setDate(dMonth.getDate() - 30);
+           const monthString = dMonth.toISOString().split('T')[0];
+           
+           let todayRev = 0, weekRev = 0, monthRev = 0;
+           
+           bookings.forEach((b: any) => {
+             if (b.status === 'cancelled') return;
+             const bDate = b.booking_date?.split('T')[0];
+             if (!bDate) return;
+             const amt = b.amount || 0;
+             if (bDate === todayString) todayRev += amt;
+             if (bDate >= weekString) weekRev += amt;
+             if (bDate >= monthString) monthRev += amt;
+           });
 
            setRevenueData({
              today: Math.floor(todayRev),
@@ -34,6 +50,31 @@ const Revenue = () => {
              month: Math.floor(monthRev),
              year: parseInt(totalRev, 10)
            });
+
+          const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          const tempWeekly: any = {};
+          for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            tempWeekly[dateStr] = {
+              day: days[d.getDay()],
+              value: 0
+            };
+          }
+          bookings.forEach((b: any) => {
+             const bDate = b.booking_date?.split('T')[0];
+             if (tempWeekly[bDate] && b.status !== 'cancelled') {
+                tempWeekly[bDate].value += (b.amount || 0);
+             }
+          });
+          const rawWeekly = Object.values(tempWeekly) as any[];
+          const maxVal = Math.max(...rawWeekly.map((w: any) => w.value), 1); 
+          setWeeklyChart(rawWeekly.map((w: any) => ({
+            day: w.day,
+            actualValue: w.value,
+            value: Math.floor((w.value / maxVal) * 100) || 5
+          })));
 
            // Recent Transactions
            const recent = bookings.slice(0, 5).map((b: any) => ({
@@ -46,9 +87,9 @@ const Revenue = () => {
            }));
            setRecentTransactions(recent);
 
-           // Breakdown 
            const breakdownMap: any = {};
            bookings.forEach((b: any) => {
+             if (b.status === 'cancelled') return;
              if (!breakdownMap[b.pitch_name]) {
                breakdownMap[b.pitch_name] = { pitch: b.pitch_name, bookings: 0, revenue: 0, utilization: 0 };
              }
@@ -56,9 +97,10 @@ const Revenue = () => {
              breakdownMap[b.pitch_name].revenue += b.amount || 0;
            });
            
+           const maxBookings = Math.max(...Object.values(breakdownMap).map((item: any) => item.bookings), 1);
            const breakdownArray = Object.values(breakdownMap).map((item: any) => ({
              ...item,
-             utilization: Math.min(100, Math.floor(Math.random() * 40 + 40)) // mock utilization
+             utilization: Math.floor((item.bookings / maxBookings) * 100)
            }));
            setMonthlyBreakdown(breakdownArray);
         }
@@ -143,22 +185,22 @@ const Revenue = () => {
           <div className="h-64 flex items-center justify-center bg-slate-800/30 rounded-xl border border-slate-800/80 shadow-inner relative z-10 p-4">
             {/* Mocked visual for chart area */}
             <div className="w-full h-full flex flex-col justify-end gap-2 p-2">
-               <div className="flex justify-between items-end h-full gap-2 lg:gap-4">
-                 {[40, 70, 45, 90, 65, 85, 100].map((h, i) => (
+                <div className="flex justify-between items-end h-full gap-2 lg:gap-4">
+                 {weeklyChart.map((h, i) => (
                    <div key={i} className="w-full relative flex justify-center h-full items-end pb-0 group/bar">
                      <div 
                        className="w-full bg-gradient-to-t from-emerald-500/20 to-emerald-400/60 rounded-t-md hover:from-emerald-500/40 hover:to-emerald-400 transition-all duration-500 cursor-pointer border border-emerald-500/20 border-b-0 relative" 
-                       style={{ height: `${h}%` }}
+                       style={{ height: `${h.value}%` }}
                      >
                         <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-semibold py-1.5 px-2.5 rounded-lg opacity-0 group-hover/bar:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl border border-slate-700">
-                          ${h * 8}
+                          ${h.actualValue}
                         </div>
                      </div>
                    </div>
                  ))}
                </div>
                <div className="flex justify-between items-center px-1 mt-2 border-t border-slate-700/50 pt-2 text-[10px] font-bold text-slate-500 uppercase">
-                  <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                  {weeklyChart.map((h, i) => <span key={i}>{h.day}</span>)}
                </div>
             </div>
           </div>
