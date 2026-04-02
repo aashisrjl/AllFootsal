@@ -1,7 +1,13 @@
-import React from 'react';
 import { Settings as SettingsIcon, User, Bell, Shield, CreditCard, Check } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Settings = () => {
+  const { futsalProfile } = useAuth();
+  
+  // Split ownerName into first and last name if possible
+  const ownerNames = futsalProfile?.ownerName?.split(' ') || ['Owner', ''];
+  const firstName = ownerNames[0];
+  const lastName = ownerNames.slice(1).join(' ');
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between mb-8">
@@ -49,21 +55,21 @@ const Settings = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">First Name</label>
-                  <input type="text" defaultValue="John" className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <input type="text" defaultValue={firstName} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
                 </div>
                 <div>
                   <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Last Name</label>
-                  <input type="text" defaultValue="Smith" className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <input type="text" defaultValue={lastName} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div>
                   <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Email Address</label>
-                  <input type="email" defaultValue="john.smith@example.com" className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <input type="email" defaultValue={futsalProfile?.email || 'N/A'} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
                 </div>
                 <div>
                   <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Phone Number</label>
-                  <input type="tel" defaultValue="+1 (555) 123-4567" className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <input type="tel" defaultValue={futsalProfile?.phoneNumber || 'N/A'} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
                 </div>
               </div>
               <div className="pt-4 flex justify-end gap-3 mt-4">

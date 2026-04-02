@@ -10,6 +10,7 @@ import {
   Bell,
   LogOut 
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
+  const { futsalProfile, logout } = useAuth();
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -68,7 +70,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          <button className="flex w-full items-center rounded-xl px-4 py-3 text-sm font-semibold text-slate-400 transition-colors border border-transparent hover:bg-slate-800/50 hover:text-rose-400 group">
+          <button 
+             onClick={logout}
+             className="flex w-full items-center rounded-xl px-4 py-3 text-sm font-semibold text-slate-400 transition-colors border border-transparent hover:bg-slate-800/50 hover:text-rose-400 group">
             <LogOut className="mr-3 h-5 w-5 text-slate-500 group-hover:text-rose-400 transition-colors" />
             Logout
           </button>
@@ -93,11 +97,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </button>
               <div className="flex items-center gap-3 pl-4 border-l border-slate-700/50 cursor-pointer group">
                 <div className="text-right">
-                  <span className="block text-sm font-bold text-slate-200 group-hover:text-white transition-colors">Elite Sports Arena</span>
-                  <span className="block text-[10px] font-bold tracking-wider uppercase text-emerald-400">Owner</span>
+                  <span className="block text-sm font-bold text-slate-200 group-hover:text-white transition-colors">{futsalProfile?.futsalName || 'Futsal Arena'}</span>
+                  <span className="block text-[10px] font-bold tracking-wider uppercase text-emerald-400">{futsalProfile?.ownerName || 'Owner'}</span>
                 </div>
                 <div className="w-9 h-9 text-xs rounded-full bg-gradient-to-tr from-emerald-500 to-emerald-700 flex items-center justify-center text-white font-black shadow-lg border-2 border-slate-800/80 relative overflow-hidden group-hover:scale-105 transition-transform">
-                  EA
+                  {futsalProfile?.futsalName?.substring(0, 2).toUpperCase() || 'FA'}
                   <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
               </div>

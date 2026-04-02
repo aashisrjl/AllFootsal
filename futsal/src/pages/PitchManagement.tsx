@@ -1,15 +1,70 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, Plus, Edit, ToggleLeft, ToggleRight, Wrench } from 'lucide-react';
+import api from '../lib/api';
+import { useAuth } from '../context/AuthContext';
 
 const PitchManagement = () => {
-  const pitches = [
-    { id: 1, name: 'Pitch A', pricePerHour: 50, isActive: true, surface: 'Artificial Grass', size: '40m x 20m', bookingsToday: 6, revenue: 300, isUnderMaintenance: false },
-    { id: 2, name: 'Pitch B', pricePerHour: 45, isActive: true, surface: 'Artificial Grass', size: '35m x 20m', bookingsToday: 4, revenue: 180, isUnderMaintenance: false },
-    { id: 3, name: 'Pitch C', pricePerHour: 40, isActive: false, surface: 'Concrete', size: '30m x 18m', bookingsToday: 0, revenue: 0, isUnderMaintenance: true },
-  ];
+  const { futsalProfile } = useAuth();
+  const [pitches, setPitches] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const togglePitchStatus = (id: number) => { console.log(`Toggle pitch ${id} status`); };
+  const fetchPitches = async () => {
+    if (!futsalProfile?.id) return;
+    try {
+      setLoading(true);
+      const res = await api.get(`/futsal/${futsalProfile.id}/pitches`);
+      if (res.data.success) {
+        // Map backend fields to frontend expected fields where necessary
+        const mappedPitches = res.data.data.map((p: any) => ({
+          ...p,
+          pricePerHour: p.price_per_hour,
+          isActive: p.is_active === 1 || p.is_active === true,
+          surface: p.surface_type || 'N/A',
+          size: p.dimensions || 'N/A',
+          bookingsToday: 0, // Not provided directly in this endpoint
+          revenue: 0, // Not provided directly in this endpoint
+          isUnderMaintenance: false // Add logic if backend supports it
+        }));
+        setPitches(mappedPitches);
+      }
+    } catch (error) {
+      console.error('Failed to fetch pitches', error);
+      setPitches([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPitches();
+  }, [futsalProfile]);
+
+  const togglePitchStatus = async (pitch: any) => {
+    try {
+      const updatedStatus = !pitch.isActive;
+      // Optimistic update
+      setPitches(pitches.map(p => p.id === pitch.id ? { ...p, isActive: updatedStatus } : p));
+      
+      await api.put(`/futsal/pitches/edit/${pitch.id}`, {
+        ...pitch,
+        is_active: updatedStatus ? 1 : 0
+      });
+    } catch (error) {
+      console.error('Failed to toggle status', error);
+      // Revert if failed
+      fetchPitches();
+    }
+  };
+
   const editPitch = (id: number) => { console.log(`Edit pitch ${id}`); };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="w-8 h-8 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -71,7 +126,7 @@ const PitchManagement = () => {
                     </span>
                   ) : (
                     <button
-                      onClick={() => togglePitchStatus(pitch.id)}
+                      onClick={() => togglePitchStatus(pitch)}
                       className="flex items-center"
                     >
                       {pitch.isActive ? (
