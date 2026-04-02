@@ -20,6 +20,11 @@ export interface Pitch {
   image: string;
   isUnderMaintenance?: boolean;
   maintenanceReason?: string;
+  pitch_type?: string;
+  surface_type?: string;
+  lighting?: boolean;
+  indoor?: boolean;
+  is_active?: boolean;
 }
 
 export interface TimeSlot {

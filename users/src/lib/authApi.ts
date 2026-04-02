@@ -1,12 +1,12 @@
+// No token extraction, no localStorage — cookie is httpOnly, JS can't read it
+// Just attach nothing; browser sends cookie on every request automatically
+
 import axios from "axios";
 
 export const API = axios.create({
   baseURL: "http://localhost:3000/api/v1",
-  withCredentials: true, // sends httpOnly cookie automatically
+  withCredentials: true,
 });
-
-// No token extraction, no localStorage — cookie is httpOnly, JS can't read it
-// Just attach nothing; browser sends cookie on every request automatically
 
 type UserRegisterPayload = {
   username: string;

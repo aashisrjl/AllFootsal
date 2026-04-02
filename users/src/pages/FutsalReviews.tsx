@@ -1,9 +1,9 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Header from "@/components/Navigation";
+import FutsalNavigation from "@/components/FutsalNavigation";
 import Footer from "@/components/Footer";
 import { useQuery } from "@tanstack/react-query";
-import { getFutsalRatings } from "@/lib/futsalApi";
+import { getFutsalRatings, getFutsalById } from "@/lib/futsalApi";
 import { ArrowLeft, Loader2, Star, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -16,13 +16,16 @@ const FutsalReviews = () => {
         queryFn: () => getFutsalRatings(id as string),
         enabled: !!id
     });
+    
+    const { data: baseData } = useQuery({ queryKey: ['futsal-base', id], queryFn: () => getFutsalById(id as string), enabled: !!id });
+    const futsalName = baseData?.data?.futsalName || "Loading...";
 
     const reviews = ratingsData?.data || [];
 
     if (isLoading) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
-                <Header />
+                <FutsalNavigation name={futsalName} />
                 <Loader2 className="h-10 w-10 animate-spin text-emerald-500 my-auto" />
                 <Footer />
             </div>
@@ -31,7 +34,7 @@ const FutsalReviews = () => {
 
     return (
         <div className="min-h-screen flex flex-col bg-slate-50">
-            <Header />
+            <FutsalNavigation name={baseData?.data?.futsalName || "Futsal Facility"} />
             <main className="flex-1 container mx-auto px-4 md:px-6 py-12 max-w-4xl">
                 <Button variant="ghost" className="mb-8" onClick={() => navigate(`/futsals/${id}`)}>
                     <ArrowLeft className="h-4 w-4 mr-2" /> Back to Facility Details

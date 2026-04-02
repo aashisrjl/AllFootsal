@@ -642,6 +642,108 @@ const getMediaBycategory = async (req, res) => {
     });
   }
 }
+
+
+const uploadLogo = async (req,res)=>{
+const code = req.futsalCode || req.tanent?.code;
+if (!code) {
+  return res.status(400).json({
+    success: false,
+    message: "futsal code is required",
+  });
+}
+  const mediaFiles = getUploadedMediaFiles(req);
+  if (!mediaFiles.length) {
+    return res.status(400).json({
+      success: false,
+      message: "media is required",
+    });
+  }
+  const media = mediaFiles[0];
+  const mediaType = getMediaType(media.mimetype);
+  if (!mediaType) {
+    return res.status(400).json({
+      success: false,
+      message: "invalid media type",
+    });
+  }
+
+  const cloudinaryResult = await uploadToCloudinary(media.path, {
+    folder: `allfutsal/media/${code}/logo`,
+    resource_type: mediaType === "video" ? "video" : "image",
+  });
+
+  safeDeleteLocalFile(media.path);
+
+  await sequelize.query(
+    `INSERT INTO media_${code} (type, category, url)
+     VALUES (:mediaType, 'logo', :mediaUrl)`,
+    {
+      replacements: {
+        mediaType,
+        mediaUrl: cloudinaryResult.secure_url,
+      },
+      type: QueryTypes.INSERT,
+    }
+  );
+
+  return res.status(200).json({
+    success: true,
+    message: "logo uploaded successfully",
+    data: {
+      url: cloudinaryResult.secure_url,
+    },
+  });
+}
+
+const uploadBanner = async (req,res)=>{
+  const code = req.futsalCode || req.tanent?.code;
+  if (!code) {
+    return res.status(400).json({
+      success: false,
+      message: "futsal code is required",
+    });
+  }
+    const mediaFiles = getUploadedMediaFiles(req);
+    if (!mediaFiles.length) {
+      return res.status(400).json({
+        success: false,
+        message: "media is required",
+      });
+    }
+    const media = mediaFiles[0];
+    const mediaType = getMediaType(media.mimetype);
+    if (!mediaType) {
+      return res.status(400).json({
+        success: false,
+        message: "invalid media type",
+      });
+    }
+  
+    const cloudinaryResult = await uploadToCloudinary(media.path, {
+      folder: `allfutsal/media/${code}/banner`,
+      resource_type: mediaType === "video" ? "video" : "image",
+    });
+  
+    safeDeleteLocalFile(media.path);
+  
+    await sequelize.query(
+      `INSERT INTO media_${code} (type, category, url)
+       VALUES (:mediaType, 'banner', :mediaUrl)`,
+      {
+        replacements: { mediaType, mediaUrl: cloudinaryResult.secure_url },
+        type: QueryTypes.INSERT,
+      }
+    );
+  
+    return res.status(200).json({
+      success: true,
+      message: "banner uploaded successfully",
+      data: {
+        url: cloudinaryResult.secure_url,
+      },
+    });
+}
   
 module.exports = {
   uploadMedia,
