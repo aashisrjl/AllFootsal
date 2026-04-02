@@ -23,8 +23,10 @@ interface BookingCardProps {
 const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
   const { cancelBooking } = useBooking();
   const { user } = useAuth();
-  const facility = facilities.find(f => f.id === booking.facilityId);
-  const pitch = pitches.find(p => p.id === booking.pitchId);
+  
+  // Natively extracted from our JOIN mapped Live APIs!
+  const facilityName = (booking as any).futsal_name || "Facility";
+  const pitchName = (booking as any).pitchName || "Pitch";
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -43,29 +45,22 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
 
   const handleCancel = async () => {
     if (!user) return;
-    
     await cancelBooking(booking.id, user.id);
   };
 
-  // Check if the booking is in the future and not cancelled
-  // Only allow cancellations for confirmed or pending bookings
   const canBeCancelled = 
     (booking.status === "confirmed" || booking.status === "pending") &&
     new Date(`${booking.date}T${booking.startTime}`) > new Date();
 
-  // Check if the pitch or facility is under maintenance
-  const isUnderMaintenance = pitch?.isUnderMaintenance || facility?.isUnderMaintenance;
-  const maintenanceReason = pitch?.isUnderMaintenance 
-    ? pitch.maintenanceReason 
-    : facility?.isUnderMaintenance 
-      ? facility.maintenanceReason 
-      : "";
+  // Maintenance flags are omitted temporarily due to global shard layout
+  const isUnderMaintenance = false;
+  const maintenanceReason = "";
 
   return (
     <Card>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-lg">{pitch?.name} at {facility?.name}</CardTitle>
+          <CardTitle className="text-lg">{pitchName} at {facilityName}</CardTitle>
           <Badge className={getStatusColor(booking.status)} variant="outline">
             {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
           </Badge>
@@ -82,7 +77,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <MapPin className="h-4 w-4" />
-          <span>{facility?.location}</span>
+          <span>{facilityName}</span>
         </div>
         {isUnderMaintenance && (
           <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 p-2 rounded-md mt-2">
