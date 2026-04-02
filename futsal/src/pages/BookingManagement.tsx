@@ -49,6 +49,18 @@ const BookingManagement = () => {
     }
   };
 
+  const handleConfirmBooking = async (id: number) => {
+    if (!window.confirm("Are you sure you want to confirm this booking?")) return;
+    try {
+      // Optimistic
+      setBookings(bookings.map(b => b.id === id ? { ...b, status: 'confirmed' } : b));
+      await api.patch(`/futsal/bookings/${id}/confirm`);
+    } catch (error) {
+      console.error('Failed to confirm booking', error);
+      fetchBookings(); // revert
+    }
+  };
+
   // Filter bookings by status and selectedDate (if date filtering is desired)
   const filteredBookings = bookings.filter(booking => {
     let match = true;
@@ -194,7 +206,7 @@ const BookingManagement = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-xs font-bold space-x-3">
                     {booking.status === 'pending' && (
                       <div className="flex gap-2">
-                        <button className="bg-emerald-500/10 text-emerald-400 px-3 py-1.5 rounded-lg border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all">Confirm</button>
+                        <button onClick={() => handleConfirmBooking(booking.id)} className="bg-emerald-500/10 text-emerald-400 px-3 py-1.5 rounded-lg border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all">Confirm</button>
                         <button onClick={() => handleCancelBooking(booking.id)} className="bg-rose-500/10 text-rose-400 px-3 py-1.5 rounded-lg border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all">Reject</button>
                       </div>
                     )}

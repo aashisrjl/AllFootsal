@@ -131,6 +131,26 @@ const cancelBookingByAdmin = async (req,res) => {
     })
 }
 
+//admin can confirm any booking
+const confirmBookingByAdmin = async (req,res) => {
+    const code = req.futsalCode;
+    const bookingId = req.params.bookingId;
+
+    await sequelize.query(
+        `UPDATE booking_${code} SET status = 'confirmed' 
+         WHERE id = ?`,
+        {
+            replacements: [bookingId],
+            type: QueryTypes.UPDATE,
+        }
+    );
+
+    res.status(200).json({
+        success:true,
+        message:"Booking confirmed successfully by admin"
+    })
+}
+
 //user
 const deleteBookingByUser = async (req,res) => {
     const code = await resolveBookingTenantCode(req);
@@ -248,6 +268,7 @@ module.exports = {
     getBookingsByUser,
     cancelBooking,
     cancelBookingByAdmin,
+    confirmBookingByAdmin,
     deleteBookingByUser,
     deleteBookingByAdmin,
     getBookingStats,
