@@ -14,8 +14,11 @@ import {
   updateProfile,
   updateProfileImage,
   changePassword,
+  getUserBookings,
   type UserProfileApiData,
 } from "@/lib/userApi";
+import { getForumsByUserId } from "@/lib/forumApi";
+import { useQuery } from "@tanstack/react-query";
 import { 
   User, Info, Settings, Edit3, Calendar, MessageSquare, Lock, LogOut, 
   Phone, Mail, Upload, Trash2, Loader2, ShieldCheck, ChevronRight
@@ -45,6 +48,18 @@ const UserProfileInfo = () => {
     cNewPassword: "",
   });
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  const { data: userBookingsData, isLoading: isLoadingBookings } = useQuery({
+    queryKey: ['user-bookings'],
+    queryFn: getUserBookings,
+    enabled: isAuthenticated && activeSection === 'bookings'
+  });
+
+  const { data: userForumsData, isLoading: isLoadingForums } = useQuery({
+    queryKey: ['user-forums'],
+    queryFn: getForumsByUserId,
+    enabled: isAuthenticated && activeSection === 'forums'
+  });
 
   useEffect(() => {
     if (user && ((user.role as string) === 'futsal' || user.role === 'footsal')) {
@@ -301,13 +316,48 @@ const UserProfileInfo = () => {
 
   const renderProfileSection = () => {
     if (activeSection === "bookings") {
+      const bookings = userBookingsData?.data || [];
       return (
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-slate-50">My Bookings</h2>
-          <p className="text-slate-400 text-sm">View and manage your futsal match bookings and timeslots.</p>
+        <div className="space-y-6 flex flex-col h-full">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-50">My Bookings</h2>
+            <p className="text-slate-400 text-sm">View and manage your futsal match bookings and timeslots.</p>
+          </div>
+          
+          <div className="bg-slate-900/40 p-4 border border-slate-800/80 rounded-2xl flex flex-col gap-3 min-h-[150px] flex-1">
+             {isLoadingBookings ? (
+                <div className="flex justify-center items-center h-full my-auto"><Loader2 className="h-6 w-6 animate-spin text-emerald-500" /></div>
+             ) : bookings.length === 0 ? (
+                <p className="text-slate-500 text-sm italic m-auto text-center">You have no booking history.</p>
+             ) : (
+                <div className="max-h-[350px] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                   {bookings.map((b: any) => (
+                      <div 
+                         key={b.id} 
+                         onClick={() => navigate('/bookings')}
+                         className="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center hover:border-emerald-500/50 cursor-pointer transition-colors group"
+                      >
+                         <div>
+                            <p className="text-slate-200 font-bold group-hover:text-emerald-400 transition-colors">{b.pitch_name || "Pitch"}</p>
+                            <p className="text-slate-400 text-xs mt-1 font-medium">
+                               {new Date(b.booking_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric'})} &middot; {b.start_time} - {b.end_time}
+                            </p>
+                         </div>
+                         <div className="text-right">
+                            <span className={`inline-block px-2.5 py-1 text-[0.65rem] font-bold rounded-full uppercase tracking-wider ${b.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : b.status === 'cancelled' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>
+                               {b.status}
+                            </span>
+                            <p className="text-emerald-400 font-bold mt-1 text-sm tracking-tight">Rs. {b.amount}</p>
+                         </div>
+                      </div>
+                   ))}
+                </div>
+             )}
+          </div>
+          
           <button 
             onClick={() => navigate("/bookings")}
-            className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-5 py-2.5 rounded-xl font-semibold transition-colors shadow-lg shadow-emerald-500/20"
+            className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-5 py-2.5 rounded-xl font-semibold transition-colors shadow-lg shadow-emerald-500/20 w-fit"
           >
             <Calendar className="h-4 w-4" />
             View All Bookings
@@ -317,13 +367,41 @@ const UserProfileInfo = () => {
     }
 
     if (activeSection === "forums") {
+      const forums = userForumsData?.data || [];
       return (
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-slate-50">My Forums</h2>
-          <p className="text-slate-400 text-sm">Visit the futsal forums and participate in the community discussion board.</p>
+        <div className="space-y-6 flex flex-col h-full">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-50">My Forums</h2>
+            <p className="text-slate-400 text-sm">Visit the futsal forums and participate in the community discussion board.</p>
+          </div>
+
+          <div className="bg-slate-900/40 p-4 border border-slate-800/80 rounded-2xl flex flex-col gap-3 min-h-[150px] flex-1">
+             {isLoadingForums ? (
+                <div className="flex justify-center items-center h-full my-auto"><Loader2 className="h-6 w-6 animate-spin text-emerald-500" /></div>
+             ) : forums.length === 0 ? (
+                <p className="text-slate-500 text-sm italic m-auto text-center">You haven't created any forums yet.</p>
+             ) : (
+                <div className="max-h-[350px] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                   {forums.slice(0, 6).map((f: any) => (
+                      <div 
+                         key={f.id} 
+                         onClick={() => navigate(`/forum/${f.slug || f.id}`)}
+                         className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2.5 hover:border-emerald-500/50 cursor-pointer transition-colors group"
+                      >
+                         <h3 className="text-slate-100 font-bold text-md leading-tight group-hover:text-emerald-400 transition-colors">{f.title}</h3>
+                         <div className="flex items-center gap-2.5 text-[0.7rem] font-bold uppercase tracking-wider text-slate-500">
+                             <span className="bg-sky-500/10 text-sky-400 border border-sky-500/20 px-2 py-0.5 rounded-md">{f.category || "General"}</span>
+                             <span>{new Date(f.createdAt).toLocaleDateString()}</span>
+                         </div>
+                      </div>
+                   ))}
+                </div>
+             )}
+          </div>
+
           <button 
             onClick={() => navigate("/forum")}
-            className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-5 py-2.5 rounded-xl font-semibold transition-colors shadow-lg shadow-emerald-500/20"
+            className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-5 py-2.5 rounded-xl font-semibold transition-colors shadow-lg shadow-emerald-500/20 w-fit"
           >
             <MessageSquare className="h-4 w-4" />
             Go to Forums
