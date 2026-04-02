@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import Header from "@/components/Navigation";
+import FutsalNavigation from "@/components/FutsalNavigation";
 import Footer from "@/components/Footer";
 import TimeSlotPicker from "@/components/TimeSlotPicker";
 import BookingSummary from "@/components/BookingSummary";
@@ -47,7 +47,7 @@ const FutsalBookings = () => {
   if (baseLoading || pitchesLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
-        <Header />
+        <FutsalNavigation name="Loading..." />
         <Loader2 className="h-10 w-10 animate-spin text-emerald-500 my-auto" />
         <p className="text-slate-500 font-semibold my-auto mt-0">Loading Booking Gateway...</p>
         <Footer />
@@ -58,7 +58,7 @@ const FutsalBookings = () => {
   if (!futsal) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
+        <FutsalNavigation name="Facility Not Found" />
         <div className="flex-1 flex items-center justify-center bg-slate-50">
           <div className="text-center bg-white p-10 rounded-3xl shadow-sm border border-slate-100 max-w-md mx-4">
             <h1 className="text-2xl font-bold mb-4 text-slate-800">Facility Not Found</h1>
@@ -72,7 +72,7 @@ const FutsalBookings = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
-      <Header />
+      <FutsalNavigation name={futsal?.futsalName || "Futsal Booking"} />
       <main className="flex-1 container mx-auto px-4 md:px-6 py-12 max-w-7xl">
         <Button variant="ghost" className="mb-8" onClick={() => navigate(`/futsals/${id}`)}>
           <ArrowLeft className="h-4 w-4 mr-2" /> Back to Facility Details

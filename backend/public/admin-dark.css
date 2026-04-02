@@ -1,0 +1,171 @@
+/* Force AdminJS chrome (sidebar + header) to dark mode */
+
+html,
+body,
+#app {
+  background: #0b1220 !important;
+  color: #e5e7eb !important;
+}
+
+main,
+section,
+[data-css='content'],
+[data-css='main'],
+[class*='LayoutContent'],
+[class*='DrawerContent'] {
+  background: #0b1220 !important;
+  color: #e5e7eb !important;
+}
+
+[data-css='sidebar'],
+aside {
+  background: #0f172a !important;
+  border-right: 1px solid #1f2937 !important;
+}
+
+[data-css='topbar'],
+header,
+nav {
+  background: #111827 !important;
+  border-bottom: 1px solid #1f2937 !important;
+}
+
+[data-css='sidebar'] a,
+aside a,
+header a,
+nav a {
+  color: #d1d5db !important;
+}
+
+[data-css='sidebar'] a:hover,
+aside a:hover,
+header a:hover,
+nav a:hover {
+  color: #f8fafc !important;
+}
+
+[data-css='sidebar'] [aria-current='page'],
+[data-css='sidebar'] .active {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+[data-css='topbar'] *,
+header *,
+nav * {
+  color: #e5e7eb !important;
+}
+
+/* Panels / cards */
+[class*='Box'],
+[class*='Card'],
+[class*='Section'],
+[class*='Drawer'],
+[class*='Modal'],
+[class*='MessageBox'] {
+  background: #111827 !important;
+  border-color: #1f2937 !important;
+  color: #e5e7eb !important;
+}
+
+/* Table views */
+table,
+thead,
+tbody,
+tr,
+th,
+td,
+[class*='Table'] {
+  background: #111827 !important;
+  color: #e5e7eb !important;
+  border-color: #1f2937 !important;
+}
+
+th,
+thead th {
+  color: #cbd5e1 !important;
+}
+
+tr:hover td,
+[class*='TableRow']:hover {
+  background: #1f2937 !important;
+}
+
+/* Form controls */
+input,
+select,
+textarea,
+[class*='Input'],
+[class*='Select'] {
+  background: #0f172a !important;
+  color: #e5e7eb !important;
+  border-color: #334155 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+label,
+[class*='Label'],
+[class*='FormGroup'] {
+  color: #cbd5e1 !important;
+}
+
+/* Buttons and action controls */
+button,
+a[role='button'],
+[class*='Button'] {
+  border-color: #334155 !important;
+}
+
+button[class*='primary'],
+a[role='button'][class*='primary'] {
+  background: #2563eb !important;
+  color: #ffffff !important;
+}
+
+button[class*='danger'],
+a[role='button'][class*='danger'] {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+/* Links and misc text */
+a {
+  color: #93c5fd !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+small,
+strong,
+li,
+div {
+  border-color: #1f2937;
+}
+
+/* Dropdowns / popovers / filters */
+[class*='DropDown'],
+[class*='Popover'],
+[class*='Filter'],
+[class*='DatePicker'] {
+  background: #111827 !important;
+  color: #e5e7eb !important;
+  border-color: #334155 !important;
+}
+
+/* Pagination */
+[class*='Pagination'] button,
+[class*='Pagination'] a {
+  background: #0f172a !important;
+  color: #e5e7eb !important;
+  border-color: #334155 !important;
+}

@@ -29,6 +29,7 @@ import Futsals from "./pages/Futsals";
 import FutsalBookings from "./pages/FutsalBookings";
 import FutsalReviews from "./pages/FutsalReviews";
 import UserProfileInfo from "./pages/UserProfileInfo";
+import FutsalGallery from "./pages/FutsalGallery";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/futsals/:id" element={<FacilityDetails />} />
               <Route path="/futsals/:id/bookings" element={<FutsalBookings />} />
               <Route path="/futsals/:id/reviews" element={<FutsalReviews />} />
+              <Route path="/futsals/:id/gallery" element={<FutsalGallery />} />
               <Route path="/auth/login" element={<Login />} />
               <Route path="/auth/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/reset-password" element={<ResetPassword />} />

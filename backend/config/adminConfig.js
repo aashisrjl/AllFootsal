@@ -68,6 +68,9 @@ const setupAdminPanel = (app) => {
 	const adminJs = new AdminJS({
 		databases: [sequelize],
 		rootPath: ADMIN_FRONTEND_URL,
+		assets: {
+			styles: ['/admin-dark.css'],
+		},
 		dashboard: {
 			component: AdminJS.bundle('../components/dashboard-components.jsx'),
 			handler: buildDashboardHandler,

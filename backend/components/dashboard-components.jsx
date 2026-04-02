@@ -256,7 +256,7 @@ const Dashboard = () => {
                                 <li
                                   key={table.tableName}
                                   style={{
-                                    color: table.exists ? '#16a34a' : '#dc2626',
+                                    color: table.exists ? '#4ade80' : '#f87171',
                                   }}
                                 >
                                   {table.tableName} {table.exists ? '✓' : '✗'}
@@ -312,7 +312,7 @@ const Dashboard = () => {
 const styles = {
   page: {
     padding: '24px',
-    background: '#f8fafc',
+    background: '#0b1220',
     minHeight: '100vh',
     fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
   },
@@ -323,11 +323,11 @@ const styles = {
     margin: 0,
     fontSize: '28px',
     fontWeight: 700,
-    color: '#0f172a',
+    color: '#f8fafc',
   },
   subtitle: {
     marginTop: '8px',
-    color: '#475569',
+    color: '#94a3b8',
   },
   grid: {
     display: 'grid',
@@ -336,25 +336,25 @@ const styles = {
     marginBottom: '20px',
   },
   card: {
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
+    background: '#111827',
+    border: '1px solid #1f2937',
     borderRadius: '12px',
     padding: '16px',
   },
   cardLabel: {
     margin: 0,
     fontSize: '13px',
-    color: '#64748b',
+    color: '#9ca3af',
   },
   cardValue: {
     margin: '8px 0 0',
     fontSize: '24px',
     fontWeight: 700,
-    color: '#0f172a',
+    color: '#f8fafc',
   },
   tableSection: {
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
+    background: '#111827',
+    border: '1px solid #1f2937',
     borderRadius: '12px',
     padding: '16px',
     marginTop: '20px',
@@ -362,7 +362,7 @@ const styles = {
   sectionTitle: {
     margin: '0 0 12px',
     fontSize: '18px',
-    color: '#0f172a',
+    color: '#f8fafc',
   },
   tableWrap: {
     overflowX: 'auto',
@@ -374,21 +374,21 @@ const styles = {
   th: {
     textAlign: 'left',
     fontSize: '13px',
-    color: '#475569',
-    borderBottom: '1px solid #e2e8f0',
+    color: '#cbd5e1',
+    borderBottom: '1px solid #1f2937',
     padding: '10px 8px',
   },
   td: {
     fontSize: '14px',
-    color: '#0f172a',
-    borderBottom: '1px solid #f1f5f9',
+    color: '#e5e7eb',
+    borderBottom: '1px solid #1f2937',
     padding: '10px 8px',
   },
   info: {
-    color: '#475569',
+    color: '#94a3b8',
   },
   error: {
-    color: '#b91c1c',
+    color: '#fca5a5',
   },
   tenantCards: {
     display: 'grid',
@@ -396,8 +396,8 @@ const styles = {
     gap: '12px',
   },
   tenantCard: {
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
+    background: '#0f172a',
+    border: '1px solid #1e293b',
     borderRadius: '8px',
     overflow: 'hidden',
   },
@@ -407,19 +407,19 @@ const styles = {
     alignItems: 'center',
     padding: '12px',
     cursor: 'pointer',
-    backgroundColor: '#f8fafc',
-    borderBottom: '1px solid #e2e8f0',
+    backgroundColor: '#111827',
+    borderBottom: '1px solid #1e293b',
   },
   tenantCardTitle: {
     margin: '0 0 4px',
     fontSize: '15px',
     fontWeight: 600,
-    color: '#0f172a',
+    color: '#f8fafc',
   },
   tenantCardSubtitle: {
     margin: 0,
     fontSize: '12px',
-    color: '#64748b',
+    color: '#94a3b8',
   },
   tenantCardStatus: {
     display: 'flex',
@@ -435,33 +435,33 @@ const styles = {
     whiteSpace: 'nowrap',
   },
   badgeSuccess: {
-    backgroundColor: '#dcfce7',
-    color: '#166534',
+    backgroundColor: '#14532d',
+    color: '#bbf7d0',
   },
   badgeWarning: {
-    backgroundColor: '#fef3c7',
-    color: '#92400e',
+    backgroundColor: '#78350f',
+    color: '#fde68a',
   },
   badgeActive: {
-    backgroundColor: '#dbeafe',
-    color: '#0c4a6e',
+    backgroundColor: '#1e3a8a',
+    color: '#bfdbfe',
   },
   badgeInactive: {
-    backgroundColor: '#fee2e2',
-    color: '#7f1d1d',
+    backgroundColor: '#7f1d1d',
+    color: '#fecaca',
   },
   toggleIcon: {
     fontSize: '12px',
-    color: '#648748b',
+    color: '#9ca3af',
   },
   tenantCardDetails: {
     padding: '12px',
-    borderTop: '1px solid #e2e8f0',
+    borderTop: '1px solid #1e293b',
   },
   detailText: {
     margin: '0 0 8px',
     fontSize: '12px',
-    color: '#334155',
+    color: '#cbd5e1',
   },
   tableList: {
     marginTop: '12px',
