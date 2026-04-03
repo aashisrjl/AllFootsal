@@ -385,7 +385,7 @@ const UserProfileInfo = () => {
                    {forums.slice(0, 6).map((f: any) => (
                       <div 
                          key={f.id} 
-                         onClick={() => navigate(`/forum/${f.slug || f.id}`)}
+                         onClick={() => navigate(`/forum/${f.id}`)}
                          className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2.5 hover:border-emerald-500/50 cursor-pointer transition-colors group"
                       >
                          <h3 className="text-slate-100 font-bold text-md leading-tight group-hover:text-emerald-400 transition-colors">{f.title}</h3>

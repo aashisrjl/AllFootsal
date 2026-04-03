@@ -154,12 +154,7 @@ const loginFootsal = async (identifier: string, password: string): Promise<boole
 };
 
 const logout = async () => {
-  try {
-    await logoutUser();
-  } catch (err) {
-    console.error("Logout API error:", err);
-  }
-
+  // Reset auth state immediately so the UI reflects logged-out before any navigation
   setAuthState({
     user: null,
     isAuthenticated: false,
@@ -167,19 +162,21 @@ const logout = async () => {
   });
 
   try {
-    localStorage.removeItem("utoken");
-  } catch {
-    return;
+    await logoutUser(); // tells the server to clear the httpOnly cookie
+  } catch (err) {
+    console.error("Logout API error:", err);
   }
+
+  try {
+    localStorage.removeItem("utoken");
+  } catch { /* ignore */ }
 
   toast({
     title: "Logged out successfully",
   });
 
-  // Force hard reload to clear all cookies and browser state
-  setTimeout(() => {
-    window.location.href = "/";
-  }, 500);
+  // Use a non-reload redirect — avoids re-triggering bootstrapAuth with a stale cookie
+  window.location.replace("/auth/login");
 };
 
 const registerUser = async (
