@@ -16,9 +16,9 @@ import {
 import { ForumUserSnippet } from "@/components/ForumUserSnippet";
 
 const categoryColors: Record<string, string> = {
-  Announcement: "bg-emerald-500/15 text-emerald-300 border-emerald-400/40",
-  General: "bg-sky-500/10 text-sky-200 border-sky-400/40",
-  Help: "bg-amber-500/15 text-amber-200 border-amber-400/40",
+  Announcement: "bg-emerald-500/15 text-emerald-700 border-emerald-400/40 dark:text-emerald-300",
+  General: "bg-sky-500/10 text-sky-700 border-sky-400/40 dark:text-sky-200",
+  Help: "bg-amber-500/15 text-amber-700 border-amber-400/40 dark:text-amber-200",
 };
 
 const getCategoryColor = (category: string) => {
@@ -44,7 +44,7 @@ const ForumCard: React.FC<{ thread: ForumApiData }> = ({ thread }) => {
   const likesCount = Array.isArray(likesData) ? likesData.length : (typeof likesData === 'number' ? likesData : 0);
 
   return (
-    <article className="flex flex-col sm:flex-row gap-3 sm:gap-4 px-4 sm:px-5 py-4 hover:bg-slate-900/80 transition border-b border-slate-800/50 last:border-0">
+    <article className="flex flex-col sm:flex-row gap-3 sm:gap-4 px-4 sm:px-5 py-4 hover:bg-slate-100 dark:hover:bg-slate-900/80 transition border-b border-slate-200 dark:border-slate-800/50 last:border-0">
       <div className="flex-1 min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <span
@@ -63,7 +63,7 @@ const ForumCard: React.FC<{ thread: ForumApiData }> = ({ thread }) => {
           )}
         </div>
         <Link to={`/forum/${thread.id}`}>
-          <h3 className="mt-2 text-sm sm:text-base font-semibold text-slate-50 line-clamp-2 hover:text-emerald-400 hover:underline transition-colors block shrink-0">
+          <h3 className="mt-2 text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-50 line-clamp-2 hover:text-emerald-600 dark:hover:text-emerald-400 hover:underline transition-colors block shrink-0">
             {thread.title}
           </h3>
         </Link>
@@ -77,7 +77,7 @@ const ForumCard: React.FC<{ thread: ForumApiData }> = ({ thread }) => {
           <button 
             onClick={(e) => { e.preventDefault(); likeMutation.mutate(); }}
             disabled={likeMutation.isPending}
-            className="inline-flex items-center gap-1.5 text-slate-400 bg-slate-900 border border-slate-700 rounded-full px-2.5 py-1 hover:text-emerald-400 hover:border-emerald-500/50 transition-colors"
+            className="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-full px-2.5 py-1 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-500/50 transition-colors"
           >
             <ThumbsUp className={`h-3 w-3 ${likeMutation.isPending ? 'animate-bounce text-emerald-400' : ''}`} />
             <span className="font-medium">{likesCount} Likes</span>
@@ -145,7 +145,7 @@ const Forum: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300">
       <Header />
 
       <main className="flex-1 container mx-auto px-4 py-16 pt-28">
@@ -180,7 +180,7 @@ const Forum: React.FC = () => {
               </div>
             </div>
 
-            <div className="rounded-2xl bg-slate-900/80 border border-emerald-500/40 shadow-[0_18px_45px_rgba(16,185,129,0.35)] p-6 space-y-4 backdrop-blur">
+            <div className="rounded-2xl bg-slate-100 dark:bg-slate-900/80 border border-emerald-200 dark:border-emerald-500/40 shadow-lg p-6 space-y-4">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center">
                   <MessageCircle className="h-5 w-5" />
@@ -218,7 +218,7 @@ const Forum: React.FC = () => {
                       onClick={() => setActiveFilter(filter)}
                       className={`px-3 py-1.5 rounded-full border text-xs sm:text-[0.8rem] transition ${activeFilter === filter
                           ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow-md"
-                          : "bg-slate-900/60 border-slate-700 text-slate-300 hover:border-emerald-300/60"
+                          : "bg-slate-100 dark:bg-slate-900/60 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-emerald-400/60"
                         }`}
                     >
                       {filter}
@@ -227,7 +227,7 @@ const Forum: React.FC = () => {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 divide-y divide-slate-800 shadow-xl overflow-hidden min-h-[300px]">
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/70 divide-y divide-slate-100 dark:divide-slate-800 shadow-xl overflow-hidden min-h-[300px]">
                 {isLoading ? (
                   <div className="flex flex-col items-center justify-center p-12 text-slate-400 gap-3">
                     <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
@@ -248,7 +248,7 @@ const Forum: React.FC = () => {
 
             {/* New topic + guidelines */}
             <aside className="space-y-4">
-              <div className="rounded-2xl border border-emerald-500/40 bg-slate-950/80 p-5 sm:p-6 shadow-[0_18px_45px_rgba(16,185,129,0.4)] backdrop-blur">
+              <div className="rounded-2xl border border-emerald-200 dark:border-emerald-500/40 bg-slate-50 dark:bg-slate-950/80 p-5 sm:p-6 shadow-lg backdrop-blur">
                 <h2 className="text-base sm:text-lg font-semibold text-slate-50 flex items-center gap-2 mb-3">
                   <MessageCircle className="h-5 w-5 text-emerald-300" />
                   Start a new topic
@@ -261,7 +261,7 @@ const Forum: React.FC = () => {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder="What would you like to discuss?"
-                      className="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                      className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                       disabled={createForumMutation.isPending}
                     />
                   </div>
@@ -271,7 +271,7 @@ const Forum: React.FC = () => {
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                      className="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                      className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                       disabled={createForumMutation.isPending}
                     >
                       <option value="General">General</option>
@@ -287,7 +287,7 @@ const Forum: React.FC = () => {
                       onChange={(e) => setContent(e.target.value)}
                       rows={4}
                       placeholder="Share context, times, venue details, or what you’re looking for..."
-                      className="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none transition-colors"
+                      className="w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none transition-colors"
                       disabled={createForumMutation.isPending}
                     />
                   </div>
@@ -322,7 +322,7 @@ const Forum: React.FC = () => {
                 </form>
               </div>
 
-              <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-5 sm:p-6 space-y-3 text-xs sm:text-sm text-slate-300 backdrop-blur">
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 p-5 sm:p-6 space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300 backdrop-blur">
                 <h3 className="text-sm font-semibold text-slate-100">Forum tips</h3>
                 <ul className="space-y-1.5">
                   <li>• Use descriptive titles so others can help quickly.</li>

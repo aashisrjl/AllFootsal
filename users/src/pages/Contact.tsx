@@ -88,7 +88,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 const Input: React.FC<InputProps> = (props) => (
     <input 
-        className="flex h-11 w-full rounded-lg border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:bg-white transition-all duration-200"
+        className="flex h-11 w-full rounded-lg border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800 px-3 py-2 text-sm text-gray-900 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:bg-white dark:focus:bg-slate-700 transition-all duration-200"
         {...props} 
     />
 );
@@ -98,7 +98,7 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
 
 const Textarea: React.FC<TextareaProps> = (props) => (
     <textarea 
-        className="flex min-h-[120px] w-full rounded-lg border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:bg-white transition-all duration-200"
+        className="flex min-h-[120px] w-full rounded-lg border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800 px-3 py-2 text-sm text-gray-900 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:bg-white dark:focus:bg-slate-700 transition-all duration-200"
         {...props} 
     />
 );
@@ -106,7 +106,7 @@ const Textarea: React.FC<TextareaProps> = (props) => (
 // 5. Card Components
 interface CardProps { children: React.ReactNode; className?: string; style?: React.CSSProperties }
 const Card: React.FC<CardProps> = ({ children, className, style }) => (
-    <div style={style} className={`bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden ${className}`}>
+    <div style={style} className={`bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden ${className}`}>
         {children}
     </div>
 );
@@ -114,10 +114,10 @@ const CardHeader: React.FC<CardProps> = ({ children, className }) => (
     <div className={`flex flex-col space-y-1.5 p-6 ${className}`}>{children}</div>
 );
 const CardTitle: React.FC<CardProps> = ({ children, className }) => (
-    <h3 className={`text-xl font-bold tracking-tight text-gray-900 ${className}`}>{children}</h3>
+    <h3 className={`text-xl font-bold tracking-tight text-gray-900 dark:text-slate-100 ${className}`}>{children}</h3>
 );
 const CardDescription: React.FC<CardProps> = ({ children, className }) => (
-    <p className={`text-sm text-gray-500 ${className}`}>{children}</p>
+    <p className={`text-sm text-gray-500 dark:text-slate-400 ${className}`}>{children}</p>
 );
 const CardContent: React.FC<CardProps> = ({ children, className }) => (
     <div className={`p-6 pt-0 ${className}`}>{children}</div>
@@ -186,14 +186,14 @@ const Contact: React.FC = () => {
   };
 
   const contactDetails = [
-    { icon: MapPin, title: "Our Location", text: "Thamel, Kathmandu, Nepal", color: "text-emerald-600", bg: "bg-emerald-50" },
-    { icon: Phone, title: "Support Line", text: "+977 1 234 5678", color: "text-sky-600", bg: "bg-sky-50" },
-    { icon: Mail, title: "Email Us", text: "info@goalfutsal.com.np", color: "text-emerald-600", bg: "bg-emerald-50" },
-    { icon: Clock, title: "Open Hours", text: "Sun - Fri: 9am - 9pm", color: "text-sky-600", bg: "bg-sky-50" },
+    { icon: MapPin, title: "Our Location", text: "Thamel, Kathmandu, Nepal", color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-900/30" },
+    { icon: Phone, title: "Support Line", text: "+977 1 234 5678", color: "text-sky-600", bg: "bg-sky-50 dark:bg-sky-900/30" },
+    { icon: Mail, title: "Email Us", text: "info@goalfutsal.com.np", color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-900/30" },
+    { icon: Clock, title: "Open Hours", text: "Sun - Fri: 9am - 9pm", color: "text-sky-600", bg: "bg-sky-50 dark:bg-sky-900/30" },
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 font-sans relative overflow-x-hidden">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-slate-100 font-sans relative overflow-x-hidden transition-colors duration-300">
       <style>{animationStyle}</style>
 
       {/* Decorative Background Elements */}
@@ -217,11 +217,11 @@ const Contact: React.FC = () => {
               <span className="text-xs font-semibold uppercase tracking-wider text-emerald-800">We respond fast</span>
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-slate-50 tracking-tight">
               Get in touch with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-sky-600">AllFutsal</span>
             </h1>
             
-            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl text-gray-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
               Have questions about pitch booking, technical support, or partnership opportunities? We're here to help you get back in the game.
             </p>
           </div>
@@ -252,7 +252,7 @@ const Contact: React.FC = () => {
                     <form onSubmit={handleSubmit} className="space-y-5">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-2">
-                          <label htmlFor="name" className="text-sm font-medium text-gray-700">Full Name</label>
+                          <label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-slate-300">Full Name</label>
                           <Input
                             id="name"
                             name="name"
@@ -263,7 +263,7 @@ const Contact: React.FC = () => {
                           />
                         </div>
                         <div className="space-y-2">
-                          <label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address</label>
+                          <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-slate-300">Email Address</label>
                           <Input
                             id="email"
                             name="email"
@@ -277,7 +277,7 @@ const Contact: React.FC = () => {
                       </div>
                       
                       <div className="space-y-2">
-                        <label htmlFor="subject" className="text-sm font-medium text-gray-700">Subject</label>
+                        <label htmlFor="subject" className="text-sm font-medium text-gray-700 dark:text-slate-300">Subject</label>
                         <Input
                           id="subject"
                           name="subject"
@@ -289,7 +289,7 @@ const Contact: React.FC = () => {
                       </div>
                       
                       <div className="space-y-2">
-                        <label htmlFor="message" className="text-sm font-medium text-gray-700">Message</label>
+                        <label htmlFor="message" className="text-sm font-medium text-gray-700 dark:text-slate-300">Message</label>
                         <Textarea
                           id="message"
                           name="message"
@@ -335,13 +335,13 @@ const Contact: React.FC = () => {
                 </CardHeader>
                 <CardContent className="grid gap-4">
                   {contactDetails.map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-4 p-3 rounded-xl hover:bg-white hover:shadow-md transition-all duration-300 border border-transparent hover:border-gray-100">
+                    <div key={idx} className="flex items-start gap-4 p-3 rounded-xl hover:bg-white dark:hover:bg-slate-800 hover:shadow-md transition-all duration-300 border border-transparent hover:border-gray-100 dark:hover:border-slate-700">
                       <div className={`p-3 rounded-lg ${item.bg}`}>
                         <item.icon className={`h-5 w-5 ${item.color}`} />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-900">{item.title}</p>
-                        <p className="text-sm text-gray-600">{item.text}</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">{item.title}</p>
+                        <p className="text-sm text-gray-600 dark:text-slate-400">{item.text}</p>
                       </div>
                     </div>
                   ))}
@@ -384,8 +384,8 @@ const Contact: React.FC = () => {
           {/* 3. FAQ Section */}
           <div className="animate-fadeInUp" style={{ animationDelay: "0.4s" }}>
              <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold text-gray-900">Frequently Asked Questions</h2>
-                <p className="text-gray-500 mt-2">Quick answers to common questions.</p>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Frequently Asked Questions</h2>
+                <p className="text-gray-500 dark:text-slate-400 mt-2">Quick answers to common questions.</p>
              </div>
              
              <div className="grid md:grid-cols-3 gap-6">
@@ -394,12 +394,12 @@ const Contact: React.FC = () => {
                   { q: "Can I cancel my booking?", a: "Yes, cancellations made 24 hours prior to the match time are eligible for a full refund." },
                   { q: "Do you offer memberships?", a: "Some venues offer membership cards directly through our platform for discounted rates." },
                 ].map((faq, i) => (
-                  <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                    <div className="h-10 w-10 bg-sky-50 rounded-full flex items-center justify-center mb-4">
+                  <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 hover:shadow-md transition-shadow">
+                    <div className="h-10 w-10 bg-sky-50 dark:bg-sky-900/30 rounded-full flex items-center justify-center mb-4">
                       <HelpCircle className="h-5 w-5 text-sky-600" />
                     </div>
-                    <h3 className="font-bold text-gray-900 mb-2">{faq.q}</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">{faq.a}</p>
+                    <h3 className="font-bold text-gray-900 dark:text-slate-100 mb-2">{faq.q}</h3>
+                    <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{faq.a}</p>
                   </div>
                 ))}
              </div>
