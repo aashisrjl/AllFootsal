@@ -235,39 +235,42 @@ const VerifyOtp = async (req, res) => {
 //logout api
 const Logout = async (req, res) => {
   try {
-    const utoken = req.cookies.utoken || req.headers.utoken;
-    const ftoken = req.cookies.ftoken || req.headers.ftoken;
+    const cookieOpts = {
+      path: "/",
+      httpOnly: true,
+      secure: NODE_ENV === "production",
+      sameSite: "lax",
+    };
 
-    const userId = req.user?.id;
-    const futsalId = req.futsal?.id;
+    // Always clear both cookies — the route has no auth middleware so
+    // req.user / req.futsal are not populated. We resolve identity from
+    // the raw token so we can mark is_active = false as a best-effort.
+    const jwt = require("jsonwebtoken");
 
-    if (utoken && userId) {
-      await User.update(
-        { is_active: false },
-        { where: { id: userId } }
-      );
-        res.clearCookie("utoken", {
-          path: "/",
-    httpOnly: true,
-    secure: NODE_ENV === "production",
-    sameSite: "lax",
-  });
+    const utoken = req.cookies.utoken;
+    if (utoken) {
+      try {
+        const decoded = jwt.verify(utoken, JWT_SECRET_USER || "fallback-user-secret");
+        if (decoded?.id) {
+          await User.update({ is_active: false }, { where: { id: decoded.id } });
+        }
+      } catch (_) { /* token expired/invalid — still clear it */ }
+      res.clearCookie("utoken", cookieOpts);
     }
 
-    if (ftoken && futsalId) {
-      await Footsal.update(
-        { is_active: false },
-        { where: { id: futsalId } }
-      );
-      res.clearCookie("ftoken", {
-        path: "/",
-    httpOnly: true,
-    secure: NODE_ENV === "production",
-    sameSite: "lax",
-  });
+    const ftoken = req.cookies.ftoken;
+    if (ftoken) {
+      try {
+        const decoded = jwt.verify(ftoken, JWT_SECRET_FUTSAL || "fallback-futsal-secret");
+        if (decoded?.id) {
+          await Footsal.update({ is_active: false }, { where: { id: decoded.id } });
+        }
+      } catch (_) { /* token expired/invalid — still clear it */ }
+      res.clearCookie("ftoken", cookieOpts);
     }
 
     return res.status(200).json({
+      success: true,
       message: "Logout successful",
     });
 
