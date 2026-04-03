@@ -51,15 +51,15 @@ const Button: React.FC<ButtonProps> = ({
 // 2. Card Components
 interface CardProps { children: React.ReactNode; className?: string; }
 const Card: React.FC<CardProps> = ({ children, className }) => (
-    <div className={`bg-white rounded-xl shadow-2xl border border-gray-100 p-8 transition-all duration-500 ${className}`}>
+    <div className={`bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-800 p-8 transition-all duration-500 ${className}`}>
         {children}
     </div>
 );
 const CardTitle: React.FC<CardProps> = ({ children, className }) => (
-    <h3 className={`text-2xl font-bold tracking-tight text-gray-900 ${className}`}>{children}</h3>
+    <h3 className={`text-2xl font-bold tracking-tight text-gray-900 dark:text-slate-100 ${className}`}>{children}</h3>
 );
 const CardDescription: React.FC<CardProps> = ({ children, className }) => (
-    <p className={`text-base text-gray-600 ${className}`}>{children}</p>
+    <p className={`text-base text-gray-600 dark:text-slate-400 ${className}`}>{children}</p>
 );
 
 // Custom Animation Class (for subtle entrance)
@@ -123,8 +123,8 @@ interface FeatureItemProps {
 
 const FeatureItem: React.FC<FeatureItemProps> = ({ text, isIncluded, color }) => (
     <li className="flex items-start space-x-3 py-1">
-        <CheckCircle className={`h-5 w-5 shrink-0 ${isIncluded ? color : 'text-gray-400'}`} />
-        <span className={`${isIncluded ? 'text-gray-700' : 'text-gray-400 line-through'}`}>
+        <CheckCircle className={`h-5 w-5 shrink-0 ${isIncluded ? color : 'text-gray-400 dark:text-slate-600'}`} />
+        <span className={`${isIncluded ? 'text-gray-700 dark:text-slate-300' : 'text-gray-400 dark:text-slate-600 line-through'}`}>
             {text}
         </span>
     </li>
@@ -169,8 +169,8 @@ const PriceOptionCard: React.FC<{
     const effectiveTotal = details.amount * details.totalDuration;
 
     return (
-        <div className={`p-6 rounded-xl border-2 ${isYearly ? 'border-sky-500 bg-sky-50 shadow-lg' : 'border-gray-200 bg-white'} transition-all duration-300 hover:shadow-xl hover:border-sky-500`}>
-            <h4 className="text-xl font-extrabold text-gray-900 mb-2">
+        <div className={`p-6 rounded-xl border-2 ${isYearly ? 'border-sky-500 bg-sky-50 dark:bg-sky-950/40 shadow-lg' : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900'} transition-all duration-300 hover:shadow-xl hover:border-sky-500`}>
+            <h4 className="text-xl font-extrabold text-gray-900 dark:text-slate-100 mb-2">
                 {cycle === 'monthly' ? 'Monthly' : cycle === 'six_months' ? 'Half-Yearly (6 Months)' : 'Annual (1 Year)'}
             </h4>
             
@@ -180,10 +180,10 @@ const PriceOptionCard: React.FC<{
                 </div>
             )}
             
-            <p className="text-4xl font-extrabold text-gray-900 my-3">
+            <p className="text-4xl font-extrabold text-gray-900 dark:text-slate-100 my-3">
                 Rs {effectiveTotal.toLocaleString()}
             </p>
-            <p className="text-sm font-medium text-gray-500">
+            <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
                 {isMonthly ? 'Billed monthly' : `Total up-front payment`}
             </p>
 
@@ -193,7 +193,7 @@ const PriceOptionCard: React.FC<{
                 </p>
             )}
             
-            <p className="text-sm font-bold text-gray-700 mt-4 border-t pt-3">
+            <p className="text-sm font-bold text-gray-700 dark:text-slate-300 mt-4 border-t border-gray-200 dark:border-slate-700 pt-3">
                 Rs {details.amount.toLocaleString()} / month (effective)
             </p>
 
@@ -218,7 +218,7 @@ const Pricing: React.FC = () => {
 
     return (
         <>
-        <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50 text-gray-900 font-sans relative overflow-hidden">
+        <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-gray-900 dark:text-slate-100 font-sans relative overflow-hidden transition-colors duration-300">
             {styleElement}
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
                 <div className="absolute -left-10 -top-20 h-64 w-64 rounded-full bg-emerald-300/40 blur-3xl animate-float" />
@@ -241,7 +241,7 @@ const Pricing: React.FC = () => {
                             <h1 className="text-5xl sm:text-6xl font-extrabold leading-tight tracking-tight">
                                 Pricing that gets you <span className="text-transparent bg-clip-text gradient-shift text-white rounded-lg mt-6">booked fast</span>.
                             </h1>
-                            <p className="text-xl text-gray-600 max-w-2xl">
+                            <p className="text-xl text-gray-600 dark:text-slate-400 max-w-2xl">
                                 Launch a digital-ready futsal venue with payments, analytics, and bookings in minutes. No hidden fees—just pick the duration that matches your ambition.
                             </p>
                             <div className="flex flex-wrap gap-4">
@@ -261,9 +261,9 @@ const Pricing: React.FC = () => {
                                     { label: "Support", value: "24/7" },
                                     { label: "Venues onboarded", value: "120+" },
                                 ].map((item) => (
-                                    <div key={item.label} className="rounded-xl bg-white/70 border border-emerald-100 px-4 py-3 shadow-sm backdrop-blur">
-                                        <p className="text-sm text-gray-500">{item.label}</p>
-                                        <p className="text-2xl font-bold text-gray-900">{item.value}</p>
+                                    <div key={item.label} className="rounded-xl bg-white/70 dark:bg-slate-800/70 border border-emerald-100 dark:border-slate-700 px-4 py-3 shadow-sm backdrop-blur">
+                                        <p className="text-sm text-gray-500 dark:text-slate-400">{item.label}</p>
+                                        <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">{item.value}</p>
                                     </div>
                                 ))}
                             </div>
@@ -304,7 +304,7 @@ const Pricing: React.FC = () => {
                         <div className="text-center mb-10 space-y-3">
                             <p className="text-emerald-600 font-semibold uppercase tracking-[0.2em] text-xs">Owners</p>
                             <h2 className="text-4xl font-extrabold">Choose the duration that suits you</h2>
-                            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                            <p className="text-lg text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">
                                 The same all-in-one platform, with flexible billing that rewards commitment.
                             </p>
                         </div>
@@ -337,7 +337,7 @@ const Pricing: React.FC = () => {
                                 ))}
                             </ul>
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-8">
-                                <p className="text-gray-500 italic text-sm">
+                                <p className="text-gray-500 dark:text-slate-400 italic text-sm">
                                     *All plans include a 7-day free trial. Cancel anytime before billing starts.
                                 </p>
                                 <Button variant="outline" className="border-gray-300 text-gray-800" onClick={() => console.log("Download feature sheet")}>
@@ -403,7 +403,7 @@ const Pricing: React.FC = () => {
                     </div>
 
                     {/* CTA */}
-                    <div className={`text-center p-10 bg-white rounded-2xl shadow-xl border border-emerald-100 ${ANIMATION_CLASSES}`} style={{ animationDelay: '0.85s' }}>
+                    <div className={`text-center p-10 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-emerald-100 dark:border-slate-800 ${ANIMATION_CLASSES}`} style={{ animationDelay: '0.85s' }}>
                         <div className="flex flex-col gap-3 items-center">
                             <span className="px-4 py-1 rounded-full bg-emerald-50 text-emerald-700 font-semibold text-xs uppercase tracking-[0.2em]">Need more?</span>
                             <h3 className="text-3xl font-bold text-gray-900">Multi-branch or custom requirements?</h3>
