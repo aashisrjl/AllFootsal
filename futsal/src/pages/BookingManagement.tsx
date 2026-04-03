@@ -61,6 +61,18 @@ const BookingManagement = () => {
     }
   };
 
+  const handleUnconfirmBooking = async (id: number) => {
+    if (!window.confirm("Are you sure you want to unconfirm this booking?")) return;
+    try {
+      // Optimistic
+      setBookings(bookings.map(b => b.id === id ? { ...b, status: 'pending' } : b));
+      await api.patch(`/futsal/bookings/${id}/unconfirm`);
+    } catch (error) {
+      console.error('Failed to unconfirm booking', error);
+      fetchBookings(); // revert
+    }
+  };
+
   // Filter bookings by status and selectedDate (if date filtering is desired)
   const filteredBookings = bookings.filter(booking => {
     let match = true;
@@ -211,7 +223,10 @@ const BookingManagement = () => {
                       </div>
                     )}
                     {booking.status === 'confirmed' && (
-                      <button onClick={() => handleCancelBooking(booking.id)} className="bg-rose-500/10 text-rose-400 px-3 py-1.5 rounded-lg border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all mr-2">Cancel</button>
+                      <div className="flex gap-2">
+                        <button onClick={() => handleUnconfirmBooking(booking.id)} className="bg-amber-500/10 text-amber-400 px-3 py-1.5 rounded-lg border border-amber-500/20 hover:bg-amber-500 hover:text-white transition-all">Unconfirm</button>
+                        <button onClick={() => handleCancelBooking(booking.id)} className="bg-rose-500/10 text-rose-400 px-3 py-1.5 rounded-lg border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all mr-2">Cancel</button>
+                      </div>
                     )}
                     {booking.status !== 'pending' && booking.status !== 'confirmed' && (
                       <button className="text-slate-400 hover:text-white underline decoration-slate-600 underline-offset-4 transition-colors">Details</button>

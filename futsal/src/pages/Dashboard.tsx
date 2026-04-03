@@ -7,18 +7,63 @@ const Dashboard = () => {
   const { futsalProfile } = useAuth();
   const [analytics, setAnalytics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [todayBookings, setTodayBookings] = useState<any[]>([]);
+  const [weeklyData, setWeeklyData] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const [analyticsRes] = await Promise.all([
+        const [analyticsRes, bookingsRes] = await Promise.all([
           api.get('/futsal/analytics/fetch').catch(() => null),
-          // api.get('/futsal-bookings').catch(() => null)
+          api.get('/futsal-bookings').catch(() => null)
         ]);
         
         if (analyticsRes?.data?.success) {
           setAnalytics(analyticsRes.data.data);
+        }
+
+        if (bookingsRes?.data?.success) {
+          const bookings = bookingsRes.data.data;
+          const todayDate = new Date().toISOString().split('T')[0];
+          
+          const todays = bookings.filter((b: any) => b.booking_date?.split('T')[0] === todayDate).map((b: any) => ({
+            time: `${b.start_time?.substring(0, 5) || ''} - ${b.end_time?.substring(0, 5) || ''}`,
+            pitch: b.pitch_name || 'Pitch',
+            player: b.user_name || 'Guest',
+            status: b.status,
+            avatar: (b.user_name || 'G').substring(0, 2).toUpperCase()
+          }));
+          setTodayBookings(todays);
+
+          const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          const tempWeekly: any = {};
+          
+          for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            tempWeekly[dateStr] = {
+              day: days[d.getDay()],
+              value: 0
+            };
+          }
+
+          bookings.forEach((b: any) => {
+             const bDate = b.booking_date?.split('T')[0];
+             if (tempWeekly[bDate] && b.status !== 'cancelled') {
+                tempWeekly[bDate].value += (b.amount || 0);
+             }
+          });
+
+          const rawWeekly = Object.values(tempWeekly) as any[];
+          const maxVal = Math.max(...rawWeekly.map((w: any) => w.value), 1); 
+          
+          setWeeklyData(rawWeekly.map((w: any) => ({
+            day: w.day,
+            actualValue: w.value,
+            value: Math.floor((w.value / maxVal) * 100)
+          })));
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -33,25 +78,6 @@ const Dashboard = () => {
     { name: 'Total Revenue', value: `$${analytics?.totalRevenue || 0}`, icon: DollarSign, change: '+12%', changeType: 'increase', color: 'text-blue-400', bgPrimary: 'bg-blue-500/10', borderPrimary: 'border-blue-500/20' },
     { name: 'Visits', value: analytics?.totalVisitors || '0', icon: Users, change: '+5', changeType: 'increase', color: 'text-purple-400', bgPrimary: 'bg-purple-500/10', borderPrimary: 'border-purple-500/20' },
     { name: 'Avg Rating', value: parseFloat(analytics?.averageRating || '0').toFixed(1), icon: TrendingUp, change: '+8%', changeType: 'increase', color: 'text-rose-400', bgPrimary: 'bg-rose-500/10', borderPrimary: 'border-rose-500/20' },
-  ];
-
-  const todayBookings = [
-    { time: '08:00 - 09:00', pitch: 'Pitch A', player: 'John Smith', status: 'confirmed', avatar: 'JS' },
-    { time: '09:00 - 10:00', pitch: 'Pitch B', player: 'Mike Johnson', status: 'confirmed', avatar: 'MJ' },
-    { time: '10:00 - 11:00', pitch: 'Pitch A', player: 'Sarah Wilson', status: 'pending', avatar: 'SW' },
-    { time: '14:00 - 15:00', pitch: 'Pitch C', player: 'Team Alpha', status: 'confirmed', avatar: 'TA' },
-    { time: '16:00 - 17:00', pitch: 'Pitch A', player: 'David Brown', status: 'pending', avatar: 'DB' },
-  ];
-
-  // Mock data for weekly revenue chart
-  const weeklyData = [
-    { day: 'Mon', value: 40 },
-    { day: 'Tue', value: 30 },
-    { day: 'Wed', value: 60 },
-    { day: 'Thu', value: 45 },
-    { day: 'Fri', value: 80 },
-    { day: 'Sat', value: 100 },
-    { day: 'Sun', value: 90 },
   ];
 
   if (loading) {
@@ -138,7 +164,7 @@ const Dashboard = () => {
                   >
                     {/* Tooltip on hover */}
                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-semibold py-1.5 px-2.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl border border-slate-700">
-                      ${item.value * 10}
+                      ${item.actualValue}
                     </div>
                   </div>
                 </div>

@@ -84,10 +84,44 @@ const getFutsalProfile = async (req,res)=>{
     })
 }
 
+const updateFutsalProfile = async (req, res) => {
+    const futsalId = req.futsalId;
+    const { ownerName, email, phoneNumber } = req.body;
+    
+    const futsal = await Footsal.findByPk(futsalId);
+    if(!futsal){
+        return res.status(400).json({
+            success:false,
+            message:"No futsal found with this id"
+        })
+    }
+
+    try {
+        if(ownerName) futsal.ownerName = ownerName;
+        if(email) futsal.email = email;
+        if(phoneNumber) futsal.phoneNumber = phoneNumber;
+
+        await futsal.save();
+
+        res.status(200).json({
+            success:true,
+            message:"Futsal profile updated successfully",
+            data:futsal
+        })
+    } catch(err) {
+        return res.status(500).json({
+            success:false,
+            message:"Error updating futsal profile",
+            error: err.message
+        })
+    }
+}
+
 
 module.exports = {
     getAllFutsal,
     getFutsalById,
     getFutsalbySubsciption_true,
-    getFutsalProfile
+    getFutsalProfile,
+    updateFutsalProfile
 }

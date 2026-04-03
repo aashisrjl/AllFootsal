@@ -2,11 +2,18 @@ import { useState, useEffect } from 'react';
 import { MapPin, Plus, Edit, ToggleLeft, ToggleRight, Wrench } from 'lucide-react';
 import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import PitchModal from '../components/PitchModal';
+import ScheduleModal from '../components/ScheduleModal';
 
 const PitchManagement = () => {
   const { futsalProfile } = useAuth();
   const [pitches, setPitches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Modal states
+  const [isPitchModalOpen, setIsPitchModalOpen] = useState(false);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [selectedPitch, setSelectedPitch] = useState<any>(null);
 
   const fetchPitches = async () => {
     if (!futsalProfile?.id) return;
@@ -56,7 +63,20 @@ const PitchManagement = () => {
     }
   };
 
-  const editPitch = (id: number) => { console.log(`Edit pitch ${id}`); };
+  const editPitch = (pitch: any) => { 
+    setSelectedPitch(pitch);
+    setIsPitchModalOpen(true);
+  };
+
+  const schedulePitch = (pitch: any) => {
+    setSelectedPitch(pitch);
+    setIsScheduleModalOpen(true);
+  };
+
+  const handleAddPitchClick = () => {
+    setSelectedPitch(null);
+    setIsPitchModalOpen(true);
+  };
 
   if (loading) {
     return (
@@ -73,7 +93,7 @@ const PitchManagement = () => {
            <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Pitch Management</h1>
            <p className="text-slate-400 mt-1 text-sm font-medium">Add, configure, and maintain your futsal pitches.</p>
         </div>
-        <button className="flex items-center px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:-translate-y-0.5 active:translate-y-0">
+        <button onClick={handleAddPitchClick} className="flex items-center px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:-translate-y-0.5 active:translate-y-0">
           <Plus className="h-5 w-5 mr-1" />
           Add Pitch
         </button>
@@ -167,13 +187,13 @@ const PitchManagement = () => {
 
               <div className="flex space-x-3 relative z-10 mt-auto pt-2">
                 <button
-                  onClick={() => editPitch(pitch.id)}
+                  onClick={() => editPitch(pitch)}
                   className="flex-[1] flex items-center justify-center px-4 py-3 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold transition-all border border-slate-700 hover:text-white"
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </button>
-                <button className="flex-[1.5] px-4 py-3 bg-slate-800/40 text-emerald-400 border border-emerald-500/20 rounded-xl text-sm font-bold hover:bg-emerald-500 hover:text-white transition-all">
+                <button onClick={() => schedulePitch(pitch)} className="flex-[1.5] px-4 py-3 bg-slate-800/40 text-emerald-400 border border-emerald-500/20 rounded-xl text-sm font-bold hover:bg-emerald-500 hover:text-white transition-all">
                   Schedule
                 </button>
               </div>
@@ -181,6 +201,19 @@ const PitchManagement = () => {
           </div>
         ))}
       </div>
+
+      <PitchModal 
+        isOpen={isPitchModalOpen} 
+        onClose={() => setIsPitchModalOpen(false)} 
+        pitch={selectedPitch} 
+        onSaved={fetchPitches} 
+      />
+      <ScheduleModal 
+        isOpen={isScheduleModalOpen} 
+        onClose={() => setIsScheduleModalOpen(false)} 
+        pitch={selectedPitch} 
+        futsalId={futsalProfile?.id}
+      />
     </div>
   );
 };
