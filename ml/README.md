@@ -57,14 +57,14 @@ Processed Dataset Ready
 - Python 3.10+
 - pip
 
-Current code imports:
+Current core code imports:
 - pandas
 - numpy
 
-Install manually for now (the `requirements.txt` file is currently empty):
+Install dependencies:
 
 ```bash
-pip install pandas numpy
+pip install -r requirements.txt
 ```
 
 ## Quick Start
