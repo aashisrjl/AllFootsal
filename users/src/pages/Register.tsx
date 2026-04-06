@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { LogIn, ArrowLeft } from "lucide-react";
@@ -121,7 +121,7 @@ const Register = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-white to-green-100"
+      className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-white to-green-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors duration-500"
       style={{
         backgroundImage: `url(${AuthBackground})`,
         backgroundSize: "cover",
@@ -129,35 +129,36 @@ const Register = () => {
       }}
     >
       <main className="flex flex-1 items-center justify-center py-10 px-4 mt-8">
-        <div className="bg-white/90 backdrop-blur-lg shadow-2xl rounded-3xl flex flex-col md:flex-row overflow-hidden max-w-5xl w-full border border-green-100">
+        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg shadow-2xl rounded-3xl flex flex-col md:flex-row overflow-hidden max-w-5xl w-full border border-green-100 dark:border-slate-800 transition-all duration-300">
           {/* Left side form */}
           <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center relative">
-          
 
-            <div className="flex justify-center md:justify-start mb-6 mt-4">
-              <img
-                src={logo_transparent}
-                alt="AllFutsal Logo"
-                className="h-16 w-auto object-contain transition-transform duration-300 hover:scale-105 drop-shadow-md"
-              />
-            </div>
-              <div className=" mb-3">
+            <Link to="/">
+              <div className="flex justify-center md:justify-start mb-6 mt-4">
+                <img
+                  src={logo_transparent}
+                  alt="AllFutsal Logo"
+                  className="h-16 w-auto object-contain transition-transform duration-300 hover:scale-105 drop-shadow-md dark:invert dark:brightness-100"
+                />
+              </div>
+            </Link>
+            <div className=" mb-3">
               {step === 2 && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setStep(1)}
-                  className="text-green-600 hover:text-green-700 bg-green-200 p-3 flex items-center"
+                  className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 p-3 flex items-center rounded-xl"
                 >
                   <ArrowLeft className="h-4 w-4 mr-1" /> Back
                 </Button>
               )}
             </div>
 
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-3xl font-black text-gray-900 dark:text-slate-50 mb-2 tracking-tight">
               {step === 1 ? "Create Account" : "Set Your Password"}
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-slate-400 mb-6 font-medium">
               {step === 1
                 ? "Fill in your details to begin registration."
                 : "Create a secure password to complete registration."}
@@ -166,19 +167,20 @@ const Register = () => {
             {step === 1 ? (
               <>
                 <form onSubmit={handleInfoSubmit} className="space-y-5 mt-4">
-                  <div>
-                    <Label htmlFor="fullName">Full Name</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Full Name</Label>
                     <Input
                       id="fullName"
                       placeholder="Enter your full name"
                       value={formData.fullName}
                       onChange={handleChange}
                       required
+                      className="h-12 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-emerald-500 rounded-xl"
                     />
                   </div>
 
-                  <div>
-                    <Label htmlFor="email">Email</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Email</Label>
                     <Input
                       id="email"
                       type="email"
@@ -186,11 +188,12 @@ const Register = () => {
                       value={formData.email}
                       onChange={handleChange}
                       required
+                      className="h-12 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-emerald-500 rounded-xl"
                     />
                   </div>
 
-                  <div>
-                    <Label htmlFor="phone">Phone Number</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Phone Number</Label>
                     <Input
                       id="phone"
                       type="tel"
@@ -198,56 +201,57 @@ const Register = () => {
                       value={formData.phone}
                       onChange={handleChange}
                       required
+                      className="h-12 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-emerald-500 rounded-xl"
                     />
                   </div>
 
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full h-11 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all duration-300"
+                    className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/25 transition-all duration-300"
                   >
                     {isLoading ? "Processing..." : "Next"}
                   </Button>
                 </form>
 
                 {/* Divider */}
-                <div className="flex  items-center my-6">
-                  <div className="flex-grow h-px bg-gray-300"></div>
-                  <span className="px-4 text-gray-500 text-sm">
+                <div className="flex items-center my-8">
+                  <div className="flex-grow h-px bg-slate-200 dark:bg-slate-800"></div>
+                  <span className="px-4 text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-widest">
                     or continue with
                   </span>
-                  <div className="flex-grow h-px bg-gray-300"></div>
+                  <div className="flex-grow h-px bg-slate-200 dark:bg-slate-800"></div>
                 </div>
 
                 {/* Social Login Buttons */}
-                <div className="flex justify-center items-center gap-3">
+                <div className="flex justify-center items-center gap-4">
                   <Button
                     variant="outline"
-                    className="w-auto h-11 border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                    className="flex-1 h-12 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all"
                     onClick={() => {
                       window.location.href =
                         "https://accounts.google.com/signin";
                     }}
                   >
-                    <FaGoogle className="mr-3 text-red-500 text-lg" />
+                    <FaGoogle className="text-rose-500 text-xl" />
                   </Button>
 
                   <Button
                     variant="outline"
-                    className="w-auto h-11 border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                    className="flex-1 h-12 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all"
                     onClick={() => {
                       window.location.href =
                         "https://www.facebook.com/login.php";
                     }}
                   >
-                    <FaFacebookF className="mr-3 text-blue-600 text-lg" />
+                    <FaFacebookF className="text-blue-600 text-xl" />
                   </Button>
                 </div>
               </>
             ) : (
               <form onSubmit={handlePasswordSubmit} className="space-y-5 mt-4">
-                <div>
-                  <Label htmlFor="password">Password</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Password</Label>
                   <Input
                     id="password"
                     type="password"
@@ -255,10 +259,11 @@ const Register = () => {
                     value={formData.password}
                     onChange={handleChange}
                     required
+                    className="h-12 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-emerald-500 rounded-xl"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Confirm Password</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
@@ -266,37 +271,38 @@ const Register = () => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
+                    className="h-12 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-emerald-500 rounded-xl"
                   />
                 </div>
 
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-11 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all duration-300"
+                  className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/25 transition-all duration-300"
                 >
-                  <LogIn className="mr-2 h-4 w-4" />
+                  <LogIn className="mr-2 h-5 w-5" />
                   {isLoading ? "Registering..." : "Register"}
                 </Button>
               </form>
             )}
 
-            <div className="mt-6 text-center text-gray-700 text-sm">
+            <div className="mt-8 text-center text-slate-500 dark:text-slate-400 text-sm font-medium">
               Already have an account?{" "}
               <a
                 href="/auth/login"
-                className="text-green-600 hover:text-green-700 font-semibold"
+                className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline"
               >
                 Login
               </a>
             </div>
           </div>
 
-          {/* Right side illustration - CONDITIONAL RENDERING APPLIED HERE */}
-          <div className="hidden md:flex  bg-white justify-center items-center">
+          {/* Right side illustration */}
+          <div className="hidden md:flex bg-slate-50/50 dark:bg-slate-800/30 backdrop-blur-sm justify-center items-center p-12">
             <img
-              src={currentIllustration} // Use the conditionally determined illustration source
-              alt={illustrationAltText} // Use the correct alt text
-              className="w-100 object-fit p-8"
+              src={currentIllustration}
+              alt={illustrationAltText}
+              className="w-full h-auto object-contain drop-shadow-2xl animate-float rounded-xl"
             />
           </div>
         </div>
