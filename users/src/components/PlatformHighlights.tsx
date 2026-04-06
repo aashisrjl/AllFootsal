@@ -6,8 +6,9 @@ import admin_page from "@/assets/ui-img/admin.png";
 
 export default function PlatformHighlights() {
   return (
-    <section id="platforms" className="py-20 sm:py-24 bg-white dark:bg-slate-950 transition-colors duration-500">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="platforms" className="relative py-20 sm:py-24 bg-white dark:bg-slate-950 transition-colors duration-500 overflow-hidden">
+      <div className="absolute inset-0 dark:bg-[radial-gradient(circle_at_15%_15%,rgba(16,185,129,0.15),transparent_50%),radial-gradient(circle_at_85%_85%,rgba(14,165,233,0.15),transparent_50%)] pointer-events-none" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <motion.div
           className="text-center"
           initial={{ opacity: 0, y: 24 }}

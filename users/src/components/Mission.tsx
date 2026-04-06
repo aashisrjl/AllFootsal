@@ -5,9 +5,10 @@ export default function Mission() {
   return (
     <section
       id="mission"
-      className="relative py-20 sm:py-24 bg-white dark:bg-slate-950 transition-colors duration-500"
+      className="relative py-20 sm:py-24 bg-white dark:bg-slate-950 transition-colors duration-500 overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="absolute inset-0 dark:bg-[radial-gradient(circle_at_20%_20%,rgba(16,185,129,0.15),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(14,165,233,0.15),transparent_50%)] pointer-events-none" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Header Section */}
         <motion.div
           className="text-center mb-12 sm:mb-16"
