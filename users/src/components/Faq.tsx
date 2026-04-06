@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, MessageCircle, ArrowRight } from "lucide-react";
 
 const faqs = [
   {
@@ -31,7 +31,7 @@ const faqs = [
 ];
 
 export default function FAQ() {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(0);
 
   const toggleFAQ = (index: number) => {
     setActiveIndex(activeIndex === index ? null : index);
@@ -40,68 +40,109 @@ export default function FAQ() {
   return (
     <section
       id="faq"
-      className="py-20 sm:py-24 bg-white"
+      className="py-24 sm:py-32 bg-slate-50 dark:bg-slate-950 transition-colors duration-500 overflow-hidden"
     >
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          viewport={{ once: true }}
-        >
-          <div className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-800">
-            FAQ
-          </div>
-          <motion.h2 className="mt-4 text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
-            Frequently asked questions
-          </motion.h2>
-          <p className="mt-4 text-base sm:text-lg text-slate-600">
-            Everything you need to know about how NepFootsal helps you play, manage, and grow.
-          </p>
-        </motion.div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-20">
+          {/* Header Section */}
+          <motion.div
+            className="lg:col-span-5"
+            initial={{ opacity: 0, x: -24 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            viewport={{ once: true }}
+          >
+            <div className="inline-flex items-center rounded-full border border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-1.5 text-sm font-bold text-emerald-800 dark:text-emerald-400">
+              Support Center
+            </div>
+            <h2 className="mt-6 text-4xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+              Frequently asked questions
+            </h2>
+            <p className="mt-6 text-lg text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+              Find answers to common questions about booking, management, and the NepFootsal ecosystem.
+            </p>
 
-        <div className="mt-10 space-y-4 text-left">
-          {faqs.map((faq, index) => (
-            <motion.div
-              key={index}
-              className="bg-white shadow-sm border border-slate-200/70 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-            >
+            <div className="mt-10 p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl dark:shadow-emerald-500/5">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-700 dark:text-emerald-400">
+                  <MessageCircle className="h-6 w-6" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-bold text-slate-900 dark:text-white">Still have questions?</h4>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">We're here to help you 24/7.</p>
+                </div>
+              </div>
               <button
-                className="w-full flex justify-between items-center gap-4 px-5 sm:px-6 py-5 text-left focus:outline-none"
-                onClick={() => toggleFAQ(index)}
+                className="mt-6 w-full flex items-center justify-center gap-2 rounded-2xl bg-slate-900 dark:bg-emerald-600 px-6 py-4 text-sm font-bold text-white hover:bg-slate-800 dark:hover:bg-emerald-700 transition-all shadow-lg"
+                onClick={() => (window.location.href = "/contact")}
               >
-                <h3 className="text-base sm:text-lg font-semibold text-slate-900">
-                  {faq.question}
-                </h3>
-                <ChevronDown
-                  className={`w-5 h-5 text-emerald-700 transition-transform duration-300 ${
-                    activeIndex === index ? "rotate-180" : ""
-                  }`}
-                />
+                Contact Support
+                <ArrowRight className="h-4 w-4" />
               </button>
+            </div>
+          </motion.div>
 
-              <AnimatePresence>
-                {activeIndex === index && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="px-5 sm:px-6 pb-6 text-slate-600 leading-relaxed"
+          {/* FAQ Accordion Section */}
+          <div className="lg:col-span-7 space-y-4">
+            {faqs.map((faq, index) => (
+              <motion.div
+                key={index}
+                className={`group rounded-3xl border transition-all duration-300 overflow-hidden ${
+                  activeIndex === index
+                    ? "bg-white dark:bg-slate-900 border-emerald-500/30 shadow-2xl dark:shadow-emerald-500/10"
+                    : "bg-transparent border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                }`}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.05 }}
+                viewport={{ once: true }}
+              >
+                <button
+                  className="w-full flex justify-between items-center gap-6 px-7 py-6 text-left focus:outline-none"
+                  onClick={() => toggleFAQ(index)}
+                >
+                  <span
+                    className={`text-lg sm:text-xl font-bold tracking-tight transition-colors duration-300 ${
+                      activeIndex === index
+                        ? "text-emerald-700 dark:text-emerald-400"
+                        : "text-slate-900 dark:text-slate-200"
+                    }`}
                   >
-                    {faq.answer}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          ))}
+                    {faq.question}
+                  </span>
+                  <div
+                    className={`flex-shrink-0 h-8 w-8 rounded-full border flex items-center justify-center transition-all duration-300 ${
+                      activeIndex === index
+                        ? "bg-emerald-500 border-emerald-500 text-white rotate-180"
+                        : "bg-transparent border-slate-200 dark:border-slate-700 text-slate-400"
+                    }`}
+                  >
+                    <ChevronDown className="h-5 w-5" />
+                  </div>
+                </button>
+
+                <AnimatePresence initial={false}>
+                  {activeIndex === index && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                    >
+                      <div className="px-7 pb-7 text-base sm:text-lg text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                        <div className="h-px w-10 bg-emerald-500/30 mb-5" />
+                        {faq.answer}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
+  );
+}
   );
 }

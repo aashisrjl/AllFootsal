@@ -15,12 +15,12 @@ export default function TestimonialsMarquee() {
   const row2 = [...TESTIMONIALS.slice().reverse(), ...TESTIMONIALS.slice().reverse()];
 
   return (
-    <section className="py-16 bg-gradient-to-br from-white to-green-50">
+    <section className="py-16 bg-white dark:bg-slate-950 transition-colors duration-500">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-6 text-center">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-slate-50 mb-6 text-center">
           What Our Customers Say
         </h2>
-        <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+        <p className="text-center text-slate-600 dark:text-slate-400 mb-8 max-w-2xl mx-auto font-medium">
           Real feedback from players across Nepal — honest, short, and helpful.
         </p>
 
@@ -35,18 +35,18 @@ export default function TestimonialsMarquee() {
               {row1.map((t, i) => (
                 <article
                   key={`r1-${i}`}
-                  className="w-72 min-w-[18rem] bg-white rounded-2xl shadow-md p-4 flex flex-col justify-between border border-green-50"
+                  className="w-72 min-w-[18rem] bg-white dark:bg-slate-900 rounded-2xl shadow-md dark:shadow-emerald-500/5 p-5 flex flex-col justify-between border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 transition-colors"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-semibold">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 flex items-center justify-center text-emerald-700 dark:text-emerald-400 font-bold text-lg shrink-0">
                       {t.name.charAt(0)}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{t.name}</h3>
-                      <p className="text-sm text-gray-500">{t.place}</p>
+                      <h3 className="font-bold text-slate-900 dark:text-slate-100">{t.name}</h3>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t.place}</p>
                     </div>
                   </div>
-                  <p className="mt-3 text-gray-700 text-sm">{t.text}</p>
+                  <p className="mt-4 text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium italic">"{t.text}"</p>
                 </article>
               ))}
             </div>
@@ -61,25 +61,25 @@ export default function TestimonialsMarquee() {
               {row2.map((t, i) => (
                 <article
                   key={`r2-${i}`}
-                  className="w-72 min-w-[18rem] bg-white rounded-2xl shadow-md p-4 flex flex-col justify-between border border-green-50"
+                  className="w-72 min-w-[18rem] bg-white dark:bg-slate-900 rounded-2xl shadow-md dark:shadow-emerald-500/5 p-5 flex flex-col justify-between border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 transition-colors"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-semibold">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 flex items-center justify-center text-emerald-700 dark:text-emerald-400 font-bold text-lg shrink-0">
                       {t.name.charAt(0)}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{t.name}</h3>
-                      <p className="text-sm text-gray-500">{t.place}</p>
+                      <h3 className="font-bold text-slate-900 dark:text-slate-100">{t.name}</h3>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t.place}</p>
                     </div>
                   </div>
-                  <p className="mt-3 text-gray-700 text-sm">{t.text}</p>
+                  <p className="mt-4 text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium italic">"{t.text}"</p>
                 </article>
               ))}
             </div>
           </div>
 
           {/* Small note for accessibility */}
-          <p className="text-xs text-gray-400 text-center">
+          <p className="text-xs text-slate-400 dark:text-slate-500 text-center font-medium">
             Testimonials auto-scroll. Hover to pause.
           </p>
         </div>

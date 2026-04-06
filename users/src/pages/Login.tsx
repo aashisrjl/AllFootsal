@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -42,7 +42,7 @@ const Login = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-white to-green-100"
+      className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-white to-green-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors duration-500"
       style={{
         backgroundImage: `url(${AuthBackground})`,
         backgroundSize: "cover",
@@ -50,29 +50,28 @@ const Login = () => {
       }}
     >
       <main className="flex flex-1 items-center justify-center py-10 px-4 mt-10">
-        <div className="bg-white shadow-xl rounded-2xl flex flex-col md:flex-row overflow-hidden max-w-5xl w-full">
+        <div className="bg-white dark:bg-slate-900 shadow-2xl rounded-3xl flex flex-col md:flex-row overflow-hidden max-w-5xl w-full border border-slate-100 dark:border-slate-800 transition-all duration-300">
           {/* Left side form */}
-          <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-            {/* <h1 className="h-12 w-auto text-3xl font-bold text-green-600 mb-4">
-              AllFootsal
-            </h1> */}
-            <div className="flex justify-center md:justify-start mb-3">
-              <img
-                src={logo_transparent}
-                alt="AllFutsal Logo"
-                className="h-20 w-auto object-contain transition-transform duration-300 hover:scale-105"
-              />
-            </div>
+          <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm">
+            <Link to="/">
+              <div className="flex justify-center md:justify-start mb-3">
+                <img
+                  src={logo_transparent}
+                  alt="AllFutsal Logo"
+                  className="h-20 w-auto object-contain transition-transform duration-300 hover:scale-105 dark:invert dark:brightness-100"
+                />
+              </div>
+            </Link>
 
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Login</h2>
-            <p className="text-gray-600 mb-6">
+            <h2 className="text-3xl font-black text-gray-900 dark:text-slate-50 mb-2 tracking-tight">Login</h2>
+            <p className="text-gray-600 dark:text-slate-400 mb-6 font-medium">
               Please fill up the following form to login.
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email">
-                  Email or Phone <span className="text-red-500">*</span>
+                <Label htmlFor="email" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Email or Phone <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   id="email"
@@ -81,13 +80,13 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-11 focus-visible:ring-green-500"
+                  className="h-12 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-emerald-500 rounded-xl"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">
-                  Password <span className="text-red-500">*</span>
+                <Label htmlFor="password" title="Password" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Password <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   id="password"
@@ -96,14 +95,14 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-11 focus-visible:ring-green-500"
+                  className="h-12 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-emerald-500 rounded-xl"
                 />
               </div>
 
               <div className="flex justify-between text-sm">
                 <a
                   href="/auth/forgot-password"
-                  className="text-green-600 hover:underline"
+                  className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline"
                 >
                   Forgot Password?
                 </a>
@@ -112,50 +111,50 @@ const Login = () => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-11 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg"
+                className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/25 transition-all"
               >
-                <LogIn className="mr-2 h-4 w-4" />
+                <LogIn className="mr-2 h-5 w-5" />
                 {isLoading ? "Logging in..." : "Login"}
               </Button>
             </form>
 
             {/* Divider */}
-            <div className="flex  items-center my-6">
-              <div className="flex-grow h-px bg-gray-300"></div>
-              <span className="px-4 text-gray-500 text-sm">
+            <div className="flex items-center my-8">
+              <div className="flex-grow h-px bg-slate-200 dark:bg-slate-800"></div>
+              <span className="px-4 text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-widest">
                 or continue with
               </span>
-              <div className="flex-grow h-px bg-gray-300"></div>
+              <div className="flex-grow h-px bg-slate-200 dark:bg-slate-800"></div>
             </div>
 
             {/* Social Login Buttons */}
-            <div className="flex justify-center items-center gap-3">
+            <div className="flex justify-center items-center gap-4">
               <Button
                 variant="outline"
-                className="w-auto h-11 border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                className="flex-1 h-12 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all"
                 onClick={() => {
                   window.location.href = "http://localhost:3000/api/v1/auth/user/google";
                 }}
               >
-                <FaGoogle className="mr-3 text-red-500 text-lg" />
+                <FaGoogle className="text-rose-500 text-xl" />
               </Button>
 
               <Button
                 variant="outline"
-                className="w-auto h-11 border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                className="flex-1 h-12 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all"
                 onClick={() => {
                   window.location.href = "http://localhost:3000/api/v1/auth/user/facebook";
                 }}
               >
-                <FaFacebookF className="mr-3 text-blue-600 text-lg" />
+                <FaFacebookF className="text-blue-600 text-xl" />
               </Button>
             </div>
 
-            <p className="text-center text-sm text-gray-600 mt-6">
+            <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-8 font-medium">
               Don’t have an account?{" "}
               <a
                 href="/auth/register"
-                className="text-green-600 font-medium hover:underline"
+                className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline"
               >
                 Register
               </a>
@@ -163,11 +162,11 @@ const Login = () => {
           </div>
 
           {/* Right side illustration */}
-          <div className="hidden md:flex w-1/2 bg-white justify-center items-center">
+          <div className="hidden md:flex w-1/2 bg-slate-50/50 dark:bg-slate-800/30 backdrop-blur-sm justify-center items-center p-12">
             <img
               src={AuthImage}
               alt="Login Illustration"
-              className="w-96 h-auto object-contain"
+              className="w-full h-auto object-contain drop-shadow-2xl animate-float rounded-xl"
             />
           </div>
         </div>

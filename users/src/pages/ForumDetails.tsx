@@ -35,7 +35,7 @@ const ReplyCard: React.FC<{ reply: ForumReplyApiData; isOp?: boolean }> = ({ rep
   });
 
   return (
-    <div className="p-5 rounded-2xl bg-slate-900/50 border border-slate-800/80 mt-4 transition-all hover:bg-slate-900/80">
+    <div className="p-5 rounded-2xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 mt-4 transition-all hover:bg-slate-50 dark:hover:bg-slate-900/80 shadow-md">
       <div className="flex justify-between items-start mb-2">
         <ForumUserSnippet userId={reply.user_id} futsalId={reply.footsal_id} size="md" isOp={isOp} />
         {reply.createdAt && (
@@ -47,12 +47,12 @@ const ReplyCard: React.FC<{ reply: ForumReplyApiData; isOp?: boolean }> = ({ rep
       <div className="min-w-0 mt-1">
 
         {reply.is_solution && (
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mb-2">
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 mb-2">
             Accepted Solution
           </span>
         )}
 
-        <p className="text-slate-300 text-sm whitespace-pre-wrap leading-relaxed">
+        <p className="text-slate-700 dark:text-slate-300 text-sm whitespace-pre-wrap leading-relaxed">
           {reply.content}
         </p>
 
@@ -60,9 +60,9 @@ const ReplyCard: React.FC<{ reply: ForumReplyApiData; isOp?: boolean }> = ({ rep
           <button
             onClick={() => likeMutation.mutate()}
             disabled={likeMutation.isPending}
-            className="group flex items-center gap-1.5 text-xs text-slate-400 hover:text-emerald-400 transition-colors"
+            className="group flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
           >
-            <div className="p-1.5 rounded-full bg-slate-800/50 group-hover:bg-emerald-500/10 transition-colors">
+            <div className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-800/50 group-hover:bg-emerald-500/10 transition-colors">
               <ThumbsUp className={`h-3.5 w-3.5 ${likeMutation.isPending ? 'animate-pulse text-emerald-500' : ''}`} />
             </div>
             <span className="font-medium">{likeCount} Likes</span>
@@ -129,20 +129,20 @@ const ForumDetails: React.FC = () => {
 
   const categoryBadgeClass =
     forum?.category === 'Help'
-      ? 'bg-amber-500/15 text-amber-200 border-amber-400/40'
+      ? 'bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-200 border-amber-400/40'
       : forum?.category === 'Announcement'
-        ? 'bg-emerald-500/15 text-emerald-300 border-emerald-400/40'
-        : 'bg-sky-500/10 text-sky-200 border-sky-400/40';
+        ? 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-400/40'
+        : 'bg-sky-100 dark:bg-sky-500/10 text-sky-700 dark:text-sky-200 border-sky-400/40';
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300">
       <Header />
 
       <main className="flex-1 container mx-auto px-4 py-16 pt-28">
         <section className="max-w-4xl mx-auto space-y-6">
           <button
             onClick={() => navigate('/forum')}
-            className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-emerald-400 transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors font-medium"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Forums
@@ -154,14 +154,14 @@ const ForumDetails: React.FC = () => {
               <p className="text-sm">Loading topic details...</p>
             </div>
           ) : isError || !forum ? (
-            <div className="flex flex-col items-center justify-center p-20 text-slate-400 gap-3 border border-slate-800 bg-slate-950/50 rounded-2xl">
+            <div className="flex flex-col items-center justify-center p-20 text-slate-400 gap-3 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 rounded-2xl">
               <MessageCircle className="h-10 w-10 text-rose-500 opacity-50" />
               <p className="text-sm">Forum topic not found or failed to load.</p>
             </div>
           ) : (
             <>
               {/* Main Forum Post */}
-              <article className="rounded-2xl border border-slate-800 bg-slate-950/70 p-6 sm:p-8 shadow-xl backdrop-blur relative overflow-hidden">
+              <article className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/70 p-6 sm:p-8 shadow-xl backdrop-blur relative overflow-hidden">
                 <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-sky-500 to-emerald-500 opacity-50" />
 
                 <div className="flex flex-wrap items-center gap-3 mb-5 mt-2">
@@ -169,44 +169,44 @@ const ForumDetails: React.FC = () => {
                     <Tag className="h-3 w-3" />
                     {forum.category}
                   </span>
-                  <span className="inline-flex items-center gap-1.5 text-xs text-slate-400">
+                  <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
                     <Clock className="h-3.5 w-3.5" />
                     {new Date(forum.createdAt).toLocaleString()}
                   </span>
                 </div>
 
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-50 mb-6 leading-tight tracking-tight">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-slate-50 mb-6 leading-tight tracking-tight">
                   {forum.title}
                 </h1>
 
-                <div className="mb-8 pb-8 border-b border-slate-800/80 inline-block overflow-hidden">
+                <div className="mb-8 pb-8 border-b border-slate-100 dark:border-slate-800/80 inline-block overflow-hidden">
                   <ForumUserSnippet userId={forum.user_id} futsalId={forum.futsal_id} size="lg" />
                 </div>
 
-                <div className="prose prose-invert max-w-none prose-emerald">
-                  <p className="text-slate-300 leading-relaxed whitespace-pre-wrap text-sm sm:text-base">
+                <div className="prose dark:prose-invert max-w-none prose-emerald">
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap text-sm sm:text-base font-medium">
                     {forum.content}
                   </p>
                 </div>
 
-                <div className="mt-10 pt-6 border-t border-slate-800/80 flex justify-between items-center text-sm text-slate-400">
+                <div className="mt-10 pt-6 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap justify-between items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
                   <div className="flex gap-3">
                     <button
                       onClick={() => likeForumMutation.mutate()}
                       disabled={likeForumMutation.isPending}
-                      className="inline-flex items-center gap-2 bg-slate-900/80 hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/50 px-3.5 py-1.5 rounded-full border border-slate-700 transition-all font-medium"
+                      className="inline-flex items-center gap-2 bg-slate-50 dark:bg-slate-900/80 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-500/50 px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 transition-all font-semibold"
                     >
                       <ThumbsUp className={`h-4 w-4 ${likeForumMutation.isPending ? "animate-bounce text-emerald-500" : ""}`} />
                       <span>{forumLikesCount} Likes</span>
                     </button>
 
-                    <div className="inline-flex items-center gap-2 bg-slate-900/60 px-3.5 py-1.5 rounded-full border border-slate-800 cursor-default">
-                      <MessageCircle className="h-4 w-4 text-sky-400" />
-                      <span className="font-medium text-slate-300">{replies.length}</span> Replies
+                    <div className="inline-flex items-center gap-2 bg-slate-50 dark:bg-slate-900/60 px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-800 cursor-default font-semibold">
+                      <MessageCircle className="h-4 w-4 text-sky-500 dark:text-sky-400" />
+                      <span className="font-bold text-slate-700 dark:text-slate-300">{replies.length}</span> Replies
                     </div>
                   </div>
 
-                  <div className="inline-flex items-center gap-2 text-slate-500">
+                  <div className="inline-flex items-center gap-2 text-slate-400 dark:text-slate-500 font-medium">
                     {forum.views_count} Views
                   </div>
                 </div>
@@ -214,8 +214,8 @@ const ForumDetails: React.FC = () => {
 
               {/* Replies Section */}
               <div className="mt-8 space-y-6">
-                <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2 ml-2">
-                  <MessageCircle className="h-5 w-5 text-emerald-400" />
+                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2 ml-2">
+                  <MessageCircle className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />
                   Discussion ({replies.length})
                 </h3>
 
@@ -232,7 +232,7 @@ const ForumDetails: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="p-8 text-center rounded-2xl border border-slate-800 border-dashed bg-slate-900/30 text-slate-400">
+                  <div className="p-8 text-center rounded-2xl border border-slate-200 dark:border-slate-800 border-dashed bg-slate-50/50 dark:bg-slate-900/30 text-slate-400 font-medium">
                     No replies yet. Be the first to start the conversation!
                   </div>
                 )}
@@ -240,9 +240,9 @@ const ForumDetails: React.FC = () => {
                 {/* Reply Form */}
                 <form
                   onSubmit={handleReplySubmit}
-                  className="mt-6 rounded-2xl bg-slate-900/60 border border-slate-800 p-5 backdrop-blur shadow-lg"
+                  className="mt-6 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-5 backdrop-blur shadow-lg"
                 >
-                  <label htmlFor="reply" className="block text-sm font-medium text-slate-300 mb-2">
+                  <label htmlFor="reply" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 ml-1">
                     Add a reply
                   </label>
                   <textarea
@@ -251,13 +251,13 @@ const ForumDetails: React.FC = () => {
                     value={replyContent}
                     onChange={(e) => setReplyContent(e.target.value)}
                     placeholder="Write your thoughts..."
-                    className="w-full rounded-xl bg-slate-950 border border-slate-700 p-3 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none transition-colors"
+                    className="w-full rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 p-3 text-sm text-slate-800 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none transition-colors"
                   />
                   <div className="mt-3 flex justify-end">
                     <button
                       type="submit"
                       disabled={createReplyMutation.isPending || !replyContent.trim()}
-                      className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-5 py-2.5 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/20"
+                      className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-white dark:text-slate-950 font-bold px-5 py-2.5 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/20"
                     >
                       {createReplyMutation.isPending ? (
                         <Loader2 className="h-4 w-4 animate-spin" />

@@ -186,10 +186,10 @@ const Contact: React.FC = () => {
   };
 
   const contactDetails = [
-    { icon: MapPin, title: "Our Location", text: "Thamel, Kathmandu, Nepal", color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-900/30" },
-    { icon: Phone, title: "Support Line", text: "+977 1 234 5678", color: "text-sky-600", bg: "bg-sky-50 dark:bg-sky-900/30" },
-    { icon: Mail, title: "Email Us", text: "info@goalfutsal.com.np", color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-900/30" },
-    { icon: Clock, title: "Open Hours", text: "Sun - Fri: 9am - 9pm", color: "text-sky-600", bg: "bg-sky-50 dark:bg-sky-900/30" },
+    { icon: MapPin, title: "Our Location", text: "Thamel, Kathmandu, Nepal", color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-900/30" },
+    { icon: Phone, title: "Support Line", text: "+977 1 234 5678", color: "text-sky-600 dark:text-sky-400", bg: "bg-sky-50 dark:bg-sky-900/30" },
+    { icon: Mail, title: "Email Us", text: "info@goalfutsal.com.np", color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-900/30" },
+    { icon: Clock, title: "Open Hours", text: "Sun - Fri: 9am - 9pm", color: "text-sky-600 dark:text-sky-400", bg: "bg-sky-50 dark:bg-sky-900/30" },
   ];
 
   return (
@@ -198,8 +198,8 @@ const Contact: React.FC = () => {
 
       {/* Decorative Background Elements */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-gradient-to-r from-emerald-100/50 to-sky-100/50 blur-3xl animate-float" />
-        <div className="absolute top-[20%] right-[-5%] w-[30%] h-[30%] rounded-full bg-sky-100/40 blur-3xl animate-float" style={{ animationDelay: "2s" }} />
+        <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-gradient-to-r from-emerald-100/50 dark:from-emerald-900/20 to-sky-100/50 dark:to-sky-900/20 blur-3xl animate-float" />
+        <div className="absolute top-[20%] right-[-5%] w-[30%] h-[30%] rounded-full bg-sky-100/40 dark:bg-sky-900/20 blur-3xl animate-float" style={{ animationDelay: "2s" }} />
       </div>
 
       <Header />
@@ -209,16 +209,16 @@ const Contact: React.FC = () => {
 
           {/* 1. Hero Section */}
           <div className="text-center space-y-6 animate-fadeInUp">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-emerald-100 shadow-sm mb-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-slate-900 border border-emerald-100 dark:border-emerald-800 shadow-sm mb-2">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <span className="text-xs font-semibold uppercase tracking-wider text-emerald-800">We respond fast</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">We respond fast</span>
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-slate-50 tracking-tight">
-              Get in touch with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-sky-600">AllFutsal</span>
+              Get in touch with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-sky-600 dark:from-emerald-400 dark:to-sky-400">AllFutsal</span>
             </h1>
             
             <p className="text-lg md:text-xl text-gray-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
@@ -231,20 +231,20 @@ const Contact: React.FC = () => {
             
             {/* Left Column: Contact Form (7 columns) */}
             <div className="lg:col-span-7 animate-fadeInUp" style={{ animationDelay: "0.2s" }}>
-              <Card className="shadow-xl border-gray-100/80 bg-white/80 backdrop-blur-sm">
+              <Card className="shadow-xl border-gray-100/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="text-2xl">Send us a message</CardTitle>
                   <CardDescription>Fill out the form below and our team will get back to you.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {showSuccess ? (
-                    <div className="flex flex-col items-center justify-center py-12 space-y-4 text-center bg-emerald-50 rounded-lg border border-emerald-100 animate-fadeInUp">
-                      <div className="h-16 w-16 bg-emerald-100 rounded-full flex items-center justify-center">
-                         <Send className="h-8 w-8 text-emerald-600" />
+                    <div className="flex flex-col items-center justify-center py-12 space-y-4 text-center bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-800/50 animate-fadeInUp">
+                      <div className="h-16 w-16 bg-emerald-100 dark:bg-emerald-900/40 rounded-full flex items-center justify-center">
+                         <Send className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
                       </div>
-                      <h3 className="text-xl font-bold text-emerald-800">Message Sent!</h3>
-                      <p className="text-emerald-600 max-w-xs">We've received your inquiry and will contact you shortly.</p>
-                      <Button variant="outline" onClick={() => setShowSuccess(false)} className="mt-4">
+                      <h3 className="text-xl font-bold text-emerald-800 dark:text-emerald-200">Message Sent!</h3>
+                      <p className="text-emerald-600 dark:text-emerald-400 max-w-xs">We've received your inquiry and will contact you shortly.</p>
+                      <Button variant="outline" onClick={() => setShowSuccess(false)} className="mt-4 dark:border-emerald-800 dark:hover:bg-emerald-900/20">
                         Send another message
                       </Button>
                     </div>
@@ -326,10 +326,10 @@ const Contact: React.FC = () => {
             <div className="lg:col-span-5 space-y-6 animate-fadeInUp" style={{ animationDelay: "0.3s" }}>
               
               {/* Contact Details Card */}
-              <Card className="bg-gradient-to-br from-white to-gray-50 border-gray-100 shadow-lg">
+              <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-slate-900 dark:to-slate-950 border-gray-100 dark:border-slate-800 shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Building className="h-5 w-5 text-sky-600" />
+                    <Building className="h-5 w-5 text-sky-600 dark:text-sky-400" />
                     Contact Information
                   </CardTitle>
                 </CardHeader>
@@ -341,7 +341,7 @@ const Contact: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">{item.title}</p>
-                        <p className="text-sm text-gray-600 dark:text-slate-400">{item.text}</p>
+                        <p className="text-sm text-gray-600 dark:text-slate-400 tracking-wide">{item.text}</p>
                       </div>
                     </div>
                   ))}
@@ -349,33 +349,30 @@ const Contact: React.FC = () => {
               </Card>
 
               {/* Social Media Card */}
-              <Card className="bg-gray-900 text-white border-gray-800 shadow-xl overflow-hidden relative">
-                {/* Abstract decorative circle */}
-                <div className="absolute -right-10 -bottom-10 h-32 w-32 bg-emerald-500/20 rounded-full blur-2xl" />
-                
+              <Card className="bg-white dark:bg-slate-900 border-emerald-100 dark:border-slate-800 shadow-xl overflow-hidden relative group">
+                <div className="absolute -right-10 -bottom-10 h-32 w-32 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-2xl" />
                 <CardHeader>
-                  <CardTitle className="text-black flex items-center gap-2">
-                    <Users className="h-5 w-5 text-green-500" />
+                  <CardTitle className="text-slate-900 dark:text-white flex items-center gap-2">
+                    <Users className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                     Join the Community
                   </CardTitle>
-                  <CardDescription className="text-gray-400">
+                  <CardDescription className="text-slate-500 dark:text-slate-400">
                     Follow us for updates, tournament news, and venue highlights.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex gap-4 relative z-10">
-                   <a href="#" className="bg-gray-800 p-3 rounded-lg hover:bg-[#1877F2] transition-colors duration-300 group">
-                      <Facebook className="h-5 w-5 text-gray-300 group-hover:text-white" />
+                   <a href="#" className="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg hover:bg-[#1877F2] transition-colors duration-300 group/fb">
+                      <Facebook className="h-5 w-5 text-slate-600 dark:text-slate-300 group-hover/fb:text-white" />
                    </a>
-                   <a href="#" className="bg-gray-800 p-3 rounded-lg hover:bg-[#1DA1F2] transition-colors duration-300 group">
-                      <Twitter className="h-5 w-5 text-gray-300 group-hover:text-white" />
+                   <a href="#" className="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg hover:bg-[#1DA1F2] transition-colors duration-300 group/tw">
+                      <Twitter className="h-5 w-5 text-slate-600 dark:text-slate-300 group-hover/tw:text-white" />
                    </a>
-                   <a href="#" className="bg-gray-800 p-3 rounded-lg hover:bg-[#E1306C] transition-colors duration-300 group">
-                      <Instagram className="h-5 w-5 text-gray-300 group-hover:text-white" />
+                   <a href="#" className="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg hover:bg-[#E1306C] transition-colors duration-300 group/ig">
+                      <Instagram className="h-5 w-5 text-slate-600 dark:text-slate-300 group-hover/ig:text-white" />
                    </a>
-                   <a href="#" className="bg-gray-800 p-3 rounded-lg hover:bg-[#E1306C] transition-colors duration-300 group">
-                      <FaTiktok className="h-5 w-5 text-gray-300 group-hover:text-white" />
+                   <a href="#" className="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg hover:bg-black transition-colors duration-300 group/tk">
+                      <FaTiktok className="h-5 w-5 text-slate-600 dark:text-slate-300 group-hover/tk:text-white" />
                    </a>
-                   
                 </CardContent>
               </Card>
             </div>
@@ -396,10 +393,10 @@ const Contact: React.FC = () => {
                 ].map((faq, i) => (
                   <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 hover:shadow-md transition-shadow">
                     <div className="h-10 w-10 bg-sky-50 dark:bg-sky-900/30 rounded-full flex items-center justify-center mb-4">
-                      <HelpCircle className="h-5 w-5 text-sky-600" />
+                      <HelpCircle className="h-5 w-5 text-sky-600 dark:text-sky-400" />
                     </div>
                     <h3 className="font-bold text-gray-900 dark:text-slate-100 mb-2">{faq.q}</h3>
-                    <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{faq.a}</p>
+                    <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed font-medium">{faq.a}</p>
                   </div>
                 ))}
              </div>
