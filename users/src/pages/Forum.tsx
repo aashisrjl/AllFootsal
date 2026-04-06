@@ -248,7 +248,7 @@ const Forum: React.FC = () => {
 
             {/* New topic + guidelines */}
             <aside className="space-y-4">
-              <div className="rounded-2xl border border-emerald-200 dark:border-emerald-500/40 bg-slate-50 dark:bg-slate-950/80 p-5 sm:p-6 shadow-lg backdrop-blur">
+              <div className="rounded-2xl border border-emerald-200 dark:border-emerald-500/40 bg-emerald-50/50 dark:bg-slate-950/80 p-5 sm:p-6 shadow-lg backdrop-blur">
                 <h2 className="text-base sm:text-lg font-semibold text-slate-800 dark:text-slate-50 flex items-center gap-2 mb-3">
                   <MessageCircle className="h-5 w-5 text-emerald-500 dark:text-emerald-300" />
                   Start a new topic
