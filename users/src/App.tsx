@@ -32,6 +32,8 @@ import FutsalBookings from "./pages/FutsalBookings";
 import FutsalReviews from "./pages/FutsalReviews";
 import UserProfileInfo from "./pages/UserProfileInfo";
 import FutsalGallery from "./pages/FutsalGallery";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailure from "./pages/PaymentFailure";
 import FloatingThemeToggle from "@/components/FloatingThemeToggle";
 
 const queryClient = new QueryClient();
@@ -69,6 +71,8 @@ const App = () => (
               <Route path="/forum/:id" element={<ForumDetails />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/profile" element={<UserProfileInfo />} />
+              <Route path="/payment/success" element={<PaymentSuccess />} />
+              <Route path="/payment/failure" element={<PaymentFailure />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

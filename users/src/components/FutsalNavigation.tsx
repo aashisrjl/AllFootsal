@@ -81,15 +81,15 @@ export default function FutsalNavigation({ name }: { name?: string }) {
     }
 
     if (isActive) {
-      return "text-emerald-600 bg-emerald-50";
+      return "text-emerald-500 bg-emerald-500/10";
     }
-    return "text-slate-600 hover:text-emerald-600 hover:bg-emerald-50";
+    return "text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10";
   };
 
   const userInitial = user?.name?.trim()?.charAt(0)?.toUpperCase() || "U";
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all duration-300">
+    <nav className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-md border-b border-border shadow-sm transition-all duration-300">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
@@ -97,12 +97,12 @@ export default function FutsalNavigation({ name }: { name?: string }) {
               variant="ghost"
               size="icon"
               onClick={() => navigate("/futsals")}
-              className="text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-full shrink-0"
+              className="text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10 rounded-full shrink-0"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div 
-              className="font-extrabold text-lg text-slate-800 truncate max-w-[150px] md:max-w-[250px] cursor-pointer"
+              className="font-extrabold text-lg text-foreground truncate max-w-[150px] md:max-w-[250px] cursor-pointer"
               onClick={() => handleNav('home')}
               title={name || "Facility"}
             >
@@ -125,7 +125,7 @@ export default function FutsalNavigation({ name }: { name?: string }) {
               )
             })}
             
-            <div className="w-px h-6 bg-slate-200 mx-1"></div>
+            <div className="w-px h-6 bg-border mx-1"></div>
             
             {/* User Info / Login */}
             {isLoading ? null : isAuthenticated ? (
@@ -162,7 +162,7 @@ export default function FutsalNavigation({ name }: { name?: string }) {
             ) : null}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-slate-600 hover:text-emerald-600 p-2 shrink-0"
+              className="text-muted-foreground hover:text-emerald-500 p-2 shrink-0"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -171,7 +171,7 @@ export default function FutsalNavigation({ name }: { name?: string }) {
       </div>
 
       {isMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-slate-100 shadow-lg absolute w-full py-2 px-4 flex flex-col gap-1 z-50">
+        <div className="lg:hidden bg-card border-t border-border shadow-lg absolute w-full py-2 px-4 flex flex-col gap-1 z-50">
             {navItems.map(item => {
                const Icon = item.icon;
                return (
@@ -188,7 +188,7 @@ export default function FutsalNavigation({ name }: { name?: string }) {
             
             {!isLoading && !isAuthenticated && (
               <>
-                <div className="h-px w-full bg-slate-100 my-2"></div>
+                <div className="h-px w-full bg-border my-2"></div>
                 <Button 
                     variant="default" 
                     onClick={() => handleNav(`/auth/login`)} 

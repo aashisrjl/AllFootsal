@@ -9,7 +9,7 @@ const generateEsewaSignature = ({
   merchantCode,
   secretKey
 }) => {
-  const message = `${amount},${transactionUuid},${merchantCode}`;
+  const message = `total_amount=${amount},transaction_uuid=${transactionUuid},product_code=${merchantCode}`;
   const hmac = crypto.createHmac("sha256", secretKey);
   hmac.update(message);
   return hmac.digest("base64");

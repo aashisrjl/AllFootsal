@@ -33,6 +33,23 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({ timeSlots }) => {
     selectTimeSlot(timeSlotId === selectedTimeSlotId ? null : timeSlotId);
   };
 
+  const isPastSlot = (startTime: string) => {
+    if (!selectedDate) return false;
+    
+    const now = new Date();
+    const todayStr = now.toISOString().split("T")[0];
+    
+    if (selectedDate < todayStr) return true;
+    if (selectedDate > todayStr) return false;
+    
+    // If it's today, check the time
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const slotTime = new Date();
+    slotTime.setHours(hours, minutes, 0, 0);
+    
+    return slotTime < now;
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <Card>
@@ -61,19 +78,22 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({ timeSlots }) => {
                 <div
                   key={slot.id}
                   className={`time-slot ${
-                    slot.isBooked
-                      ? "time-slot-booked"
+                    slot.isBooked || isPastSlot(slot.startTime)
+                      ? "time-slot-booked opacity-60 cursor-not-allowed"
                       : slot.id === selectedTimeSlotId
                       ? "time-slot-selected"
                       : "time-slot-available"
                   }`}
                   onClick={() => {
-                    if (!slot.isBooked) {
+                    if (!slot.isBooked && !isPastSlot(slot.startTime)) {
                       handleTimeSlotSelect(slot.id);
                     }
                   }}
                 >
                   {slot.startTime}
+                  {isPastSlot(slot.startTime) && !slot.isBooked && (
+                    <span className="text-[10px] block font-normal opacity-70">Passed</span>
+                  )}
                 </div>
               ))}
             </div>
