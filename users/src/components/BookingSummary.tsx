@@ -59,13 +59,9 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
       
       let newBookingId = bookingRes?.data?.id;
 
-      // Temporary bypass if backend doesn't return ID immediately but inserts correctly
-      if (!newBookingId && gateway === 'cash') {
-          toast.success("Booking placed successfully. Please pay upon arrival.", { duration: 5000 });
-          return navigate('/profile'); // or '/bookings'
-      } else if (!newBookingId) {
+      if (!newBookingId) {
           toast.error("Booking succeeded but backend failed to return ID for digital payment. Please contact support.");
-          return navigate('/profile');
+          return navigate('/bookings');
       }
 
       // 2. Hit createPayment API
@@ -81,22 +77,36 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
       } else if (gateway === 'khalti') {
         if (paymentRes?.data?.payment_url) {
             window.location.href = paymentRes.data.payment_url;
-        } else if (paymentRes?.data?.pidx) {
-            toast.success("Khalti Payment initiated", { description: "Processing..."});
-            setTimeout(() => {
-                if (paymentRes?.data?.payment_url) window.location.href = paymentRes.data.payment_url;
-                else navigate('/bookings');
-            }, 1000);
         } else {
-             toast.success("Khalti Payment created.", { description: "Please complete via portal."});
-             navigate('/bookings');
+            toast.error("Redirection URL not found for Khalti. Redirecting to bookings history.");
+            navigate('/bookings');
         }
       } else if (gateway === 'esewa') {
         toast.success("eSewa Payment initiated", { description: "Processing redirect..."});
-        setTimeout(() => {
-            if (paymentRes?.data?.payment_url) window.location.href = paymentRes.data.payment_url;
-            else navigate('/bookings');
-        }, 1000);
+        
+        // eSewa requires a POST request with form data
+        const esewaData = paymentRes.data;
+        const isLive = esewaData.isLive;
+        const ESEWA_URL = isLive 
+            ? "https://epay.esewa.com.np/api/epay/main/v2/form" 
+            : "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = ESEWA_URL;
+
+        for (const key in esewaData) {
+            if (['amount', 'tax_amount', 'total_amount', 'transaction_uuid', 'product_code', 'product_service_charge', 'product_delivery_charge', 'success_url', 'failure_url', 'signed_field_names', 'signature'].includes(key)) {
+                const hiddenField = document.createElement('input');
+                hiddenField.type = 'hidden';
+                hiddenField.name = key;
+                hiddenField.value = esewaData[key];
+                form.appendChild(hiddenField);
+            }
+        }
+
+        document.body.appendChild(form);
+        form.submit();
       }
 
     } catch (error: any) {

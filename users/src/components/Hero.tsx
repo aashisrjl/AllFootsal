@@ -58,7 +58,7 @@ export default function Hero() {
               </motion.h1>
 
               <motion.p variants={item} className="mt-5 text-lg sm:text-xl text-white/85 max-w-2xl leading-relaxed">
-                Discover venues, check real‑time slots, and manage bookings with confidence — built for players, futsal owners, and organizers.
+                Discover venues, check real‑time slots, and manage bookings with confidence -- built for players, futsal owners, and organizers.
               </motion.p>
 
               <motion.div variants={item} className="mt-8 flex flex-col sm:flex-row gap-3 sm:items-center">
@@ -161,23 +161,22 @@ export default function Hero() {
                   </div>
                 </div>
 
-                <div className="px-6 sm:px-7 py-5 border-t border-white/10 bg-black/10">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="text-white">
-                      <div className="text-sm text-white/70">Next step</div>
-                      <div className="font-semibold">Choose a venue → confirm</div>
-                    </div>
-                    <Button
-                      className="bg-white text-slate-900 hover:bg-white/90"
-                      onClick={() => {
-                        navigate("/futsals");
-                      }}
-                    >
-                      See Futsals
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
+                <motion.div className="px-4 sm:px-7 py-2 border-t border-white/10 bg-black/10">
+                  {/* <div className="flex items-center justify-between gap-4"> */}
+                  {/* animation of color flow from left to ri ght green color */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-white text-slate-900 hover:bg-white/90 w-full h-16"
+                    onClick={() => {
+                      navigate("/futsals");
+                    }}
+                  >
+                    Browse Futsals
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </motion.button>
+                  {/* </div> */}
+                </motion.div>
               </motion.div>
             </motion.div>
           </div>

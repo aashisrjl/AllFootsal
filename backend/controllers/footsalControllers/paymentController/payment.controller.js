@@ -633,6 +633,7 @@ const createPayment = async (req, res) => {
             : null;
         let gatewayResponse = null;
         let rawResponse = null;
+        let isLive = false;
 
         if (gateway === "cash") {
             if (providerOrderId || providerTxnId) {
@@ -665,6 +666,8 @@ const createPayment = async (req, res) => {
                 futsalId: tenant.futsalId,
                 gateway
             });
+            
+            if (paymentConfig) isLive = paymentConfig.isLive;
 
             if (!paymentConfig) {
                 return res.status(400).json({
@@ -791,12 +794,12 @@ const createPayment = async (req, res) => {
         const responsePayload = {
             success: true,
             message: `${gateway} payment created successfully`,
-            data: payment[0] || null
+            data: {
+                ...(payment[0] || {}),
+                ...(gatewayResponse || {}),
+                isLive
+            }
         };
-
-        if (gatewayResponse) {
-            responsePayload.gatewayResponse = gatewayResponse;
-        }
 
         return res.status(201).json(responsePayload);
     } catch (err) {
