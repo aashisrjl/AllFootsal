@@ -232,4 +232,13 @@
     height: 380px;
     background: radial-gradient(circle at 30% 30%, #22c55e 0%, #0ea5e9 20%, transparent 70%);
   }
+
+  @keyframes flow {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
 }
