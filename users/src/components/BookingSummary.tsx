@@ -71,6 +71,8 @@ const BookingSummary: React.FC<BookingSummaryProps> = ({
       });
 
       // 3. Handle Gateway Responses
+      localStorage.setItem("last_futsal_id", facilityId);
+      
       if (gateway === 'cash') {
         toast.success("Booking placed successfully. Please pay upon arrival.", { duration: 5000 });
         navigate('/bookings');
