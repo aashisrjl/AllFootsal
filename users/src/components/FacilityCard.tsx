@@ -33,9 +33,9 @@ const FacilityCard: React.FC<FacilityCardProps> = ({ facility }) => {
     : "5.0";
 
   return (
-    <Card className="group overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-emerald-900/10 border-slate-200/60 bg-white hover:-translate-y-1">
+    <Card className="group overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-emerald-900/10 border-border bg-card hover:-translate-y-1">
       <Link to={`/futsals/${facility.id}`}>
-        <AspectRatio ratio={16 / 9} className="overflow-hidden bg-slate-100">
+        <AspectRatio ratio={16 / 9} className="overflow-hidden bg-muted">
           <img
             src={imageUrl}
             alt={facility.name}
@@ -48,23 +48,23 @@ const FacilityCard: React.FC<FacilityCardProps> = ({ facility }) => {
           </div>
         </AspectRatio>
         <CardContent className="p-5">
-          <h3 className="font-bold text-xl text-slate-800 line-clamp-1 group-hover:text-emerald-600 transition-colors">{facility.name}</h3>
-          <div className="flex items-center gap-1.5 text-slate-500 mt-2">
+          <h3 className="font-bold text-xl text-foreground line-clamp-1 group-hover:text-emerald-500 transition-colors">{facility.name}</h3>
+          <div className="flex items-center gap-1.5 text-muted-foreground mt-2">
             <MapPin className="h-4 w-4 text-emerald-500" />
             <span className="text-sm font-medium">{locationStr}</span>
           </div>
-          <p className="text-sm text-slate-600 mt-3 line-clamp-2 leading-relaxed">
+          <p className="text-sm text-muted-foreground/80 mt-3 line-clamp-2 leading-relaxed">
             {facility.description}
           </p>
         </CardContent>
-        <CardFooter className="p-5 pt-0 flex justify-between items-center border-t border-slate-100 mt-4">
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 mt-4">
-            <div className="bg-emerald-100 text-emerald-700 p-1.5 rounded-lg">
+        <CardFooter className="p-5 pt-0 flex justify-between items-center border-t border-border mt-4">
+          <div className="flex items-center gap-2 text-sm font-semibold text-foreground/80 mt-4">
+            <div className="bg-emerald-500/15 text-emerald-500 p-1.5 rounded-lg">
                <Trophy className="h-4 w-4" />
             </div>
             {pitches.length} {pitches.length === 1 ? 'Pitch' : 'Pitches'} Available
           </div>
-          <div className="mt-4 flex items-center gap-1 text-sm font-bold text-emerald-600 group-hover:translate-x-1 transition-transform">
+          <div className="mt-4 flex items-center gap-1 text-sm font-bold text-emerald-500 group-hover:translate-x-1 transition-transform">
              Book Now <ArrowRight className="h-4 w-4" />
           </div>
         </CardFooter>

@@ -39,7 +39,7 @@ const Futsals = () => {
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
       <Header />
 
       <main className="flex-1">
@@ -58,7 +58,7 @@ const Futsals = () => {
                 placeholder="Search by futsal name or location..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 py-6 text-lg rounded-2xl border-0 ring-4 ring-emerald-500/20 bg-white dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
+                className="pl-12 py-6 text-lg rounded-2xl border-0 ring-4 ring-emerald-500/20 bg-card text-foreground placeholder:text-muted-foreground"
               />
             </div>
           </div>
@@ -68,9 +68,9 @@ const Futsals = () => {
 
           {/* Facilities Grid */}
           {isLoading ? (
-            <div className="flex justify-center items-center py-24 text-gray-500">
+            <div className="flex justify-center items-center py-24 text-muted-foreground">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mr-3"></div>
-              <span className="text-gray-500 dark:text-slate-400">Loading Futsals...</span>
+              <span className="text-muted-foreground">Loading Futsals...</span>
             </div>
           ) : filteredFacilities.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -80,10 +80,10 @@ const Futsals = () => {
             </div>
           ) : (
             <div className="text-center py-16">
-              <p className="text-lg text-gray-600 dark:text-slate-400">
+              <p className="text-lg text-muted-foreground">
                 No facilities found matching "{searchTerm}".
               </p>
-              <p className="text-gray-600 dark:text-slate-500 mt-2">
+              <p className="text-muted-foreground/70 mt-2">
                 Try a different search term or browse all facilities.
               </p>
             </div>
