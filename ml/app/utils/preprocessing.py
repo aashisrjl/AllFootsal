@@ -93,13 +93,19 @@ def encode_binary_sentiment(
 	df[output_col] = normalized.map(mapping)
 	return df
 
+def remove_index_col(df: pd.DataFrame) -> pd.DataFrame:
+	df = df.copy()
+	index_cols = [col for col in df.columns if col.lower() in ["index", "unnamed: 0"]]
+	if index_cols:
+		df = df.drop(columns=index_cols)
+	return df
 
 def preprocess_dataset(df: pd.DataFrame) -> pd.DataFrame:
 	df = standarize_names(df)
 	df = fill_numeric(df)
 	df = fill_categorical(df)
 	df = remove_duplicates(df)
-
+	df = remove_index_col(df)
 	# For your binary sentiment dataset, avoid outlier filtering on ids.
 	df = detect_remove_outliers(df, exclude_cols=["id", "user_id"])
 	df = noise_reduction(df, text_col="review")
