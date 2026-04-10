@@ -61,26 +61,44 @@ const StarPicker = ({
 };
 
 // ─── Sentiment Badge ──────────────────────────────────────────────────────────
-const SentimentBadge = ({ score }: { score?: number | null }) => {
+const SentimentBadge = ({
+    score,
+    label,
+}: {
+    score?: number | null;
+    label?: string | null;
+}) => {
     if (score == null) return null;
-    const label =
-        score >= 0.6
-            ? "Positive"
-            : score >= 0.3
-            ? "Neutral"
-            : "Negative";
-    const colors =
-        score >= 0.6
-            ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-            : score >= 0.3
-            ? "bg-yellow-50 text-yellow-600 border-yellow-100"
-            : "bg-red-50 text-red-500 border-red-100";
+
+    // Format score as percentage
+    const percentage = Math.round(score * 100);
+
+    // Default label if not provided
+    const displayLabel =
+        label ||
+        (score >= 0.6 ? "Positive" : score <= 0.4 ? "Negative" : "Neutral");
+
+    // Logic for colors based on the label (case insensitive)
+    const normalizedLabel = displayLabel.toLowerCase();
+    let colors = "bg-slate-50 text-slate-600 border-slate-100 shadow-sm";
+
+    if (normalizedLabel.includes("pos")) {
+        colors = "bg-emerald-50 text-emerald-700 border-emerald-100 shadow-sm";
+    } else if (normalizedLabel.includes("neg")) {
+        colors = "bg-red-50 text-red-600 border-red-100 shadow-sm";
+    } else if (normalizedLabel.includes("neu") || normalizedLabel.includes("mix")) {
+        colors = "bg-amber-50 text-amber-600 border-amber-100 shadow-sm";
+    }
+
     return (
-        <span
-            className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${colors}`}
-        >
-            {label}
-        </span>
+        <div className="flex items-center gap-1.5">
+            <span
+                className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full border ${colors} flex items-center gap-1`}
+            >
+                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-80" />
+                {percentage}% {displayLabel}
+            </span>
+        </div>
     );
 };
 
@@ -304,7 +322,10 @@ const MyReviewCard = ({
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <SentimentBadge score={review.sentiment_score} />
+                    <SentimentBadge
+                        score={review.sentiment_score}
+                        label={review.sentiment_label}
+                    />
                     <div className="flex items-center gap-1 bg-yellow-50 px-3 py-1.5 rounded-full border border-yellow-100">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         <span className="font-bold text-yellow-700 text-sm">
@@ -378,7 +399,10 @@ const ReviewCard = ({ review }: { review: any }) => (
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-                <SentimentBadge score={review.sentiment_score} />
+                <SentimentBadge
+                    score={review.sentiment_score}
+                    label={review.sentiment_label}
+                />
                 <div className="flex items-center gap-1 bg-yellow-50 px-3 py-1.5 rounded-full border border-yellow-100">
                     <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                     <span className="font-bold text-yellow-700 text-sm">

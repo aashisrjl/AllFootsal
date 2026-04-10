@@ -4,7 +4,7 @@ import joblib
 import numpy as np
 from scipy.sparse import load_npz
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
 
 def main() -> None:
@@ -31,7 +31,12 @@ def main() -> None:
     y_train = np.load(y_train_path)
     y_test = np.load(y_test_path)
 
-    model = LogisticRegression(max_iter=1000)
+    model = LogisticRegression(
+        max_iter=1000,
+        solver="liblinear",
+        random_state=42
+        )
+    
     model.fit(X_train_tfidf, y_train)
 
     y_pred = model.predict(X_test_tfidf)
@@ -40,6 +45,10 @@ def main() -> None:
 
     model_path = model_dir / "sentiment_model.joblib"
     joblib.dump(model, model_path)
+
+    cm = confusion_matrix(y_test, y_pred)
+    print("Confusion Matrix:")
+    print(cm)
 
     print(f"Accuracy: {accuracy:.4f}")
     print("\nClassification report:")

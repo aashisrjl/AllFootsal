@@ -1,128 +1,127 @@
 # Futsal Sentiment ML Module
 
-This folder contains the machine learning pipeline for futsal review sentiment analysis.
-
-Because a public futsal-specific review dataset was not available, the project currently uses a **synthetic dataset** generated with varied review styles, short/noisy text, and mixed-sentiment phrases to better simulate real-world user feedback.
+End-to-end sentiment analysis module for futsal reviews using a synthetic dataset, TF-IDF vectorization, and Logistic Regression.
 
 ## Current Status
 
 Implemented:
-- Synthetic dataset generation
-- Data preprocessing and cleaning
-- Processed dataset export
+- Synthetic data generation
+- Data preprocessing and label encoding
+- Train/test split + TF-IDF vectorization
+- Model training and artifact saving
+- FastAPI inference endpoint
 
-Not implemented yet (files exist as scaffolding):
-- Model training pipeline
-- Sentiment API routes/services
-- Automated tests
-- Docker and production entrypoint
+Pending:
+- Automated tests (file exists but is empty)
+- Notebook experiments (notebook exists but has no cells)
 
 ## Project Structure
 
-```
+```text
 ml/
 ├── app/
 │   ├── data/
-│   │   ├── createDataset.py                # Generates synthetic review data
+│   │   ├── createDataset.py
 │   │   ├── raw/
 │   │   │   └── futsal_reviews_dataset.csv
 │   │   └── processed/
-│   │       └── futsal_reviews_dataset_processed.csv
+│   │       ├── futsal_reviews_dataset_processed.csv
+│   │       ├── futsal_reviews_train.csv
+│   │       ├── futsal_reviews_test.csv
+│   │       └── vectorized/
+│   │           ├── X_train_tfidf.npz
+│   │           ├── X_test_tfidf.npz
+│   │           ├── y_train.npy
+│   │           └── y_test.npy
+│   ├── routes/
+│   │   └── sentiment.py
+│   ├── services/
+│   │   └── sentiment_service.py
+│   ├── trained_model/
+│   │   ├── sentiment_model.joblib
+│   │   └── tfidf_vectorizer.joblib
+│   ├── training/
+│   │   ├── vectorize.py
+│   │   └── train_model.py
 │   ├── utils/
-│   │   └── preprocessing.py                # Cleans and preprocesses dataset
-│   ├── models/                             # (Scaffold)
-│   ├── routes/                             # (Scaffold)
-│   ├── services/                           # (Scaffold)
-│   └── training/                           # (Scaffold)
+│   │   └── preprocessing.py
+│   └── main.py
 ├── notebooks/
 │   └── training_experiments.ipynb
-└── tests/
-    └── test_sentiment.py                   # (Scaffold)
+├── tests/
+│   └── test_sentiment.py
+├── requirements.txt
+└── Dockerfile
 ```
 
-## Pipeline Workflow
-
-```
-Dataset Generation
-        ↓
-Preprocessing (cleaning + encoding)
-        ↓
-Processed Dataset Ready
-        ↓
-(Planned) Train/Test Split → TF-IDF → Model Training → Evaluation → Save Model
-```
-
-## Prerequisites
-
-- Python 3.10+
-- pip
-
-Current core code imports:
-- pandas
-- numpy
-
-Install dependencies:
+## Setup
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Quick Start
+## Training Pipeline
 
-Run all commands from the `ml` directory.
-
-### 1) Generate synthetic raw dataset
+Run from project root (`ml/`):
 
 ```bash
 python app/data/createDataset.py
+python app/utils/preprocessing.py
+python app/training/vectorize.py
+python app/training/train_model.py
 ```
 
-Output:
-- `app/data/raw/futsal_reviews_dataset.csv`
+Expected model artifacts:
+- `app/trained_model/sentiment_model.joblib`
+- `app/trained_model/tfidf_vectorizer.joblib`
 
-Default behavior:
-- 1200 total records
-- Balanced classes: Positive / Negative
-- Includes noisy, short, and mixed-sentiment text
-
-### 2) Preprocess raw dataset
+## Run API
 
 ```bash
-python app/utils/preprocessing.py
+python -m uvicorn app.main:app --reload
 ```
 
-Output:
-- `app/data/processed/futsal_reviews_dataset_processed.csv`
+Base URL:
+- `http://localhost:8000`
 
-Preprocessing includes:
-- Column name standardization
-- Missing value handling (numeric + categorical)
-- Duplicate removal
-- Numeric outlier filtering (excluding IDs)
-- Text cleaning (lowercase, URL/special-char cleanup)
-- Binary label encoding (`negative -> 0`, `positive -> 1`)
+Health check:
+- `GET /`
 
-## Dataset Schema
+Prediction endpoint:
+- `GET /api/sentiment/predict?text=Great%20court`
 
-Raw dataset columns:
-- `id`
-- `user_id`
-- `rating`
-- `review`
-- `sentiment_label`
+Example response:
 
-Processed dataset adds:
-- `label` (0/1 binary target)
+```json
+{
+  "sentiment": "Positive",
+  "confidence": 0.91
+}
+```
+
+## What to Include in Notebook (Suggested)
+
+Use `notebooks/training_experiments.ipynb` for:
+1. Dataset inspection and class balance
+2. EDA on review length / token distribution
+3. Baseline training results (current setup)
+4. Experiments:
+   - TF-IDF `max_features`
+   - n-grams `(1,1)` vs `(1,2)`
+   - LogisticRegression `C`, `solver`, `class_weight`
+5. Comparison table of metrics (accuracy, precision, recall, f1)
+6. Final selected model configuration
+
+## What to Include in Tests (Suggested)
+
+Use `tests/test_sentiment.py` for:
+1. API health endpoint test
+2. API prediction success test (valid text)
+3. API empty-text behavior test
+4. Service-level unit tests for `predict()` output keys/types
+5. Regression tests with fixed sample sentences
 
 ## Notes
 
-- The generated data is synthetic and useful for baseline development, not final production evaluation.
-- Before real deployment, replace or augment with real user reviews and rerun preprocessing/training.
-
-## Next Recommended Steps
-
-1. Populate `requirements.txt` with exact versions.
-2. Implement `app/training/train_model.py` for model training and artifact saving.
-3. Implement API entrypoint (`app/main.py`) and sentiment route/service logic.
-4. Add tests in `tests/test_sentiment.py`.
-5. Add Docker and run instructions after entrypoint is ready.
+- Current data is synthetic, suitable for baseline development.
+- For production quality, retrain with real review data and re-evaluate.

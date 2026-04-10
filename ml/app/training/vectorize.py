@@ -11,6 +11,7 @@ from sklearn.model_selection import train_test_split
 def split_dataset(df: pd.DataFrame, test_size: float = 0.2, random_state: int = 42):
     X = df["review"].astype(str)
     y = df["label"].astype(int)
+    print("Label Mapping: 0 = Negative, 1 = Positive")
     return train_test_split(
         X,
         y,
@@ -45,7 +46,12 @@ def main() -> None:
     train_df.to_csv(processed_dir / "futsal_reviews_train.csv", index=False)
     test_df.to_csv(processed_dir / "futsal_reviews_test.csv", index=False)
 
-    vectorizer = TfidfVectorizer(max_features=5000)
+    vectorizer = TfidfVectorizer(
+        max_features=5000,
+        ngram_range=(1,2),
+        stop_words='english'
+        )
+    
     X_train_tfidf = vectorizer.fit_transform(X_train)
     X_test_tfidf = vectorizer.transform(X_test)
 
