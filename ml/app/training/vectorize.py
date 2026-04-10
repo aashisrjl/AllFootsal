@@ -27,7 +27,7 @@ def main() -> None:
     processed_path = app_root / "data" / "processed" / "futsal_reviews_dataset_processed.csv"
     processed_dir = processed_path.parent
     vectorized_dir = processed_dir / "vectorized"
-    model_dir = project_root / "trained_model"
+    model_dir = app_root / "trained_model"
 
     vectorized_dir.mkdir(parents=True, exist_ok=True)
     model_dir.mkdir(parents=True, exist_ok=True)

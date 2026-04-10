@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score, classification_report
 def main() -> None:
     project_root = Path(__file__).resolve().parents[2]
     vectorized_dir = project_root / "app" / "data" / "processed" / "vectorized"
-    model_dir = project_root / "trained_model"
+    model_dir = project_root / "app" / "trained_model"
     model_dir.mkdir(parents=True, exist_ok=True)
 
     x_train_path = vectorized_dir / "X_train_tfidf.npz"
