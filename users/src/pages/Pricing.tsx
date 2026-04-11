@@ -3,7 +3,7 @@ import { CheckCircle, Zap, Shield, Users, CreditCard, MessageCircle } from "luci
 
 import Header from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // 1. Button
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -162,8 +162,8 @@ const ownerPlans = [
 const PriceOptionCard: React.FC<{ 
     cycle: BillingCycle, 
     details: PriceDetail & { buttonText: string },
-    planName: string
-}> = ({ cycle, details, planName }) => {
+    onSelect: (cycle: BillingCycle) => void,
+}> = ({ cycle, details, onSelect }) => {
     const isYearly = cycle === 'yearly';
     const isMonthly = cycle === 'monthly';
     const effectiveTotal = details.amount * details.totalDuration;
@@ -200,7 +200,7 @@ const PriceOptionCard: React.FC<{
             <Button 
                 className={`mt-6 w-full h-10 text-base ${isYearly ? 'bg-sky-600 hover:bg-sky-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}
                 variant={isYearly ? 'accent' : 'default'}
-                onClick={() => console.log(`Attempting to sign up for ${planName} - ${cycle}`)}
+                onClick={() => onSelect(cycle)}
             >
                 {details.buttonText}
             </Button>
@@ -210,7 +210,25 @@ const PriceOptionCard: React.FC<{
 
 
 const Pricing: React.FC = () => {
-    const Navigate = useNavigate();
+    const navigate = useNavigate();
+
+    const goToFutsalSubscription = (plan: 'trial' | 'monthly' | 'half-yearly' | 'yearly') => {
+        window.location.href = `http://localhost:3002/subscription?plan=${plan}&from=users-pricing`;
+    };
+
+    const handleOwnerPlanSelect = (cycle: BillingCycle) => {
+        if (cycle === 'monthly') {
+            goToFutsalSubscription('monthly');
+            return;
+        }
+
+        if (cycle === 'six_months') {
+            goToFutsalSubscription('half-yearly');
+            return;
+        }
+
+        goToFutsalSubscription('yearly');
+    };
     // Inject Custom CSS for animation
     const styleElement = <style>{animationStyle}</style>;
 
@@ -245,7 +263,7 @@ const Pricing: React.FC = () => {
                                 Launch a digital-ready futsal venue with payments, analytics, and bookings in minutes. No hidden fees—just pick the duration that matches your ambition.
                             </p>
                             <div className="flex flex-wrap gap-4">
-                                <Button className="shadow-xl" onClick={() => Navigate("/auth/register")}>
+                                <Button className="shadow-xl" onClick={() => goToFutsalSubscription('trial')}>
                                     <Zap className="w-5 h-5 mr-2" />
                                     Start 7-day free trial
                                 </Button>
@@ -291,7 +309,7 @@ const Pricing: React.FC = () => {
                                             <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-emerald-500" /> Player insights & repeat rate</li>
                                         </ul>
                                     </div>
-                                    <Button className="w-full mt-4 h-12 text-lg" onClick={() => console.log("Start yearly trial")}>
+                                    <Button className="w-full mt-4 h-12 text-lg" onClick={() => goToFutsalSubscription('yearly')}>
                                         Go live now
                                     </Button>
                                 </div>
@@ -310,9 +328,9 @@ const Pricing: React.FC = () => {
                         </div>
 
                         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <PriceOptionCard cycle="monthly" details={plan.prices.monthly} planName={plan.name} />
-                            <PriceOptionCard cycle="six_months" details={plan.prices.six_months} planName={plan.name} />
-                            <PriceOptionCard cycle="yearly" details={plan.prices.yearly} planName={plan.name} />
+                            <PriceOptionCard cycle="monthly" details={plan.prices.monthly} onSelect={handleOwnerPlanSelect} />
+                            <PriceOptionCard cycle="six_months" details={plan.prices.six_months} onSelect={handleOwnerPlanSelect} />
+                            <PriceOptionCard cycle="yearly" details={plan.prices.yearly} onSelect={handleOwnerPlanSelect} />
                         </div>
 
                         <Card className="max-w-6xl mx-auto mt-10 p-10 shadow-xl border-t-4 border-emerald-500 bg-white/90 dark:bg-slate-900/90 backdrop-blur">
@@ -393,7 +411,7 @@ const Pricing: React.FC = () => {
                                 <Button 
                                     className="w-full md:w-2/3 h-14 text-xl font-extrabold bg-slate-400  text-emerald-600 hover:bg-slate-200 shadow-2xl"
                                     variant="default"
-                                    onClick={() => {Navigate("/auth/register")}}
+                                    onClick={() => {navigate("/auth/register")}}
                                 >
                                     <Zap className="w-6 h-6 mr-3" />
                                     Register & Start Playing Today
