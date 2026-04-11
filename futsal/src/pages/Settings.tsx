@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { User, Bell, Shield, CreditCard, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import api from '../lib/api';
+import { updateFutsalProfile } from '../lib/authApi';
 
 const Settings = () => {
   const { futsalProfile, refreshProfile } = useAuth();
@@ -29,7 +29,7 @@ const Settings = () => {
       setIsSaving(true);
       setSuccessMsg('');
       const ownerName = `${firstName} ${lastName}`.trim();
-      await api.patch('/futsals-profile', { ownerName, email, phoneNumber: phone });
+      await updateFutsalProfile({ ownerName, email, phoneNumber: phone });
       await refreshProfile();
       setSuccessMsg('Profile updated successfully!');
       setTimeout(() => setSuccessMsg(''), 3000);

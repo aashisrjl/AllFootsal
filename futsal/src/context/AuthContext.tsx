@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../lib/api';
+import { getFutsalProfile, loginFutsal, logoutFutsal } from '../lib/authApi';
 
 export interface FutsalProfile {
   id: string;
@@ -8,6 +8,12 @@ export interface FutsalProfile {
   email: string;
   phoneNumber: string;
   ownerName: string;
+  profileCompletion?: {
+    isLocationComplete: boolean;
+    isInfoComplete: boolean;
+    isProfileComplete: boolean;
+    missingSections: string[];
+  };
   // add other fields as necessary
 }
 
@@ -28,9 +34,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/futsals-profile');
-      if (res.data.success) {
-        setFutsalProfile(res.data.data);
+      const res = await getFutsalProfile();
+      if (res.success) {
+        setFutsalProfile(res.data);
       } else {
         setFutsalProfile(null);
       }
@@ -45,11 +51,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (credentials: { email: string; password: string }) => {
     try {
       setLoading(true);
-      const res = await api.post('/auth/futsal/login', credentials);
+      const res = await loginFutsal(credentials);
       
       // Axios directly throws on non-2xx status codes, so if we reach here, it succeeded assuming the backend follows REST
-      if (res.data.futsal) {
-        setFutsalProfile(res.data.futsal);
+      if (res.futsal) {
+        setFutsalProfile(res.futsal);
       } else {
         throw new Error('Login failed: Invalid response format');
       }
@@ -63,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      await api.post('/auth/logout');
+      await logoutFutsal();
       setFutsalProfile(null);
     } catch (error) {
       console.error('Logout failed', error);

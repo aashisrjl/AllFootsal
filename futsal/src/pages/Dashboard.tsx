@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Calendar, DollarSign, Users, TrendingUp, MoreVertical, CheckCircle2, Clock } from 'lucide-react';
-import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import { getOwnerAnalytics } from '../lib/analyticsApi';
+import { getOwnerBookings } from '../lib/bookingApi';
 
 const Dashboard = () => {
   const { futsalProfile } = useAuth();
@@ -15,16 +16,16 @@ const Dashboard = () => {
       try {
         setLoading(true);
         const [analyticsRes, bookingsRes] = await Promise.all([
-          api.get('/futsal/analytics/fetch').catch(() => null),
-          api.get('/futsal-bookings').catch(() => null)
+          getOwnerAnalytics().catch(() => null),
+          getOwnerBookings().catch(() => null)
         ]);
         
-        if (analyticsRes?.data?.success) {
-          setAnalytics(analyticsRes.data.data);
+        if (analyticsRes?.success) {
+          setAnalytics(analyticsRes.data);
         }
 
-        if (bookingsRes?.data?.success) {
-          const bookings = bookingsRes.data.data;
+        if (bookingsRes?.success) {
+          const bookings = bookingsRes.data;
           const todayDate = new Date().toISOString().split('T')[0];
           
           const todays = bookings.filter((b: any) => b.booking_date?.split('T')[0] === todayDate).map((b: any) => ({
