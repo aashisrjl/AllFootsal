@@ -5,6 +5,7 @@ import BookingManagement from './pages/BookingManagement';
 import PitchManagement from './pages/PitchManagement';
 import Revenue from './pages/Revenue';
 import Settings from './pages/Settings';
+import Subscription from './pages/Subscription';
 import Layout from './components/Layout';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
@@ -48,6 +49,9 @@ function App() {
                     <Route path="/pitches" element={<PitchManagement />} />
                     <Route path="/revenue" element={<Revenue />} />
                     <Route path="/settings" element={<Settings />} />
+                    <Route path="/subscription" element={<Subscription />} />
+                    <Route path="/payment/success" element={<Subscription />} />
+                    <Route path="/payment/failure" element={<Subscription />} />
                   </Routes>
                 </Layout>
               </ProtectedRoute>

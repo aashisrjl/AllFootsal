@@ -6,6 +6,7 @@ import {
   Calendar, 
   MapPin, 
   DollarSign,
+  Wallet,
   Settings,
   Bell,
   LogOut 
@@ -26,8 +27,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'Bookings', href: '/bookings', icon: Calendar },
     { name: 'Pitch Management', href: '/pitches', icon: MapPin },
     { name: 'Revenue', href: '/revenue', icon: DollarSign },
+    { name: 'Subscription', href: '/subscription', icon: Wallet },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
+
+  const isNavItemActive = (href: string) => {
+    if (href === '/subscription') {
+      return location.pathname === '/subscription' || location.pathname.startsWith('/payment/');
+    }
+    return location.pathname === href;
+  };
+
+  const getHeaderTitle = () => {
+    if (location.pathname.startsWith('/payment/')) {
+      return 'Subscription';
+    }
+    return navigation.find((item) => item.href === location.pathname)?.name || 'Dashboard';
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0f1c] text-slate-200 font-sans selection:bg-emerald-500/30">
@@ -48,7 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <ul className="space-y-2">
             {navigation.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.href;
+              const isActive = isNavItemActive(item.href);
               
               return (
                 <li key={item.name}>
@@ -88,7 +104,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <header className="bg-slate-900/30 backdrop-blur-xl border-b border-slate-800/50 px-6 py-4 sticky top-0 z-40">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-white tracking-tight relative z-10 drop-shadow-md">
-              {navigation.find(item => item.href === location.pathname)?.name || 'Dashboard'}
+              {getHeaderTitle()}
             </h2>
             <div className="flex items-center space-x-5 relative z-10">
               <button className="rounded-full bg-slate-800/80 p-2.5 relative border border-slate-700/50 hover:border-slate-600 hover:bg-slate-700 transition-all shadow-inner hover:shadow-lg">

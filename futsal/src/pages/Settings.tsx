@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Settings as SettingsIcon, User, Bell, Shield, CreditCard, Check } from 'lucide-react';
+import { User, Bell, Shield, CreditCard, Check } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
 
@@ -138,7 +139,7 @@ const Settings = () => {
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer ml-4">
                     <input type="checkbox" defaultChecked={notif.on} className="sr-only peer" />
-                    <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 shadow-inner peer-checked:after:bg-white"></div>
+                    <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 shadow-inner peer-checked:after:bg-white"></div>
                   </label>
                 </div>
               ))}
@@ -149,28 +150,24 @@ const Settings = () => {
           <div id="billing" className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-8 hover:border-slate-700 transition-colors">
             <h3 className="text-lg font-black text-white mb-6 flex items-center gap-2 border-b border-slate-800/80 pb-4">
               <CreditCard className="h-5 w-5 text-purple-500" />
-              Current Subscription
+              Billing & Subscription
             </h3>
             <div className="border border-emerald-500/30 rounded-xl p-6 bg-emerald-500/5 relative overflow-hidden group shadow-inner">
               <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-3xl rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none group-hover:bg-emerald-500/10 transition-colors duration-700"></div>
               
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 relative z-10 gap-3">
                 <span className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
-                  Premium Plan
+                  Manage Subscription
                   <span className="px-2.5 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] uppercase tracking-widest rounded-lg font-black shadow-sm">Active</span>
                 </span>
               </div>
               <p className="text-slate-300 font-medium text-sm mb-6 relative z-10 leading-relaxed max-w-lg">
-                You are currently on the Premium Plan billed at <strong className="text-emerald-400 font-black px-1.5 py-0.5 bg-emerald-500/10 rounded-md border border-emerald-500/20 mx-1">$199/month</strong>. <br className="hidden sm:block" />
-                Your next billing cycle will automatically start on <strong className="text-white">Feb 15, 2024</strong>.
+                Open the subscription center to choose your plan, make payment with Khalti/eSewa/manual methods, and verify payment status.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 relative z-10">
-                <button className="px-5 py-2.5 bg-slate-800/80 text-emerald-400 border border-emerald-500/30 font-bold rounded-xl hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all shadow-sm">
-                  Change Plan
-                </button>
-                <button className="px-5 py-2.5 bg-transparent text-slate-300 font-bold rounded-xl border border-slate-700 hover:bg-slate-800 hover:text-white transition-all shadow-sm">
-                  View Billing History
-                </button>
+                <Link to="/subscription" className="px-5 py-2.5 bg-slate-800/80 text-emerald-400 border border-emerald-500/30 font-bold rounded-xl hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all shadow-sm text-center">
+                  Go to Subscription Center
+                </Link>
               </div>
             </div>
           </div>
