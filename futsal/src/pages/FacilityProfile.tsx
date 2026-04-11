@@ -1,152 +1,575 @@
-import { Building2, MapPin, Clock, Star, Edit, Phone, Mail } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Building2, Crosshair, Facebook, Globe, Instagram, MapPin, Plus, Save, ShieldAlert, Trash2, Twitter, Youtube } from 'lucide-react';
+import {
+  createOwnerInfo,
+  createOwnerLocation,
+  getFutsalInfoById,
+  getOwnerLocation,
+  updateOwnerInfo,
+  updateOwnerLocation,
+} from '../lib/facilityApi';
 import { useAuth } from '../context/AuthContext';
+import MapPicker from '../components/MapPicker';
+
+interface LocationPayload {
+  id?: number;
+  district: string;
+  address: string;
+  city: string;
+  postal_code: string;
+  latitude: number | null;
+  longitude: number | null;
+  full_address: string;
+}
+
+interface DayHours {
+  isClosed: boolean;
+  open: string;
+  close: string;
+}
+
+interface InfoFormPayload {
+  id?: number;
+  established_year: string;
+  facilities: string[];
+  operating_hours: Record<string, DayHours>;
+  social_links: {
+    facebook: string;
+    instagram: string;
+    tiktok: string;
+    youtube: string;
+    x: string;
+  };
+  website_url: string;
+  parking_info: string;
+  additional_info: string;
+}
+
+const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
+
+const defaultOperatingHours = (): Record<string, DayHours> =>
+  DAYS.reduce<Record<string, DayHours>>((acc, day) => {
+    acc[day] = { isClosed: false, open: '06:00', close: '22:00' };
+    return acc;
+  }, {});
 
 const FacilityProfile = () => {
-  const { futsalProfile } = useAuth();
+  const { futsalProfile, refreshProfile } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [savingLocation, setSavingLocation] = useState(false);
+  const [savingInfo, setSavingInfo] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [facilityInput, setFacilityInput] = useState('');
 
-  const facility = {
-    name: futsalProfile?.futsalName || 'Elite Sports Arena',
-    location: (futsalProfile as any)?.location || 'Not specified',
-    description: (futsalProfile as any)?.description || 'Premium futsal facility with state-of-the-art pitches and modern amenities.',
-    rating: 4.8,
-    reviews: 156,
-    amenities: ['Parking', 'Changing Rooms', 'Cafeteria', 'Equipment Rental', 'Wi-Fi'],
-    operatingHours: {
-      weekdays: '6:00 AM - 11:00 PM',
-      weekends: '7:00 AM - 12:00 AM'
+  const [location, setLocation] = useState<LocationPayload>({
+    district: '',
+    address: '',
+    city: '',
+    postal_code: '',
+    latitude: null,
+    longitude: null,
+    full_address: '',
+  });
+
+  const [info, setInfo] = useState<InfoFormPayload>({
+    established_year: '',
+    facilities: [],
+    operating_hours: defaultOperatingHours(),
+    social_links: {
+      facebook: '',
+      instagram: '',
+      tiktok: '',
+      youtube: '',
+      x: '',
     },
-    contact: {
-      phone: futsalProfile?.phoneNumber || '+1 (555) 123-4567',
-      email: futsalProfile?.email || 'info@elitesportsarena.com'
+    website_url: '',
+    parking_info: '',
+    additional_info: '',
+  });
+
+  const completion = futsalProfile?.profileCompletion;
+
+  const isMandatoryComplete = useMemo(() => {
+    return completion?.isProfileComplete ?? false;
+  }, [completion]);
+
+  const fetchFacilityData = async () => {
+    if (!futsalProfile?.id) return;
+
+    try {
+      setLoading(true);
+      setError('');
+
+      const [locationRes, infoRes] = await Promise.all([
+        getOwnerLocation().catch(() => ({ data: [] })),
+        getFutsalInfoById(futsalProfile.id).catch(() => ({ data: [] })),
+      ]);
+
+      const locationRows = (locationRes?.data || []) as any[];
+      const infoRows = (infoRes?.data || []) as any[];
+
+      const latestLocation = locationRows[0];
+      if (latestLocation) {
+        setLocation({
+          id: latestLocation.id,
+          district: latestLocation.district || '',
+          address: latestLocation.address || '',
+          city: latestLocation.city || '',
+          postal_code: latestLocation.postal_code || '',
+          latitude: latestLocation.latitude !== null ? Number(latestLocation.latitude) : null,
+          longitude: latestLocation.longitude !== null ? Number(latestLocation.longitude) : null,
+          full_address: latestLocation.full_address || '',
+        });
+      }
+
+      const latestInfo = infoRows[0];
+      if (latestInfo) {
+        let parsedFacilities: string[] = [];
+        let parsedOperatingHours = defaultOperatingHours();
+        let parsedSocialLinks = {
+          facebook: '',
+          instagram: '',
+          tiktok: '',
+          youtube: '',
+          x: '',
+        };
+
+        try {
+          const value = typeof latestInfo.facilities === 'string' ? JSON.parse(latestInfo.facilities) : latestInfo.facilities;
+          if (Array.isArray(value)) {
+            parsedFacilities = value.map((item) => String(item));
+          }
+        } catch {
+          parsedFacilities = [];
+        }
+
+        try {
+          const value = typeof latestInfo.operating_hours === 'string'
+            ? JSON.parse(latestInfo.operating_hours)
+            : latestInfo.operating_hours;
+          if (value && typeof value === 'object') {
+            parsedOperatingHours = {
+              ...defaultOperatingHours(),
+              ...value,
+            };
+          }
+        } catch {
+          parsedOperatingHours = defaultOperatingHours();
+        }
+
+        try {
+          const value = typeof latestInfo.social_links === 'string'
+            ? JSON.parse(latestInfo.social_links)
+            : latestInfo.social_links;
+          if (value && typeof value === 'object') {
+            parsedSocialLinks = {
+              ...parsedSocialLinks,
+              ...value,
+            };
+          }
+        } catch {
+          parsedSocialLinks = parsedSocialLinks;
+        }
+
+        setInfo({
+          id: latestInfo.id,
+          established_year: latestInfo.established_year ? String(latestInfo.established_year) : '',
+          facilities: parsedFacilities,
+          operating_hours: parsedOperatingHours,
+          social_links: parsedSocialLinks,
+          website_url: latestInfo.website_url || '',
+          parking_info: latestInfo.parking_info || '',
+          additional_info: latestInfo.additional_info || '',
+        });
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to load facility data';
+      setError(message);
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    void fetchFacilityData();
+  }, [futsalProfile?.id]);
+
+  const validateLocation = () => {
+    if (!location.district || !location.address || !location.city || location.latitude === null || location.longitude === null) {
+      throw new Error('Location requires district, address, city, latitude and longitude.');
+    }
+  };
+
+  const validateInfo = () => {
+    if (!info.established_year || !info.website_url || info.facilities.length === 0) {
+      throw new Error('Info requires established year and website URL.');
+    }
+  };
+
+  const addFacility = () => {
+    const value = facilityInput.trim();
+    if (!value) return;
+
+    if (info.facilities.some((item) => item.toLowerCase() === value.toLowerCase())) {
+      setFacilityInput('');
+      return;
+    }
+
+    setInfo((prev) => ({ ...prev, facilities: [...prev.facilities, value] }));
+    setFacilityInput('');
+  };
+
+  const removeFacility = (facility: string) => {
+    setInfo((prev) => ({
+      ...prev,
+      facilities: prev.facilities.filter((item) => item !== facility),
+    }));
+  };
+
+  const setCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported in this browser.');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocation((prev) => ({
+          ...prev,
+          latitude: Number(position.coords.latitude.toFixed(7)),
+          longitude: Number(position.coords.longitude.toFixed(7)),
+        }));
+      },
+      () => {
+        setError('Unable to get current location. Please select it from map.');
+      }
+    );
+  };
+
+  const saveLocation = async () => {
+    try {
+      setSavingLocation(true);
+      setError('');
+      setSuccess('');
+
+      validateLocation();
+
+      const payload = {
+        district: location.district,
+        address: location.address,
+        city: location.city,
+        postal_code: location.postal_code,
+        latitude: Number(location.latitude),
+        longitude: Number(location.longitude),
+        full_address: location.full_address,
+      };
+
+      if (location.id) {
+        await updateOwnerLocation(location.id, payload);
+      } else {
+        await createOwnerLocation(payload);
+      }
+
+      await refreshProfile();
+      await fetchFacilityData();
+      setSuccess('Location saved successfully.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to save location';
+      setError(message);
+    } finally {
+      setSavingLocation(false);
+    }
+  };
+
+  const saveInfo = async () => {
+    if (!futsalProfile?.id) return;
+
+    try {
+      setSavingInfo(true);
+      setError('');
+      setSuccess('');
+
+      validateInfo();
+
+      const payload = {
+        established_year: Number(info.established_year),
+        facilities: info.facilities,
+        operating_hours: info.operating_hours,
+        social_links: info.social_links,
+        website_url: info.website_url,
+        parking_info: info.parking_info,
+        additional_info: info.additional_info,
+      };
+
+      if (info.id) {
+        await updateOwnerInfo(info.id, payload);
+      } else {
+        await createOwnerInfo(payload);
+      }
+
+      await refreshProfile();
+      await fetchFacilityData();
+      setSuccess('Facility info saved successfully.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to save info';
+      setError(message);
+    } finally {
+      setSavingInfo(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[40vh]">
+        <div className="w-8 h-8 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-           <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Facility Profile</h1>
-           <p className="text-slate-400 mt-1 text-sm font-medium">View and manage your public venue details.</p>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Facility Profile</h1>
+          <p className="text-slate-400 mt-1 text-sm font-medium">Complete location and facility info to activate full owner dashboard access.</p>
         </div>
-        <button className="flex items-center px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:-translate-y-0.5 active:translate-y-0">
-          <Edit className="h-4 w-4 mr-2" />
-          Edit Profile
-        </button>
+        <span
+          className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${
+            isMandatoryComplete
+              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+              : 'bg-amber-500/10 text-amber-300 border-amber-500/30'
+          }`}
+        >
+          {isMandatoryComplete ? 'Profile Completed' : 'Mandatory Profile Pending'}
+        </span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Profile Card */}
-        <div className="lg:col-span-2 bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-8 relative overflow-hidden group">
-          {/* Decorative glow */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none group-hover:bg-emerald-500/20 transition-all duration-700"></div>
+      {!isMandatoryComplete && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200 flex items-start gap-2">
+          <ShieldAlert className="w-4 h-4 mt-0.5" />
+          <span>
+            You must complete both <strong>Location</strong> and <strong>Facility Info</strong> after registration.
+          </span>
+        </div>
+      )}
 
-          <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8 mb-10 relative z-10">
-            <div className="w-32 h-32 bg-slate-800/80 border-2 border-slate-700/50 shadow-2xl rounded-3xl flex items-center justify-center shrink-0 group-hover:border-emerald-500/50 transition-colors duration-500">
-              <Building2 className="h-14 w-14 text-emerald-400" />
+      {error ? <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">{error}</div> : null}
+      {success ? <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">{success}</div> : null}
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-6 space-y-4">
+          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-emerald-400" />
+            Location (Mandatory)
+          </h2>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">District</label>
+            <input value={location.district} onChange={(e) => setLocation((prev) => ({ ...prev, district: e.target.value }))} placeholder="Enter district" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">City</label>
+            <input value={location.city} onChange={(e) => setLocation((prev) => ({ ...prev, city: e.target.value }))} placeholder="Enter city" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Street Address</label>
+            <input value={location.address} onChange={(e) => setLocation((prev) => ({ ...prev, address: e.target.value }))} placeholder="Street, lane, or landmark" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Postal Code</label>
+            <input value={location.postal_code} onChange={(e) => setLocation((prev) => ({ ...prev, postal_code: e.target.value }))} placeholder="Postal code" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+          </div>
+
+          <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-3 text-xs text-slate-400">
+            Click on the map to place the pin, or use your current location. The selected coordinates are saved automatically.
+          </div>
+
+          <MapPicker
+            value={location.latitude !== null && location.longitude !== null ? { lat: location.latitude, lng: location.longitude } : null}
+            onChange={(value) => {
+              setLocation((prev) => ({
+                ...prev,
+                latitude: Number(value.lat.toFixed(7)),
+                longitude: Number(value.lng.toFixed(7)),
+              }));
+            }}
+          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-slate-300 rounded-xl text-sm">
+              Latitude: {location.latitude ?? 'Not selected'}
             </div>
-            <div className="flex-1 text-center md:text-left">
-              <h2 className="text-3xl font-black text-white mb-3 tracking-tight">{facility.name}</h2>
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm font-bold text-slate-400 mb-5">
-                <div className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-1.5 text-rose-400" />
-                  {facility.location}
-                </div>
-                <div className="flex items-center text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20 shadow-sm">
-                  <Star className="h-4 w-4 mr-1.5 fill-amber-400" />
-                  {facility.rating} ({facility.reviews} reviews)
-                </div>
-              </div>
-              <p className="text-slate-400 font-medium leading-relaxed max-w-2xl text-sm md:text-base">{facility.description}</p>
+            <div className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-slate-300 rounded-xl text-sm">
+              Longitude: {location.longitude ?? 'Not selected'}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10 pt-8 border-t border-slate-800/80">
-            {/* Amenities */}
-            <div>
-              <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-5">Amenities Included</h3>
-              <div className="flex flex-wrap gap-2.5">
-                {facility.amenities.map((amenity, index) => (
-                  <span key={index} className="px-3 py-1.5 bg-slate-800/80 border border-slate-700 text-slate-300 rounded-lg text-xs font-bold shadow-sm hover:bg-slate-700 hover:text-white transition-colors cursor-default">
-                    {amenity}
-                  </span>
-                ))}
-              </div>
-            </div>
+          <button onClick={setCurrentLocation} type="button" className="inline-flex items-center gap-2 px-3 py-2 bg-slate-800 border border-slate-700 text-slate-200 rounded-lg text-sm hover:border-slate-500 w-fit">
+            <Crosshair className="w-4 h-4" />
+            Use My Current Location
+          </button>
 
-            {/* Operating Hours */}
-            <div>
-              <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-5">Operating Hours</h3>
-              <div className="space-y-3">
-                <div className="flex items-center bg-slate-800/40 p-3.5 rounded-xl border border-slate-700/50 shadow-inner group-hover:border-slate-600 transition-colors">
-                  <div className="p-2.5 bg-slate-900 rounded-lg mr-4 shadow-sm border border-slate-800">
-                    <Clock className="h-5 w-5 text-emerald-400" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Weekdays</p>
-                    <span className="text-sm font-black text-slate-200">{facility.operatingHours.weekdays}</span>
-                  </div>
-                </div>
-                <div className="flex items-center bg-slate-800/40 p-3.5 rounded-xl border border-slate-700/50 shadow-inner group-hover:border-slate-600 transition-colors">
-                  <div className="p-2.5 bg-slate-900 rounded-lg mr-4 shadow-sm border border-slate-800">
-                    <Clock className="h-5 w-5 text-blue-400" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Weekends</p>
-                    <span className="text-sm font-black text-slate-200">{facility.operatingHours.weekends}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <textarea value={location.full_address} onChange={(e) => setLocation((prev) => ({ ...prev, full_address: e.target.value }))} placeholder="Full Address" rows={3} className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+
+          <button
+            onClick={() => void saveLocation()}
+            disabled={savingLocation}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl disabled:opacity-60"
+          >
+            <Save className="w-4 h-4" />
+            {savingLocation ? 'Saving...' : 'Save Location'}
+          </button>
         </div>
 
-        {/* Side Panel */}
-        <div className="space-y-6">
-          {/* Contact Info */}
-          <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-6 hover:border-slate-700 transition-colors">
-            <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-6 border-b border-slate-800/80 pb-4">Contact Information</h3>
-            <div className="space-y-5">
-              <div className="flex items-center group/contact">
-                <div className="p-2.5 bg-slate-800/80 rounded-xl mr-4 border border-slate-700 group-hover/contact:border-emerald-500/50 transition-colors shadow-inner">
-                   <Phone className="w-5 h-5 text-emerald-400" />
-                </div>
-                <div>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Support Phone</p>
-                  <p className="text-sm font-black text-slate-200 group-hover/contact:text-white transition-colors">{facility.contact.phone}</p>
-                </div>
-              </div>
-              <div className="flex items-center group/contact">
-                 <div className="p-2.5 bg-slate-800/80 rounded-xl mr-4 border border-slate-700 group-hover/contact:border-blue-500/50 transition-colors shadow-inner">
-                   <Mail className="w-5 h-5 text-blue-400" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Email Address</p>
-                  <p className="text-sm font-black text-slate-200 truncate group-hover/contact:text-white transition-colors" title={facility.contact.email}>{facility.contact.email}</p>
-                </div>
-              </div>
+        <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-6 space-y-4">
+          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <Building2 className="w-5 h-5 text-blue-400" />
+            Facility Info (Mandatory)
+          </h2>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Established Year</label>
+            <input value={info.established_year} onChange={(e) => setInfo((prev) => ({ ...prev, established_year: e.target.value }))} placeholder="e.g. 2023" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+          </div>
+          <div>
+            <label className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide flex items-center gap-2">
+              <Globe className="w-3.5 h-3.5 text-emerald-400" />
+              Website Link
+            </label>
+            <input value={info.website_url} onChange={(e) => setInfo((prev) => ({ ...prev, website_url: e.target.value }))} placeholder="https://your-futsal-website.com" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Facilities</label>
+            <div className="flex gap-2">
+              <input
+                value={facilityInput}
+                onChange={(e) => setFacilityInput(e.target.value)}
+                placeholder="Add facility (e.g. Parking)"
+                className="flex-1 px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl"
+              />
+              <button type="button" onClick={addFacility} className="px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-200 hover:border-slate-500">
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {info.facilities.map((facility) => (
+                <span key={facility} className="inline-flex items-center gap-2 px-2.5 py-1 bg-emerald-500/10 text-emerald-300 rounded-lg border border-emerald-500/30 text-sm">
+                  {facility}
+                  <button type="button" onClick={() => removeFacility(facility)} className="text-rose-300 hover:text-rose-200">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              ))}
             </div>
           </div>
 
-          {/* Quick Stats */}
-          <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-6 hover:border-slate-700 transition-colors">
-             <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-4 border-b border-slate-800/80 pb-4">Quick Insights</h3>
-            <div className="space-y-1">
-              {[
-                { label: "Total Bookings", val: "1,234" },
-                { label: "This Month", val: "156", highlight: true },
-                { label: "Revenue (MTD)", val: "$7,800", color: "text-emerald-400" },
-                { label: "Active Pitches", val: "4" }
-              ].map((s, i) => (
-                <div key={i} className="flex flex-col py-3.5 border-b border-slate-800/50 last:border-0 last:pb-0 group/stat cursor-default">
-                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover/stat:text-slate-400 transition-colors">{s.label}</span>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className={`text-xl font-black ${s.color || 'text-slate-200'} group-hover/stat:scale-105 transition-transform origin-left`}>{s.val}</span>
-                    {s.highlight && <span className="bg-emerald-500/20 text-emerald-400 text-[9px] font-black px-1.5 py-0.5 rounded border border-emerald-500/20 uppercase tracking-widest shadow-sm">High Vol</span>}
-                  </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Operating Hours</label>
+            <div className="space-y-2">
+              {DAYS.map((day) => (
+                <div key={day} className="grid grid-cols-[120px_1fr_1fr_auto] gap-2 items-center">
+                  <span className="capitalize text-slate-300 text-sm">{day}</span>
+                  <input
+                    type="time"
+                    disabled={info.operating_hours[day]?.isClosed}
+                    value={info.operating_hours[day]?.open || '06:00'}
+                    onChange={(e) =>
+                      setInfo((prev) => ({
+                        ...prev,
+                        operating_hours: {
+                          ...prev.operating_hours,
+                          [day]: { ...prev.operating_hours[day], open: e.target.value },
+                        },
+                      }))
+                    }
+                    className="px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-white"
+                  />
+                  <input
+                    type="time"
+                    disabled={info.operating_hours[day]?.isClosed}
+                    value={info.operating_hours[day]?.close || '22:00'}
+                    onChange={(e) =>
+                      setInfo((prev) => ({
+                        ...prev,
+                        operating_hours: {
+                          ...prev.operating_hours,
+                          [day]: { ...prev.operating_hours[day], close: e.target.value },
+                        },
+                      }))
+                    }
+                    className="px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-white"
+                  />
+                  <label className="text-xs text-slate-400 inline-flex items-center gap-1">
+                    <input
+                      type="checkbox"
+                      checked={info.operating_hours[day]?.isClosed || false}
+                      onChange={(e) =>
+                        setInfo((prev) => ({
+                          ...prev,
+                          operating_hours: {
+                            ...prev.operating_hours,
+                            [day]: { ...prev.operating_hours[day], isClosed: e.target.checked },
+                          },
+                        }))
+                      }
+                    />
+                    Closed
+                  </label>
                 </div>
               ))}
             </div>
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide flex items-center gap-2">
+                <Facebook className="w-3.5 h-3.5 text-blue-400" />
+                Facebook URL
+              </label>
+              <input value={info.social_links.facebook} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, facebook: e.target.value } }))} placeholder="https://facebook.com/yourpage" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide flex items-center gap-2">
+                <Instagram className="w-3.5 h-3.5 text-pink-400" />
+                Instagram URL
+              </label>
+              <input value={info.social_links.instagram} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, instagram: e.target.value } }))} placeholder="https://instagram.com/yourpage" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide flex items-center gap-2">
+                <Youtube className="w-3.5 h-3.5 text-rose-400" />
+                YouTube URL
+              </label>
+              <input value={info.social_links.youtube} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, youtube: e.target.value } }))} placeholder="https://youtube.com/@yourchannel" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide flex items-center gap-2">
+                <Twitter className="w-3.5 h-3.5 text-sky-400" />
+                X / Twitter URL
+              </label>
+              <input value={info.social_links.x} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, x: e.target.value } }))} placeholder="https://x.com/yourpage" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">TikTok URL</label>
+              <input value={info.social_links.tiktok} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, tiktok: e.target.value } }))} placeholder="https://tiktok.com/@yourpage" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+            </div>
+          </div>
+          <textarea value={info.parking_info} onChange={(e) => setInfo((prev) => ({ ...prev, parking_info: e.target.value }))} placeholder="Parking Info" rows={2} className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+          <textarea value={info.additional_info} onChange={(e) => setInfo((prev) => ({ ...prev, additional_info: e.target.value }))} placeholder="Additional Info" rows={2} className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+
+          <button
+            onClick={() => void saveInfo()}
+            disabled={savingInfo}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl disabled:opacity-60"
+          >
+            <Save className="w-4 h-4" />
+            {savingInfo ? 'Saving...' : 'Save Facility Info'}
+          </button>
         </div>
       </div>
     </div>

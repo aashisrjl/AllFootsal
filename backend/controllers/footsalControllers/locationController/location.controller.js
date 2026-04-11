@@ -35,17 +35,50 @@ const postFutsalLocation = async (req, res) => {
     full_address,
   } = req.body;
 
-  if (!district || !address || !city || !longitude || !latitude) {
+  if (district === undefined || district === null || address === undefined || address === null || city === undefined || city === null || longitude === undefined || longitude === null || latitude === undefined || latitude === null) {
     return res.status(400).json({
       success: false,
       message:
         "district, address, city , longitude and latitude can't be empty !",
     });
   }
-  var data;
 
   try {
-    data = await sequelize.query(
+    const existingLocation = await sequelize.query(
+      `SELECT id FROM location_${futsalCode} ORDER BY id DESC LIMIT 1`,
+      { type: QueryTypes.SELECT }
+    );
+
+    if (existingLocation[0]?.id) {
+      const [_, updateMeta] = await sequelize.query(
+        `UPDATE location_${futsalCode}
+        SET district = ?, address = ?, city = ?, postal_code = ?, latitude = ?, longitude = ?, full_address = ?
+        WHERE id = ?`,
+        {
+          replacements: [
+            district,
+            address,
+            city,
+            postal_code,
+            latitude,
+            longitude,
+            full_address,
+            existingLocation[0].id,
+          ],
+          type: QueryTypes.UPDATE,
+        },
+      );
+
+      const affectedRows = typeof updateMeta === "number" ? updateMeta : updateMeta?.affectedRows;
+
+      return res.status(200).json({
+        success: true,
+        message: "Location updated successfully",
+        data: { affectedRows, id: existingLocation[0].id },
+      });
+    }
+
+    const data = await sequelize.query(
       `INSERT INTO location_${futsalCode} (district,address,city,postal_code,latitude,longitude,full_address)
         VALUES (?,?,?,?,?,?,?)`,
       {

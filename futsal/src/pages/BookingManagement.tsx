@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Calendar, Search, Filter, CheckCircle, XCircle, Clock, ChevronDown } from 'lucide-react';
-import api from '../lib/api';
+import { cancelOwnerBooking, confirmOwnerBooking, getOwnerBookings, unconfirmOwnerBooking } from '../lib/bookingApi';
 
 const BookingManagement = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -11,10 +11,9 @@ const BookingManagement = () => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/futsal-bookings');
-      console.log(res.data);
-      if (res.data.success) {
-        const mapped = res.data.data.map((b: any) => ({
+      const res = await getOwnerBookings();
+      if (res.success) {
+        const mapped = res.data.map((b: any) => ({
           id: b.id,
           customerName: b.user_name || 'Guest',
           pitch: b.pitch_name,
@@ -42,7 +41,7 @@ const BookingManagement = () => {
     try {
       // Optimistic
       setBookings(bookings.map(b => b.id === id ? { ...b, status: 'cancelled' } : b));
-      await api.patch(`/futsal/bookings/${id}/cancel`);
+      await cancelOwnerBooking(id);
     } catch (error) {
       console.error('Failed to cancel booking', error);
       fetchBookings(); // revert
@@ -54,7 +53,7 @@ const BookingManagement = () => {
     try {
       // Optimistic
       setBookings(bookings.map(b => b.id === id ? { ...b, status: 'confirmed' } : b));
-      await api.patch(`/futsal/bookings/${id}/confirm`);
+      await confirmOwnerBooking(id);
     } catch (error) {
       console.error('Failed to confirm booking', error);
       fetchBookings(); // revert
@@ -66,7 +65,7 @@ const BookingManagement = () => {
     try {
       // Optimistic
       setBookings(bookings.map(b => b.id === id ? { ...b, status: 'pending' } : b));
-      await api.patch(`/futsal/bookings/${id}/unconfirm`);
+      await unconfirmOwnerBooking(id);
     } catch (error) {
       console.error('Failed to unconfirm booking', error);
       fetchBookings(); // revert
