@@ -4,9 +4,9 @@ import FutsalNavigation from "@/components/FutsalNavigation";
 import FutsalFooter from "@/components/FutsalFooter";
 import PitchCard from "@/components/PitchCard";
 import { useQuery } from "@tanstack/react-query";
-import { getFutsalById, getFutsalInfo, getFutsalLocation, getFutsalMedia, getFutsalPitches, sendContactMessage, getFutsalRatings, getEventMedia } from "@/lib/futsalApi";
+import { getFutsalById, getFutsalInfo, getFutsalLocation, getFutsalMedia, getFutsalPitches, sendContactMessage, getFutsalRatings, getEventMedia, getFutsalFaqs } from "@/lib/futsalApi";
 import { useBooking } from "@/contexts/BookingContext";
-import { MapPin, Star, Clock, ArrowLeft, Loader2, CheckCircle2, Phone, Mail, CalendarDays, Navigation2, Facebook, Instagram, Globe, Send, MessageSquare, User } from "lucide-react";
+import { MapPin, Star, Clock, ArrowLeft, Loader2, CheckCircle2, Phone, Mail, CalendarDays, Navigation2, Facebook, Instagram, Globe, Send, MessageSquare, User, HelpCircle, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import SentimentBadge from "@/components/SentimentBadge";
@@ -74,6 +74,7 @@ const FacilityDetails = () => {
   const { data: pitchMediaData } = useQuery({ queryKey: ['futsal-media-pitch', id], queryFn: () => getFutsalMedia(id as string, 'pitch'), enabled: !!id, retry: false });
   const { data: pitchesData, isLoading: pitchesLoading } = useQuery({ queryKey: ['futsal-pitches', id], queryFn: () => getFutsalPitches(id as string), enabled: !!id, retry: false });
   const { data: ratingsData, isLoading: ratingsLoading } = useQuery({ queryKey: ['futsal-ratings', id], queryFn: () => getFutsalRatings(id as string), enabled: !!id, retry: false });
+  const { data: faqsData } = useQuery({ queryKey: ['futsal-faqs', id], queryFn: () => getFutsalFaqs(id as string), enabled: !!id, retry: false });
 
   const isPageLoading = baseLoading || infoLoading || locLoading || pitchesLoading || homeMediaLoading;
 
@@ -81,6 +82,7 @@ const FacilityDetails = () => {
   const info = infoData?.data?.[0];
   const loc = locData?.data?.[0];
   const reviews = ratingsData?.data?.slice(0, 5) || [];
+  const faqs = faqsData?.data || [];
 
   // Collect images
   const allHomeMedia = homeMediaData?.data || [];
@@ -489,6 +491,83 @@ const FacilityDetails = () => {
             </div>
           </div>
         </section>
+
+        {/* PREMIUM FAQ SECTION */}
+        {faqs.length > 0 && (
+          <section id="faq" className="py-32 bg-slate-50 dark:bg-slate-950/20 scroll-mt-16 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[120px] -mr-64 -mt-64 pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-600/5 rounded-full blur-[120px] -ml-64 -mb-64 pointer-events-none"></div>
+
+            <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
+              <div className="flex flex-col lg:flex-row gap-16 items-start">
+                
+                {/* FAQ Header & Visual */}
+                <div className="lg:w-1/3 lg:sticky lg:top-32 space-y-6">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                    <HelpCircle className="h-3.5 w-3.5" /> Assistance Center
+                  </div>
+                  <h2 className="text-4xl md:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
+                    Everything you <br /> 
+                    <span className="text-emerald-500">need to know</span>
+                  </h2>
+                  <p className="text-muted-foreground text-lg leading-relaxed max-w-md">
+                    Find quick answers to common questions about our facilities, booking policies, and player guidelines.
+                  </p>
+                  
+                  <div className="pt-8">
+                    <div className="p-10 rounded-[2.5rem] bg-emerald-600 text-white shadow-2xl shadow-emerald-500/20 relative overflow-hidden group transition-transform hover:-translate-y-1">
+                      <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                         <MessageSquare className="h-24 w-24" />
+                      </div>
+                      <h4 className="text-xl font-bold mb-2 relative z-10">Still have questions?</h4>
+                      <p className="text-emerald-50 mb-6 text-sm opacity-90 relative z-10">Our support team is always ready to help you with your inquiries.</p>
+                      <Button 
+                        onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="bg-white text-emerald-700 hover:bg-emerald-50 border-none rounded-2xl px-6 h-11 font-bold shadow-sm relative z-10"
+                      >
+                        Contact Support
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* FAQ Questions */}
+                <div className="lg:w-2/3 w-full space-y-5">
+                  {faqs.map((faq: any, idx: number) => (
+                    <div 
+                      key={faq.id} 
+                      className="group bg-card hover:bg-emerald-50/30 dark:hover:bg-emerald-500/5 border border-border hover:border-emerald-500/30 rounded-[2rem] overflow-hidden transition-all duration-500 shadow-sm hover:shadow-xl hover:-translate-y-1"
+                    >
+                      <details className="group peer overflow-hidden">
+                        <summary className="flex items-center justify-between p-8 cursor-pointer list-none select-none">
+                          <div className="flex items-center gap-6">
+                            <span className="flex items-center justify-center h-10 w-10 rounded-2xl bg-muted group-hover:bg-emerald-500/10 text-muted-foreground group-hover:text-emerald-600 font-bold text-sm transition-colors border border-transparent group-hover:border-emerald-500/20 shrink-0">
+                               {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
+                            </span>
+                            <h3 className="font-bold text-foreground text-lg md:text-xl tracking-tight leading-tight transition-colors group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+                              {faq.question}
+                            </h3>
+                          </div>
+                          <div className="flex items-center justify-center h-10 w-10 rounded-full border border-border group-hover:border-emerald-500/20 group-hover:bg-emerald-500/5 transition-all text-muted-foreground group-open:bg-emerald-500 group-open:text-white group-open:border-emerald-500 group-open:rotate-180 shrink-0">
+                             <ChevronDown className="h-5 w-5" />
+                          </div>
+                        </summary>
+                        <div className="px-8 pb-8 pt-2 animate-in fade-in slide-in-from-top-2 duration-500">
+                          <div className="pl-16">
+                            <p className="text-muted-foreground text-base md:text-lg leading-relaxed font-medium">
+                              {faq.answer}
+                            </p>
+                          </div>
+                        </div>
+                      </details>
+                    </div>
+                  ))}
+                </div>
+
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* CONTACT SECTION */}
         <section id="contact" className="py-24 bg-slate-900 scroll-mt-16 relative overflow-hidden">
