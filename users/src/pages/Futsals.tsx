@@ -39,7 +39,7 @@ const Futsals = () => {
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
       <Header />
 
       <main className="flex-1">

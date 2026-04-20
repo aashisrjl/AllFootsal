@@ -65,7 +65,7 @@ const FutsalGallery = () => {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4 text-foreground">
                 <FutsalNavigation name="Loading Gallery..." />
                 <Loader2 className="h-10 w-10 animate-spin text-emerald-500 my-auto" />
                 <FutsalFooter />
@@ -74,23 +74,23 @@ const FutsalGallery = () => {
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
+        <div className="min-h-screen flex flex-col bg-background font-sans text-foreground">
             <FutsalNavigation name={futsalName} />
             
             <main className="flex-1 container mx-auto px-4 md:px-6 py-10 max-w-7xl">
-                <Button variant="ghost" className="mb-6 hover:bg-emerald-50 text-emerald-700" onClick={() => navigate(`/futsals/${id}`)}>
+                <Button variant="ghost" className="mb-6 hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" onClick={() => navigate(`/futsals/${id}`)}>
                     <ArrowLeft className="h-4 w-4 mr-2" /> Back to Facility
                 </Button>
 
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
                     <div>
-                        <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-3 tracking-tight">Full Gallery</h1>
-                        <p className="text-slate-500 text-lg">Browse systematically curated photos from {futsalName}.</p>
+                        <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-3 tracking-tight">Full Gallery</h1>
+                        <p className="text-muted-foreground text-lg">Browse systematically curated photos from {futsalName}.</p>
                     </div>
 
                     {/* Filter Tabs */}
-                    <div className="flex flex-wrap items-center gap-2 bg-white p-2 rounded-2xl shadow-sm border border-slate-200">
-                        <div className="px-3 text-slate-400 hidden sm:block"><Filter className="h-4 w-4" /></div>
+                    <div className="flex flex-wrap items-center gap-2 bg-card p-2 rounded-2xl shadow-sm border border-border">
+                        <div className="px-3 text-muted-foreground hidden sm:block"><Filter className="h-4 w-4" /></div>
                         {filters.map(filter => (
                             <button
                                 key={filter}
@@ -98,7 +98,7 @@ const FutsalGallery = () => {
                                 className={`px-5 py-2.5 outline-none rounded-xl text-sm font-bold transition-all duration-300 ${
                                     activeFilter === filter 
                                     ? "bg-emerald-500 text-white shadow-md transform scale-105" 
-                                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                                 }`}
                             >
                                 {filter} {filter !== "All" && <span className="opacity-70 ml-1 text-xs">({formatMedia(
@@ -117,7 +117,7 @@ const FutsalGallery = () => {
                         {filteredImages.map((img, index) => (
                             <div 
                                 key={`${img.id}-${index}`} 
-                                className="break-inside-avoid relative group rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 bg-slate-200 cursor-pointer"
+                                className="break-inside-avoid relative group rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 bg-muted cursor-pointer"
                                 onClick={() => setSelectedImage(img)}
                             >
                                 <img 
@@ -138,15 +138,15 @@ const FutsalGallery = () => {
                         ))}
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center p-20 text-center bg-white rounded-[3rem] border border-slate-100 shadow-sm">
-                        <div className="h-20 w-20 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mb-6 shadow-sm border border-slate-100">
+                    <div className="flex flex-col items-center justify-center p-20 text-center bg-card rounded-[3rem] border border-border shadow-sm">
+                        <div className="h-20 w-20 bg-muted text-muted-foreground rounded-full flex items-center justify-center mb-6 shadow-sm border border-border">
                             <Filter className="h-8 w-8" />
                         </div>
-                        <h3 className="text-2xl font-bold text-slate-800 mb-2">No photos found</h3>
-                        <p className="text-slate-500 max-w-sm">No images are currently available in the "{activeFilter}" category. Try selecting another filter.</p>
+                        <h3 className="text-2xl font-bold text-foreground mb-2">No photos found</h3>
+                        <p className="text-muted-foreground max-w-sm">No images are currently available in the "{activeFilter}" category. Try selecting another filter.</p>
                         <Button 
                             variant="outline" 
-                            className="mt-6 border-slate-200"
+                            className="mt-6 border-border"
                             onClick={() => setActiveFilter("All")}
                         >
                             Clear Filters
@@ -160,11 +160,11 @@ const FutsalGallery = () => {
             {/* Lightbox / Selected Image Modal */}
             {selectedImage && (
                 <div 
-                    className="fixed inset-0 z-[100] bg-slate-900/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-10 animate-in fade-in duration-300"
+                    className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-10 animate-in fade-in duration-300"
                     onClick={() => setSelectedImage(null)}
                 >
                     <button 
-                        className="absolute top-6 right-6 md:top-10 md:right-10 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-colors backdrop-blur-md"
+                        className="absolute top-6 right-6 md:top-10 md:right-10 bg-foreground/10 hover:bg-foreground/20 text-foreground p-3 rounded-full transition-colors backdrop-blur-md"
                         onClick={(e) => { e.stopPropagation(); setSelectedImage(null); }}
                     >
                         <X className="h-6 w-6" />
@@ -180,7 +180,7 @@ const FutsalGallery = () => {
                             <span className="bg-emerald-500 text-white text-sm font-bold px-4 py-1.5 rounded-full mb-3 shadow-[0_0_15px_rgba(16,185,129,0.5)]">
                                 {selectedImage.category} Collection
                             </span>
-                            <p className="text-slate-300 text-sm max-w-md">Use the X button or tap outside the image to close this preview.</p>
+                            <p className="text-muted-foreground text-sm max-w-md">Use the X button or tap outside the image to close this preview.</p>
                         </div>
                     </div>
                 </div>
