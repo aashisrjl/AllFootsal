@@ -161,5 +161,15 @@ module.exports = {
       INDEX idx_ip_hash (ip_hash),
       UNIQUE KEY uq_session (session_id)
     ) ENGINE=InnoDB;
+  `,
+  faq: (code) => `
+    CREATE TABLE IF NOT EXISTS faq_${code} (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      question TEXT NOT NULL,
+      answer TEXT NOT NULL,
+      is_active BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;
   `
 };

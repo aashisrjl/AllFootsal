@@ -11,6 +11,7 @@ import {
   logo_transparent,
   ForgotPasswordImage,
 } from "@/assets/images";
+import { forgotPassword } from "@/lib/authApi";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -33,8 +34,7 @@ const ForgotPassword = () => {
 
     setIsLoading(true);
     try {
-      // TODO: Replace with your OTP API call
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // mock delay
+      await forgotPassword(email);
 
       toast({
         title: "OTP Sent",

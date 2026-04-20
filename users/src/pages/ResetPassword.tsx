@@ -11,6 +11,7 @@ import {
   OTPIllustration,
   PasswordIllustration,
 } from "@/assets/images";
+import { resendOtp, resetPassword } from "@/lib/authApi";
 
 const ResetPassword = () => {
   const [otp, setOtp] = useState("");
@@ -39,7 +40,7 @@ const ResetPassword = () => {
   const handleResendOTP = async () => {
     setIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // simulate API
+      await resendOtp(email, 'forgot_password');
       setResendTimer(180);
       toast({
         title: "OTP Resent",
@@ -97,8 +98,7 @@ const ResetPassword = () => {
 
     setIsLoading(true);
     try {
-      // TODO: Replace with API call for reset password
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // mock delay
+      await resetPassword({ email, otp, newPassword, cNewPassword: confirmPassword });
       toast({
         title: "Success",
         description: "Your password has been reset successfully.",

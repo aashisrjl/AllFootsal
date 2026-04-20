@@ -81,6 +81,7 @@ const paymentFutsalRoutes = require("./routes/footsalRoutes/paymentRoutes/paymen
 const pitchRoutes = require("./routes/footsalRoutes/pitchRoutes/pitch.route")
 const timeslotRoutes = require("./routes/footsalRoutes/timeslotsRoutes/timeslot.route")
 const visitorRoutes = require("./routes/footsalRoutes/visitorRoutes/visitors.route")
+const faqRoutes = require("./routes/footsalRoutes/faqRoutes/faq.routes")
 
 app.use('/api/v1/', analyticsRoutes)
 app.use('/api/v1/', contactRoutes)
@@ -93,6 +94,7 @@ app.use('/api/v1/', paymentFutsalRoutes)
 app.use('/api/v1/', pitchRoutes)
 app.use('/api/v1/', timeslotRoutes)
 app.use('/api/v1/', visitorRoutes)
+app.use('/api/v1/', faqRoutes)
 
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));

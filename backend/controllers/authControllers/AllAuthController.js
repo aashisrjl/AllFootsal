@@ -439,6 +439,60 @@ const changeForgotPassword = async (req, res) => {
   }
 };
 
+// Resend OTP api
+const resendOtp = async (req, res) => {
+  try {
+    const { email, type } = req.body;
+
+    if (!email || !type) {
+      return res.status(400).json({
+        error: "Email and type are required",
+      });
+    }
+
+    const otp = generateOTP(6);
+    let redisKey, subject, text;
+
+    switch (type) {
+      case "user_registration":
+        redisKey = `user:otp:${email}`;
+        subject = "Your OTP Code for User Registration";
+        text = `Your OTP code is ${otp}. It expires in 5 minutes.`;
+        break;
+      case "footsal_registration":
+        redisKey = `footsal:otp:${email}`;
+        subject = "Your OTP Code for Footsal Registration";
+        text = `Your OTP code is ${otp}. It expires in 5 minutes.`;
+        break;
+      case "forgot_password":
+        redisKey = `otp:reset:${email}`;
+        subject = "Your OTP Code for Password Reset - AllFutsal";
+        text = `Your OTP code is ${otp}. It expires in 5 minutes.`;
+        break;
+      default:
+        return res.status(400).json({
+          error: "Invalid OTP type",
+        });
+    }
+
+    // Store in Redis (5 minutes)
+    await redisClient.setEx(redisKey, 300, type === "forgot_password" ? otp : JSON.stringify({ email, otp, type }));
+
+    // Send email
+    await sendOtp(email, otp, subject, text);
+
+    return res.status(200).json({
+      message: "OTP resent successfully",
+    });
+    
+  } catch (error) {
+    console.error("Resend OTP error:", error);
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
+
 
 module.exports = AllAuthController = {
   VerifyOtp,
@@ -446,5 +500,6 @@ module.exports = AllAuthController = {
   Login,
   forgotPassword,
   changeForgotPassword,
-  ChangePassword
+  ChangePassword,
+  resendOtp
 };

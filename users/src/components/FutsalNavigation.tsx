@@ -15,7 +15,8 @@ export default function FutsalNavigation({ name }: { name?: string }) {
 
   const isReviewsPage = location.pathname.includes("/reviews");
   const isBookingsPage = location.pathname.includes("/bookings");
-  const isOverviewPage = !isReviewsPage && !isBookingsPage;
+  const isGalleryPage = location.pathname.includes("/gallery");
+  const isOverviewPage = !isReviewsPage && !isBookingsPage && !isGalleryPage;
 
   useEffect(() => {
     if (isOverviewPage) {
@@ -54,7 +55,15 @@ export default function FutsalNavigation({ name }: { name?: string }) {
   const handleNav = (hash: string) => {
     setIsMenuOpen(false);
     if (!isOverviewPage) {
-       navigate(`/futsals/${id}#${hash}`);
+       if (hash === "gallery") {
+         navigate(`/futsals/${id}/gallery`);
+       } else if (hash === "reviews") {
+         navigate(`/futsals/${id}/reviews`);
+       } else if (hash === "pitches") {
+         navigate(`/futsals/${id}/bookings`);
+       } else {
+         navigate(`/futsals/${id}#${hash}`);
+       }
     } else {
        document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
        setActiveHash(hash);
@@ -76,6 +85,8 @@ export default function FutsalNavigation({ name }: { name?: string }) {
         isActive = activeHash === itemId;
     } else if (isReviewsPage && itemId === "reviews") {
         isActive = true;
+    } else if (isGalleryPage && itemId === "gallery") {
+      isActive = true;
     } else if (isBookingsPage && itemId === "pitches") {
         isActive = true;
     }

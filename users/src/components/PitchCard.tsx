@@ -19,8 +19,8 @@ const PitchCard: React.FC<PitchCardProps> = ({ pitch, onSelectPitch }) => {
     <Card className={`overflow-hidden transition-all duration-300 group ${
         isSelected 
             ? 'border-emerald-500 shadow-lg shadow-emerald-500/20 ring-2 ring-emerald-500 ring-offset-2' 
-            : 'border-slate-200 hover:border-emerald-300 hover:shadow-xl hover:-translate-y-1'
-    } rounded-3xl bg-white`}>
+            : 'border-border hover:border-emerald-300 dark:hover:border-emerald-500/50 hover:shadow-xl hover:-translate-y-1'
+    } rounded-3xl bg-card`}>
       
       <div className="relative">
         <AspectRatio ratio={4 / 3}>
@@ -54,28 +54,27 @@ const PitchCard: React.FC<PitchCardProps> = ({ pitch, onSelectPitch }) => {
       <CardContent className="p-5">
         <div className="flex justify-between items-start mb-3">
             <div>
-                <h3 className="font-extrabold text-xl text-slate-800 tracking-tight">{pitch.name}</h3>
+                <h3 className="font-extrabold text-xl text-foreground tracking-tight">{pitch.name}</h3>
                 {(pitch.pitch_type || pitch.surface_type) && (
-                    <div className="flex items-center gap-1.5 mt-1.5 text-slate-500 text-sm font-medium">
+                    <div className="flex items-center gap-1.5 mt-1.5 text-muted-foreground text-sm font-medium">
                         {pitch.pitch_type && (
-                            <span className="bg-slate-100 px-2.5 py-0.5 rounded-md text-slate-600">{pitch.pitch_type}</span>
+                            <span className="bg-secondary px-2.5 py-0.5 rounded-md text-secondary-foreground">{pitch.pitch_type}</span>
                         )}
                         {pitch.surface_type && (
-                            <span className="bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-md flex items-center gap-1">
+                            <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-0.5 rounded-md flex items-center gap-1 border border-emerald-500/20">
                                 <Map className="h-3 w-3" /> {pitch.surface_type}
                             </span>
                         )}
                     </div>
                 )}
             </div>
-            
         </div>
         
-        <div className="flex items-center gap-1 mt-4 p-3 bg-emerald-50 rounded-xl border border-emerald-100/50">
-            <div className="text-emerald-700 font-black text-lg">
+        <div className="flex items-center gap-1 mt-4 p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+            <div className="text-emerald-600 dark:text-emerald-400 font-black text-lg">
                 NPR {pitch.pricePerHour}
             </div>
-            <div className="text-emerald-600/70 text-sm font-semibold">/ hour</div>
+            <div className="text-emerald-600/70 dark:text-emerald-400/70 text-sm font-semibold">/ hour</div>
         </div>
       </CardContent>
 
@@ -85,7 +84,7 @@ const PitchCard: React.FC<PitchCardProps> = ({ pitch, onSelectPitch }) => {
           className={`w-full h-12 rounded-xl text-base font-bold transition-all shadow-md ${
              isSelected 
              ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/30" 
-             : "bg-slate-900 hover:bg-emerald-600 text-white"
+             : "bg-primary hover:bg-emerald-600 text-primary-foreground md:bg-slate-900 md:text-white"
           }`}
           disabled={pitch.is_active === false}
         >

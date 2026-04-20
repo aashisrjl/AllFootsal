@@ -157,3 +157,9 @@ export const deleteRating = async (futsalId: number | string) => {
     const res = await API.delete(`/futsal/${futsalId}/ratings/me`);
     return res.data;
 };
+
+// FAQ
+export const getFutsalFaqs = async (futsalId: number | string) => {
+    const res = await API.get(`/futsal/${futsalId}/faqs`);
+    return res.data;
+};
