@@ -126,7 +126,7 @@ const FootsalAuthRegister = () => {
       );
 
       if (success) {
-        navigate("/auth/verify-email", { state: { email: formData.email } });
+        navigate("/auth/verify-email", { state: { email: formData.email, type: 'footsal_registration' } });
       }
     } catch (error) {
       console.error(error);

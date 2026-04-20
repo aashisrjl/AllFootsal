@@ -103,7 +103,7 @@ const Register = () => {
 
       // Only navigate on successful registration
       if (success) {
-        navigate("/auth/verify-email", { state: { email: formData.email } });
+        navigate("/auth/verify-email", { state: { email: formData.email, type: 'user_registration' } });
       }
     } catch (error) {
       // Error handling is done in the context, just catch silently here
