@@ -9,6 +9,7 @@ import { useBooking } from "@/contexts/BookingContext";
 import { MapPin, Star, Clock, ArrowLeft, Loader2, CheckCircle2, Phone, Mail, CalendarDays, Navigation2, Facebook, Instagram, Globe, Send, MessageSquare, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import SentimentBadge from "@/components/SentimentBadge";
 
 const safelyParse = (str: string) => {
   try {
@@ -465,9 +466,15 @@ const FacilityDetails = () => {
                         <p className="text-xs text-muted-foreground">{new Date(review.createdAt || Date.now()).toLocaleDateString()}</p>
                       </div>
                     </div>
-                    <div className="flex gap-1 bg-yellow-50 dark:bg-yellow-500/10 px-2.5 py-1 rounded-full border border-yellow-100 dark:border-yellow-500/20 text-yellow-600 dark:text-yellow-300 font-bold items-center text-sm">
-                      <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-                      <span>{review.rating}.0</span>
+                    <div className="flex items-center gap-2">
+                      <SentimentBadge
+                        score={review.sentiment_score}
+                        label={review.sentiment_label}
+                      />
+                      <div className="flex gap-1 bg-yellow-50 dark:bg-yellow-500/10 px-2.5 py-1 rounded-full border border-yellow-100 dark:border-yellow-500/20 text-yellow-600 dark:text-yellow-300 font-bold items-center text-sm">
+                        <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+                        <span>{review.rating}.0</span>
+                      </div>
                     </div>
                   </div>
                   <p className="text-muted-foreground leading-relaxed text-sm">
