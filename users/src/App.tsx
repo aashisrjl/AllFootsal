@@ -9,14 +9,14 @@ import { BookingProvider } from "@/contexts/BookingContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 
 import Index from "./pages/Index";
-import Facilities from "./pages/Futsals";
+// import Facilities from "./pages/Futsals";
 import FacilityDetails from "./pages/FacilityDetails";
 import Login from "./pages/Login";
 import UserBookings from "./pages/UserBookings";
 import BookingDetails from "./pages/BookingDetails";
 import NotFound from "./pages/NotFound";
-import AdminDashboard from "./pages/AdminDashboard";
-import About from "./pages/About";
+// import AdminDashboard from "./pages/AdminDashboard";
+// import About from "./pages/About";
 import Contact from "./pages/Contact";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
