@@ -1,0 +1,53 @@
+flowchart LR
+    %% Clients
+    U[User Web App]
+    FO[Futsal Owner Web App]
+    A[Admin Web App]
+    M[Mobile App]
+
+    %% Backend Core
+    API[Backend API (Node.js/Express)]
+    RT[Routes Layer]
+    CTL[Controllers Layer]
+    SVC[Services Layer]
+    MW[Middleware Layer]
+    ORM[Sequelize Models]
+    TEN[Tenant Table Manager]
+
+    %% Data & External
+    DB[(MySQL Database)]
+    REDIS[(Redis Cache - optional)]
+    PAY[Payment Gateways\n(Khalti / eSewa)]
+    CLOUD[Cloudinary Storage]
+    MAIL[Mail/OTP Service]
+    ML[ML Service (FastAPI)]
+
+    %% Client -> API
+    U --> API
+    FO --> API
+    A --> API
+    M --> API
+
+    %% Internal backend composition
+    API --> MW
+    API --> RT
+    RT --> CTL
+    CTL --> SVC
+    CTL --> ORM
+    SVC --> ORM
+    SVC --> TEN
+
+    %% Data connections
+    ORM --> DB
+    TEN --> DB
+    API --> REDIS
+
+    %% External integrations
+    SVC --> PAY
+    SVC --> CLOUD
+    SVC --> MAIL
+    SVC --> ML
+
+    %% Data domains in DB
+    DB --- G1[Global Tables\nusers, footsal, subscription,\npayments, forum, analytics]
+    DB --- G2[Tenant Tables per futsalCode\npitch_*, timeslot_*, booking_*,\npayment_*, rating_*, location_*]

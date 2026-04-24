@@ -1,0 +1,61 @@
+flowchart TD
+    Start([Start])
+
+    subgraph F[Futsal Owner]
+        F1[Register / Login]
+        F2[Choose subscription plan]
+        F3[Pay subscription fee]
+        F4{Subscription payment successful?}
+        F5[Subscription activated]
+        F6[Setup payment gateway keys]
+        F7[Manage pitches, slots, pricing]
+        F8[Receive booking]
+        F9{Approve booking?}
+        F10[Confirm booking]
+        F11[Reject booking]
+        F12[View owner analytics/dashboard]
+    end
+
+    subgraph U[User]
+        U1[Register / Login]
+        U2[Search futsal]
+        U3[View futsal details]
+        U4[Select pitch and time slot]
+        U5[Create booking request]
+        U6[Pay booking amount]
+        U7{Booking payment successful?}
+        U8[Receive booking confirmation]
+        U9[Submit rating and review]
+    end
+
+    subgraph S[System / Backend]
+        S1[Validate auth and role]
+        S2[Check owner subscription status]
+        S3{Subscription active?}
+        S4[Fetch futsal availability]
+        S5{Slot available?}
+        S6[Create booking record]
+        S7[Verify booking payment]
+        S8[Update booking/payment status]
+        S9[Store review + sentiment]
+        S10[Update futsal analytics]
+    end
+
+    Start --> F1 --> F2 --> F3 --> F4
+    F4 -- No --> F3
+    F4 -- Yes --> F5 --> F6 --> F7 --> S2
+    S2 --> S3
+    S3 -- No --> F2
+    S3 -- Yes --> U1
+
+    U1 --> U2 --> U3 --> S4 --> U4 --> U5 --> S1 --> S5
+    S5 -- No --> U4
+    S5 -- Yes --> S6 --> U6 --> U7
+    U7 -- No --> U6
+    U7 -- Yes --> S7 --> S8 --> F8
+
+    F8 --> F9
+    F9 -- Yes --> F10 --> U8
+    F9 -- No --> F11 --> U8
+
+    U8 --> U9 --> S9 --> S10 --> F12 --> End([End])
