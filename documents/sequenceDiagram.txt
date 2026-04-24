@@ -1,0 +1,46 @@
+sequenceDiagram
+    actor User
+    participant Frontend as User App
+    participant API as Backend API
+    participant Auth as Auth Middleware
+    participant DB as MySQL Database
+    participant Tenant as Tenant Tables
+    participant Pay as Payment Gateway
+    participant ML as ML Service
+
+    User->>Frontend: Search futsal / view slots
+    Frontend->>API: GET /futsals, /slots
+    API->>Auth: Verify token
+    Auth-->>API: Authorized
+    API->>DB: Fetch futsal list
+    API->>Tenant: Fetch pitch, timeslot, location data
+    Tenant-->>API: Available slots
+    API-->>Frontend: Slot data
+
+    User->>Frontend: Create booking
+    Frontend->>API: POST /booking
+    API->>Auth: Verify token
+    Auth-->>API: Authorized
+    API->>Tenant: Check slot availability
+    Tenant-->>API: Slot available
+
+    API->>DB: Create booking record
+    API->>Pay: Initiate payment
+    Pay-->>API: Payment response
+    API->>DB: Update payment status
+    API->>Tenant: Update booking status
+    API-->>Frontend: Booking confirmation
+
+    User->>Frontend: Submit review
+    Frontend->>API: POST /rating
+    API->>DB: Store review
+    API->>ML: Analyze sentiment
+    ML-->>API: sentiment_label + sentiment_score
+    API->>Tenant: Save rating result
+    API-->>Frontend: Review saved
+
+    User->>Frontend: View recommended futsals
+    Frontend->>API: GET /recommended-futsals?lat&lng
+    API->>Tenant: Read location, rating, booking stats
+    API->>DB: Fetch futsal list
+    API-->>Frontend: Ranked recommendations

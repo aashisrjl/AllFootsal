@@ -1,0 +1,61 @@
+flowchart TB
+    %% Client Nodes
+    subgraph Clients[Client Devices]
+        U1[User Browser]
+        U2[Futsal Owner Browser]
+        U3[Admin Browser]
+    end
+
+    %% Edge / Delivery
+    subgraph Edge[Edge / Delivery Layer]
+        DNS[DNS]
+        CDN[CDN / Static Hosting\n(Vercel/Netlify)]
+    end
+
+    %% Application Nodes
+    subgraph App[Application Runtime]
+        FE1[Users Frontend\n(Vite React Build)]
+        FE2[Futsal Frontend\n(Vite React Build)]
+        FE3[Admin Frontend\n(Vite React Build)]
+        API[Backend API Container\n(Node.js + Express)]
+        ML[ML Service Container\n(Python FastAPI)]
+    end
+
+    %% Data Nodes
+    subgraph Data[Data Layer]
+        DB[(MySQL Server)]
+        R[(Redis - optional)]
+        FS[(File Upload Storage)]
+    end
+
+    %% External Services
+    subgraph Ext[External Integrations]
+        PAY[Payment Gateways\nKhalti / eSewa]
+        CLD[Cloudinary]
+        MAIL[Email/OTP Provider]
+    end
+
+    %% Client access flow
+    U1 --> DNS --> CDN
+    U2 --> DNS --> CDN
+    U3 --> DNS --> CDN
+
+    CDN --> FE1
+    CDN --> FE2
+    CDN --> FE3
+
+    %% Frontend to backend
+    FE1 --> API
+    FE2 --> API
+    FE3 --> API
+
+    %% Backend internal dependencies
+    API --> DB
+    API --> R
+    API --> FS
+    API --> ML
+
+    %% External integrations
+    API --> PAY
+    API --> CLD
+    API --> MAIL

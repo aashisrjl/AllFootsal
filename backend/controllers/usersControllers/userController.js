@@ -293,9 +293,11 @@ const getRecommendedFutsals = async (req, res) => {
                     sequelize.query(
                         `SELECT 
                             COUNT(*) AS totalReviews,
-                            AVG(COALESCE(sentiment_score, 0)) AS avgSentiment,
                             AVG(COALESCE(rating, 0)) AS avgRating,
-                            SUM(CASE WHEN sentiment_score > 0.5 THEN 1 ELSE 0 END) AS positiveReviews
+                            SUM(CASE WHEN LOWER(COALESCE(sentiment_label, '')) = 'positive' THEN 1 ELSE 0 END) AS positiveReviews,
+                            SUM(CASE WHEN LOWER(COALESCE(sentiment_label, '')) = 'negative' THEN 1 ELSE 0 END) AS negativeReviews,
+                            AVG(CASE WHEN LOWER(COALESCE(sentiment_label, '')) = 'positive' THEN COALESCE(sentiment_score, 0) END) AS avgPositiveSentimentScore,
+                            AVG(CASE WHEN LOWER(COALESCE(sentiment_label, '')) = 'negative' THEN COALESCE(sentiment_score, 0) END) AS avgNegativeSentimentScore
                          FROM rating_${code}`,
                         { type: QueryTypes.SELECT }
                     ).catch(() => []),
@@ -329,9 +331,12 @@ const getRecommendedFutsals = async (req, res) => {
                 const bookingStats = bookingRows[0] || {};
 
                 const totalReviews = Number(ratingStats.totalReviews || 0);
-                const avgSentiment = Number(ratingStats.avgSentiment || 0);
                 const avgRating = Number(ratingStats.avgRating || 0);
                 const positiveReviews = Number(ratingStats.positiveReviews || 0);
+                const negativeReviews = Number(ratingStats.negativeReviews || 0);
+                const avgPositiveSentimentScore = Number(ratingStats.avgPositiveSentimentScore || 0);
+                const avgNegativeSentimentScore = Number(ratingStats.avgNegativeSentimentScore || 0);
+                const avgSentiment = totalReviews > 0 ? (positiveReviews / totalReviews) : 0;
                 const totalBookings = Number(bookingStats.totalBookings || 0);
 
                 return {
@@ -358,6 +363,9 @@ const getRecommendedFutsals = async (req, res) => {
                         avgSentiment,
                         avgRating,
                         positiveReviews,
+                        negativeReviews,
+                        avgPositiveSentimentScore,
+                        avgNegativeSentimentScore,
                         totalBookings,
                     },
                 };
