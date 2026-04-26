@@ -260,6 +260,21 @@ const createBooking = async (req,res) => {
         })
     }
 
+    // 0. Prevent booking past dates or past slots for today
+    const now = new Date();
+    const selectedDate = new Date(booking_date);
+    
+    // Normalize dates to midnight for comparison
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const targetDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+
+    if (targetDate < today) {
+        return res.status(400).json({
+            success: false,
+            message: "You cannot book a date in the past."
+        });
+    }
+
     try {
         // 1. Verify Timeslot Existence and Association
         const timeslotCheck = await sequelize.query(
@@ -275,6 +290,19 @@ const createBooking = async (req,res) => {
         }
 
         const reqSlot = timeslotCheck[0];
+
+        // 1.1 If it's today, check if the start time has already passed
+        if (targetDate.getTime() === today.getTime()) {
+            const [hours, minutes] = reqSlot.start_time.split(':').map(Number);
+            const slotStartTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hours, minutes);
+            
+            if (slotStartTime < now) {
+                return res.status(400).json({
+                    success: false,
+                    message: "This timeslot has already passed for today."
+                });
+            }
+        }
 
         // 2. Double-Booking Protection: No one can book an already booked confirmed/pending slot
         const existingSlot = await sequelize.query(
@@ -314,7 +342,7 @@ const createBooking = async (req,res) => {
         }
 
         // Insert validated booking
-        await sequelize.query(
+        const [insertedId] = await sequelize.query(
             `INSERT INTO booking_${code} (user_id, pitch_id, timeslot_id, booking_date, amount, notes) 
              VALUES (?, ?, ?, ?, ?, ?)`,
             {
@@ -322,6 +350,12 @@ const createBooking = async (req,res) => {
                 type: QueryTypes.INSERT,
             }
         );
+
+        return res.status(201).json({
+            success: true,
+            message: "Booking created successfully",
+            data: { id: insertedId }
+        });
     } catch(err) {
         console.error("Error creating booking:", err);
         return res.status(500).json({
@@ -330,10 +364,6 @@ const createBooking = async (req,res) => {
         });
     }
 
-    res.status(201).json({
-        success:true,
-        message:"Booking created successfully"
-    })
 }
 
 module.exports = {

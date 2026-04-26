@@ -40,6 +40,19 @@ export const getAllFutsals = async () => {
     return res.data;
 };
 
+type RecommendedFutsalParams = {
+    latitude: number;
+    longitude: number;
+    limit?: number;
+};
+
+export const getRecommendedFutsals = async ({ latitude, longitude, limit = 5 }: RecommendedFutsalParams) => {
+    const res = await API.get("/user/recommendations", {
+        params: { latitude, longitude, limit },
+    });
+    return res.data;
+};
+
 // get futsal extra info (amenities, etc)
 export const getFutsalInfo = async (id: number | string) => {
     const res = await API.get(`/futsal/${id}/info/`);
@@ -155,5 +168,11 @@ export const updateRating = async (futsalId: number | string, data: any) => {
 
 export const deleteRating = async (futsalId: number | string) => {
     const res = await API.delete(`/futsal/${futsalId}/ratings/me`);
+    return res.data;
+};
+
+// FAQ
+export const getFutsalFaqs = async (futsalId: number | string) => {
+    const res = await API.get(`/futsal/${futsalId}/faqs`);
     return res.data;
 };

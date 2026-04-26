@@ -1,0 +1,256 @@
+classDiagram
+direction LR
+
+%% =========================
+%% Core (global) entities
+%% =========================
+class User {
+  +id: int
+  +username: string
+  +email: string
+  +phoneNumber: string?
+  +role: enum(user)
+  +isActive: boolean
+  +isVerified: boolean
+}
+
+class Footsal {
+  +id: int
+  +futsalCode: int
+  +futsalName: string
+  +email: string
+  +phoneNumber: string
+  +ownerName: string
+  +isActive: boolean
+  +isVerified: boolean
+}
+
+class Subscription {
+  +id: int
+  +footsal_id: int
+  +subscription_plan: enum
+  +subscription_start: date?
+  +subscription_end: date?
+  +subscription_fee: decimal?
+  +status: enum
+  +auto_renew: boolean
+  +is_trial: boolean
+}
+
+class FootsalPayment {
+  +id: int
+  +footsal_id: int
+  +subscription_id: int
+  +amount: decimal
+  +payment_method: enum
+  +payment_status: enum
+  +payment_date: date
+  +transaction_id: string?
+}
+
+class FootsalAnalytics {
+  +footsal_id: int <<PK/FK>>
+  +avg_rating: float
+  +total_bookings: int
+  +total_revenue: decimal
+  +review_summary: text?
+}
+
+class FutsalPaymentConfig {
+  +id: int
+  +futsal_id: int
+  +gateway: enum(khalti, esewa)
+  +public_key: string?
+  +secret_encrypted: blob
+  +merchant_code: string?
+  +is_active: boolean
+  +is_live: boolean
+}
+
+class Forum {
+  +id: int
+  +title: string
+  +slug: string
+  +content: text
+  +category: enum
+  +user_id: int?
+  +futsal_id: int?
+  +is_locked: boolean
+  +is_pinned: boolean
+  +views_count: int
+}
+
+class ForumReply {
+  +id: int
+  +forum_id: int
+  +user_id: int
+  +footsal_id: int?
+  +content: text
+  +is_solution: boolean
+}
+
+class ForumLike {
+  +id: int
+  +forum_id: int?
+  +reply_id: int?
+  +user_id: int?
+  +futsal_id: int?
+}
+
+%% Core relationships
+Footsal "1" --> "1" Subscription : hasOne
+Subscription "*" --> "1" Footsal : belongsTo
+
+Subscription "1" --> "*" FootsalPayment : hasMany
+Footsal "1" --> "*" FootsalPayment : hasMany
+Footsal "1" --> "1" FootsalAnalytics : hasOne
+Footsal "1" --> "1" FutsalPaymentConfig : hasOne
+
+Forum "1" --> "*" ForumReply : hasMany
+Forum "1" --> "*" ForumLike : hasMany
+ForumReply "1" --> "*" ForumLike : hasMany
+
+User "1" --> "*" Forum : optional author
+Footsal "1" --> "*" Forum : optional author
+User "1" --> "*" ForumReply : writes
+Footsal "1" --> "*" ForumReply : optional writes
+
+%% =========================
+%% Tenant-scoped entities
+%% (physical table pattern: <name>_<footsalCode>)
+%% =========================
+class TenantLocation {
+  +id: int
+  +district: string?
+  +address: text
+  +city: string?
+  +postal_code: string?
+  +latitude: decimal?
+  +longitude: decimal?
+}
+
+class TenantInfo {
+  +id: int
+  +established_year: year?
+  +facilities: json?
+  +operating_hours: json?
+  +social_links: json?
+  +website_url: string?
+}
+
+class TenantPitch {
+  +id: int
+  +name: string
+  +pitch_type: enum(5A,6A,7A)
+  +surface_type: string?
+  +price_per_hour: decimal
+  +is_active: boolean
+}
+
+class TenantTimeslot {
+  +id: int
+  +pitch_id: int
+  +day_of_week: tinyint
+  +start_time: time
+  +end_time: time
+  +price: decimal
+  +is_available: boolean
+}
+
+class TenantBooking {
+  +id: int
+  +user_id: int
+  +pitch_id: int
+  +timeslot_id: int
+  +booking_date: date
+  +amount: decimal
+  +status: enum(pending,confirmed,cancelled,completed)
+}
+
+class TenantPayment {
+  +id: int
+  +booking_id: int
+  +user_id: int
+  +gateway: enum(cash,khalti,esewa,bank_transfer)
+  +provider_order_id: string?
+  +provider_txn_id: string?
+  +amount: decimal
+  +status: enum(pending,success,failed,refunded)
+}
+
+class TenantRating {
+  +id: int
+  +user_id: int
+  +rating: tinyint(1..5)
+  +review: text?
+  +sentiment_label: string?
+  +sentiment_score: decimal?
+}
+
+class TenantMedia {
+  +id: int
+  +type: enum(image,video)
+  +category: enum(home,pitch,facility,event,other,logo,banner)
+  +url: string
+  +pitch_id: int?
+}
+
+class TenantAnalytics {
+  +id: int
+  +month: date
+  +total_bookings: int
+  +total_revenue: decimal
+  +avg_rating: decimal
+}
+
+class TenantContact {
+  +id: int
+  +name: string?
+  +email: string?
+  +phone: string?
+  +message: text?
+  +is_read: boolean
+}
+
+class TenantVisitor {
+  +id: bigint
+  +user_id: int?
+  +ip_hash: string?
+  +session_id: string?
+  +visit_count: int
+  +first_seen_at: timestamp
+  +last_seen_at: timestamp
+}
+
+class TenantFAQ {
+  +id: int
+  +question: text
+  +answer: text
+  +is_active: boolean
+}
+
+%% Tenant relationships
+TenantPitch "1" --> "*" TenantTimeslot : hasMany
+TenantPitch "1" --> "*" TenantBooking : hasMany
+TenantTimeslot "1" --> "*" TenantBooking : hasMany
+TenantBooking "1" --> "*" TenantPayment : hasMany
+TenantPitch "1" --> "*" TenantMedia : hasMany (optional)
+
+User "1" --> "*" TenantBooking : books
+User "1" --> "*" TenantPayment : pays
+User "1" --> "0..1" TenantRating : rates once
+User "1" --> "*" TenantVisitor : optional identified visits
+
+%% Logical ownership (tenant scope)
+Footsal "1" --> "*" TenantPitch : scoped by futsalCode
+Footsal "1" --> "*" TenantTimeslot : scoped by futsalCode
+Footsal "1" --> "*" TenantBooking : scoped by futsalCode
+Footsal "1" --> "*" TenantPayment : scoped by futsalCode
+Footsal "1" --> "*" TenantRating : scoped by futsalCode
+Footsal "1" --> "*" TenantLocation : scoped by futsalCode
+Footsal "1" --> "*" TenantInfo : scoped by futsalCode
+Footsal "1" --> "*" TenantMedia : scoped by futsalCode
+Footsal "1" --> "*" TenantAnalytics : scoped by futsalCode
+Footsal "1" --> "*" TenantContact : scoped by futsalCode
+Footsal "1" --> "*" TenantVisitor : scoped by futsalCode
+Footsal "1" --> "*" TenantFAQ : scoped by futsalCode

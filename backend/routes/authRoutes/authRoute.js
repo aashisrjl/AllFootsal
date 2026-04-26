@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userRegister = require("./../../controllers/authControllers/userAuthController");
 const RegisterFootsal = require("./../../controllers/authControllers/footsalAuthController");
-const { VerifyOtp, Login, Logout, forgotPassword, changeForgotPassword, ChangePassword } = require("../../controllers/authControllers/AllAuthController");
+const { VerifyOtp, Login, Logout, forgotPassword, changeForgotPassword, ChangePassword, resendOtp } = require("../../controllers/authControllers/AllAuthController");
 const generateJwt = require("../../utils/jwt/generateJwt");
 const passport = require("passport");
 const isUserAuthenticated = require("../../middleware/authMiddleware/userAuthenticate");
@@ -139,5 +139,9 @@ router.post(
 router.post(
   `/auth/logout`, // #swagger.tags = ['Auth']
   Logout); 
+
+router.post(
+  `/auth/resend-otp`, // #swagger.tags = ['Auth']
+  resendOtp);
 
 module.exports = router;

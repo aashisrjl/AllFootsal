@@ -48,7 +48,7 @@ module.exports = {
     ) ENGINE=InnoDB;
   `,
 
-payment: (code) => `
+  payment: (code) => `
   CREATE TABLE IF NOT EXISTS payment_${code} (
     id INT AUTO_INCREMENT PRIMARY KEY,
     booking_id INT NOT NULL,
@@ -76,6 +76,7 @@ payment: (code) => `
       user_id INT NOT NULL,
       rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
       review TEXT,
+      sentiment_label VARCHAR(20),
       sentiment_score DECIMAL(5,4),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       UNIQUE KEY one_rating_per_user (user_id)
@@ -159,6 +160,16 @@ payment: (code) => `
       INDEX idx_user_id (user_id),
       INDEX idx_ip_hash (ip_hash),
       UNIQUE KEY uq_session (session_id)
+    ) ENGINE=InnoDB;
+  `,
+  faq: (code) => `
+    CREATE TABLE IF NOT EXISTS faq_${code} (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      question TEXT NOT NULL,
+      answer TEXT NOT NULL,
+      is_active BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;
   `
 };

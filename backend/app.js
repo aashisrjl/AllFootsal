@@ -8,7 +8,7 @@ const passport = require('./utils/passport/passport');
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger-output.json');
 const { setupAdminPanel } = require('./config/adminConfig')
-const {CORS_ALLOWED_ORIGINS} = process.env
+const { CORS_ALLOWED_ORIGINS } = process.env
 
 const app = express();
 const PORT = process.env.SERVER_PORT || 3003;
@@ -26,8 +26,8 @@ app.use(
 
 app.use(cors({
   origin: CORS_ALLOWED_ORIGINS?.split(',') || '*',
-   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE','PATCH'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
@@ -56,14 +56,14 @@ app.use('/api/v1/', paymentRoutes)
 //forum routes
 const forumRoutes = require("./routes/forumRoutes/forum.routes")
 const forumReplyRoutes = require("./routes/forumRoutes/forumReply.routes")
-const forumlikesRoutes = require("./routes/forumRoutes/forumLike.routes")  
+const forumlikesRoutes = require("./routes/forumRoutes/forumLike.routes")
 app.use('/api/v1/', forumRoutes)
 app.use('/api/v1/', forumReplyRoutes)
 app.use('/api/v1/', forumlikesRoutes)
 
 //futsal routes
 const futsalRoutes = require("./routes/footsalRoutes/futsal.route")
-app.use('/api/v1/', futsalRoutes) 
+app.use('/api/v1/', futsalRoutes)
 
 // super admin tenant operations
 const superAdminTenantRoutes = require("./routes/adminRoutes/superAdminTenant.route")
@@ -81,6 +81,7 @@ const paymentFutsalRoutes = require("./routes/footsalRoutes/paymentRoutes/paymen
 const pitchRoutes = require("./routes/footsalRoutes/pitchRoutes/pitch.route")
 const timeslotRoutes = require("./routes/footsalRoutes/timeslotsRoutes/timeslot.route")
 const visitorRoutes = require("./routes/footsalRoutes/visitorRoutes/visitors.route")
+const faqRoutes = require("./routes/footsalRoutes/faqRoutes/faq.routes")
 
 app.use('/api/v1/', analyticsRoutes)
 app.use('/api/v1/', contactRoutes)
@@ -93,6 +94,7 @@ app.use('/api/v1/', paymentFutsalRoutes)
 app.use('/api/v1/', pitchRoutes)
 app.use('/api/v1/', timeslotRoutes)
 app.use('/api/v1/', visitorRoutes)
+app.use('/api/v1/', faqRoutes)
 
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
@@ -112,8 +114,8 @@ app.use(limiter);
 
 // Health check
 app.get('/', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
+  res.status(200).json({
+    status: 'OK',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
@@ -125,7 +127,7 @@ app.use((err, req, res, next) => {
   if (res.headersSent) {
     return next(err);
   }
-  res.status(500).json({ 
+  res.status(500).json({
     error: 'Something went wrong!',
     message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
   });

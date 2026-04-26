@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { DollarSign, TrendingUp, Calendar, CreditCard } from 'lucide-react';
-import api from '../lib/api';
+import { getOwnerAnalytics } from '../lib/analyticsApi';
+import { getOwnerBookings } from '../lib/bookingApi';
 
 const Revenue = () => {
   const [revenueData, setRevenueData] = useState({ today: 0, week: 0, month: 0, year: 0 });
@@ -15,15 +16,15 @@ const Revenue = () => {
       try {
         setLoading(true);
         const [analyticsRes, bookingsRes] = await Promise.all([
-          api.get('/futsal/analytics/fetch').catch(() => null),
-          api.get('/futsal-bookings').catch(() => null)
+          getOwnerAnalytics().catch(() => null),
+          getOwnerBookings().catch(() => null)
         ]);
         
         // Use total revenue safely
-        const totalRev = analyticsRes?.data?.data?.totalRevenue || 0;
+        const totalRev = analyticsRes?.data?.totalRevenue || 0;
 
-        if (bookingsRes?.data?.success) {
-           const bookings = bookingsRes.data.data;
+        if (bookingsRes?.success) {
+           const bookings = bookingsRes.data;
            
            const todayString = new Date().toISOString().split('T')[0];
            

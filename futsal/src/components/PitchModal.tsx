@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Check } from 'lucide-react';
-import api from '../lib/api';
+import { createPitch, updatePitch } from '../lib/pitchApi';
 
 export default function PitchModal({ isOpen, onClose, pitch, onSaved }: any) {
   const [formData, setFormData] = useState({
@@ -35,9 +35,9 @@ export default function PitchModal({ isOpen, onClose, pitch, onSaved }: any) {
       setSaving(true);
       const payload = { ...formData, price_per_hour: Number(formData.price_per_hour), is_active: formData.is_active ? 1 : 0, lighting: formData.lighting ? 1 : 0, indoor: formData.indoor ? 1 : 0 };
       if (pitch && pitch.id) {
-        await api.put(`/futsal/pitches/edit/${pitch.id}`, payload);
+        await updatePitch(pitch.id, payload);
       } else {
-        await api.post('/futsal/pitches/create', payload);
+        await createPitch(payload);
       }
       onSaved();
       onClose();

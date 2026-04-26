@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Clock } from 'lucide-react';
-import api from '../lib/api';
+import { createTimeslot, deleteTimeslot, getFutsalTimeslots } from '../lib/timeslotApi';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -16,7 +16,7 @@ export default function ScheduleModal({ isOpen, onClose, pitch, futsalId }: any)
     if (!pitch || !futsalId) return;
     try {
       setLoading(true);
-      const res = await api.get(`/futsal/${futsalId}/timeslots?pitch_id=${pitch.id}&day_of_week=${day}`);
+      const res = await getFutsalTimeslots({ futsalId, pitchId: pitch.id, dayOfWeek: day });
       if (res.data.timeslots) {
         setTimeslots(res.data.timeslots);
       }
@@ -44,7 +44,7 @@ export default function ScheduleModal({ isOpen, onClose, pitch, futsalId }: any)
         day_of_week: day,
         price: newSlot.price || pitch.pricePerHour || pitch.price_per_hour
       };
-      await api.post('/futsal/timeslots/create', payload);
+      await createTimeslot(payload);
       setNewSlot({ start_time: '', end_time: '', price: '', is_available: true });
       fetchSchedule();
     } catch (err: any) {
@@ -58,7 +58,7 @@ export default function ScheduleModal({ isOpen, onClose, pitch, futsalId }: any)
   const handleDelete = async (id: number) => {
     if (!window.confirm('Delete this timeslot?')) return;
     try {
-      await api.delete(`/futsal/timeslots/delete/${id}`);
+      await deleteTimeslot(id);
       fetchSchedule();
     } catch (err) {
       console.error(err);

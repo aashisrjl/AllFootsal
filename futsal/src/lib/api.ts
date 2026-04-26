@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: 'http://localhost:3002/api/v1',
+export const API = axios.create({
+  baseURL: 'http://localhost:3000/api/v1',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -9,11 +9,11 @@ const api = axios.create({
 });
 
 // Interceptor for handling errors
-api.interceptors.response.use(
+API.interceptors.response.use(
   (response) => response,
   (error) => {
     return Promise.reject(error);
   }
 );
 
-export default api;
+export default API;

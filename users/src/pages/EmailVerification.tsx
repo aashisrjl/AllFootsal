@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { AuthBackground, logo_transparent, OTPIllustration } from '@/assets/images';
-import { verifyOtp } from '@/lib/authApi';
+import { verifyOtp, resendOtp } from '@/lib/authApi';
 
 // NOTE: Since this must be a single, self-contained file, the external image imports
 // are replaced with local placeholder constants, similar to the previous version.
@@ -88,9 +88,10 @@ const EmailVerification: React.FC = () => {
   const location = useLocation();
   const { toast } = useToast();
   
-  // Safely retrieve the email passed via navigation state
-  const state = location.state as { email?: string } | null;
+  // Safely retrieve the email and type passed via navigation state
+  const state = location.state as { email?: string; type?: string } | null;
   const email = state?.email || 'user@example.com';
+  const type = state?.type || 'user_registration';
   
   // State for OTP and flow control
   const [otp, setOtp] = useState<string>('');
@@ -145,8 +146,7 @@ const EmailVerification: React.FC = () => {
   const handleResendOTP = async () => {
     setIsLoading(true);
     try {
-      // Simulate API call to send new OTP
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await resendOtp(email, type);
       
       setResendTimer(60); // Reset timer to 60 seconds
       setOtp(''); // Clear previous OTP

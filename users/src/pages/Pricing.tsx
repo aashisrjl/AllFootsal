@@ -3,7 +3,7 @@ import { CheckCircle, Zap, Shield, Users, CreditCard, MessageCircle } from "luci
 
 import Header from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // 1. Button
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -162,8 +162,8 @@ const ownerPlans = [
 const PriceOptionCard: React.FC<{ 
     cycle: BillingCycle, 
     details: PriceDetail & { buttonText: string },
-    planName: string
-}> = ({ cycle, details, planName }) => {
+    onSelect: (cycle: BillingCycle) => void,
+}> = ({ cycle, details, onSelect }) => {
     const isYearly = cycle === 'yearly';
     const isMonthly = cycle === 'monthly';
     const effectiveTotal = details.amount * details.totalDuration;
@@ -200,7 +200,7 @@ const PriceOptionCard: React.FC<{
             <Button 
                 className={`mt-6 w-full h-10 text-base ${isYearly ? 'bg-sky-600 hover:bg-sky-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}
                 variant={isYearly ? 'accent' : 'default'}
-                onClick={() => console.log(`Attempting to sign up for ${planName} - ${cycle}`)}
+                onClick={() => onSelect(cycle)}
             >
                 {details.buttonText}
             </Button>
@@ -210,7 +210,25 @@ const PriceOptionCard: React.FC<{
 
 
 const Pricing: React.FC = () => {
-    const Navigate = useNavigate();
+    const navigate = useNavigate();
+
+    const goToFutsalSubscription = (plan: 'trial' | 'monthly' | 'half-yearly' | 'yearly') => {
+        window.location.href = `http://localhost:3002/subscription?plan=${plan}&from=users-pricing`;
+    };
+
+    const handleOwnerPlanSelect = (cycle: BillingCycle) => {
+        if (cycle === 'monthly') {
+            goToFutsalSubscription('monthly');
+            return;
+        }
+
+        if (cycle === 'six_months') {
+            goToFutsalSubscription('half-yearly');
+            return;
+        }
+
+        goToFutsalSubscription('yearly');
+    };
     // Inject Custom CSS for animation
     const styleElement = <style>{animationStyle}</style>;
 
@@ -234,9 +252,9 @@ const Pricing: React.FC = () => {
                     {/* Hero */}
                     <div className={`grid gap-10 lg:grid-cols-[1.3fr_1fr] items-center ${ANIMATION_CLASSES}`} style={{ animationDelay: '0.1s' }}>
                         <div className="space-y-6">
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 shadow-lg border border-emerald-100 backdrop-blur">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 dark:bg-slate-800/80 shadow-lg border border-emerald-100 dark:border-slate-700 backdrop-blur">
                                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulseGlow" />
-                                <span className="text-sm font-semibold text-emerald-700 ">Built for futsal owners & players</span>
+                                <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">Built for futsal owners & players</span>
                             </div>
                             <h1 className="text-5xl sm:text-6xl font-extrabold leading-tight tracking-tight">
                                 Pricing that gets you <span className="text-transparent bg-clip-text gradient-shift text-white rounded-lg mt-6">booked fast</span>.
@@ -245,11 +263,11 @@ const Pricing: React.FC = () => {
                                 Launch a digital-ready futsal venue with payments, analytics, and bookings in minutes. No hidden fees—just pick the duration that matches your ambition.
                             </p>
                             <div className="flex flex-wrap gap-4">
-                                <Button className="shadow-xl" onClick={() => Navigate("/auth/register")}>
+                                <Button className="shadow-xl" onClick={() => goToFutsalSubscription('trial')}>
                                     <Zap className="w-5 h-5 mr-2" />
                                     Start 7-day free trial
                                 </Button>
-                                <Button variant="outline" className="border-emerald-500 text-emerald-600" onClick={() => console.log("Demo requested")}>
+                                <Button variant="outline" className="border-emerald-500 text-emerald-600 dark:text-emerald-400 dark:hover:bg-emerald-950/30" onClick={() => console.log("Demo requested")}>
                                     <CreditCard className="w-5 h-5 mr-2" />
                                     Book a live demo
                                 </Button>
@@ -269,29 +287,29 @@ const Pricing: React.FC = () => {
                             </div>
                         </div>
                         <div className="relative">
-                            <div className="absolute -inset-4 bg-white/50 border border-emerald-100 rounded-3xl blur-2xl" />
-                            <div className="relative rounded-3xl bg-white shadow-2xl p-6 border border-emerald-100/60 backdrop-blur">
+                            <div className="absolute -inset-4 bg-white/50 dark:bg-slate-900/50 border border-emerald-100 dark:border-slate-800 rounded-3xl blur-2xl" />
+                            <div className="relative rounded-3xl bg-white dark:bg-slate-900 shadow-2xl p-6 border border-emerald-100/60 dark:border-slate-800 backdrop-blur">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <Shield className="w-6 h-6 text-emerald-600" />
-                                    <p className="text-sm font-semibold text-emerald-700">Standard Platform Access</p>
+                                    <Shield className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                                    <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">Standard Platform Access</p>
                                 </div>
-                                <div className="space-y-3 text-gray-700">
-                                    <div className="flex items-center justify-between rounded-xl bg-emerald-50 px-4 py-3 border border-emerald-100">
+                                <div className="space-y-3 text-gray-700 dark:text-slate-300">
+                                    <div className="flex items-center justify-between rounded-xl bg-emerald-50 dark:bg-emerald-900/20 px-4 py-3 border border-emerald-100 dark:border-emerald-800/50">
                                         <div>
-                                            <p className="text-sm text-emerald-700 font-semibold">Best for busy venues</p>
-                                            <p className="text-xl font-extrabold">Annual • Rs {(plan.prices.yearly.amount * plan.prices.yearly.totalDuration).toLocaleString()}</p>
+                                            <p className="text-sm text-emerald-700 dark:text-emerald-400 font-semibold">Best for busy venues</p>
+                                            <p className="text-xl font-extrabold text-gray-900 dark:text-slate-100">Annual • Rs {(plan.prices.yearly.amount * plan.prices.yearly.totalDuration).toLocaleString()}</p>
                                         </div>
                                         <span className="text-xs font-bold text-white bg-emerald-500 px-3 py-1 rounded-full">Save Rs {plan.prices.yearly.totalSavings.toLocaleString()}</span>
                                     </div>
-                                    <div className="rounded-xl border border-gray-100 p-4">
-                                        <p className="text-sm font-semibold text-gray-600 mb-3">Highlights</p>
+                                    <div className="rounded-xl border border-gray-100 dark:border-slate-800 p-4">
+                                        <p className="text-sm font-semibold text-gray-600 dark:text-slate-400 mb-3">Highlights</p>
                                         <ul className="space-y-2">
                                             <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-emerald-500" /> Instant QR & wallet payments</li>
                                             <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-emerald-500" /> Slot automation with reminders</li>
                                             <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-emerald-500" /> Player insights & repeat rate</li>
                                         </ul>
                                     </div>
-                                    <Button className="w-full mt-4 h-12 text-lg" onClick={() => console.log("Start yearly trial")}>
+                                    <Button className="w-full mt-4 h-12 text-lg" onClick={() => goToFutsalSubscription('yearly')}>
                                         Go live now
                                     </Button>
                                 </div>
@@ -302,26 +320,26 @@ const Pricing: React.FC = () => {
                     {/* Owner pricing */}
                     <div className={`${ANIMATION_CLASSES}`} style={{ animationDelay: '0.25s' }}>
                         <div className="text-center mb-10 space-y-3">
-                            <p className="text-emerald-600 font-semibold uppercase tracking-[0.2em] text-xs">Owners</p>
-                            <h2 className="text-4xl font-extrabold">Choose the duration that suits you</h2>
+                            <p className="text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-[0.2em] text-xs">Owners</p>
+                            <h2 className="text-4xl font-extrabold text-gray-900 dark:text-slate-100">Choose the duration that suits you</h2>
                             <p className="text-lg text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">
                                 The same all-in-one platform, with flexible billing that rewards commitment.
                             </p>
                         </div>
 
                         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <PriceOptionCard cycle="monthly" details={plan.prices.monthly} planName={plan.name} />
-                            <PriceOptionCard cycle="six_months" details={plan.prices.six_months} planName={plan.name} />
-                            <PriceOptionCard cycle="yearly" details={plan.prices.yearly} planName={plan.name} />
+                            <PriceOptionCard cycle="monthly" details={plan.prices.monthly} onSelect={handleOwnerPlanSelect} />
+                            <PriceOptionCard cycle="six_months" details={plan.prices.six_months} onSelect={handleOwnerPlanSelect} />
+                            <PriceOptionCard cycle="yearly" details={plan.prices.yearly} onSelect={handleOwnerPlanSelect} />
                         </div>
 
-                        <Card className="max-w-6xl mx-auto mt-10 p-10 shadow-xl border-t-4 border-emerald-500 bg-white/90 backdrop-blur">
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 border-b pb-4">
-                                <CardTitle className="flex items-center gap-3 text-3xl text-gray-900">
-                                    <plan.icon className="w-7 h-7 text-emerald-600" />
+                        <Card className="max-w-6xl mx-auto mt-10 p-10 shadow-xl border-t-4 border-emerald-500 bg-white/90 dark:bg-slate-900/90 backdrop-blur">
+                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 border-b dark:border-slate-800 pb-4">
+                                <CardTitle className="flex items-center gap-3 text-3xl text-gray-900 dark:text-slate-100">
+                                    <plan.icon className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
                                     Everything you need to run smarter
                                 </CardTitle>
-                                <CardDescription className="text-lg text-emerald-600 font-semibold">
+                                <CardDescription className="text-lg text-emerald-600 dark:text-emerald-400 font-semibold">
                                     {plan.tag}
                                 </CardDescription>
                             </div>
@@ -332,7 +350,7 @@ const Pricing: React.FC = () => {
                                         key={idx}
                                         text={feature.text}
                                         isIncluded={feature.included}
-                                        color={`text-emerald-600`}
+                                        color={`text-emerald-600 dark:text-emerald-400`}
                                     />
                                 ))}
                             </ul>
@@ -340,7 +358,7 @@ const Pricing: React.FC = () => {
                                 <p className="text-gray-500 dark:text-slate-400 italic text-sm">
                                     *All plans include a 7-day free trial. Cancel anytime before billing starts.
                                 </p>
-                                <Button variant="outline" className="border-gray-300 text-gray-800" onClick={() => console.log("Download feature sheet")}>
+                                <Button variant="outline" className="border-gray-300 dark:border-slate-700 text-gray-800 dark:text-slate-200 dark:hover:bg-slate-800" onClick={() => console.log("Download feature sheet")}>
                                     Download feature sheet
                                 </Button>
                             </div>
@@ -350,8 +368,8 @@ const Pricing: React.FC = () => {
                     {/* Players section */}
                     <div className={`mt-4 ${ANIMATION_CLASSES}`} style={{ animationDelay: '0.6s' }}>
                         <div className="text-center mb-8">
-                            <p className="text-sky-600 font-semibold uppercase tracking-[0.2em] text-xs">Players</p>
-                            <h2 className="text-4xl font-extrabold text-gray-900">Play more. Pay nothing.</h2>
+                            <p className="text-sky-600 dark:text-sky-400 font-semibold uppercase tracking-[0.2em] text-xs">Players</p>
+                            <h2 className="text-4xl font-extrabold text-gray-900 dark:text-slate-100">Play more. Pay nothing.</h2>
                         </div>
                         
                         <Card className="relative max-w-5xl mx-auto p-10 bg-gradient-to-r from-sky-600 via-sky-500 to-emerald-500 text-white border-none shadow-2xl overflow-hidden">
@@ -393,7 +411,7 @@ const Pricing: React.FC = () => {
                                 <Button 
                                     className="w-full md:w-2/3 h-14 text-xl font-extrabold bg-slate-400  text-emerald-600 hover:bg-slate-200 shadow-2xl"
                                     variant="default"
-                                    onClick={() => {Navigate("/auth/register")}}
+                                    onClick={() => {navigate("/auth/register")}}
                                 >
                                     <Zap className="w-6 h-6 mr-3" />
                                     Register & Start Playing Today
@@ -405,14 +423,14 @@ const Pricing: React.FC = () => {
                     {/* CTA */}
                     <div className={`text-center p-10 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-emerald-100 dark:border-slate-800 ${ANIMATION_CLASSES}`} style={{ animationDelay: '0.85s' }}>
                         <div className="flex flex-col gap-3 items-center">
-                            <span className="px-4 py-1 rounded-full bg-emerald-50 text-emerald-700 font-semibold text-xs uppercase tracking-[0.2em]">Need more?</span>
-                            <h3 className="text-3xl font-bold text-gray-900">Multi-branch or custom requirements?</h3>
-                            <p className="text-lg text-gray-600 max-w-2xl">
+                            <span className="px-4 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-semibold text-xs uppercase tracking-[0.2em]">Need more?</span>
+                            <h3 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Multi-branch or custom requirements?</h3>
+                            <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl">
                                 Tell us what you need and we’ll tailor the platform to your locations, branding, or advanced analytics.
                             </p>
                             <Button 
                                 variant="default"
-                                className="bg-gray-900 text-white hover:bg-gray-800"
+                                className="bg-gray-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-gray-800 dark:hover:bg-white"
                                 onClick={() => console.log("Redirect to Contact Page")}
                             >
                                 <MessageCircle className="w-5 h-5 mr-2" />

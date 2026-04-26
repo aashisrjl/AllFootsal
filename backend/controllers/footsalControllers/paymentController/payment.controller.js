@@ -633,6 +633,7 @@ const createPayment = async (req, res) => {
             : null;
         let gatewayResponse = null;
         let rawResponse = null;
+        let isLive = false;
 
         if (gateway === "cash") {
             if (providerOrderId || providerTxnId) {
@@ -665,6 +666,8 @@ const createPayment = async (req, res) => {
                 futsalId: tenant.futsalId,
                 gateway
             });
+            
+            if (paymentConfig) isLive = paymentConfig.isLive;
 
             if (!paymentConfig) {
                 return res.status(400).json({
@@ -791,12 +794,12 @@ const createPayment = async (req, res) => {
         const responsePayload = {
             success: true,
             message: `${gateway} payment created successfully`,
-            data: payment[0] || null
+            data: {
+                ...(payment[0] || {}),
+                ...(gatewayResponse || {}),
+                isLive
+            }
         };
-
-        if (gatewayResponse) {
-            responsePayload.gatewayResponse = gatewayResponse;
-        }
 
         return res.status(201).json(responsePayload);
     } catch (err) {
@@ -818,29 +821,45 @@ const verifyPayment = async (req, res) => {
             });
         }
 
-        const paymentId = Number(req.params?.paymentId || req.body?.paymentId);
-        if (!Number.isInteger(paymentId) || paymentId <= 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Valid paymentId is required"
-            });
+        const paymentIdParam = req.params?.paymentId || req.body?.paymentId;
+        const pidxFromReq = req.body?.pidx;
+
+        let payment = null;
+        if (Number.isInteger(Number(paymentIdParam)) && Number(paymentIdParam) > 0) {
+            const paymentRows = await sequelize.query(
+                `SELECT * FROM ${paymentTableName(tenant.code)} WHERE id = ? LIMIT 1`,
+                {
+                    replacements: [Number(paymentIdParam)],
+                    type: QueryTypes.SELECT
+                }
+            );
+            payment = paymentRows[0];
         }
 
-        const paymentRows = await sequelize.query(
-            `SELECT * FROM ${paymentTableName(tenant.code)} WHERE id = ? LIMIT 1`,
-            {
-                replacements: [paymentId],
-                type: QueryTypes.SELECT
+        // If not found by ID, try finding by provider_txn_id (pidx etc.) or transaction_uuid
+        if (!payment) {
+            const lookupValue = pidxFromReq || paymentIdParam;
+            if (lookupValue) {
+                const paymentRows = await sequelize.query(
+                    `SELECT * FROM ${paymentTableName(tenant.code)} 
+                     WHERE provider_txn_id = ? OR provider_order_id = ? LIMIT 1`,
+                    {
+                        replacements: [lookupValue, lookupValue],
+                        type: QueryTypes.SELECT
+                    }
+                );
+                payment = paymentRows[0];
             }
-        );
+        }
 
-        const payment = paymentRows[0];
         if (!payment) {
             return res.status(404).json({
                 success: false,
-                message: "No payment found with this id"
+                message: "No payment found with this ID or transaction identifier"
             });
         }
+        
+        const paymentId = payment.id;
 
         if (payment.status === "success") {
             return res.status(400).json({
@@ -957,6 +976,16 @@ const verifyPayment = async (req, res) => {
 
             nextStatus = String(decodedData.status || "").toUpperCase() === "COMPLETE" ? "success" : "failed";
         } else {
+            // Manual verification (cash, bank_transfer) should only be allowed for admins/futsal owners
+            // If the request comes from isUserAuthenticated, they might not have the rights
+            // Check if req.user or req.futsal exists to determine role
+            if (!req.futsal && !req.futsalCode) {
+                return res.status(403).json({
+                    success: false,
+                    message: "Manual verification is only allowed for administrators"
+                });
+            }
+
             const manualStatus = String(req.body?.status || "success").toLowerCase();
             if (!VALID_STATUSES.has(manualStatus)) {
                 return res.status(400).json({
@@ -984,6 +1013,17 @@ const verifyPayment = async (req, res) => {
                 type: QueryTypes.UPDATE
             }
         );
+
+        // Update booking status if payment is successful
+        if (nextStatus === "success" && payment.booking_id) {
+            await sequelize.query(
+                `UPDATE booking_${tenant.code} SET status = 'confirmed' WHERE id = ?`,
+                {
+                    replacements: [payment.booking_id],
+                    type: QueryTypes.UPDATE
+                }
+            );
+        }
 
         const updatedPayment = await sequelize.query(
             `SELECT * FROM ${paymentTableName(tenant.code)} WHERE id = ? LIMIT 1`,

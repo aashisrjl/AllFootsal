@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/components/ui/use-toast";
+import SentimentBadge from "@/components/SentimentBadge";
 
 // ─── Star Picker ──────────────────────────────────────────────────────────────
 const StarPicker = ({
@@ -51,7 +52,7 @@ const StarPicker = ({
                         className={`h-8 w-8 transition-colors ${
                             star <= (hovered || value)
                                 ? "fill-yellow-400 text-yellow-400"
-                                : "text-slate-300"
+                                : "text-muted-foreground/40"
                         }`}
                     />
                 </button>
@@ -60,29 +61,6 @@ const StarPicker = ({
     );
 };
 
-// ─── Sentiment Badge ──────────────────────────────────────────────────────────
-const SentimentBadge = ({ score }: { score?: number | null }) => {
-    if (score == null) return null;
-    const label =
-        score >= 0.6
-            ? "Positive"
-            : score >= 0.3
-            ? "Neutral"
-            : "Negative";
-    const colors =
-        score >= 0.6
-            ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-            : score >= 0.3
-            ? "bg-yellow-50 text-yellow-600 border-yellow-100"
-            : "bg-red-50 text-red-500 border-red-100";
-    return (
-        <span
-            className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${colors}`}
-        >
-            {label}
-        </span>
-    );
-};
 
 // ─── Star Display ─────────────────────────────────────────────────────────────
 const StarDisplay = ({ rating }: { rating: number }) => (
@@ -93,7 +71,7 @@ const StarDisplay = ({ rating }: { rating: number }) => (
                 className={`h-4 w-4 ${
                     s <= rating
                         ? "fill-yellow-400 text-yellow-400"
-                        : "text-slate-200"
+                        : "text-muted-foreground/25"
                 }`}
             />
         ))}
@@ -158,29 +136,29 @@ const ReviewForm = ({
     return (
         <form
             onSubmit={handleSubmit}
-            className="bg-white rounded-3xl border border-emerald-100 shadow-md p-6 flex flex-col gap-5"
+            className="bg-card rounded-3xl border border-border shadow-md p-6 flex flex-col gap-5"
         >
             <div className="flex items-center gap-3">
-                <div className="h-11 w-11 rounded-full bg-emerald-50 flex items-center justify-center">
+                <div className="h-11 w-11 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
                     <MessageSquarePlus className="h-5 w-5 text-emerald-600" />
                 </div>
                 <div>
-                    <h3 className="font-bold text-slate-800 text-lg">
+                    <h3 className="font-bold text-foreground text-lg">
                         {existing ? "Edit Your Review" : "Write a Review"}
                     </h3>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-muted-foreground">
                         Share your experience with this facility
                     </p>
                 </div>
             </div>
 
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-slate-600">
+                <label className="text-sm font-semibold text-foreground/80">
                     Your Rating
                 </label>
                 <StarPicker value={rating} onChange={setRating} />
                 {rating > 0 && (
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                         {["", "Poor", "Fair", "Good", "Very Good", "Excellent"][
                             rating
                         ]}{" "}
@@ -190,9 +168,9 @@ const ReviewForm = ({
             </div>
 
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-slate-600">
+                <label className="text-sm font-semibold text-foreground/80">
                     Your Review{" "}
-                    <span className="font-normal text-slate-400">
+                    <span className="font-normal text-muted-foreground">
                         (optional)
                     </span>
                 </label>
@@ -201,7 +179,7 @@ const ReviewForm = ({
                     onChange={(e) => setReview(e.target.value)}
                     placeholder="Tell others what you think about this futsal..."
                     rows={3}
-                    className="resize-none rounded-xl border-slate-200 focus:ring-emerald-400"
+                    className="resize-none rounded-xl border-border focus:ring-emerald-400"
                 />
             </div>
 
@@ -275,11 +253,11 @@ const MyReviewCard = ({
     }
 
     return (
-        <div className="bg-gradient-to-br from-emerald-50 to-white rounded-3xl border border-emerald-100 shadow-md p-6 flex flex-col gap-4">
+        <div className="bg-gradient-to-br from-emerald-50 to-background dark:from-emerald-950/40 dark:to-card rounded-3xl border border-border shadow-md p-6 flex flex-col gap-4">
             {/* Badge */}
             <div className="flex items-center gap-2 mb-1">
                 <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wide">
+                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
                     Your Review
                 </span>
             </div>
@@ -290,8 +268,8 @@ const MyReviewCard = ({
                         {userName.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                        <h4 className="font-bold text-slate-800">{userName}</h4>
-                        <p className="text-xs text-slate-400">
+                        <h4 className="font-bold text-foreground">{userName}</h4>
+                        <p className="text-xs text-muted-foreground">
                             {new Date(
                                 review.createdAt || Date.now()
                             ).toLocaleDateString("en-US", {
@@ -304,10 +282,13 @@ const MyReviewCard = ({
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <SentimentBadge score={review.sentiment_score} />
-                    <div className="flex items-center gap-1 bg-yellow-50 px-3 py-1.5 rounded-full border border-yellow-100">
+                    <SentimentBadge
+                        score={review.sentiment_score}
+                        label={review.sentiment_label}
+                    />
+                    <div className="flex items-center gap-1 bg-yellow-50 dark:bg-yellow-500/10 px-3 py-1.5 rounded-full border border-yellow-100 dark:border-yellow-500/20">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="font-bold text-yellow-700 text-sm">
+                        <span className="font-bold text-yellow-700 dark:text-yellow-300 text-sm">
                             {review.rating}.0
                         </span>
                     </div>
@@ -317,7 +298,7 @@ const MyReviewCard = ({
             <StarDisplay rating={review.rating} />
 
             {review.review && (
-                <p className="text-slate-700 leading-relaxed bg-white/70 p-4 rounded-2xl border border-slate-100 italic">
+                <p className="text-foreground/80 leading-relaxed bg-background/70 p-4 rounded-2xl border border-border italic">
                     "{review.review}"
                 </p>
             )}
@@ -353,19 +334,19 @@ const MyReviewCard = ({
 
 // ─── Other Review Card ────────────────────────────────────────────────────────
 const ReviewCard = ({ review }: { review: any }) => (
-    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col gap-4 hover:shadow-md transition-shadow">
+    <div className="bg-card p-6 rounded-3xl shadow-sm border border-border flex flex-col gap-4 hover:shadow-md transition-shadow">
         <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 font-bold">
+                <div className="h-10 w-10 bg-muted rounded-full flex items-center justify-center text-muted-foreground font-bold">
                     {review.reviewerName
                         ? review.reviewerName.charAt(0).toUpperCase()
                         : "A"}
                 </div>
                 <div>
-                    <h4 className="font-bold text-slate-800">
+                    <h4 className="font-bold text-foreground">
                         {review.reviewerName || "Anonymous"}
                     </h4>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-muted-foreground">
                         {new Date(
                             review.createdAt || Date.now()
                         ).toLocaleDateString("en-US", {
@@ -378,10 +359,13 @@ const ReviewCard = ({ review }: { review: any }) => (
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-                <SentimentBadge score={review.sentiment_score} />
-                <div className="flex items-center gap-1 bg-yellow-50 px-3 py-1.5 rounded-full border border-yellow-100">
+                <SentimentBadge
+                    score={review.sentiment_score}
+                    label={review.sentiment_label}
+                />
+                <div className="flex items-center gap-1 bg-yellow-50 dark:bg-yellow-500/10 px-3 py-1.5 rounded-full border border-yellow-100 dark:border-yellow-500/20">
                     <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-bold text-yellow-700 text-sm">
+                    <span className="font-bold text-yellow-700 dark:text-yellow-300 text-sm">
                         {review.rating}.0
                     </span>
                 </div>
@@ -391,7 +375,7 @@ const ReviewCard = ({ review }: { review: any }) => (
         <StarDisplay rating={review.rating} />
 
         {review.review && (
-            <p className="text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl">
+            <p className="text-foreground/80 leading-relaxed bg-muted p-4 rounded-2xl">
                 "{review.review}"
             </p>
         )}
@@ -441,7 +425,7 @@ const FutsalReviews = () => {
 
     if (isPageLoading) {
         return (
-            <div className="min-h-screen flex flex-col bg-slate-50">
+            <div className="min-h-screen flex flex-col bg-background text-foreground">
                 <FutsalNavigation name="Reviews" />
                 <div className="flex-1 flex items-center justify-center">
                     <Loader2 className="h-10 w-10 animate-spin text-emerald-500" />
@@ -461,14 +445,14 @@ const FutsalReviews = () => {
             : null;
 
     return (
-        <div className="min-h-screen flex flex-col bg-slate-50">
+        <div className="min-h-screen flex flex-col bg-background text-foreground">
             <FutsalNavigation name={futsalName} />
 
             <main className="flex-1 container mx-auto px-4 md:px-6 py-12 max-w-4xl">
                 {/* Back button */}
                 <Button
                     variant="ghost"
-                    className="mb-8 text-slate-500 hover:text-slate-800"
+                    className="mb-8 text-muted-foreground hover:text-foreground"
                     onClick={() => navigate(`/futsals/${id}`)}
                 >
                     <ArrowLeft className="h-4 w-4 mr-2" />
@@ -478,10 +462,10 @@ const FutsalReviews = () => {
                 {/* Header */}
                 <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                     <div>
-                        <h1 className="text-4xl font-extrabold text-slate-900 mb-1">
+                        <h1 className="text-4xl font-extrabold text-foreground mb-1">
                             Reviews
                         </h1>
-                        <p className="text-slate-500 text-base">
+                        <p className="text-muted-foreground text-base">
                             {allReviews.length > 0
                                 ? `${allReviews.length} review${allReviews.length !== 1 ? "s" : ""} for ${futsalName}`
                                 : `No reviews yet for ${futsalName}`}
@@ -489,13 +473,13 @@ const FutsalReviews = () => {
                     </div>
 
                     {avgRating && (
-                        <div className="flex items-center gap-3 bg-white border border-yellow-100 rounded-2xl px-5 py-3 shadow-sm">
+                        <div className="flex items-center gap-3 bg-card border border-border rounded-2xl px-5 py-3 shadow-sm">
                             <Star className="h-8 w-8 fill-yellow-400 text-yellow-400" />
                             <div>
-                                <p className="text-3xl font-extrabold text-slate-900 leading-none">
+                                <p className="text-3xl font-extrabold text-foreground leading-none">
                                     {avgRating}
                                 </p>
-                                <p className="text-xs text-slate-400 mt-0.5">
+                                <p className="text-xs text-muted-foreground mt-0.5">
                                     Average rating
                                 </p>
                             </div>
@@ -506,21 +490,21 @@ const FutsalReviews = () => {
                 <div className="flex flex-col gap-8">
                     {/* ── My Review Section ── */}
                     <section>
-                        <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-4">
+                        <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-4">
                             Your Review
                         </h2>
 
                         {!isAuthenticated ? (
                             // Not logged in — CTA
-                            <div className="bg-white rounded-3xl border border-slate-100 p-6 flex items-center gap-4 shadow-sm">
-                                <div className="h-12 w-12 bg-slate-100 rounded-full flex items-center justify-center shrink-0">
-                                    <LogIn className="h-5 w-5 text-slate-400" />
+                            <div className="bg-card rounded-3xl border border-border p-6 flex items-center gap-4 shadow-sm">
+                                <div className="h-12 w-12 bg-muted rounded-full flex items-center justify-center shrink-0">
+                                    <LogIn className="h-5 w-5 text-muted-foreground" />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="font-semibold text-slate-700">
+                                    <p className="font-semibold text-foreground">
                                         Log in to leave a review
                                     </p>
-                                    <p className="text-sm text-slate-400">
+                                    <p className="text-sm text-muted-foreground">
                                         Share your experience with this facility
                                     </p>
                                 </div>
@@ -532,7 +516,7 @@ const FutsalReviews = () => {
                                 </Button>
                             </div>
                         ) : myRatingLoading ? (
-                            <div className="flex items-center gap-3 text-slate-400 p-4">
+                            <div className="flex items-center gap-3 text-muted-foreground p-4">
                                 <Loader2 className="h-5 w-5 animate-spin" />
                                 <span className="text-sm">Loading your review...</span>
                             </div>
@@ -551,7 +535,7 @@ const FutsalReviews = () => {
 
                     {/* ── All Other Reviews ── */}
                     <section>
-                        <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-4">
+                        <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-4">
                             {otherReviews.length > 0
                                 ? `All Reviews (${otherReviews.length})`
                                 : isAuthenticated && !myReview
@@ -569,7 +553,7 @@ const FutsalReviews = () => {
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center p-12 bg-white rounded-3xl border border-slate-100 text-slate-400">
+                            <div className="text-center p-12 bg-card rounded-3xl border border-border text-muted-foreground">
                                 <MessageSquarePlus className="h-10 w-10 mx-auto mb-3 opacity-40" />
                                 <p className="text-lg font-medium">
                                     No community reviews yet

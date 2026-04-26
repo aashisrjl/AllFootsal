@@ -58,9 +58,9 @@ const getStatusCfg = (status: string) =>
 
 // ─── Stat Card ─────────────────────────────────────────────────────────────────
 const StatCard = ({ label, count, color }: { label: string; count: number; color: string }) => (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col gap-1 min-w-[100px]">
+    <div className="bg-card/60 border border-border rounded-2xl p-4 flex flex-col gap-1 min-w-[100px]">
         <p className={`text-2xl font-extrabold ${color}`}>{count}</p>
-        <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">{label}</p>
+        <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">{label}</p>
     </div>
 );
 
@@ -92,41 +92,41 @@ const BookingRow = ({ booking, onCancel }: { booking: any; onCancel: (id: string
 
     return (
         <div
-            className={`group relative bg-slate-900/60 border border-slate-800/80 border-l-4 ${cfg.border} rounded-2xl p-5 hover:bg-slate-900/80 hover:border-slate-700 transition-all duration-200`}
+            className={`group relative bg-card/60 border border-border border-l-4 ${cfg.border} rounded-2xl p-5 hover:bg-card/80 transition-all duration-200`}
         >
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 {/* Status icon circle */}
-                <div className={`hidden sm:flex h-12 w-12 shrink-0 items-center justify-center rounded-full border ${cfg.badge} border`}>
+                <div className={`hidden sm:flex h-12 w-12 shrink-0 items-center justify-center rounded-full border ${cfg.badge}`}>
                     <StatusIcon className="h-5 w-5" />
                 </div>
 
                 {/* Main info */}
                 <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <h3 className="text-slate-100 font-bold text-base leading-tight">
+                        <h3 className="text-foreground font-bold text-base leading-tight">
                             {pitchName}
                         </h3>
-                        <span className="text-slate-500 text-sm">at</span>
-                        <span className="text-emerald-400 font-semibold text-sm">{facilityName}</span>
+                        <span className="text-muted-foreground text-sm">at</span>
+                        <span className="text-emerald-500 font-semibold text-sm">{facilityName}</span>
                         <span className={`ml-auto sm:hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.65rem] font-bold uppercase tracking-wider border ${cfg.badge}`}>
                             <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
                             {cfg.label}
                         </span>
                     </div>
 
-                    <div className="flex flex-wrap gap-4 text-xs text-slate-400 mt-2">
+                    <div className="flex flex-wrap gap-4 text-xs text-muted-foreground mt-2">
                         <span className="flex items-center gap-1.5">
-                            <CalendarDays className="h-3.5 w-3.5 text-slate-500" />
+                            <CalendarDays className="h-3.5 w-3.5 text-muted-foreground/70" />
                             {formattedDate}
                         </span>
                         {startTime && (
                             <span className="flex items-center gap-1.5">
-                                <Clock className="h-3.5 w-3.5 text-slate-500" />
+                                <Clock className="h-3.5 w-3.5 text-muted-foreground/70" />
                                 {startTime} – {endTime}
                             </span>
                         )}
                         <span className="flex items-center gap-1.5">
-                            <MapPin className="h-3.5 w-3.5 text-slate-500" />
+                            <MapPin className="h-3.5 w-3.5 text-muted-foreground/70" />
                             {facilityName}
                         </span>
                     </div>
@@ -148,7 +148,7 @@ const BookingRow = ({ booking, onCancel }: { booking: any; onCancel: (id: string
                     <div className="flex gap-2">
                         <button
                             onClick={() => navigate(`/bookings/${booking.id}`)}
-                            className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-emerald-500/15 hover:text-emerald-400 text-slate-300 border border-slate-700 hover:border-emerald-500/40 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
+                            className="inline-flex items-center gap-1.5 bg-muted hover:bg-emerald-500/10 hover:text-emerald-500 text-foreground/80 border border-border hover:border-emerald-500/40 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
                         >
                             <ExternalLink className="h-3.5 w-3.5" />
                             Details
@@ -196,14 +196,14 @@ const BookingSection = ({
                 <span className={`flex items-center justify-center h-8 w-8 rounded-xl ${accent}`}>
                     <Icon className="h-4 w-4" />
                 </span>
-                <span className="font-bold text-slate-200 text-base">
+                <span className="font-bold text-foreground text-base">
                     {title}
                 </span>
-                <span className="ml-1 text-xs font-semibold text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full">
+                <span className="ml-1 text-xs font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                     {bookings.length}
                 </span>
                 <ChevronRight
-                    className={`h-4 w-4 text-slate-500 ml-auto transition-transform duration-200 ${collapsed ? "" : "rotate-90"}`}
+                    className={`h-4 w-4 text-muted-foreground ml-auto transition-transform duration-200 ${collapsed ? "" : "rotate-90"}`}
                 />
             </button>
 
@@ -214,7 +214,7 @@ const BookingSection = ({
                             <BookingRow key={b.id} booking={b} onCancel={onCancel} />
                         ))
                     ) : (
-                        <div className="bg-slate-900/30 border border-slate-800 border-dashed rounded-2xl p-6 text-center text-slate-500 text-sm">
+                        <div className="bg-muted/30 border border-border border-dashed rounded-2xl p-6 text-center text-muted-foreground text-sm">
                             {emptyText}
                         </div>
                     )}
@@ -277,7 +277,7 @@ const UserBookings = () => {
     // Show spinner while auth is resolving
     if (authLoading || (isAuthenticated && isLoading)) {
         return (
-            <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+            <div className="min-h-screen flex flex-col bg-background">
                 <Header />
                 <div className="flex-1 flex items-center justify-center">
                     <Loader2 className="h-10 w-10 animate-spin text-emerald-500" />
@@ -288,7 +288,7 @@ const UserBookings = () => {
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50">
+        <div className="min-h-screen flex flex-col bg-background text-foreground">
             <Header />
 
             <main className="flex-1 container mx-auto px-4 py-16 pt-28 max-w-5xl">
@@ -296,19 +296,19 @@ const UserBookings = () => {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
                     <div>
-                        <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400 mb-1">
+                        <p className="text-xs font-semibold uppercase tracking-widest text-emerald-500 mb-1">
                             Dashboard
                         </p>
-                        <h1 className="text-4xl font-extrabold tracking-tight text-slate-50">
+                        <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
                             My Bookings
                         </h1>
-                        <p className="text-slate-400 text-sm mt-1">
+                        <p className="text-muted-foreground text-sm mt-1">
                             Track and manage all your futsal sessions in one place.
                         </p>
                     </div>
                     <Link
                         to="/futsals"
-                        className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-emerald-500/20 text-sm shrink-0"
+                        className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-emerald-950 font-bold px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-emerald-500/20 text-sm shrink-0"
                     >
                         <PlusCircle className="h-4 w-4" />
                         Book New Session
@@ -318,29 +318,29 @@ const UserBookings = () => {
                 {/* Stats strip */}
                 {bookings.length > 0 && (
                     <div className="flex flex-wrap gap-3 mb-10">
-                        <StatCard label="Total" count={bookings.length} color="text-slate-200" />
-                        <StatCard label="Confirmed" count={confirmed.length} color="text-emerald-400" />
-                        <StatCard label="Pending" count={pending.length} color="text-amber-400" />
-                        <StatCard label="Completed" count={completed.length} color="text-sky-400" />
-                        <StatCard label="Cancelled" count={cancelled.length} color="text-rose-400" />
+                        <StatCard label="Total" count={bookings.length} color="text-foreground" />
+                        <StatCard label="Confirmed" count={confirmed.length} color="text-emerald-500" />
+                        <StatCard label="Pending" count={pending.length} color="text-amber-500" />
+                        <StatCard label="Completed" count={completed.length} color="text-sky-500" />
+                        <StatCard label="Cancelled" count={cancelled.length} color="text-rose-500" />
                     </div>
                 )}
 
                 {/* No bookings empty state */}
                 {bookings.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-24 gap-5 border border-slate-800 border-dashed rounded-3xl bg-slate-900/30">
-                        <div className="h-16 w-16 bg-slate-800/80 rounded-2xl flex items-center justify-center">
-                            <Layers className="h-8 w-8 text-slate-500" />
+                    <div className="flex flex-col items-center justify-center py-24 gap-5 border border-border border-dashed rounded-3xl bg-muted/30">
+                        <div className="h-16 w-16 bg-muted rounded-2xl flex items-center justify-center">
+                            <Layers className="h-8 w-8 text-muted-foreground/50" />
                         </div>
                         <div className="text-center">
-                            <h2 className="text-xl font-bold text-slate-300">No Bookings Yet</h2>
-                            <p className="text-slate-500 text-sm mt-1 max-w-xs">
+                            <h2 className="text-xl font-bold text-foreground/80">No Bookings Yet</h2>
+                            <p className="text-muted-foreground text-sm mt-1 max-w-xs">
                                 You haven't made any futsal bookings yet. Browse facilities and book your first session!
                             </p>
                         </div>
                         <Link
                             to="/futsals"
-                            className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl transition-colors shadow-lg shadow-emerald-500/20 text-sm"
+                            className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-emerald-950 font-bold px-6 py-2.5 rounded-xl transition-colors shadow-lg shadow-emerald-500/20 text-sm"
                         >
                             <PlusCircle className="h-4 w-4" />
                             Browse Futsals

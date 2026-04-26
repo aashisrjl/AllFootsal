@@ -6,7 +6,7 @@ async function createTenantTables(footsalCode) {
 
   const tableCreators = [
     'location', 'info', 'pitch', 'timeslot',
-    'booking', 'payment', 'rating', 'contact', 'analytics','media','visitor'
+    'booking', 'payment', 'rating', 'contact', 'analytics','media','visitor','faq'
   ];
 
   for (const name of tableCreators) {
@@ -18,7 +18,8 @@ async function dropTenantTables(footsalCode) {
   const { sequelize } = db;
   const tables = [
     'analytics', 'contact', 'rating', 'payment',
-    'booking', 'timeslot', 'media', 'pitch', 'info', 'location', 'visitor'
+    'analytics', 'contact', 'rating', 'payment',
+    'booking', 'timeslot', 'media', 'pitch', 'info', 'location', 'visitor', 'faq'
   ];
 
   const dialect = sequelize.getDialect();

@@ -1,5 +1,7 @@
 const { sequelize, Footsal } = require("../../../models");
 const { QueryTypes } = require("sequelize");
+// import axios
+const axios = require("axios");
 
 const resolveRatingTenantCode = async (req) => {
   const codeFromReq = req.futsalCode || req.tenant?.code || req.tanent?.code;
@@ -20,7 +22,7 @@ const getRatings = async (req, res) => {
   try {
     const futsalCode = req.futsalCode;
     const ratings = await sequelize.query(
-      `SELECT r.id, r.rating, r.review, r.created_at AS createdAt, u.username AS reviewerName
+      `SELECT r.id, r.rating, r.review, r.sentiment_score, r.sentiment_label, r.created_at AS createdAt, u.username AS reviewerName
        FROM rating_${futsalCode} r
        JOIN users u ON r.user_id = u.id
        ORDER BY r.created_at DESC`,
@@ -72,15 +74,21 @@ const postRating = async (req, res) => {
       });
     }
 
+    // check the sentiment of the review 
+    const modelapi = `http://localhost:8000/api/sentiment/predict?text=${review}`
+    const sentiment = await axios.get(modelapi);
+    console.log(sentiment.data);
+
     await sequelize.query(
-      `INSERT INTO rating_${code} (user_id, rating, review)
-       VALUES (?, ?, ?)
-       ON DUPLICATE KEY UPDATE rating = VALUES(rating), review = VALUES(review)`,
+      `INSERT INTO rating_${code} (user_id, rating, review,sentiment_score,sentiment_label)
+       VALUES (?, ?, ?,? ,?)
+       ON DUPLICATE KEY UPDATE rating = VALUES(rating), review = VALUES(review),sentiment_score = VALUES(sentiment_score),sentiment_label = VALUES(sentiment_label)`,
       {
-        replacements: [userId, rating, review ?? null],
+        replacements: [userId, rating, review ?? null, sentiment.data.confidence, sentiment.data.sentiment],
         type: QueryTypes.INSERT,
       }
     );
+
 
     return res.status(201).json({
       success: true,
@@ -114,13 +122,17 @@ const updateRating = async (req, res) => {
         message: "Rating must be between 1 and 5",
       });
     }
+    // check the sentiment of the review 
+    const modelapi = `http://localhost:8000/api/sentiment/predict?text=${review}`
+    const sentiment = await axios.get(modelapi);
+    console.log(sentiment.data);
 
     const [_, meta] = await sequelize.query(
       `UPDATE rating_${code}
-       SET rating = ?, review = ?
+       SET rating = ?, review = ?,sentiment_score = ?,sentiment_label = ?
        WHERE user_id = ?`,
       {
-        replacements: [rating, review ?? null, userId],
+        replacements: [rating, review ?? null, sentiment.data.confidence, sentiment.data.sentiment, userId],
         type: QueryTypes.UPDATE,
       }
     );
@@ -221,7 +233,7 @@ const getRatingByUser = async (req, res) => {
     }
 
     const rating = await sequelize.query(
-      `SELECT r.id, r.rating, r.review, r.created_at AS createdAt, u.username AS reviewerName
+      `SELECT r.id, r.rating, r.review, r.sentiment_score, r.sentiment_label, r.created_at AS createdAt, u.username AS reviewerName
        FROM rating_${code} r
        JOIN users u ON r.user_id = u.id
        WHERE r.user_id = ?
@@ -265,7 +277,7 @@ const getRatingByfutsalId = async (req, res) => {
   }
   const code = futsal.futsalCode;
   const ratings = await sequelize.query(
-    `SELECT r.id, r.rating, r.review, r.created_at AS createdAt, u.username AS reviewerName
+    `SELECT r.id, r.rating, r.review, r.sentiment_score, r.sentiment_label, r.created_at AS createdAt, u.username AS reviewerName
      FROM rating_${code} r
      JOIN users u ON r.user_id = u.id
      ORDER BY r.created_at DESC`,

@@ -58,7 +58,7 @@ export default function Hero() {
               </motion.h1>
 
               <motion.p variants={item} className="mt-5 text-lg sm:text-xl text-white/85 max-w-2xl leading-relaxed">
-                Discover venues, check real‑time slots, and manage bookings with confidence — built for players, futsal owners, and organizers.
+                Discover venues, check real‑time slots, and manage bookings with confidence -- built for players, futsal owners, and organizers.
               </motion.p>
 
               <motion.div variants={item} className="mt-8 flex flex-col sm:flex-row gap-3 sm:items-center">
@@ -120,9 +120,11 @@ export default function Hero() {
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
             >
               <motion.div
-                whileHover={{ y: -4 }}
+                whileHover={{ y: -4, scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
                 transition={{ duration: 0.25 }}
-                className="rounded-3xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-2xl shadow-black/30 overflow-hidden"
+                className="rounded-3xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-2xl shadow-black/30 overflow-hidden cursor-pointer group"
+                onClick={() => navigate("/futsals")}
               >
                 <div className="p-6 sm:p-7">
                   <div className="flex items-center justify-between gap-4">
@@ -161,28 +163,38 @@ export default function Hero() {
                   </div>
                 </div>
 
-                <div className="px-6 sm:px-7 py-5 border-t border-white/10 bg-black/10">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="text-white">
-                      <div className="text-sm text-white/70">Next step</div>
-                      <div className="font-semibold">Choose a venue → confirm</div>
+                <motion.div className="px-4 sm:px-7 py-6 border-t border-white/10 bg-black/10">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="relative w-full h-16 rounded-2xl font-bold text-lg overflow-hidden group/btn shadow-2xl transition-all duration-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate("/futsals");
+                    }}
+                  >
+                    {/* Continuous animated background layer */}
+                    <div className="absolute inset-0 bg-slate-950"></div>
+                    <div className="absolute inset-0 opacity-40 bg-[linear-gradient(90deg,transparent_0%,#10b981_30%,#34d399_50%,#10b981_70%,transparent_100%)] bg-[length:200%_100%] animate-[flow_4s_linear_infinite]"></div>
+                    
+                    {/* Subtle overlay for richness */}
+                    <div className="absolute inset-0 bg-black/20 group-hover/btn:bg-black/0 transition-colors duration-500"></div>
+                    
+                    {/* Button content */}
+                    <div className="relative z-10 flex items-center justify-center gap-2 text-white">
+                      Browse Futsals
+                      <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover/btn:translate-x-2" />
                     </div>
-                    <Button
-                      className="bg-white text-slate-900 hover:bg-white/90"
-                      onClick={() => {
-                        navigate("/futsals");
-                      }}
-                    >
-                      See Futsals
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
+                  </motion.button>
+                </motion.div>
               </motion.div>
             </motion.div>
           </div>
         </div>
       </div>
+
+      {/* Spacing for scroll arrow area to prevent overlap */}
+      <div className="h-24 lg:h-0" />
 
       <div className="pointer-events-none absolute bottom-8 left-1/2 -translate-x-1/2">
         <motion.div

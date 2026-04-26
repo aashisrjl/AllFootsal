@@ -1,6 +1,3 @@
-// No token extraction, no localStorage — cookie is httpOnly, JS can't read it
-// Just attach nothing; browser sends cookie on every request automatically
-
 import axios from "axios";
 
 export const API = axios.create({
@@ -52,17 +49,17 @@ export const registerFutsal = async (data: FutsalRegisterPayload) => {
 };
 
 export const googleLogin = async (token: string) => {
-  const res = await API.get("/auth/user/google", { token });
+  const res = await API.get("/auth/user/google", { params: { token } });
   return res.data;
 };
 
 export const facebookLogin = async (token: string) => {
-  const res = await API.get("/auth/user/facebook", { token });
+  const res = await API.get("/auth/user/facebook", { params: { token } });
   return res.data;
 };
 
 export const googleLoginFutsal = async (token: string) => {
-  const res = await API.get("/auth/futsal/google", { token });
+  const res = await API.get("/auth/futsal/google", { params: { token } });
   return res.data;
 };
 
@@ -73,5 +70,20 @@ export const logoutUser = async () => {
 
 export const verifyOtp = async (email: string, otp: string) => {
   const res = await API.post(`/auth/verify-otp?email=${encodeURIComponent(email)}`, { otp });
+  return res.data;
+};
+
+export const resendOtp = async (email: string, type: string) => {
+  const res = await API.post("/auth/resend-otp", { email, type });
+  return res.data;
+};
+
+export const forgotPassword = async (email: string) => {
+  const res = await API.post("/auth/forgot-password", { email });
+  return res.data;
+};
+
+export const resetPassword = async (data: any) => {
+  const res = await API.post("/auth/change-forgot-password", data);
   return res.data;
 };

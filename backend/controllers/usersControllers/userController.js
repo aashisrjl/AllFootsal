@@ -1,8 +1,15 @@
-const { User } = require("../../models");
+const { User, Footsal, sequelize } = require("../../models");
+const { QueryTypes } = require("sequelize");
 const fs = require('fs');
 const path = require('path');
 const { upload } = require('../../services/multer/multerConfig');
 const { uploadToCloudinary } = require('../../services/cloudinary/cloudinary.service');
+const {
+    normalizeTenantCode,
+    haversineDistanceKm,
+    extractCoordinates,
+    getPublicIp,
+} = require('../../utils/location/recommendationHelpers');
 
 const resolveStoredImagePath = (storedValue) => {
     if (!storedValue) return null;
@@ -244,6 +251,180 @@ const getMyAllBookings = async (req, res) => {
     }
 };
 
+const getRecommendedFutsals = async (req, res) => {
+    const coordinates = extractCoordinates(req);
+
+    if (!coordinates) {
+        return res.status(400).json({
+            success: false,
+            message: "latitude and longitude are required. Use browser geolocation on the frontend and send them to this endpoint.",
+            clientIp: getPublicIp(req),
+            note: "Localhost requests usually show ::1 or 127.0.0.1, which cannot be used for real geolocation.",
+        });
+    }
+
+    try {
+        const futsals = await Footsal.findAll({
+            attributes: ['id', 'futsalCode', 'futsalName', 'email', 'phoneNumber', 'ownerName', 'isActive', 'isVerified'],
+        });
+
+        if (!futsals.length) {
+            return res.status(200).json({
+                success: true,
+                message: 'No futsal found',
+                data: [],
+            });
+        }
+
+        const scoredFutsals = await Promise.all(
+            futsals.map(async (futsal) => {
+                const code = normalizeTenantCode(futsal.futsalCode);
+
+                if (!code) return null;
+
+                const [locationRows, ratingRows, bookingRows] = await Promise.all([
+                    sequelize.query(
+                        `SELECT district, address, city, postal_code, latitude, longitude, full_address
+                         FROM location_${code}
+                         ORDER BY id DESC
+                         LIMIT 1`,
+                        { type: QueryTypes.SELECT }
+                    ).catch(() => []),
+                    sequelize.query(
+                        `SELECT 
+                            COUNT(*) AS totalReviews,
+                            AVG(COALESCE(rating, 0)) AS avgRating,
+                            SUM(CASE WHEN LOWER(COALESCE(sentiment_label, '')) = 'positive' THEN 1 ELSE 0 END) AS positiveReviews,
+                            SUM(CASE WHEN LOWER(COALESCE(sentiment_label, '')) = 'negative' THEN 1 ELSE 0 END) AS negativeReviews,
+                            AVG(CASE WHEN LOWER(COALESCE(sentiment_label, '')) = 'positive' THEN COALESCE(sentiment_score, 0) END) AS avgPositiveSentimentScore,
+                            AVG(CASE WHEN LOWER(COALESCE(sentiment_label, '')) = 'negative' THEN COALESCE(sentiment_score, 0) END) AS avgNegativeSentimentScore
+                         FROM rating_${code}`,
+                        { type: QueryTypes.SELECT }
+                    ).catch(() => []),
+                    sequelize.query(
+                        `SELECT COUNT(*) AS totalBookings
+                         FROM booking_${code}`,
+                        { type: QueryTypes.SELECT }
+                    ).catch(() => []),
+                ]);
+
+                const location = locationRows[0];
+                if (!location || location.latitude === null || location.latitude === undefined || location.longitude === null || location.longitude === undefined) {
+                    return null;
+                }
+
+                const latitude = Number(location.latitude);
+                const longitude = Number(location.longitude);
+
+                if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+                    return null;
+                }
+
+                const distanceKm = haversineDistanceKm(
+                    coordinates.latitude,
+                    coordinates.longitude,
+                    latitude,
+                    longitude
+                );
+
+                const ratingStats = ratingRows[0] || {};
+                const bookingStats = bookingRows[0] || {};
+
+                const totalReviews = Number(ratingStats.totalReviews || 0);
+                const avgRating = Number(ratingStats.avgRating || 0);
+                const positiveReviews = Number(ratingStats.positiveReviews || 0);
+                const negativeReviews = Number(ratingStats.negativeReviews || 0);
+                const avgPositiveSentimentScore = Number(ratingStats.avgPositiveSentimentScore || 0);
+                const avgNegativeSentimentScore = Number(ratingStats.avgNegativeSentimentScore || 0);
+                const avgSentiment = totalReviews > 0 ? (positiveReviews / totalReviews) : 0;
+                const totalBookings = Number(bookingStats.totalBookings || 0);
+
+                return {
+                    id: futsal.id,
+                    futsalCode: futsal.futsalCode,
+                    futsalName: futsal.futsalName,
+                    ownerName: futsal.ownerName,
+                    email: futsal.email,
+                    phoneNumber: futsal.phoneNumber,
+                    isActive: futsal.isActive,
+                    isVerified: futsal.isVerified,
+                    location: {
+                        district: location.district,
+                        address: location.address,
+                        city: location.city,
+                        postal_code: location.postal_code,
+                        full_address: location.full_address,
+                        latitude,
+                        longitude,
+                    },
+                    metrics: {
+                        distanceKm,
+                        totalReviews,
+                        avgSentiment,
+                        avgRating,
+                        positiveReviews,
+                        negativeReviews,
+                        avgPositiveSentimentScore,
+                        avgNegativeSentimentScore,
+                        totalBookings,
+                    },
+                };
+            })
+        );
+
+        const validFutsals = scoredFutsals.filter(Boolean);
+
+        if (!validFutsals.length) {
+            return res.status(200).json({
+                success: true,
+                message: 'No futsal location data found for recommendation',
+                data: [],
+            });
+        }
+
+        const maxBookings = Math.max(...validFutsals.map((item) => item.metrics.totalBookings), 1);
+        const maxDistance = Math.max(...validFutsals.map((item) => item.metrics.distanceKm), 1);
+
+        const rankedFutsals = validFutsals
+            .map((item) => {
+                const distanceScore = 1 - Math.min(item.metrics.distanceKm / maxDistance, 1);
+                const sentimentScore = Math.min(Math.max(item.metrics.avgSentiment, 0), 1);
+                const bookingScore = Math.min(item.metrics.totalBookings / maxBookings, 1);
+
+                const finalScore =
+                    (distanceScore * 0.5) +
+                    (sentimentScore * 0.3) +
+                    (bookingScore * 0.2);
+
+                return {
+                    ...item,
+                    score: Number(finalScore.toFixed(4)),
+                    ranking: {
+                        distanceScore: Number(distanceScore.toFixed(4)),
+                        sentimentScore: Number(sentimentScore.toFixed(4)),
+                        bookingScore: Number(bookingScore.toFixed(4)),
+                    },
+                };
+            })
+            .sort((a, b) => b.score - a.score);
+
+        const limit = Math.max(1, Math.min(Number(req.query.limit || 5), 20));
+
+        return res.status(200).json({
+            success: true,
+            message: 'Recommended futsals fetched successfully',
+            userLocation: coordinates,
+            data: rankedFutsals.slice(0, limit),
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to fetch recommended futsals',
+            error: error.message,
+        });
+    }
+};
+
 module.exports = {
     getAllUsers,
     getUserById,
@@ -251,5 +432,6 @@ module.exports = {
     updateProfile,
     updateProfileImage,
     deleteProfileImage,
-    getMyAllBookings
+    getMyAllBookings,
+    getRecommendedFutsals,
 }

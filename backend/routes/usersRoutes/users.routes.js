@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, getUserById, getProfile, updateProfile, updateProfileImage, deleteProfileImage, getMyAllBookings } = require('../../controllers/usersControllers/userController');
+const { getAllUsers, getUserById, getProfile, updateProfile, updateProfileImage, deleteProfileImage, getMyAllBookings, getRecommendedFutsals } = require('../../controllers/usersControllers/userController');
 const isBothAuthenticated = require('../../middleware/authMiddleware/bothAuthenticated');
 const isUserAuthenticated = require('../../middleware/authMiddleware/userAuthenticate');
 const { upload } = require('../../services/multer/multerConfig');
@@ -46,6 +46,12 @@ router.get(
     '/user/bookings', // #swagger.tags=['Users']
     isUserAuthenticated,
     getMyAllBookings
+);
+
+router.get(
+    '/user/recommendations', // #swagger.tags=['Users']
+    isUserAuthenticated,
+    getRecommendedFutsals
 );
 
 module.exports = router;

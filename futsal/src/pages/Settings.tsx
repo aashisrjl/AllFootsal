@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { User, Bell, Shield, CreditCard, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import api from '../lib/api';
+import { updateFutsalProfile } from '../lib/authApi';
 
 const Settings = () => {
   const { futsalProfile, refreshProfile } = useAuth();
@@ -39,7 +39,7 @@ const Settings = () => {
       setIsSaving(true);
       setSuccessMsg('');
       const ownerName = `${firstName} ${lastName}`.trim();
-      await api.patch('/futsals-profile', { ownerName, email, phoneNumber: phone });
+      await updateFutsalProfile({ ownerName, email, phoneNumber: phone });
       await refreshProfile();
       setSuccessMsg('Profile updated successfully!');
       setTimeout(() => setSuccessMsg(''), 3000);
@@ -149,7 +149,7 @@ const Settings = () => {
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer ml-4">
                     <input type="checkbox" defaultChecked={notif.on} className="sr-only peer" />
-                    <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 shadow-inner peer-checked:after:bg-white"></div>
+                    <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 shadow-inner peer-checked:after:bg-white"></div>
                   </label>
                 </div>
               ))}
@@ -160,7 +160,7 @@ const Settings = () => {
           <div id="billing" className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-8 hover:border-slate-700 transition-colors">
             <h3 className="text-lg font-black text-white mb-6 flex items-center gap-2 border-b border-slate-800/80 pb-4">
               <CreditCard className="h-5 w-5 text-purple-500" />
-              Current Subscription
+              Billing & Subscription
             </h3>
             <div className="border border-emerald-500/30 rounded-xl p-6 bg-emerald-500/5 relative overflow-hidden group shadow-inner">
               <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-3xl rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none group-hover:bg-emerald-500/10 transition-colors duration-700"></div>
@@ -184,12 +184,9 @@ const Settings = () => {
                 </p>
               )}
               <div className="flex flex-col sm:flex-row gap-3 relative z-10">
-                <button className="px-5 py-2.5 bg-slate-800/80 text-emerald-400 border border-emerald-500/30 font-bold rounded-xl hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all shadow-sm">
-                  Change Plan
-                </button>
-                <button className="px-5 py-2.5 bg-transparent text-slate-300 font-bold rounded-xl border border-slate-700 hover:bg-slate-800 hover:text-white transition-all shadow-sm">
-                  View Billing History
-                </button>
+                <Link to="/subscription" className="px-5 py-2.5 bg-slate-800/80 text-emerald-400 border border-emerald-500/30 font-bold rounded-xl hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all shadow-sm text-center">
+                  Go to Subscription Center
+                </Link>
               </div>
             </div>
           </div>

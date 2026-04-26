@@ -9,14 +9,14 @@ import { BookingProvider } from "@/contexts/BookingContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 
 import Index from "./pages/Index";
-import Facilities from "./pages/Futsals";
+// import Facilities from "./pages/Futsals";
 import FacilityDetails from "./pages/FacilityDetails";
 import Login from "./pages/Login";
 import UserBookings from "./pages/UserBookings";
 import BookingDetails from "./pages/BookingDetails";
 import NotFound from "./pages/NotFound";
-import AdminDashboard from "./pages/AdminDashboard";
-import About from "./pages/About";
+// import AdminDashboard from "./pages/AdminDashboard";
+// import About from "./pages/About";
 import Contact from "./pages/Contact";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -32,6 +32,8 @@ import FutsalBookings from "./pages/FutsalBookings";
 import FutsalReviews from "./pages/FutsalReviews";
 import UserProfileInfo from "./pages/UserProfileInfo";
 import FutsalGallery from "./pages/FutsalGallery";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailure from "./pages/PaymentFailure";
 import FloatingThemeToggle from "@/components/FloatingThemeToggle";
 
 const queryClient = new QueryClient();
@@ -69,6 +71,8 @@ const App = () => (
               <Route path="/forum/:id" element={<ForumDetails />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/profile" element={<UserProfileInfo />} />
+              <Route path="/payment/success" element={<PaymentSuccess />} />
+              <Route path="/payment/failure" element={<PaymentFailure />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { MapPin, Plus, Edit, ToggleLeft, ToggleRight, Wrench } from 'lucide-react';
-import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import PitchModal from '../components/PitchModal';
 import ScheduleModal from '../components/ScheduleModal';
+import { getFutsalPitches, updatePitch } from '../lib/pitchApi';
 
 const PitchManagement = () => {
   const { futsalProfile } = useAuth();
@@ -75,7 +75,7 @@ const PitchManagement = () => {
       // Optimistic update
       setPitches(pitches.map(p => p.id === pitch.id ? { ...p, isActive: updatedStatus } : p));
       
-      await api.put(`/futsal/pitches/edit/${pitch.id}`, {
+      await updatePitch(pitch.id, {
         ...pitch,
         is_active: updatedStatus ? 1 : 0
       });
