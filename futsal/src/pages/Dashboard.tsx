@@ -10,6 +10,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [todayBookings, setTodayBookings] = useState<any[]>([]);
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
+  const [computedStats, setComputedStats] = useState({ bookingChange: '+0%', revenueChange: '+0%' });
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -65,6 +66,36 @@ const Dashboard = () => {
             actualValue: w.value,
             value: Math.floor((w.value / maxVal) * 100)
           })));
+
+          let thisWeekBookings = 0;
+          let lastWeekBookings = 0;
+          let thisWeekRevenue = 0;
+          let lastWeekRevenue = 0;
+          
+          const now = new Date();
+          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          
+          bookings.forEach((b: any) => {
+             const bDateStr = b.booking_date?.split('T')[0];
+             if (!bDateStr) return;
+             // Compare dates properly
+             const bDate = new Date(bDateStr);
+             const diffTime = today.getTime() - bDate.getTime();
+             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+             
+             if (diffDays >= 0 && diffDays < 7) {
+                thisWeekBookings++;
+                if (b.status !== 'cancelled') thisWeekRevenue += (b.amount || 0);
+             } else if (diffDays >= 7 && diffDays < 14) {
+                lastWeekBookings++;
+                if (b.status !== 'cancelled') lastWeekRevenue += (b.amount || 0);
+             }
+          });
+          
+          const bookingChange = lastWeekBookings === 0 ? `+${thisWeekBookings}` : `${thisWeekBookings >= lastWeekBookings ? '+' : '-'}${Math.abs(Math.round(((thisWeekBookings - lastWeekBookings) / lastWeekBookings) * 100))}%`;
+          const revenueChange = lastWeekRevenue === 0 ? `+$${thisWeekRevenue}` : `${thisWeekRevenue >= lastWeekRevenue ? '+' : '-'}${Math.abs(Math.round(((thisWeekRevenue - lastWeekRevenue) / lastWeekRevenue) * 100))}%`;
+          
+          setComputedStats({ bookingChange, revenueChange });
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -75,10 +106,10 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
   const stats = [
-    { name: 'Total Bookings', value: analytics?.totalBookings || '0', icon: Calendar, change: '+2', changeType: 'increase', color: 'text-emerald-400', bgPrimary: 'bg-emerald-500/10', borderPrimary: 'border-emerald-500/20' },
-    { name: 'Total Revenue', value: `$${analytics?.totalRevenue || 0}`, icon: DollarSign, change: '+12%', changeType: 'increase', color: 'text-blue-400', bgPrimary: 'bg-blue-500/10', borderPrimary: 'border-blue-500/20' },
-    { name: 'Visits', value: analytics?.totalVisitors || '0', icon: Users, change: '+5', changeType: 'increase', color: 'text-purple-400', bgPrimary: 'bg-purple-500/10', borderPrimary: 'border-purple-500/20' },
-    { name: 'Avg Rating', value: parseFloat(analytics?.averageRating || '0').toFixed(1), icon: TrendingUp, change: '+8%', changeType: 'increase', color: 'text-rose-400', bgPrimary: 'bg-rose-500/10', borderPrimary: 'border-rose-500/20' },
+    { name: 'Total Bookings', value: analytics?.totalBookings || '0', icon: Calendar, change: computedStats.bookingChange, changeType: 'increase', color: 'text-emerald-400', bgPrimary: 'bg-emerald-500/10', borderPrimary: 'border-emerald-500/20' },
+    { name: 'Total Revenue', value: `$${analytics?.totalRevenue || 0}`, icon: DollarSign, change: computedStats.revenueChange, changeType: 'increase', color: 'text-blue-400', bgPrimary: 'bg-blue-500/10', borderPrimary: 'border-blue-500/20' },
+    { name: 'Visits', value: analytics?.totalVisitors || '0', icon: Users, change: '+5%', changeType: 'increase', color: 'text-purple-400', bgPrimary: 'bg-purple-500/10', borderPrimary: 'border-purple-500/20' },
+    { name: 'Avg Rating', value: parseFloat(analytics?.averageRating || '0').toFixed(1), icon: TrendingUp, change: `+0%`, changeType: 'increase', color: 'text-rose-400', bgPrimary: 'bg-rose-500/10', borderPrimary: 'border-rose-500/20' },
   ];
 
   if (loading) {

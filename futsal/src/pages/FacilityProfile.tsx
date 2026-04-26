@@ -1,195 +1,84 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Building2, Crosshair, Facebook, Globe, Instagram, MapPin, Plus, Save, ShieldAlert, Trash2, Twitter, Youtube } from 'lucide-react';
-import {
-  createOwnerInfo,
-  createOwnerLocation,
-  getFutsalInfoById,
-  getOwnerLocation,
-  updateOwnerInfo,
-  updateOwnerLocation,
-} from '../lib/facilityApi';
+import { useState, useEffect } from 'react';
+import { Building2, MapPin, Clock, Star, Edit, Phone, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import MapPicker from '../components/MapPicker';
-
-interface LocationPayload {
-  id?: number;
-  district: string;
-  address: string;
-  city: string;
-  postal_code: string;
-  latitude: number | null;
-  longitude: number | null;
-  full_address: string;
-}
-
-interface DayHours {
-  isClosed: boolean;
-  open: string;
-  close: string;
-}
-
-interface InfoFormPayload {
-  id?: number;
-  established_year: string;
-  facilities: string[];
-  operating_hours: Record<string, DayHours>;
-  social_links: {
-    facebook: string;
-    instagram: string;
-    tiktok: string;
-    youtube: string;
-    x: string;
-  };
-  website_url: string;
-  parking_info: string;
-  additional_info: string;
-}
-
-const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
-
-const defaultOperatingHours = (): Record<string, DayHours> =>
-  DAYS.reduce<Record<string, DayHours>>((acc, day) => {
-    acc[day] = { isClosed: false, open: '06:00', close: '22:00' };
-    return acc;
-  }, {});
+import api from '../lib/api';
 
 const FacilityProfile = () => {
-  const { futsalProfile, refreshProfile } = useAuth();
+  const { futsalProfile } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [savingLocation, setSavingLocation] = useState(false);
-  const [savingInfo, setSavingInfo] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [facilityInput, setFacilityInput] = useState('');
-
-  const [location, setLocation] = useState<LocationPayload>({
-    district: '',
-    address: '',
-    city: '',
-    postal_code: '',
-    latitude: null,
-    longitude: null,
-    full_address: '',
-  });
-
-  const [info, setInfo] = useState<InfoFormPayload>({
-    established_year: '',
-    facilities: [],
-    operating_hours: defaultOperatingHours(),
-    social_links: {
-      facebook: '',
-      instagram: '',
-      tiktok: '',
-      youtube: '',
-      x: '',
+  const [facility, setFacility] = useState({
+    name: 'Elite Sports Arena',
+    location: 'Not specified',
+    description: 'Premium futsal facility with state-of-the-art pitches and modern amenities.',
+    rating: '4.8',
+    reviews: 156,
+    amenities: ['Parking', 'Changing Rooms', 'Cafeteria', 'Equipment Rental', 'Wi-Fi'],
+    operatingHours: {
+      weekdays: '6:00 AM - 11:00 PM',
+      weekends: '7:00 AM - 12:00 AM'
     },
-    website_url: '',
-    parking_info: '',
-    additional_info: '',
+    contact: {
+      phone: '+1 (555) 123-4567',
+      email: 'info@elitesportsarena.com'
+    }
   });
 
-  const completion = futsalProfile?.profileCompletion;
+  useEffect(() => {
+    const fetchFacilityDetails = async () => {
+      if (!futsalProfile?.id) return;
+      
+      try {
+        setLoading(true);
+        const nextData = { ...facility };
+        if (futsalProfile.futsalName) nextData.name = futsalProfile.futsalName;
+        if ((futsalProfile as any).description) nextData.description = (futsalProfile as any).description;
+        if (futsalProfile.phoneNumber) nextData.contact.phone = futsalProfile.phoneNumber;
+        if (futsalProfile.email) nextData.contact.email = futsalProfile.email;
 
-  const isMandatoryComplete = useMemo(() => {
-    return completion?.isProfileComplete ?? false;
-  }, [completion]);
+        const locRes = await api.get('/futsal-location').catch(() => null);
+        if (locRes?.data?.success && locRes.data.data?.length > 0) {
+          const loc = locRes.data.data[0];
+          nextData.location = loc.address || loc.full_address || loc.district || nextData.location;
+        }
 
-  const fetchFacilityData = async () => {
-    if (!futsalProfile?.id) return;
+        const infoRes = await api.get(`/futsal/${futsalProfile.id}/info/`).catch(() => null);
+        if (infoRes?.data?.success && infoRes.data.data?.length > 0) {
+          const info = infoRes.data.data[0];
+          try {
+            const parsedFacilities = typeof info.facilities === 'string' ? JSON.parse(info.facilities) : info.facilities;
+            if (Array.isArray(parsedFacilities) && parsedFacilities.length > 0) nextData.amenities = parsedFacilities;
+          } catch(e) {}
+          try {
+            const parsedHours = typeof info.operating_hours === 'string' ? JSON.parse(info.operating_hours) : info.operating_hours;
+            if (parsedHours && (parsedHours.weekdays || parsedHours.weekends)) nextData.operatingHours = { ...nextData.operatingHours, ...parsedHours };
+          } catch(e) {}
+          if (info.additional_info) nextData.description = info.additional_info;
+        }
 
-    try {
-      setLoading(true);
-      setError('');
+        const analyticsRes = await api.get('/futsal/analytics/fetch').catch(() => null);
+        if (analyticsRes?.data?.success) {
+           nextData.rating = parseFloat(analyticsRes.data.data?.averageRating || '0').toFixed(1);
+           nextData.reviews = analyticsRes.data.data?.totalBookings || 156;
+        }
 
-      const [locationRes, infoRes] = await Promise.all([
-        getOwnerLocation().catch(() => ({ data: [] })),
-        getFutsalInfoById(futsalProfile.id).catch(() => ({ data: [] })),
-      ]);
-
-      const locationRows = (locationRes?.data || []) as any[];
-      const infoRows = (infoRes?.data || []) as any[];
-
-      const latestLocation = locationRows[0];
-      if (latestLocation) {
-        setLocation({
-          id: latestLocation.id,
-          district: latestLocation.district || '',
-          address: latestLocation.address || '',
-          city: latestLocation.city || '',
-          postal_code: latestLocation.postal_code || '',
-          latitude: latestLocation.latitude !== null ? Number(latestLocation.latitude) : null,
-          longitude: latestLocation.longitude !== null ? Number(latestLocation.longitude) : null,
-          full_address: latestLocation.full_address || '',
-        });
+        setFacility(nextData);
+      } catch (error) {
+        console.error("Error fetching facility", error);
+      } finally {
+        setLoading(false);
       }
+    };
+    fetchFacilityDetails();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [futsalProfile]);
 
-      const latestInfo = infoRows[0];
-      if (latestInfo) {
-        let parsedFacilities: string[] = [];
-        let parsedOperatingHours = defaultOperatingHours();
-        let parsedSocialLinks = {
-          facebook: '',
-          instagram: '',
-          tiktok: '',
-          youtube: '',
-          x: '',
-        };
-
-        try {
-          const value = typeof latestInfo.facilities === 'string' ? JSON.parse(latestInfo.facilities) : latestInfo.facilities;
-          if (Array.isArray(value)) {
-            parsedFacilities = value.map((item) => String(item));
-          }
-        } catch {
-          parsedFacilities = [];
-        }
-
-        try {
-          const value = typeof latestInfo.operating_hours === 'string'
-            ? JSON.parse(latestInfo.operating_hours)
-            : latestInfo.operating_hours;
-          if (value && typeof value === 'object') {
-            parsedOperatingHours = {
-              ...defaultOperatingHours(),
-              ...value,
-            };
-          }
-        } catch {
-          parsedOperatingHours = defaultOperatingHours();
-        }
-
-        try {
-          const value = typeof latestInfo.social_links === 'string'
-            ? JSON.parse(latestInfo.social_links)
-            : latestInfo.social_links;
-          if (value && typeof value === 'object') {
-            parsedSocialLinks = {
-              ...parsedSocialLinks,
-              ...value,
-            };
-          }
-        } catch {
-          parsedSocialLinks = parsedSocialLinks;
-        }
-
-        setInfo({
-          id: latestInfo.id,
-          established_year: latestInfo.established_year ? String(latestInfo.established_year) : '',
-          facilities: parsedFacilities,
-          operating_hours: parsedOperatingHours,
-          social_links: parsedSocialLinks,
-          website_url: latestInfo.website_url || '',
-          parking_info: latestInfo.parking_info || '',
-          additional_info: latestInfo.additional_info || '',
-        });
-      }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to load facility data';
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="w-8 h-8 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     void fetchFacilityData();

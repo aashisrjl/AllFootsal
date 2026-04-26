@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { User, Bell, Shield, CreditCard, Check } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { updateFutsalProfile } from '../lib/authApi';
 
@@ -13,6 +12,7 @@ const Settings = () => {
   const [phone, setPhone] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [subscription, setSubscription] = useState<any>(null);
 
   useEffect(() => {
     if (futsalProfile) {
@@ -21,6 +21,16 @@ const Settings = () => {
       setLastName(ownerNames.slice(1).join(' ') || '');
       setEmail(futsalProfile.email || '');
       setPhone(futsalProfile.phoneNumber || '');
+
+      const fetchSub = async () => {
+         try {
+           const subRes = await api.get('/subscription');
+           if (subRes.data.success && subRes.data.data) {
+             setSubscription(Array.isArray(subRes.data.data) ? subRes.data.data[0] : subRes.data.data);
+           }
+         } catch(e) { console.error('Error fetching subscription'); }
+      };
+      fetchSub();
     }
   }, [futsalProfile]);
 
@@ -157,13 +167,22 @@ const Settings = () => {
               
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 relative z-10 gap-3">
                 <span className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
-                  Manage Subscription
-                  <span className="px-2.5 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] uppercase tracking-widest rounded-lg font-black shadow-sm">Active</span>
+                  {subscription ? (subscription.plan_type || 'Custom Plan') : 'No Active Plan'}
+                  <span className={`px-2.5 py-1 text-[10px] uppercase tracking-widest rounded-lg font-black shadow-sm ${subscription && subscription.status === 'active' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'}`}>
+                    {subscription ? subscription.status : 'Inactive'}
+                  </span>
                 </span>
               </div>
-              <p className="text-slate-300 font-medium text-sm mb-6 relative z-10 leading-relaxed max-w-lg">
-                Open the subscription center to choose your plan, make payment with Khalti/eSewa/manual methods, and verify payment status.
-              </p>
+              {subscription ? (
+                <p className="text-slate-300 font-medium text-sm mb-6 relative z-10 leading-relaxed max-w-lg">
+                  You are currently on the {subscription.plan_type || 'Custom Plan'} billed at <strong className="text-emerald-400 font-black px-1.5 py-0.5 bg-emerald-500/10 rounded-md border border-emerald-500/20 mx-1">Rs. {subscription.price || 0}</strong>. <br className="hidden sm:block" />
+                  Your current billing cycle will end on <strong className="text-white">{subscription.end_date ? new Date(subscription.end_date).toLocaleDateString() : 'N/A'}</strong>.
+                </p>
+              ) : (
+                <p className="text-slate-300 font-medium text-sm mb-6 relative z-10 leading-relaxed max-w-lg">
+                  You do not have an active subscription. Please subscribe to a plan to continue using all features.
+                </p>
+              )}
               <div className="flex flex-col sm:flex-row gap-3 relative z-10">
                 <Link to="/subscription" className="px-5 py-2.5 bg-slate-800/80 text-emerald-400 border border-emerald-500/30 font-bold rounded-xl hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all shadow-sm text-center">
                   Go to Subscription Center

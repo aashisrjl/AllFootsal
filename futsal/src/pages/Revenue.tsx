@@ -5,6 +5,7 @@ import { getOwnerBookings } from '../lib/bookingApi';
 
 const Revenue = () => {
   const [revenueData, setRevenueData] = useState({ today: 0, week: 0, month: 0, year: 0 });
+  const [revenueChanges, setRevenueChanges] = useState({ today: '+0%', week: '+0%', month: '+0%', year: '+0%' });
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
   const [monthlyBreakdown, setMonthlyBreakdown] = useState<any[]>([]);
   const [weeklyChart, setWeeklyChart] = useState<any[]>([]);
@@ -27,13 +28,22 @@ const Revenue = () => {
            
            const todayString = new Date().toISOString().split('T')[0];
            
+           const dYesterday = new Date(); dYesterday.setDate(dYesterday.getDate() - 1);
+           const yesterdayString = dYesterday.toISOString().split('T')[0];
+
            const dWeek = new Date(); dWeek.setDate(dWeek.getDate() - 7);
            const weekString = dWeek.toISOString().split('T')[0];
+           const dLastWeek = new Date(); dLastWeek.setDate(dLastWeek.getDate() - 14);
+           const lastWeekString = dLastWeek.toISOString().split('T')[0];
            
            const dMonth = new Date(); dMonth.setDate(dMonth.getDate() - 30);
            const monthString = dMonth.toISOString().split('T')[0];
+           const dLastMonth = new Date(); dLastMonth.setDate(dLastMonth.getDate() - 60);
+           const lastMonthString = dLastMonth.toISOString().split('T')[0];
            
-           let todayRev = 0, weekRev = 0, monthRev = 0;
+           let todayRev = 0, yesterdayRev = 0;
+           let weekRev = 0, lastWeekRev = 0;
+           let monthRev = 0, lastMonthRev = 0;
            
            bookings.forEach((b: any) => {
              if (b.status === 'cancelled') return;
@@ -41,8 +51,13 @@ const Revenue = () => {
              if (!bDate) return;
              const amt = b.amount || 0;
              if (bDate === todayString) todayRev += amt;
+             if (bDate === yesterdayString) yesterdayRev += amt;
+             
              if (bDate >= weekString) weekRev += amt;
+             else if (bDate >= lastWeekString) lastWeekRev += amt;
+             
              if (bDate >= monthString) monthRev += amt;
+             else if (bDate >= lastMonthString) lastMonthRev += amt;
            });
 
            setRevenueData({
@@ -50,6 +65,19 @@ const Revenue = () => {
              week: Math.floor(weekRev),
              month: Math.floor(monthRev),
              year: parseInt(totalRev, 10)
+           });
+           
+           const calcChange = (current: number, prev: number) => {
+             if (prev === 0) return `+$${current}`;
+             const percent = Math.round(((current - prev) / prev) * 100);
+             return `${percent >= 0 ? '+' : '-'}${Math.abs(percent)}%`;
+           };
+
+           setRevenueChanges({
+             today: calcChange(todayRev, yesterdayRev),
+             week: calcChange(weekRev, lastWeekRev),
+             month: calcChange(monthRev, lastMonthRev),
+             year: '+0%' // Needs proper year calculation for full fidelity
            });
 
           const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -145,10 +173,10 @@ const Revenue = () => {
       {/* Revenue Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { label: "Today's Revenue", val: revenueData.today, inc: "+12% from yesterday", icon: DollarSign, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-          { label: "This Week", val: revenueData.week, inc: "+8% from last week", icon: Calendar, color: "text-blue-400", bg: "bg-blue-500/10" },
-          { label: "This Month", val: revenueData.month.toLocaleString(), inc: "+15% from last month", icon: TrendingUp, color: "text-purple-400", bg: "bg-purple-500/10" },
-          { label: "This Year", val: revenueData.year.toLocaleString(), inc: "+22% from last year", icon: CreditCard, color: "text-amber-400", bg: "bg-amber-500/10" }
+          { label: "Today's Revenue", val: revenueData.today, inc: `${revenueChanges.today} from yesterday`, icon: DollarSign, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+          { label: "This Week", val: revenueData.week, inc: `${revenueChanges.week} from last week`, icon: Calendar, color: "text-blue-400", bg: "bg-blue-500/10" },
+          { label: "This Month", val: revenueData.month.toLocaleString(), inc: `${revenueChanges.month} from last month`, icon: TrendingUp, color: "text-purple-400", bg: "bg-purple-500/10" },
+          { label: "This Year", val: revenueData.year.toLocaleString(), inc: `${revenueChanges.year} from last year`, icon: CreditCard, color: "text-amber-400", bg: "bg-amber-500/10" }
         ].map((stat, i) => (
            <div key={i} className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-6 transition-all hover:-translate-y-1 hover:border-slate-700 hover:shadow-2xl relative overflow-hidden group">
             <div className={`absolute -right-6 -top-6 w-32 h-32 blur-3xl rounded-full ${stat.bg} opacity-50 group-hover:opacity-100 transition-opacity`} />

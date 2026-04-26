@@ -11,7 +11,7 @@ const { setupAdminPanel } = require('./config/adminConfig')
 const { CORS_ALLOWED_ORIGINS } = process.env
 
 const app = express();
-const PORT = process.env.SERVER_PORT || 3000;
+const PORT = process.env.SERVER_PORT || 3003;
 
 //cookie-parser
 const cookieParser = require("cookie-parser");

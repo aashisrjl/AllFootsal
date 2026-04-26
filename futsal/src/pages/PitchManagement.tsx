@@ -19,18 +19,41 @@ const PitchManagement = () => {
     if (!futsalProfile?.id) return;
     try {
       setLoading(true);
-      const res = await getFutsalPitches(futsalProfile.id);
-      if (res.success) {
-        // Map backend fields to frontend expected fields where necessary
-        const mappedPitches = res.data.map((p: any) => ({
+      const [pitchesRes, bookingsRes] = await Promise.all([
+        api.get(`/futsal/${futsalProfile.id}/pitches`),
+        api.get('/futsal-bookings').catch(() => null)
+      ]);
+
+      let pitchStats: any = {};
+      if (bookingsRes?.data?.success) {
+         const bookings = bookingsRes.data.data;
+         const todayDate = new Date().toISOString().split('T')[0];
+         bookings.forEach((b: any) => {
+            // Note: pitch_name matches backend fallback, occasionally backend provides pitch_id or pitch_name
+            const pId = b.pitch_id || b.pitch_name; 
+            if (!pitchStats[pId]) {
+               pitchStats[pId] = { bookingsToday: 0, revenue: 0 };
+            }
+            if (b.status !== 'cancelled') {
+               pitchStats[pId].revenue += (b.amount || 0);
+               const bDate = b.booking_date?.split('T')[0];
+               if (bDate === todayDate) {
+                 pitchStats[pId].bookingsToday += 1;
+               }
+            }
+         });
+      }
+
+      if (pitchesRes.data.success) {
+        const mappedPitches = pitchesRes.data.data.map((p: any) => ({
           ...p,
           pricePerHour: p.price_per_hour,
           isActive: p.is_active === 1 || p.is_active === true,
           surface: p.surface_type || 'N/A',
           size: p.dimensions || 'N/A',
-          bookingsToday: 0, // Not provided directly in this endpoint
-          revenue: 0, // Not provided directly in this endpoint
-          isUnderMaintenance: false // Add logic if backend supports it
+          bookingsToday: pitchStats[p.id]?.bookingsToday || pitchStats[p.name]?.bookingsToday || 0,
+          revenue: pitchStats[p.id]?.revenue || pitchStats[p.name]?.revenue || 0,
+          isUnderMaintenance: false
         }));
         setPitches(mappedPitches);
       }
