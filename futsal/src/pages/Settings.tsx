@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { User, Bell, Shield, CreditCard, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { updateFutsalProfile } from '../lib/authApi';
+import API from '@/lib/api';
+import { Link } from 'react-router-dom';
 
 const Settings = () => {
   const { futsalProfile, refreshProfile } = useAuth();
@@ -24,7 +26,7 @@ const Settings = () => {
 
       const fetchSub = async () => {
          try {
-           const subRes = await api.get('/subscription');
+           const subRes = await API.get('/subscription');
            if (subRes.data.success && subRes.data.data) {
              setSubscription(Array.isArray(subRes.data.data) ? subRes.data.data[0] : subRes.data.data);
            }

@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import PitchModal from '../components/PitchModal';
 import ScheduleModal from '../components/ScheduleModal';
 import { getFutsalPitches, updatePitch } from '../lib/pitchApi';
+import API from '@/lib/api';
 
 const PitchManagement = () => {
   const { futsalProfile } = useAuth();
@@ -20,8 +21,8 @@ const PitchManagement = () => {
     try {
       setLoading(true);
       const [pitchesRes, bookingsRes] = await Promise.all([
-        api.get(`/futsal/${futsalProfile.id}/pitches`),
-        api.get('/futsal-bookings').catch(() => null)
+        API.get(`/futsal/${futsalProfile.id}/pitches`),
+        API.get('/futsal-bookings').catch(() => null)
       ]);
 
       let pitchStats: any = {};
