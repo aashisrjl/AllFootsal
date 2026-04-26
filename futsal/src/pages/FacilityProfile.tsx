@@ -1,14 +1,16 @@
+import { useState, useEffect } from 'react';
 import { Building2, MapPin, Clock, Star, Edit, Phone, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import api from '../lib/api';
 
 const FacilityProfile = () => {
   const { futsalProfile } = useAuth();
-
-  const facility = {
-    name: futsalProfile?.futsalName || 'Elite Sports Arena',
-    location: (futsalProfile as any)?.location || 'Not specified',
-    description: (futsalProfile as any)?.description || 'Premium futsal facility with state-of-the-art pitches and modern amenities.',
-    rating: 4.8,
+  const [loading, setLoading] = useState(true);
+  const [facility, setFacility] = useState({
+    name: 'Elite Sports Arena',
+    location: 'Not specified',
+    description: 'Premium futsal facility with state-of-the-art pitches and modern amenities.',
+    rating: '4.8',
     reviews: 156,
     amenities: ['Parking', 'Changing Rooms', 'Cafeteria', 'Equipment Rental', 'Wi-Fi'],
     operatingHours: {
@@ -16,10 +18,67 @@ const FacilityProfile = () => {
       weekends: '7:00 AM - 12:00 AM'
     },
     contact: {
-      phone: futsalProfile?.phoneNumber || '+1 (555) 123-4567',
-      email: futsalProfile?.email || 'info@elitesportsarena.com'
+      phone: '+1 (555) 123-4567',
+      email: 'info@elitesportsarena.com'
     }
-  };
+  });
+
+  useEffect(() => {
+    const fetchFacilityDetails = async () => {
+      if (!futsalProfile?.id) return;
+      
+      try {
+        setLoading(true);
+        const nextData = { ...facility };
+        if (futsalProfile.futsalName) nextData.name = futsalProfile.futsalName;
+        if ((futsalProfile as any).description) nextData.description = (futsalProfile as any).description;
+        if (futsalProfile.phoneNumber) nextData.contact.phone = futsalProfile.phoneNumber;
+        if (futsalProfile.email) nextData.contact.email = futsalProfile.email;
+
+        const locRes = await api.get('/futsal-location').catch(() => null);
+        if (locRes?.data?.success && locRes.data.data?.length > 0) {
+          const loc = locRes.data.data[0];
+          nextData.location = loc.address || loc.full_address || loc.district || nextData.location;
+        }
+
+        const infoRes = await api.get(`/futsal/${futsalProfile.id}/info/`).catch(() => null);
+        if (infoRes?.data?.success && infoRes.data.data?.length > 0) {
+          const info = infoRes.data.data[0];
+          try {
+            const parsedFacilities = typeof info.facilities === 'string' ? JSON.parse(info.facilities) : info.facilities;
+            if (Array.isArray(parsedFacilities) && parsedFacilities.length > 0) nextData.amenities = parsedFacilities;
+          } catch(e) {}
+          try {
+            const parsedHours = typeof info.operating_hours === 'string' ? JSON.parse(info.operating_hours) : info.operating_hours;
+            if (parsedHours && (parsedHours.weekdays || parsedHours.weekends)) nextData.operatingHours = { ...nextData.operatingHours, ...parsedHours };
+          } catch(e) {}
+          if (info.additional_info) nextData.description = info.additional_info;
+        }
+
+        const analyticsRes = await api.get('/futsal/analytics/fetch').catch(() => null);
+        if (analyticsRes?.data?.success) {
+           nextData.rating = parseFloat(analyticsRes.data.data?.averageRating || '0').toFixed(1);
+           nextData.reviews = analyticsRes.data.data?.totalBookings || 156;
+        }
+
+        setFacility(nextData);
+      } catch (error) {
+        console.error("Error fetching facility", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFacilityDetails();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [futsalProfile]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="w-8 h-8 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
