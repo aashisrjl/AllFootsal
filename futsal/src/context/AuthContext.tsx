@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import { getFutsalProfile, loginFutsal, logoutFutsal } from '../lib/authApi';
 
 export interface FutsalProfile {
@@ -40,7 +41,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         setFutsalProfile(null);
       }
-    } catch (error) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        setFutsalProfile(null);
+        return;
+      }
       console.error('Failed to fetch profile', error);
       setFutsalProfile(null);
     } finally {
@@ -59,8 +64,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         throw new Error('Login failed: Invalid response format');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login failed', error);
+      if (axios.isAxiosError(error)) {
+        const message =
+          (error.response?.data as { error?: string; message?: string } | undefined)?.error ||
+          (error.response?.data as { error?: string; message?: string } | undefined)?.message ||
+          error.message ||
+          'Login failed';
+        throw new Error(message);
+      }
       throw error;
     } finally {
       setLoading(false);
