@@ -9,7 +9,8 @@ import {
   Wallet,
   Settings,
   Bell,
-  LogOut 
+  LogOut,
+  Image as ImageIcon
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -26,6 +27,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'My Facility', href: '/facility', icon: Building2 },
     { name: 'Bookings', href: '/bookings', icon: Calendar },
     { name: 'Pitch Management', href: '/pitches', icon: MapPin },
+    { name: 'Media Management', href: '/media', icon: ImageIcon },
     { name: 'Revenue', href: '/revenue', icon: DollarSign },
     { name: 'Subscription', href: '/subscription', icon: Wallet },
     { name: 'Settings', href: '/settings', icon: Settings },
