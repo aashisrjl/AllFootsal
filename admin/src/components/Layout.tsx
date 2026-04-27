@@ -7,7 +7,8 @@ import {
   CreditCard, 
   BarChart3,
   Settings,
-  LogOut 
+  LogOut,
+  Image
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -19,7 +20,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { name: 'Facilities', href: '/facilities', icon: Building },
+    { name: 'Pitch Management', href: '/facilities', icon: Building },
+    { name: 'Media Management', href: '/media', icon: Image },
     { name: 'Users', href: '/users', icon: Users },
     { name: 'Subscriptions', href: '/subscriptions', icon: CreditCard },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },

@@ -5,6 +5,7 @@ import FacilityManagement from './pages/FacilityManagement';
 import UserManagement from './pages/UserManagement';
 import SubscriptionManagement from './pages/SubscriptionManagement';
 import Analytics from './pages/Analytics';
+import MediaManagement from './pages/MediaManagement';
 import Layout from './components/Layout';
 import './index.css';
 
@@ -15,6 +16,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/facilities" element={<FacilityManagement />} />
+          <Route path="/media" element={<MediaManagement />} />
           <Route path="/users" element={<UserManagement />} />
           <Route path="/subscriptions" element={<SubscriptionManagement />} />
           <Route path="/analytics" element={<Analytics />} />
