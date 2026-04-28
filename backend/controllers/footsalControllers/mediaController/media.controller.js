@@ -53,10 +53,7 @@ const uploadMedia = async (req, res) => {
     const normalizedPitchId = category === "pitch" ? pitchId : null;
 
     if (category === "pitch" && !normalizedPitchId) {
-      return res.status(400).json({
-        success: false,
-        message: "pitchId is required when category is 'pitch'",
-      });
+      // Allow null for general pitch media
     }
 
     const uploaded = [];
