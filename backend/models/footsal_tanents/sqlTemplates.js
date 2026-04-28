@@ -135,18 +135,7 @@ module.exports = {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;
   `,
-  media: (code) => `
-    CREATE TABLE IF NOT EXISTS media_${code} (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      type ENUM('image','video') NOT NULL,
-      category ENUM('home','pitch','facility','event','other','logo','banner') NOT NULL,
-      url VARCHAR(500) NOT NULL,
-      description TEXT,
-      pitch_id INT,
-      foreign key (pitch_id) references pitch_${code}(id) on delete set null,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB;
-  `,
+                                                           
   visitor: (code) => `
     CREATE TABLE IF NOT EXISTS visitor_${code} (
       id BIGINT AUTO_INCREMENT PRIMARY KEY,
