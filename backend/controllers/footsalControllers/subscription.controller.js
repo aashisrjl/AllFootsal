@@ -1,10 +1,31 @@
-const { Subscription } = require("../../models");
+const { Subscription, Footsal } = require("../../models");
+const { sendNotificationEmail } = require("../../utils/notifications/emailNotification");
 
 const {
   YEARLY_SUBSCRIPTION_PRICE,
   HALF_YEARLY_SUBSCRIPTION_PRICE,
   MONTHLY_SUBSCRIPTION_PRICE,
 } = process.env;
+
+const notifySubscriptionChange = async (futsalId, subject, intro, subscription) => {
+  const futsal = await Footsal.findByPk(futsalId);
+
+  return sendNotificationEmail({
+    to: futsal?.email,
+    subject,
+    intro,
+    details: [
+      ["Futsal Name", futsal?.futsalName],
+      ["Owner Name", futsal?.ownerName],
+      ["Plan", subscription?.subscription_plan],
+      ["Start Date", subscription?.subscription_start],
+      ["End Date", subscription?.subscription_end],
+      ["Fee", subscription?.subscription_fee],
+      ["Status", subscription?.status],
+      ["Trial", subscription?.is_trial ? "Yes" : "No"],
+    ],
+  });
+};
 
 const getFutsalSubscription = async (req, res) => {
   try {
@@ -97,6 +118,13 @@ const addFutsalSubscription = async (req, res) => {
       }
       await existed.save();
 
+      await notifySubscriptionChange(
+        futsalId,
+        "Subscription plan updated",
+        `Hi, your subscription plan has been updated to ${plan}.`,
+        existed
+      );
+
       return res.status(200).json({
         success: true,
         message: "Successfully updated subscription",
@@ -112,6 +140,15 @@ const addFutsalSubscription = async (req, res) => {
         status: plan === "trial" ? "active" : "pending",
         is_trial: plan === "trial",
       });
+
+      await notifySubscriptionChange(
+        futsalId,
+        plan === "trial" ? "Trial subscription activated" : "Subscription created",
+        plan === "trial"
+          ? "Hi, your trial subscription has been activated successfully."
+          : `Hi, your ${plan} subscription has been created successfully.`,
+        subs
+      );
 
       return res.status(201).json({
         success: true,
@@ -173,6 +210,13 @@ const addTrialSubscription = async (req, res) => {
         is_trial: true,
       });
     }
+
+    await notifySubscriptionChange(
+      futsalId,
+      "Trial subscription activated",
+      "Hi, your trial subscription has been activated successfully.",
+      sub
+    );
 
     return res
       .status(201)
@@ -241,6 +285,13 @@ const editFutsalSubscription = async (req, res) => {
 
     await subscription.save();
 
+    await notifySubscriptionChange(
+      futsalId,
+      "Subscription updated successfully",
+      `Hi, your subscription plan has been updated to ${subscription_plan}.`,
+      subscription
+    );
+
     return res.status(200).json({
       success: true,
       message: "Subscription updated successfully",
@@ -280,6 +331,13 @@ const cancelFutsalSubscription = async (req, res) => {
     subscription.status = "cancelled";
 
     await subscription.save();
+
+    await notifySubscriptionChange(
+      futsalId,
+      "Subscription cancelled",
+      "Hi, your subscription has been cancelled successfully.",
+      subscription
+    );
 
     return res.status(200).json({
       success: true,
@@ -340,6 +398,13 @@ const renewFutsalSubscription = async (req, res) => {
     subscription.status = "pending"; // usually pending until payment verification
 
     await subscription.save();
+
+    await notifySubscriptionChange(
+      futsalId,
+      "Subscription renewed",
+      "Hi, your subscription has been renewed and is waiting for payment verification.",
+      subscription
+    );
 
     return res.status(200).json({
       success: true,
