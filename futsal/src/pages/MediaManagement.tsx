@@ -3,11 +3,11 @@ import { Upload, Trash2, Play, Loader, AlertCircle, Image as ImageIcon, VideoIco
 import { useAuth } from '../context/AuthContext';
 
 interface MediaItem {
-  id: string;
+  id: number;
   url: string;
   type: 'image' | 'video';
   category: string;
-  uploadedAt: string;
+  created_at?: string;
 }
 
 const MediaManagement = () => {
@@ -35,10 +35,10 @@ const MediaManagement = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const futsalCode = localStorage.getItem('futsalCode');
+      const futsalId = futsalProfile?.id;
       
       const response = await fetch(
-        `/api/v1/futsal/${futsalCode}/media/?category=${selectedCategory}`,
+        `/api/v1/futsal/${futsalId}/media/?category=${selectedCategory}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -85,18 +85,14 @@ const MediaManagement = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const futsalCode = localStorage.getItem('futsalCode');
       
       const formData = new FormData();
       selectedFiles.forEach(file => {
         formData.append('media', file);
       });
+      formData.append('category', selectedCategory);
 
-      const endpoint = selectedCategory === 'pitch' 
-        ? `/api/v1/futsal/media/pitch/${futsalCode}/upload`
-        : `/api/v1/futsal/media/upload`;
-
-      const response = await fetch(endpoint, {
+      const response = await fetch('/api/v1/futsal/media/upload', {
         method: 'POST',
         body: formData,
         headers: {
@@ -125,7 +121,7 @@ const MediaManagement = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (!window.confirm('Are you sure you want to delete this media?')) return;
     
     try {
@@ -337,7 +333,7 @@ const MediaManagement = () => {
                     </button>
                   </div>
                 </div>
-                <p className="text-xs text-slate-400 mt-2">{new Date(item.uploadedAt).toLocaleDateString()}</p>
+                <p className="text-xs text-slate-400 mt-2">{item.created_at ? new Date(item.created_at).toLocaleDateString() : 'Unknown'}</p>
               </div>
             ))}
           </div>
