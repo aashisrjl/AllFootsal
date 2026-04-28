@@ -37,7 +37,7 @@ module.exports = {
       timeslot_id INT NOT NULL,
       booking_date DATE NOT NULL,
       amount DECIMAL(10,2) NOT NULL,
-      status ENUM('pending','confirmed','cancelled','completed') DEFAULT 'pending',
+      status ENUM('pending','confirmed','rejected','cancelled','completed') DEFAULT 'pending',
       notes TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

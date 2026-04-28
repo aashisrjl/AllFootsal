@@ -1,5 +1,6 @@
-const { sequelize, Footsal } = require("../../../models")
+const { sequelize, Footsal, User } = require("../../../models")
 const {QueryTypes} = require("sequelize");
+const sendEmail = require("../../../services/mail/sendEmail");
 
 const resolveBookingTenantCode = async (req) => {
     const codeFromReq = req.futsalCode || req.tenant?.code || req.tanent?.code;
@@ -96,6 +97,37 @@ const cancelBooking = async (req,res) => {
         });
     }
 
+
+    const booking = await sequelize.query(
+        `SELECT b.*, t.start_time, t.end_time, p.name as pitch_name
+         FROM booking_${code} b
+         JOIN timeslot_${code} t ON b.timeslot_id = t.id
+         JOIN pitch_${code} p ON b.pitch_id = p.id
+         WHERE b.id = ? AND b.user_id = ?`,
+        {
+            replacements: [bookingId, userId],
+            type: QueryTypes.SELECT,
+        }
+    );
+
+    if (booking.length === 0) {
+        return res.status(404).json({
+            success: false,
+            message: "Booking not found"
+        });
+    }
+
+    const bookingItem = booking[0];
+    const bookingDateTime = new Date(`${bookingItem.booking_date}T${bookingItem.start_time}:00`);
+    const cancellationCutoff = new Date(bookingDateTime.getTime() - 2 * 60 * 60 * 1000);
+
+    if (new Date() > cancellationCutoff) {
+        return res.status(400).json({
+            success: false,
+            message: "Cancellation period has expired. You can only cancel at least 2 hours before the booking time."
+        });
+    }
+
     await sequelize.query(
         `UPDATE booking_${code} SET status = 'cancelled' 
          WHERE id = ? AND user_id = ?`,
@@ -104,6 +136,35 @@ const cancelBooking = async (req,res) => {
             type: QueryTypes.UPDATE,
         }
     );
+
+    try {
+        const [user, futsal] = await Promise.all([
+            User.findByPk(userId),
+            Footsal.findOne({ where: { futsalCode: code } }),
+        ]);
+
+        if (user?.email) {
+            await sendEmail({
+                option: {
+                    to: user.email,
+                    subject: "Booking cancelled successfully",
+                    text: `Your booking for ${bookingItem.pitch_name} on ${bookingItem.booking_date} at ${bookingItem.start_time} - ${bookingItem.end_time} has been cancelled successfully.`,
+                },
+            });
+        }
+
+        if (futsal?.email) {
+            await sendEmail({
+                option: {
+                    to: futsal.email,
+                    subject: "A booking was cancelled",
+                    text: `A booking for ${bookingItem.pitch_name} on ${bookingItem.booking_date} at ${bookingItem.start_time} - ${bookingItem.end_time} was cancelled by the user.`,
+                },
+            });
+        }
+    } catch (notificationError) {
+        console.error("Error sending booking cancellation notifications:", notificationError);
+    }
 
     res.status(200).json({
         success:true,
@@ -136,6 +197,19 @@ const confirmBookingByAdmin = async (req,res) => {
     const code = req.futsalCode;
     const bookingId = req.params.bookingId;
 
+    const booking = await sequelize.query(
+        `SELECT b.*, t.start_time, t.end_time, p.name as pitch_name, u.email as user_email
+         FROM booking_${code} b
+         JOIN timeslot_${code} t ON b.timeslot_id = t.id
+         JOIN pitch_${code} p ON b.pitch_id = p.id
+         JOIN users u ON b.user_id = u.id
+         WHERE b.id = ?`,
+        {
+            replacements: [bookingId],
+            type: QueryTypes.SELECT,
+        }
+    );
+
     await sequelize.query(
         `UPDATE booking_${code} SET status = 'confirmed' 
          WHERE id = ?`,
@@ -145,9 +219,71 @@ const confirmBookingByAdmin = async (req,res) => {
         }
     );
 
+    if (booking[0]?.user_email) {
+        try {
+            await sendEmail({
+                option: {
+                    to: booking[0].user_email,
+                    subject: "Booking confirmed",
+                    text: `Your booking for ${booking[0].pitch_name} on ${booking[0].booking_date} at ${booking[0].start_time} - ${booking[0].end_time} has been confirmed.`,
+                },
+            });
+        } catch (notificationError) {
+            console.error("Error sending booking confirmation email:", notificationError);
+        }
+    }
+
     res.status(200).json({
         success:true,
         message:"Booking confirmed successfully by admin"
+    })
+}
+
+// admin can reject any booking with reason
+const rejectBookingByAdmin = async (req,res) => {
+    const code = req.futsalCode;
+    const bookingId = req.params.bookingId;
+    const { reason } = req.body;
+
+    const booking = await sequelize.query(
+        `SELECT b.*, t.start_time, t.end_time, p.name as pitch_name, u.email as user_email
+         FROM booking_${code} b
+         JOIN timeslot_${code} t ON b.timeslot_id = t.id
+         JOIN pitch_${code} p ON b.pitch_id = p.id
+         JOIN users u ON b.user_id = u.id
+         WHERE b.id = ?`,
+        {
+            replacements: [bookingId],
+            type: QueryTypes.SELECT,
+        }
+    );
+
+    await sequelize.query(
+        `UPDATE booking_${code} SET status = 'rejected', notes = ?
+         WHERE id = ?`,
+        {
+            replacements: [reason || null, bookingId],
+            type: QueryTypes.UPDATE,
+        }
+    );
+
+    if (booking[0]?.user_email) {
+        try {
+            await sendEmail({
+                option: {
+                    to: booking[0].user_email,
+                    subject: "Booking rejected",
+                    text: `Your booking for ${booking[0].pitch_name} on ${booking[0].booking_date} at ${booking[0].start_time} - ${booking[0].end_time} has been rejected.${reason ? ` Reason: ${reason}` : ''}`,
+                },
+            });
+        } catch (notificationError) {
+            console.error("Error sending booking rejection email:", notificationError);
+        }
+    }
+
+    res.status(200).json({
+        success:true,
+        message:"Booking rejected successfully by admin"
     })
 }
 
@@ -351,6 +487,45 @@ const createBooking = async (req,res) => {
             }
         );
 
+        try {
+            const [user, futsal, pitch] = await Promise.all([
+                User.findByPk(userId),
+                Footsal.findOne({ where: { futsalCode: code } }),
+                sequelize.query(
+                    `SELECT name FROM pitch_${code} WHERE id = ?`,
+                    {
+                        replacements: [pitch_id],
+                        type: QueryTypes.SELECT,
+                    }
+                )
+            ]);
+
+            const pitchName = pitch?.[0]?.name || `Pitch ${pitch_id}`;
+            const bookingSummary = `Booking details: ${pitchName}, date ${booking_date}, slot ${reqSlot.start_time} - ${reqSlot.end_time}, amount ${amount}.`;
+
+            if (user?.email) {
+                await sendEmail({
+                    option: {
+                        to: user.email,
+                        subject: "Booking confirmation",
+                        text: `Your booking has been created successfully. ${bookingSummary}`,
+                    },
+                });
+            }
+
+            if (futsal?.email) {
+                await sendEmail({
+                    option: {
+                        to: futsal.email,
+                        subject: "New booking received",
+                        text: `A new booking has been made. ${bookingSummary}`,
+                    },
+                });
+            }
+        } catch (notificationError) {
+            console.error("Error sending booking notifications:", notificationError);
+        }
+
         return res.status(201).json({
             success: true,
             message: "Booking created successfully",
@@ -372,6 +547,7 @@ module.exports = {
     cancelBooking,
     cancelBookingByAdmin,
     confirmBookingByAdmin,
+    rejectBookingByAdmin,
     unconfirmBookingByAdmin,
     deleteBookingByUser,
     deleteBookingByAdmin,

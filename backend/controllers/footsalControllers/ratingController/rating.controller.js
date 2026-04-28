@@ -74,6 +74,13 @@ const postRating = async (req, res) => {
       });
     }
 
+    if (!review || !String(review).trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Review text is required before sentiment analysis",
+      });
+    }
+
     // check the sentiment of the review
     const sentiment = await axios.get("http://localhost:8000/api/sentiment/predict", {
       params: { text: review },
@@ -121,6 +128,13 @@ const updateRating = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Rating must be between 1 and 5",
+      });
+    }
+
+    if (!review || !String(review).trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Review text is required before sentiment analysis",
       });
     }
     // check the sentiment of the review
