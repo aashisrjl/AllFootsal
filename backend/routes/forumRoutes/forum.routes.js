@@ -1,5 +1,5 @@
 const express = require('express')
-const { createForum, getAllForums, getForumsByUserId, getForumsByFutsalId, getForumsByCategory, getForumById, getForumBySlug } = require('../../controllers/forumControllers/forum.controller')
+const { createForum, getAllForums, getForumsByUserId, getForumsByFutsalId, getForumsByCategory, getForumById, getForumBySlug, deleteForum } = require('../../controllers/forumControllers/forum.controller')
 const isBothAuthenticated = require('../../middleware/authMiddleware/bothAuthenticated')
 const isUserAuthenticated = require('../../middleware/authMiddleware/userAuthenticate')
 const isFutsalAuthenticated = require('../../middleware/authMiddleware/futsalAuthenticated')
@@ -47,6 +47,12 @@ router.get(
     '/forum/slug/:slug',// #swagger.tags=['Forum']
     isBothAuthenticated,
     getForumBySlug
+)
+
+router.delete(
+    '/forum/:forumId', // #swagger.tags=['Forum']
+    isBothAuthenticated,
+    deleteForum
 )
 
 module.exports = router

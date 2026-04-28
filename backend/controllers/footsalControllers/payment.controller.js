@@ -1,5 +1,6 @@
-const { Payment, Subscription } = require("../../models");
+const { Payment, Subscription, Footsal } = require("../../models");
 const crypto = require("crypto");
+const { sendNotificationEmail } = require("../../utils/notifications/emailNotification");
 
 const { createEsewaPayment } = require("../../services/esewa/esewa.service");
 const {
@@ -84,6 +85,21 @@ const createPayment = async (req, res) => {
       remarks,
     });
 
+    const futsal = await Footsal.findByPk(futsalId);
+
+    await sendNotificationEmail({
+      to: futsal?.email,
+      subject: "Subscription payment created",
+      intro: `Hi ${futsal?.ownerName || "Owner"}, your subscription payment request has been created.`,
+      details: [
+        ["Futsal Name", futsal?.futsalName],
+        ["Amount", amount],
+        ["Method", payment_method],
+        ["Status", "Pending"],
+        ["Transaction ID", transaction_uuid],
+      ],
+    });
+
     // ===============================
     // eSewa Payment
     // ===============================
@@ -152,6 +168,7 @@ const verifyPayment = async (req, res) => {
   try {
     const futsalId = req.futsalId;
     const { payment_method, transaction_uuid, data, pidx, status } = req.body;
+    const futsal = await Footsal.findByPk(futsalId);
 
     let targetPayment;
 
@@ -272,6 +289,32 @@ const verifyPayment = async (req, res) => {
         subscription.status = "active";
         await subscription.save();
       }
+
+      await sendNotificationEmail({
+        to: futsal?.email,
+        subject: "Subscription payment completed",
+        intro: `Hi ${futsal?.ownerName || "Owner"}, your payment has been completed successfully.`,
+        details: [
+          ["Amount", targetPayment.amount],
+          ["Method", targetPayment.payment_method],
+          ["Transaction ID", targetPayment.transaction_id],
+          ["Payment Status", targetPayment.payment_status],
+          ["Subscription Status", "Active"],
+        ],
+      });
+    } else {
+      await sendNotificationEmail({
+        to: futsal?.email,
+        subject: "Subscription payment status updated",
+        intro: `Hi ${futsal?.ownerName || "Owner"}, your payment status has been updated.`,
+        details: [
+          ["Amount", targetPayment.amount],
+          ["Method", targetPayment.payment_method],
+          ["Transaction ID", targetPayment.transaction_id],
+          ["Payment Status", targetPayment.payment_status],
+          ["Remarks", targetPayment.remarks],
+        ],
+      });
     }
 
     return res.status(200).json({

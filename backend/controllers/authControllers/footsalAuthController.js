@@ -4,6 +4,7 @@ const { Footsal, User } = require("../../models");
 const { createTenantTables } = require("../../models/footsal_tanents/createTenantTables");
 const { generateOTP } = require("../../utils/otpGenerator/otpGenerator");
 const sendOtp = require("../../utils/sendOtp/sendOtp");
+const { sendNotificationEmail } = require("../../utils/notifications/emailNotification");
 const bcrypt = require("bcryptjs");
 
 module.exports = RegisterFootsal = async (req, res) => {
@@ -78,8 +79,23 @@ module.exports = RegisterFootsal = async (req, res) => {
      text=`Your OTP code is ${otp} Expires in 5 minutes.`
     );
 
+  await sendNotificationEmail({
+    to: email,
+    subject: "Welcome to AllFootsal Owner Portal",
+    intro: `Hi ${ownerName}, your futsal registration has been created successfully.`,
+    details: [
+      ["Futsal Name", footsalName],
+      ["Owner Name", ownerName],
+      ["Email", email],
+      ["Phone", phoneNumber],
+      ["Futsal Code", futsal_code],
+      ["Verification", "Pending OTP confirmation"],
+    ],
+    closing: "Please verify your OTP to activate the owner account.\n\nRegards,\nAllFootsal Team",
+  });
+
   return res.status(201).json({
-    message: "Footsal registered successfully",
+    message: "Owner registered successfully",
     footsal: {
       id: newFootsal.id,
       futsalCode: newFootsal.footsalCode,

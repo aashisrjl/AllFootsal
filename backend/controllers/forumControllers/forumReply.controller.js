@@ -1,5 +1,5 @@
-const {Forum} = require("../../models");
-const {ForumReply} = require("../../models");
+const { Forum, ForumReply, User, Footsal } = require("../../models");
+const sendEmail = require("../../services/mail/sendEmail");
 
 //create forum reply
 const createForumReply = async (req,res)=>{
@@ -8,6 +8,29 @@ const createForumReply = async (req,res)=>{
     const userId = req?.userId;
     const futsalId = req?.futsalId;
     try {
+        if (!content || !content.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Reply content is required"
+            });
+        }
+
+        const forum = await Forum.findByPk(forumId);
+
+        if (!forum) {
+            return res.status(404).json({
+                success: false,
+                message: "Forum not found"
+            });
+        }
+
+        if (forum.is_locked) {
+            return res.status(403).json({
+                success: false,
+                message: "This forum is locked"
+            });
+        }
+
         const newReply = await ForumReply.create({
             content,
             is_solution:false,
@@ -15,6 +38,34 @@ const createForumReply = async (req,res)=>{
             footsal_id:futsalId,
             forum_id:forumId
         });
+
+        try {
+            let recipientEmail = null;
+            let recipientName = "Forum owner";
+
+            if (forum.user_id) {
+                const forumOwner = await User.findByPk(forum.user_id);
+                recipientEmail = forumOwner?.email || null;
+                recipientName = forumOwner?.username || recipientName;
+            } else if (forum.futsal_id) {
+                const forumOwner = await Footsal.findByPk(forum.futsal_id);
+                recipientEmail = forumOwner?.email || null;
+                recipientName = forumOwner?.futsalName || recipientName;
+            }
+
+            if (recipientEmail) {
+                await sendEmail({
+                    option: {
+                        to: recipientEmail,
+                        subject: "New reply on your forum post",
+                        text: `Hello ${recipientName},\n\nA new reply has been posted on your forum post titled "${forum.title}".\n\nReply: ${content}\n\nPlease log in to review and respond if needed.`,
+                    },
+                });
+            }
+        } catch (notificationError) {
+            console.error("Error sending forum reply notification:", notificationError);
+        }
+
         res.status(201).json({
             success:true,
             message:"Reply created successfully",
@@ -77,9 +128,64 @@ const getRepliesByUserIdOrFutsalId = async (req,res)=>{
     }
 }
 
+// delete forum reply
+const deleteForumReply = async (req, res) => {
+    const replyId = req.params.replyId;
+    const userId = req?.userId;
+    const futsalId = req?.futsalId;
+
+    if (!replyId) {
+        return res.status(400).json({
+            success: false,
+            message: "Reply ID is required"
+        });
+    }
+
+    try {
+        const reply = await ForumReply.findByPk(replyId);
+
+        if (!reply) {
+            return res.status(404).json({
+                success: false,
+                message: "Reply not found"
+            });
+        }
+
+        // Check authorization - only creator or futsal owner can delete
+        if (reply.user_id !== userId && reply.footsal_id !== futsalId) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to delete this reply"
+            });
+        }
+
+        // Delete associated likes for this reply
+        const { ForumLike } = require("../../models");
+        await ForumLike.destroy({
+            where: { reply_id: replyId }
+        });
+
+        // Delete the reply
+        await reply.destroy();
+
+        res.status(200).json({
+            success: true,
+            message: "Reply deleted successfully",
+            data: { id: replyId }
+        });
+    } catch (error) {
+        console.error("Error deleting reply:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error deleting reply",
+            error: error.message
+        });
+    }
+};
 
 module.exports = {
     createForumReply,
     getRepliesByForumId,
-    getRepliesByUserIdOrFutsalId
+    getRepliesByUserIdOrFutsalId,
+    deleteForumReply
 }

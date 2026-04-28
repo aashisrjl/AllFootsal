@@ -1,7 +1,6 @@
 from pathlib import Path
+import re
 import joblib
-
-from app.utils.preprocessing import _clean_text
 
 
 # Load model and vectorizer at module level
@@ -18,6 +17,14 @@ model = joblib.load(model_path)
 vectorizer = joblib.load(vectorizer_path)
 
 print("✅ Sentiment model and vectorizer loaded successfully")
+
+
+def _clean_text(text: str) -> str:
+    text = str(text).lower().strip()
+    text = re.sub(r"https?://\S+|www\.\S+", " ", text)
+    text = re.sub(r"[^a-z0-9\s]", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
 
 
 def predict(text: str) -> dict:
@@ -43,9 +50,10 @@ def predict(text: str) -> dict:
         0: "Negative",
         1: "Positive"
     }
-
+ 
     sentiment = label_map.get(prediction, "Unknown")
-    confidence = float(max(probabilities))
+    positive_class_index = 1 if len(probabilities) > 1 else 0
+    confidence = float(probabilities[positive_class_index])
 
     return {
         "sentiment": sentiment,

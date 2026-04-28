@@ -11,7 +11,12 @@
     "migrate:fresh": "npm run migrate:rollback && npm run migrate",
     "seed": "knex seed:run",
     "seed:dump": "mysql -u root futsal-db < seeds/dump.sql",
-    "db:fresh": "npm run migrate:fresh && npm run seed"
+    "db:fresh": "npm run migrate:fresh && npm run seed",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:auth": "jest tests/auth.test.js",
+    "test:booking": "jest tests/booking-rating.test.js"
   },
   "dependencies": {
     "@adminjs/express": "^5.1.0",

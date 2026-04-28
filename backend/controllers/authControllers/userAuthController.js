@@ -4,6 +4,7 @@ const generateJwt = require("../../utils/jwt/generateJwt");
 const sendOtp = require("../../utils/sendOtp/sendOtp");
 const { generateOTP } = require("../../utils/otpGenerator/otpGenerator");
 const { redisClient } = require("../../config/redisConfig");
+const { sendNotificationEmail } = require("../../utils/notifications/emailNotification");
 const { USER_PASSWORD_SALT_ROUNDS, USER_TOKEN_EXPIRATION, JWT_SECRET_USER } =
   process.env;
 
@@ -80,9 +81,24 @@ module.exports = userRegister = async (req, res) => {
     );
     console.log("mail send");
 
+    await sendNotificationEmail({
+      to: email,
+      subject: "Welcome to AllFootsal",
+      intro: `Hi ${username}, your user account has been created successfully.`,
+      details: [
+        ["Role", "User"],
+        ["Email", email],
+        ["Phone", phoneNumber],
+        ["Device", device],
+        ["Location", location],
+        ["Verification", "Pending OTP confirmation"],
+      ],
+      closing: "Please verify your OTP to activate your account.\n\nRegards,\nAllFootsal Team",
+    });
+
     //return data
     res.status(201).json({
-      message: "User registered successfully, send otp to email for verification",
+      message: "User registered successfully",
       user: {
         id: newUser.id,
         username: newUser.username,

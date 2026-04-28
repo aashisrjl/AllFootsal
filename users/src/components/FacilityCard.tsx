@@ -31,6 +31,8 @@ const FacilityCard: React.FC<FacilityCardProps> = ({ facility }) => {
   const avgRating = ratings.length > 0 
     ? (ratings.reduce((acc: number, curr: any) => acc + Number(curr.rating), 0) / ratings.length).toFixed(1)
     : "5.0";
+  const positiveCount = ratings.filter((rating: any) => String(rating.sentiment_label || '').toLowerCase() === 'positive').length;
+  const negativeCount = ratings.filter((rating: any) => String(rating.sentiment_label || '').toLowerCase() === 'negative').length;
 
   return (
     <Card className="group overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-emerald-900/10 border-border bg-card hover:-translate-y-1">
@@ -46,6 +48,10 @@ const FacilityCard: React.FC<FacilityCardProps> = ({ facility }) => {
              <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
              <span>{avgRating} ({ratings.length} reviews)</span>
           </div>
+           <div className="absolute top-3 right-3 flex items-center gap-2 bg-black/40 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[0.65rem] font-semibold border border-white/20">
+             <span className="text-emerald-300">+{positiveCount}</span>
+             <span className="text-rose-300">-{negativeCount}</span>
+           </div>
         </AspectRatio>
         <CardContent className="p-5">
           <h3 className="font-bold text-xl text-foreground line-clamp-1 group-hover:text-emerald-500 transition-colors">{facility.name}</h3>

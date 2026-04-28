@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { MessageCircle, Users, Tag, Clock, ThumbsUp, Lock, Loader2 } from "lucide-react";
+import { MessageCircle, Users, Tag, Clock, ThumbsUp, Lock, Loader2, Trash2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
@@ -11,6 +11,8 @@ import {
   createForum, 
   countLikesByForumId, 
   createForumLike, 
+  deleteForumLike,
+  deleteForum,
   ForumApiData 
 } from "@/lib/forumApi";
 import { ForumUserSnippet } from "@/components/ForumUserSnippet";
@@ -27,6 +29,7 @@ const getCategoryColor = (category: string) => {
 
 const ForumCard: React.FC<{ thread: ForumApiData }> = ({ thread }) => {
   const queryClient = useQueryClient();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
   const { data: likesRes } = useQuery({
     queryKey: ['forumLikes', thread.id],
@@ -37,6 +40,22 @@ const ForumCard: React.FC<{ thread: ForumApiData }> = ({ thread }) => {
     mutationFn: () => createForumLike(thread.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['forumLikes', thread.id] });
+    }
+  });
+
+  const unlikeMutation = useMutation({
+    mutationFn: () => deleteForumLike(thread.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['forumLikes', thread.id] });
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteForum(thread.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["forums"] });
+      queryClient.invalidateQueries({ queryKey: ["forums", "All"] });
+      setShowDeleteConfirm(false);
     }
   });
 
@@ -73,7 +92,7 @@ const ForumCard: React.FC<{ thread: ForumApiData }> = ({ thread }) => {
         </div>
       </div>
       <div className="flex items-end sm:items-center gap-4 text-xs text-slate-500 dark:text-slate-400 mt-2 sm:mt-0">
-        <div className="flex flex-col items-start sm:items-end gap-1.5 min-w-[100px]">
+        <div className="flex flex-col items-start sm:items-end gap-1.5 min-w-[120px]">
           <button 
             onClick={(e) => { e.preventDefault(); likeMutation.mutate(); }}
             disabled={likeMutation.isPending}
@@ -81,6 +100,13 @@ const ForumCard: React.FC<{ thread: ForumApiData }> = ({ thread }) => {
           >
             <ThumbsUp className={`h-3.3 w-3.3 ${likeMutation.isPending ? 'animate-bounce text-emerald-400' : ''}`} />
             <span className="font-medium">{likesCount} Likes</span>
+          </button>
+          <button
+            onClick={(e) => { e.preventDefault(); unlikeMutation.mutate(); }}
+            disabled={unlikeMutation.isPending}
+            className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+          >
+            Unlike
           </button>
           <div className="flex items-center gap-3 mt-1">
             <span className="inline-flex items-center gap-1 text-[0.7rem]">
@@ -91,9 +117,45 @@ const ForumCard: React.FC<{ thread: ForumApiData }> = ({ thread }) => {
               <Clock className="h-3 w-3 text-slate-400 dark:text-slate-500" />
               {new Date(thread.createdAt).toLocaleDateString()}
             </span>
+            <button 
+              onClick={(e) => { e.preventDefault(); setShowDeleteConfirm(true); }}
+              disabled={deleteMutation.isPending}
+              className="inline-flex items-center gap-1 text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+            >
+              <Trash2 className="h-3 w-3" />
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-slate-900 rounded-lg p-6 max-w-sm mx-4 border border-slate-200 dark:border-slate-700">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-2">Delete Forum Post?</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-6">
+              This action cannot be undone. All replies and likes will also be deleted.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleteMutation.isPending}
+                className="flex-1 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => deleteMutation.mutate()}
+                disabled={deleteMutation.isPending}
+                className="flex-1 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
+              >
+                {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </article>
   );
 };

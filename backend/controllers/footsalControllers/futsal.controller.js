@@ -68,7 +68,20 @@ const getProfileCompletionStatus = async (futsalCode) => {
 };
 
 const getAllFutsal = async (req,res)=>{
-    const futsals = await Footsal.findAll();
+    const now = new Date();
+    const futsals = await Footsal.findAll({
+        include: [{
+            model: Subscription,
+            as: 'subscription',
+            required: true,
+            where: {
+                status: 'active',
+                subscription_end: {
+                    [require('sequelize').Op.gt]: now,
+                },
+            },
+        }],
+    });
     if(!futsals[0]){
         return res.status(400).json({
             success:false,
@@ -100,18 +113,13 @@ const getFutsalById = async( req,res)=>{
 
 // this is without login functions
 const getFutsalbySubsciption_true = async (req,res)=>{
-    const futsals = await Footsal.findAll();
-    if(!futsals[0]){
-        return res.status(400).json({
-            success:false,
-            message:"No futsal found"
-        })
-    }
-    const futsalIds = futsals.map(futsal=> futsal.id);
+    const now = new Date();
     const futsalSubscription = await Subscription.findAll({
         where:{
-            footsal_id:futsalIds,
-            status:"active"
+            status:"active",
+            subscription_end: {
+                [require('sequelize').Op.gt]: now,
+            },
         },
         include:[
             {
@@ -120,8 +128,7 @@ const getFutsalbySubsciption_true = async (req,res)=>{
                 attributes:["id","futsalCode","futsalName","email","phoneNumber","ownerName"]
             }
         ]
-}
-    );
+    });
     if(!futsalSubscription[0]){
         return res.status(400).json({
             success:false,

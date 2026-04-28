@@ -1,5 +1,5 @@
 const express = require("express")
-const { createForumReply, getRepliesByForumId, getRepliesByUserIdOrFutsalId } = require("../../controllers/forumControllers/forumReply.controller")
+const { createForumReply, getRepliesByForumId, getRepliesByUserIdOrFutsalId, deleteForumReply } = require("../../controllers/forumControllers/forumReply.controller")
 const isBothAuthenticated = require("../../middleware/authMiddleware/bothAuthenticated")
 const router = express.Router()
 
@@ -21,7 +21,10 @@ router.get(
     getRepliesByUserIdOrFutsalId
 )
 
-
-
+router.delete(
+    '/forum/reply/:replyId', //#swagger.tags=['Forum Replies']
+    isBothAuthenticated,
+    deleteForumReply
+)
 
 module.exports = router

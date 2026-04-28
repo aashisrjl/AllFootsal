@@ -129,9 +129,121 @@ const countLikesByReplyId = async (req, res) => {
   }
 };
 
+// delete forum like
+const deleteForumLike = async (req, res) => {
+  const forumId = req.params.forumId;
+  const userId = req?.userId;
+  const futsalId = req?.futsalId;
+
+  if (!forumId) {
+    return res.status(400).json({
+      success: false,
+      message: "Forum ID is required"
+    });
+  }
+
+  try {
+    let like;
+    
+    if (userId) {
+      like = await ForumLike.findOne({
+        where: { forum_id: forumId, user_id: userId }
+      });
+    } else if (futsalId) {
+      like = await ForumLike.findOne({
+        where: { forum_id: forumId, futsal_id: futsalId }
+      });
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "User ID or Futsal ID is required"
+      });
+    }
+
+    if (!like) {
+      return res.status(404).json({
+        success: false,
+        message: "Like not found"
+      });
+    }
+
+    await like.destroy();
+
+    res.status(200).json({
+      success: true,
+      message: "Like deleted successfully",
+      data: { id: like.id }
+    });
+  } catch (error) {
+    console.error("Error deleting like:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error deleting like",
+      error: error.message
+    });
+  }
+};
+
+// delete reply like
+const deleteReplyLike = async (req, res) => {
+  const replyId = req.params.replyId;
+  const userId = req?.userId;
+  const futsalId = req?.futsalId;
+
+  if (!replyId) {
+    return res.status(400).json({
+      success: false,
+      message: "Reply ID is required"
+    });
+  }
+
+  try {
+    let like;
+    
+    if (userId) {
+      like = await ForumLike.findOne({
+        where: { reply_id: replyId, user_id: userId }
+      });
+    } else if (futsalId) {
+      like = await ForumLike.findOne({
+        where: { reply_id: replyId, futsal_id: futsalId }
+      });
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "User ID or Futsal ID is required"
+      });
+    }
+
+    if (!like) {
+      return res.status(404).json({
+        success: false,
+        message: "Like not found"
+      });
+    }
+
+    await like.destroy();
+
+    res.status(200).json({
+      success: true,
+      message: "Like deleted successfully",
+      data: { id: like.id }
+    });
+  } catch (error) {
+    console.error("Error deleting like:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error deleting like",
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   createForumLike,
   createReplyLike,
   countLikesByForumId,
   countLikesByReplyId,
+  deleteForumLike,
+  deleteReplyLike,
 };

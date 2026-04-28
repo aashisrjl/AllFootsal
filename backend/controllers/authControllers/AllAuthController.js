@@ -5,6 +5,7 @@ const { User } = require("../../models/index");
 const { Footsal } = require("../../models/index");
 const { generateOTP } = require("../../utils/otpGenerator/otpGenerator");
 const sendOtp = require("../../utils/sendOtp/sendOtp");
+const { sendNotificationEmail } = require("../../utils/notifications/emailNotification");
 const {
   TOKEN_EXPIRATION_USER,
   JWT_SECRET_USER,
@@ -214,12 +215,35 @@ const VerifyOtp = async (req, res) => {
       user.isVerified = true;
       await user.save();
       await redisClient.del(`user:otp:${email}`);
+
+      await sendNotificationEmail({
+        to: email,
+        subject: "Account verified successfully",
+        intro: `Hi ${user.username}, your user account is now verified.`,
+        details: [
+          ["Email", user.email],
+          ["Role", "User"],
+          ["Status", "Verified"],
+        ],
+      });
     }
 
     if (footsal) {
       footsal.isVerified = true;
       await footsal.save();
       await redisClient.del(`footsal:otp:${email}`);
+
+      await sendNotificationEmail({
+        to: email,
+        subject: "Owner account verified successfully",
+        intro: `Hi ${footsal.ownerName || footsal.futsalName}, your owner account is now verified.`,
+        details: [
+          ["Futsal Name", footsal.futsalName],
+          ["Email", footsal.email],
+          ["Futsal Code", footsal.futsalCode],
+          ["Status", "Verified"],
+        ],
+      });
     }
 
     return res.status(200).json({
