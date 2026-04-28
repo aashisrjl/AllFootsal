@@ -180,6 +180,78 @@ const getForumBySlug = async (req,res)=>{
     }
 }
 
+// delete forum
+const deleteForum = async (req, res) => {
+    const forumId = req.params.forumId;
+    const userId = req?.userId;
+    const futsalId = req?.futsalId;
+
+    if (!forumId) {
+        return res.status(400).json({
+            success: false,
+            message: "Forum ID is required"
+        });
+    }
+
+    try {
+        const forum = await Forum.findByPk(forumId);
+
+        if (!forum) {
+            return res.status(404).json({
+                success: false,
+                message: "Forum not found"
+            });
+        }
+
+        // Check authorization - only creator or futsal owner can delete
+        if (forum.user_id !== userId && forum.futsal_id !== futsalId) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to delete this forum"
+            });
+        }
+
+        // Cascade delete - delete associated likes and replies
+        const { ForumLike, ForumReply } = require("../../models");
+        
+        // Delete all likes on this forum
+        await ForumLike.destroy({
+            where: { forum_id: forumId }
+        });
+
+        // Delete all replies and their likes
+        const replies = await ForumReply.findAll({
+            where: { forum_id: forumId }
+        });
+
+        for (const reply of replies) {
+            await ForumLike.destroy({
+                where: { reply_id: reply.id }
+            });
+        }
+
+        await ForumReply.destroy({
+            where: { forum_id: forumId }
+        });
+
+        // Delete the forum
+        await forum.destroy();
+
+        res.status(200).json({
+            success: true,
+            message: "Forum deleted successfully",
+            data: { id: forumId }
+        });
+    } catch (error) {
+        console.error("Error deleting forum:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error deleting forum",
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     createForum,
     getAllForums,
@@ -187,5 +259,6 @@ module.exports = {
     getForumsByFutsalId,
     getForumsByCategory,
     getForumById,
-    getForumBySlug
+    getForumBySlug,
+    deleteForum
 }

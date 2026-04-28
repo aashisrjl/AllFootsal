@@ -152,3 +152,24 @@ export const countLikesByReplyId = async (replyId: number | string): Promise<{ s
     const res = await API.get(`/forum/reply/likes/${replyId}`);
     return res.data;
 };
+// --- DELETE OPERATIONS ---
+
+export const deleteForum = async (forumId: number | string): Promise<ForumResponse> => {
+    const res = await API.delete(`/forum/${forumId}`);
+    return res.data;
+};
+
+export const deleteForumReply = async (replyId: number | string): Promise<ForumReplyResponse> => {
+    const res = await API.delete(`/forum/reply/${replyId}`);
+    return res.data;
+};
+
+export const deleteForumLike = async (forumId: number | string): Promise<ForumLikeResponse> => {
+    const res = await API.delete(`/forum/${forumId}/like`);
+    return res.data;
+};
+
+export const deleteReplyLike = async (replyId: number | string): Promise<ForumLikeResponse> => {
+    const res = await API.delete(`/forum/reply/${replyId}/like`);
+    return res.data;
+};

@@ -82,7 +82,7 @@ module.exports = userRegister = async (req, res) => {
 
     //return data
     res.status(201).json({
-      message: "User registered successfully, send otp to email for verification",
+      message: "User registered successfully",
       user: {
         id: newUser.id,
         username: newUser.username,

@@ -74,9 +74,10 @@ const postRating = async (req, res) => {
       });
     }
 
-    // check the sentiment of the review 
-    const modelapi = `http://localhost:8000/api/sentiment/predict?text=${review}`
-    const sentiment = await axios.get(modelapi);
+    // check the sentiment of the review
+    const sentiment = await axios.get("http://localhost:8000/api/sentiment/predict", {
+      params: { text: review },
+    });
     console.log(sentiment.data);
 
     await sequelize.query(
@@ -122,9 +123,10 @@ const updateRating = async (req, res) => {
         message: "Rating must be between 1 and 5",
       });
     }
-    // check the sentiment of the review 
-    const modelapi = `http://localhost:8000/api/sentiment/predict?text=${review}`
-    const sentiment = await axios.get(modelapi);
+    // check the sentiment of the review
+    const sentiment = await axios.get("http://localhost:8000/api/sentiment/predict", {
+      params: { text: review },
+    });
     console.log(sentiment.data);
 
     const [_, meta] = await sequelize.query(

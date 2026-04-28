@@ -79,7 +79,7 @@ module.exports = RegisterFootsal = async (req, res) => {
     );
 
   return res.status(201).json({
-    message: "Footsal registered successfully",
+    message: "Owner registered successfully",
     footsal: {
       id: newFootsal.id,
       futsalCode: newFootsal.footsalCode,
