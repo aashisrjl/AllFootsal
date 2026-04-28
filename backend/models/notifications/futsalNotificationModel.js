@@ -47,8 +47,7 @@ module.exports = (sequelize, DataTypes) => {
         "rating",
         "forum",
         "subscription",
-        "futsal",
-        null
+        "futsal"
       ),
       allowNull: true,
     },

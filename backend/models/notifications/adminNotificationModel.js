@@ -34,8 +34,7 @@ module.exports = (sequelize, DataTypes) => {
         "futsal",
         "user",
         "booking",
-        "system",
-        null
+        "system"
       ),
       allowNull: true,
     },

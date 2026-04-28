@@ -134,7 +134,7 @@ db.AdminNotification = require("./notifications/adminNotificationModel")(sequeli
 // User → UserNotification (One-to-Many)
 db.User.hasMany(db.UserNotification, {
   foreignKey: "user_id",
-  as: "notifications"
+  as: "userNotifications"
 });
 
 db.UserNotification.belongsTo(db.User, {
@@ -144,7 +144,7 @@ db.UserNotification.belongsTo(db.User, {
 // Futsal → FutsalNotification (One-to-Many)
 db.Footsal.hasMany(db.FutsalNotification, {
   foreignKey: "futsal_id",
-  as: "notifications"
+  as: "futsalNotifications"
 });
 
 db.FutsalNotification.belongsTo(db.Footsal, {
