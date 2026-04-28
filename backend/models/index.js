@@ -126,9 +126,30 @@ db.ForumLike.belongsTo(db.ForumReply, {
   foreignKey: "reply_id"
 });
 
+// Notifications
+db.UserNotification = require("./notifications/userNotificationModel")(sequelize, DataTypes);
+db.FutsalNotification = require("./notifications/futsalNotificationModel")(sequelize, DataTypes);
+db.AdminNotification = require("./notifications/adminNotificationModel")(sequelize, DataTypes);
 
+// User → UserNotification (One-to-Many)
+db.User.hasMany(db.UserNotification, {
+  foreignKey: "user_id",
+  as: "userNotifications"
+});
 
+db.UserNotification.belongsTo(db.User, {
+  foreignKey: "user_id"
+});
 
+// Futsal → FutsalNotification (One-to-Many)
+db.Footsal.hasMany(db.FutsalNotification, {
+  foreignKey: "futsal_id",
+  as: "futsalNotifications"
+});
+
+db.FutsalNotification.belongsTo(db.Footsal, {
+  foreignKey: "futsal_id"
+});
 
 db.sequelize.sync({ force: false }).then(() => {
   console.log("✅ Database connection established! Use 'npm run migrate' to sync schema changes.");
