@@ -15,6 +15,7 @@ import Login from "./pages/Login";
 import UserBookings from "./pages/UserBookings";
 import BookingDetails from "./pages/BookingDetails";
 import NotFound from "./pages/NotFound";
+import Notifications from "./pages/Notifications";
 // import AdminDashboard from "./pages/AdminDashboard";
 // import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -73,6 +74,7 @@ const App = () => (
               <Route path="/profile" element={<UserProfileInfo />} />
               <Route path="/payment/success" element={<PaymentSuccess />} />
               <Route path="/payment/failure" element={<PaymentFailure />} />
+              <Route path="/notifications" element={<Notifications />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

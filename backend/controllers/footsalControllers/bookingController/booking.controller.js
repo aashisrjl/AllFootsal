@@ -507,8 +507,8 @@ const createBooking = async (req,res) => {
                 await sendEmail({
                     option: {
                         to: user.email,
-                        subject: "Booking confirmation",
-                        text: `Your booking has been created successfully. ${bookingSummary}`,
+                        subject: "Booking Received - Pending Payment/Approval",
+                        text: `Your booking request has been received. ${bookingSummary} Please complete your payment if you haven't already. Your booking will be confirmed once payment is verified or approved by the futsal provider.`,
                     },
                 });
             }
@@ -517,8 +517,8 @@ const createBooking = async (req,res) => {
                 await sendEmail({
                     option: {
                         to: futsal.email,
-                        subject: "New booking received",
-                        text: `A new booking has been made. ${bookingSummary}`,
+                        subject: "New Booking Request",
+                        text: `A new booking request has been received. ${bookingSummary} Please review and approve if it's a cash booking.`,
                     },
                 });
             }

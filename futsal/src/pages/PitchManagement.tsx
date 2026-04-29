@@ -3,7 +3,7 @@ import { MapPin, Plus, Edit, ToggleLeft, ToggleRight, Wrench } from 'lucide-reac
 import { useAuth } from '../context/AuthContext';
 import PitchModal from '../components/PitchModal';
 import ScheduleModal from '../components/ScheduleModal';
-import { getFutsalPitches, updatePitch } from '../lib/pitchApi';
+import { updatePitch } from '../lib/pitchApi';
 import API from '@/lib/api';
 
 const PitchManagement = () => {
@@ -29,20 +29,20 @@ const PitchManagement = () => {
       if (bookingsRes?.data?.success) {
          const bookings = bookingsRes.data.data;
          const todayDate = new Date().toISOString().split('T')[0];
-         bookings.forEach((b: any) => {
+          bookings.forEach((b: any) => {
             // Note: pitch_name matches backend fallback, occasionally backend provides pitch_id or pitch_name
             const pId = b.pitch_id || b.pitch_name; 
             if (!pitchStats[pId]) {
                pitchStats[pId] = { bookingsToday: 0, revenue: 0 };
             }
             if (b.status !== 'cancelled') {
-               pitchStats[pId].revenue += (b.amount || 0);
                const bDate = b.booking_date?.split('T')[0];
                if (bDate === todayDate) {
                  pitchStats[pId].bookingsToday += 1;
+                 pitchStats[pId].revenue += Number(b.amount || 0);
                }
             }
-         });
+          });
       }
 
       if (pitchesRes.data.success) {
@@ -129,7 +129,7 @@ const PitchManagement = () => {
           { icon: MapPin, color: 'text-emerald-400', bg: 'bg-emerald-500/10', label: 'Total Pitches', val: pitches.length },
           { icon: ToggleRight, color: 'text-blue-400', bg: 'bg-blue-500/10', label: 'Active Pitches', val: pitches.filter(p => p.isActive).length },
           { icon: Wrench, color: 'text-amber-400', bg: 'bg-amber-500/10', label: 'Maintenance', val: pitches.filter(p => p.isUnderMaintenance).length },
-          { icon: null, textIcon: "$", color: 'text-emerald-400', bg: 'bg-emerald-500/10', label: "Today's Revenue", val: `$${pitches.reduce((sum, p) => sum + p.revenue, 0)}` },
+          { icon: null, textIcon: "Rs", color: 'text-emerald-400', bg: 'bg-emerald-500/10', label: "Today's Revenue", val: `Rs ${pitches.reduce((sum, p) => sum + p.revenue, 0)}` },
         ].map((stat, i) => (
           <div key={i} className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-6 transition-all hover:-translate-y-1 hover:border-slate-700 hover:shadow-2xl">
              <div className="flex items-center">
@@ -139,7 +139,7 @@ const PitchManagement = () => {
                 </div>
               ) : (
                 <div className={`h-14 w-14 ${stat.bg} rounded-xl flex items-center justify-center border border-transparent`}>
-                  <span className={`text-2xl font-black ${stat.color}`}>{stat.textIcon}</span>
+                  <span className={`text-lg font-black ${stat.color}`}>{stat.textIcon}</span>
                 </div>
               )}
               <div className="ml-5">
@@ -186,11 +186,11 @@ const PitchManagement = () => {
               <div className="grid grid-cols-2 gap-4 mb-8 relative z-10 flex-1">
                 <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50 shadow-inner flex flex-col justify-center">
                   <span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Price / Hr</span>
-                  <span className="text-xl font-black text-emerald-400">${pitch.pricePerHour}</span>
+                  <span className="text-xl font-black text-emerald-400">Rs {pitch.pricePerHour}</span>
                 </div>
                 <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50 shadow-inner flex flex-col justify-center">
                   <span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Daily Revenue</span>
-                   <span className="text-xl font-black text-white">${pitch.revenue}</span>
+                   <span className="text-xl font-black text-white">Rs {pitch.revenue}</span>
                 </div>
                 
                 <div className="col-span-2 flex flex-col gap-3 mt-2">

@@ -44,12 +44,13 @@ const Revenue = () => {
            let todayRev = 0, yesterdayRev = 0;
            let weekRev = 0, lastWeekRev = 0;
            let monthRev = 0, lastMonthRev = 0;
+           let yearRev = 0;
            
            bookings.forEach((b: any) => {
              if (b.status === 'cancelled') return;
              const bDate = b.booking_date?.split('T')[0];
              if (!bDate) return;
-             const amt = b.amount || 0;
+             const amt = Number(b.amount || 0);
              if (bDate === todayString) todayRev += amt;
              if (bDate === yesterdayString) yesterdayRev += amt;
              
@@ -58,17 +59,21 @@ const Revenue = () => {
              
              if (bDate >= monthString) monthRev += amt;
              else if (bDate >= lastMonthString) lastMonthRev += amt;
+
+             // Simply sum all for Year Rev if we consider 'year' as all available time/current year
+             // For full year filtering, we could use yearString, but summing all non-cancelled is often what's expected for 'Total'
+             yearRev += amt;
            });
 
            setRevenueData({
              today: Math.floor(todayRev),
              week: Math.floor(weekRev),
              month: Math.floor(monthRev),
-             year: parseInt(totalRev, 10)
+             year: Math.floor(yearRev || Number(totalRev))
            });
            
            const calcChange = (current: number, prev: number) => {
-             if (prev === 0) return `+$${current}`;
+             if (prev === 0) return `+Rs ${current}`;
              const percent = Math.round(((current - prev) / prev) * 100);
              return `${percent >= 0 ? '+' : '-'}${Math.abs(percent)}%`;
            };
@@ -94,7 +99,7 @@ const Revenue = () => {
           bookings.forEach((b: any) => {
              const bDate = b.booking_date?.split('T')[0];
              if (tempWeekly[bDate] && b.status !== 'cancelled') {
-                tempWeekly[bDate].value += (b.amount || 0);
+                tempWeekly[bDate].value += Number(b.amount || 0);
              }
           });
           const rawWeekly = Object.values(tempWeekly) as any[];
@@ -109,7 +114,7 @@ const Revenue = () => {
            const recent = bookings.slice(0, 5).map((b: any) => ({
              id: b.id,
              customer: b.user_name || 'Guest',
-             amount: b.amount,
+             amount: Number(b.amount || 0),
              time: `${b.start_time || ''}`,
              pitch: b.pitch_name,
              method: b.payment_status || 'Card'
@@ -123,7 +128,7 @@ const Revenue = () => {
                breakdownMap[b.pitch_name] = { pitch: b.pitch_name, bookings: 0, revenue: 0, utilization: 0 };
              }
              breakdownMap[b.pitch_name].bookings += 1;
-             breakdownMap[b.pitch_name].revenue += b.amount || 0;
+             breakdownMap[b.pitch_name].revenue += Number(b.amount || 0);
            });
            
            const maxBookings = Math.max(...Object.values(breakdownMap).map((item: any) => item.bookings), 1);
@@ -186,7 +191,7 @@ const Revenue = () => {
               </div>
               <div className="ml-5">
                 <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-0.5">{stat.label}</p>
-                <p className="text-3xl font-black text-white tracking-tight">${stat.val}</p>
+                <p className="text-3xl font-black text-white tracking-tight">Rs {stat.val}</p>
                 <p className="text-[10px] font-bold text-emerald-400 tracking-wider mt-1 uppercase">{stat.inc}</p>
               </div>
             </div>
@@ -222,7 +227,7 @@ const Revenue = () => {
                        style={{ height: `${h.value}%` }}
                      >
                         <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-semibold py-1.5 px-2.5 rounded-lg opacity-0 group-hover/bar:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl border border-slate-700">
-                          ${h.actualValue}
+                          Rs {h.actualValue}
                         </div>
                      </div>
                    </div>
@@ -246,7 +251,7 @@ const Revenue = () => {
                   <p className="text-[11px] font-semibold text-slate-500 tracking-wide mt-0.5">{transaction.pitch} <span className="text-slate-600 px-1">•</span> {transaction.time}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-base font-black text-emerald-400">${transaction.amount}</p>
+                  <p className="text-base font-black text-emerald-400">Rs {transaction.amount}</p>
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{transaction.method}</p>
                 </div>
               </div>
@@ -282,7 +287,7 @@ const Revenue = () => {
                     {pitch.bookings}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-black text-emerald-400">
-                    ${pitch.revenue.toLocaleString()}
+                    Rs {pitch.revenue.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-300">
                     <span className="flex items-center gap-2">
