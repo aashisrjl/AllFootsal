@@ -1,171 +1,118 @@
-/* Force AdminJS chrome (sidebar + header) to dark mode */
+/* NepFutsal Admin - Enhanced Dark Theme */
 
-html,
-body,
-#app {
-  background: #0b1220 !important;
-  color: #e5e7eb !important;
+:root {
+  --admin-bg: #0b1220;
+  --admin-card-bg: #111827;
+  --admin-sidebar-bg: #0f172a;
+  --admin-border: #1f2937;
+  --admin-text: #f8fafc;
+  --admin-text-dim: #94a3b8;
+  --admin-primary: #3b82f6;
+  --admin-accent: #10b981;
 }
 
-main,
-section,
-[data-css='content'],
-[data-css='main'],
-[class*='LayoutContent'],
-[class*='DrawerContent'] {
-  background: #0b1220 !important;
-  color: #e5e7eb !important;
+html, body, #app, [data-css='content'], [data-css='main'], [class*='LayoutContent'] {
+  background: var(--admin-bg) !important;
+  color: var(--admin-text) !important;
 }
 
-[data-css='sidebar'],
-aside {
+[data-css='sidebar'], aside, [class*='Sidebar'] {
+  background: var(--admin-sidebar-bg) !important;
+  border-right: 1px solid var(--admin-border) !important;
+  flex-shrink: 0 !important;
+}
+
+[data-css='topbar'], header, nav, [class*='NavBar'] {
+  background: var(--admin-card-bg) !important;
+  border-bottom: 1px solid var(--admin-border) !important;
+}
+
+[data-css='sidebar'] a, aside a, header a, nav a, [class*='NavLink'] {
+  color: var(--admin-text-dim) !important;
+}
+
+[data-css='sidebar'] a:hover, aside a:hover, [class*='NavLink']:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--admin-text) !important;
+}
+
+[data-css='sidebar'] [aria-current='page'], [data-css='sidebar'] .active, [class*='NavLink'][class*='active'] {
+  background: var(--admin-primary) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+
+/* Cards & Boxes */
+[class*='Box'], [class*='Card'], [class*='Section'], [class*='Drawer'], [class*='Modal'], [class*='MessageBox'] {
+  background: var(--admin-card-bg) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+  border-radius: 8px !important;
+}
+
+/* Tables */
+table, thead, tbody, tr, th, td, [class*='Table'] {
+  background: transparent !important;
+  color: var(--admin-text) !important;
+  border-color: var(--admin-border) !important;
+}
+
+th, thead th {
+  background: rgba(255, 255, 255, 0.02) !important;
+  color: var(--admin-text-dim) !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 12px 16px !important;
+}
+
+td {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid var(--admin-border) !important;
+}
+
+tr:hover td, [class*='TableRow']:hover {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Form inputs & Buttons */
+input, select, textarea, [class*='Input'], [class*='Select'] {
   background: #0f172a !important;
-  border-right: 1px solid #1f2937 !important;
+  color: var(--admin-text) !important;
+  border: 1px solid var(--admin-border) !important;
+  border-radius: 6px !important;
 }
 
-[data-css='topbar'],
-header,
-nav {
-  background: #111827 !important;
-  border-bottom: 1px solid #1f2937 !important;
+input:focus, select:focus {
+  border-color: var(--admin-primary) !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
 }
 
-[data-css='sidebar'] a,
-aside a,
-header a,
-nav a {
-  color: #d1d5db !important;
+button, a[role='button'], [class*='Button'] {
+  border-radius: 6px !important;
+  transition: all 0.2s !important;
 }
 
-[data-css='sidebar'] a:hover,
-aside a:hover,
-header a:hover,
-nav a:hover {
-  color: #f8fafc !important;
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-[data-css='sidebar'] [aria-current='page'],
-[data-css='sidebar'] .active {
-  background: #1e293b !important;
-  color: #f8fafc !important;
+::-webkit-scrollbar-track {
+  background: var(--admin-bg);
 }
 
-[data-css='topbar'] *,
-header *,
-nav * {
-  color: #e5e7eb !important;
+::-webkit-scrollbar-thumb {
+  background: var(--admin-border);
+  border-radius: 4px;
 }
 
-/* Panels / cards */
-[class*='Box'],
-[class*='Card'],
-[class*='Section'],
-[class*='Drawer'],
-[class*='Modal'],
-[class*='MessageBox'] {
-  background: #111827 !important;
-  border-color: #1f2937 !important;
-  color: #e5e7eb !important;
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
 }
 
-/* Table views */
-table,
-thead,
-tbody,
-tr,
-th,
-td,
-[class*='Table'] {
-  background: #111827 !important;
-  color: #e5e7eb !important;
-  border-color: #1f2937 !important;
-}
-
-th,
-thead th {
-  color: #cbd5e1 !important;
-}
-
-tr:hover td,
-[class*='TableRow']:hover {
-  background: #1f2937 !important;
-}
-
-/* Form controls */
-input,
-select,
-textarea,
-[class*='Input'],
-[class*='Select'] {
-  background: #0f172a !important;
-  color: #e5e7eb !important;
-  border-color: #334155 !important;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #94a3b8 !important;
-}
-
-label,
-[class*='Label'],
-[class*='FormGroup'] {
-  color: #cbd5e1 !important;
-}
-
-/* Buttons and action controls */
-button,
-a[role='button'],
-[class*='Button'] {
-  border-color: #334155 !important;
-}
-
-button[class*='primary'],
-a[role='button'][class*='primary'] {
-  background: #2563eb !important;
-  color: #ffffff !important;
-}
-
-button[class*='danger'],
-a[role='button'][class*='danger'] {
-  background: #dc2626 !important;
-  color: #ffffff !important;
-}
-
-/* Links and misc text */
-a {
-  color: #93c5fd !important;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-span,
-small,
-strong,
-li,
-div {
-  border-color: #1f2937;
-}
-
-/* Dropdowns / popovers / filters */
-[class*='DropDown'],
-[class*='Popover'],
-[class*='Filter'],
-[class*='DatePicker'] {
-  background: #111827 !important;
-  color: #e5e7eb !important;
-  border-color: #334155 !important;
-}
-
-/* Pagination */
-[class*='Pagination'] button,
-[class*='Pagination'] a {
-  background: #0f172a !important;
-  color: #e5e7eb !important;
-  border-color: #334155 !important;
-}
+/* Fix for specific AdminJS quirks */
+[data-testid='property-edit-label'] { color: var(--admin-text-dim) !important; }
+[data-css='Text'] { color: var(--admin-text) !important; }
+[class*='Placeholder'] { color: var(--admin-text-dim) !important; }

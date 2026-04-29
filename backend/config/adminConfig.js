@@ -68,6 +68,20 @@ const setupAdminPanel = (app) => {
 	const adminJs = new AdminJS({
 		databases: [sequelize],
 		rootPath: ADMIN_FRONTEND_URL,
+		branding: {
+			companyName: 'NepFutsal Admin',
+			softwareBrothers: false,
+			logo: '/logo.png', // Fallback to a logo if exists
+			theme: {
+				colors: {
+					primary100: '#3b82f6',
+					accent: '#10b981',
+					love: '#ef4444',
+					bg: '#0b1220',
+					defaultText: '#f8fafc',
+				},
+			},
+		},
 		assets: {
 			styles: ['/admin-dark.css'],
 		},
