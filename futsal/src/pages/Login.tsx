@@ -1,10 +1,19 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { LogIn, Loader2, AlertCircle } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+
+import {
+  AuthImage,
+  AuthBackground,
+  logo_transparent,
+} from "@/assets/images";
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +31,17 @@ const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await login({ email, password });
+      // Basic detection for email vs phone
+      const isPhone = /^\d+$/.test(emailOrPhone.trim());
+      const credentials: any = { password };
+      
+      if (isPhone) {
+        credentials.phoneNumber = emailOrPhone.trim();
+      } else {
+        credentials.email = emailOrPhone.trim();
+      }
+
+      await login(credentials);
       navigate('/');
     } catch (err: any) {
       setError(err.message || 'Failed to login. Please check your credentials.');
@@ -32,93 +51,129 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f1c] flex items-center justify-center relative overflow-hidden font-sans selection:bg-emerald-500/30 p-4">
-      {/* Background Glows */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
-      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
+    <div
+      className="min-h-screen flex flex-col bg-slate-950 transition-colors duration-500"
+      style={{
+        backgroundImage: `url(${AuthBackground})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <main className="flex flex-1 items-center justify-center py-10 px-4 mt-10">
+        <div className="bg-slate-900 shadow-2xl rounded-3xl flex flex-col md:flex-row overflow-hidden max-w-5xl w-full border border-slate-800 transition-all duration-300">
+          {/* Left side form */}
+          <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-slate-900/40 backdrop-blur-sm relative overflow-hidden">
+            
+            {/* Background Glows for consistent premium feel */}
+            <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none z-0"></div>
 
-      <div className="relative z-10 w-full max-w-md">
-        <div className="bg-slate-900/60 backdrop-blur-2xl border border-slate-800/80 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
-          
-          {/* Glass edge highlight */}
-          <div className="absolute inset-0 border border-white/5 rounded-3xl pointer-events-none"></div>
+            <div className="relative z-10">
+              <Link to="/">
+                <div className="flex justify-center md:justify-start mb-3">
+                  <img
+                    src={logo_transparent}
+                    alt="AllFutsal Logo"
+                    className="h-20 w-auto object-contain transition-transform duration-300 hover:scale-105 invert brightness-100"
+                  />
+                </div>
+              </Link>
 
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.3)] mb-4 border border-emerald-400/50">
-              <span className="font-bold text-white text-3xl leading-none">F</span>
+              <h2 className="text-3xl font-black text-slate-50 mb-2 tracking-tight">Owner Portal</h2>
+              <p className="text-slate-400 mb-6 font-medium">
+                Sign in to manage your futsal facility.
+              </p>
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {error && (
+                  <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-4 flex items-start gap-3 animate-in fade-in zoom-in duration-300">
+                    <AlertCircle className="w-5 h-5 text-rose-400 mt-0.5 shrink-0" />
+                    <p className="text-sm text-rose-300 font-medium">{error}</p>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-semibold text-slate-300">
+                    Email or Phone <span className="text-rose-500">*</span>
+                  </Label>
+                  <Input
+                    id="email"
+                    type="text"
+                    placeholder="Enter email or phone number"
+                    value={emailOrPhone}
+                    onChange={(e) => setEmailOrPhone(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="h-12 bg-slate-800 border-slate-700 text-slate-50 placeholder:text-slate-500 focus-visible:ring-emerald-500 rounded-xl"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password" title="Password" className="text-sm font-semibold text-slate-300">
+                      Password <span className="text-rose-500">*</span>
+                    </Label>
+                    <a
+                      href="http://localhost:3001/auth/forgot-password"
+                      className="text-xs text-emerald-400 font-bold hover:underline"
+                    >
+                      Forgot?
+                    </a>
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="h-12 bg-slate-800 border-slate-700 text-slate-50 placeholder:text-slate-500 focus-visible:ring-emerald-500 rounded-xl"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/25 transition-all mt-2"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Authenticating...
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="mr-2 h-5 w-5" />
+                      Sign In
+                    </>
+                  )}
+                </Button>
+              </form>
+
+              <div className="mt-8 text-center border-t border-slate-800 pt-6">
+                <p className="text-slate-400 text-sm font-medium">
+                  Need an account for your futsal?{" "}
+                  <a
+                    href="http://localhost:3001/auth/register/footsal"
+                    className="text-emerald-400 font-bold hover:underline ml-1"
+                  >
+                    Register Here
+                  </a>
+                </p>
+              </div>
             </div>
-            <h1 className="text-3xl font-black tracking-tight text-white m-0">Owner Portal</h1>
-            <p className="text-slate-400 mt-2 text-sm text-center">Sign in to manage your futsal facility</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5 relative z-20">
-            {error && (
-              <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-4 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-rose-400 mt-0.5 shrink-0" />
-                <p className="text-sm text-rose-300">{error}</p>
-              </div>
-            )}
-
-            <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-slate-300 ml-1">Email Address</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={isLoading}
-                className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all disabled:opacity-50"
-                placeholder="owner@futsal.com"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between ml-1">
-                <label className="text-sm font-semibold text-slate-300">Password</label>
-                <a href="#" className="flex items-center text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">
-                  Forgot?
-                </a>
-              </div>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={isLoading}
-                className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all disabled:opacity-50"
-                placeholder="••••••••"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-bold py-3 px-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] transition-all flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed group border border-emerald-400/30 mt-2"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  Authenticating...
-                </>
-              ) : (
-                <>
-                  Sign In
-                  <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </>
-              )}
-            </button>
-          </form>
-          
-          {/* Bottom text */}
-          <div className="mt-8 text-center border-t border-slate-800/50 pt-6">
-             <p className="text-slate-500 text-xs font-medium">
-               Need an account? <a href="#" className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors">Contact Support</a>
-             </p>
+          {/* Right side illustration */}
+          <div className="hidden md:flex w-1/2 bg-slate-800/30 backdrop-blur-sm justify-center items-center p-12">
+            <img
+              src={AuthImage}
+              alt="Login Illustration"
+              className="w-full h-auto object-contain drop-shadow-2xl animate-float rounded-xl"
+            />
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

@@ -1,7 +1,8 @@
 
 const crypto = require("crypto");
 const { QueryTypes } = require("sequelize");
-const { sequelize, FutsalPaymentConfig, Footsal } = require("../../../models");
+const { sequelize, FutsalPaymentConfig, Footsal, User } = require("../../../models");
+const sendEmail = require("../../../services/mail/sendEmail");
 const {
     createEsewaPayment_user_futsal
 } = require("../../../services/esewa/usersToFutsal.esewa.service");
@@ -1023,6 +1024,47 @@ const verifyPayment = async (req, res) => {
                     type: QueryTypes.UPDATE
                 }
             );
+
+            // [NEW] Automated Confirmation Notifications
+            try {
+                const bookingRows = await sequelize.query(
+                    `SELECT b.*, t.start_time, t.end_time, p.name as pitch_name
+                     FROM booking_${tenant.code} b
+                     JOIN timeslot_${tenant.code} t ON b.timeslot_id = t.id
+                     JOIN pitch_${tenant.code} p ON b.pitch_id = p.id
+                     WHERE b.id = ? LIMIT 1`,
+                    {
+                        replacements: [payment.booking_id],
+                        type: QueryTypes.SELECT
+                    }
+                );
+
+                const booking = bookingRows[0];
+                const user = await User.findByPk(payment.user_id);
+                const futsal = await Footsal.findOne({ where: { id: tenant.futsalId } });
+
+                if (booking && user?.email) {
+                    await sendEmail({
+                        option: {
+                            to: user.email,
+                            subject: "Booking Confirmed!",
+                            text: `Great news! Your payment has been verified and your booking for ${booking.pitch_name} on ${booking.booking_date} (${booking.start_time} - ${booking.end_time}) is now CONFIRMED.`,
+                        },
+                    });
+                }
+
+                if (booking && futsal?.email) {
+                    await sendEmail({
+                        option: {
+                            to: futsal.email,
+                            subject: "Payment Verified - Booking Confirmed",
+                            text: `Payment for booking #${booking.id} (${booking.pitch_name}) has been verified successfully via ${payment.gateway}. The booking is now confirmed.`,
+                        },
+                    });
+                }
+            } catch (notifyErr) {
+                console.error("Error sending automated payment confirmation emails:", notifyErr);
+            }
         }
 
         const updatedPayment = await sequelize.query(

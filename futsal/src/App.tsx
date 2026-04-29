@@ -10,6 +10,7 @@ import Subscription from './pages/Subscription';
 import Layout from './components/Layout';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
+import Notifications from './pages/Notifications';
 import { Loader2 } from 'lucide-react';
 import './index.css';
 
@@ -58,6 +59,7 @@ function App() {
                     <Route path="/revenue" element={<Revenue />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/subscription" element={<Subscription />} />
+                    <Route path="/notifications" element={<Notifications />} />
                     <Route path="/payment/success" element={<Subscription />} />
                     <Route path="/payment/failure" element={<Subscription />} />
                   </Routes>

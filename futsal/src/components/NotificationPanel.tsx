@@ -219,11 +219,15 @@ export default function NotificationPanel() {
                     Load more
                   </button>
                 )}
-                {loading && (
-                  <div className="flex justify-center py-4">
-                    <span className="h-4 w-4 rounded-full border-2 border-emerald-400 border-t-transparent animate-spin" />
-                  </div>
-                )}
+                {/* See All Notifications */}
+                <div className="p-3 border-t border-slate-800 bg-slate-900/50">
+                  <button
+                    onClick={() => { setOpen(false); window.location.href = "/notifications"; }}
+                    className="w-full py-2 text-xs font-bold text-slate-500 hover:text-emerald-400 transition-colors"
+                  >
+                    See all notifications
+                  </button>
+                </div>
               </>
             )}
           </div>
