@@ -47,6 +47,10 @@ app.use('/api/v1/', authRoutes)
 const userRoutes = require("./routes/usersRoutes/users.routes")
 app.use('/api/v1/', userRoutes)
 
+// notification routes
+const notificationRoutes = require("./routes/notificationRoutes/notification.routes")
+app.use('/api/v1/', notificationRoutes)
+
 //futsal payment and subscription routes
 const subscriptionRoutes = require("./routes/footsalRoutes/subscription.route")
 const paymentRoutes = require("./routes/footsalRoutes/payment.route")

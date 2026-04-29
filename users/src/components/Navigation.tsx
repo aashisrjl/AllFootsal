@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import NotificationPanel from "@/components/NotificationPanel";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -104,22 +105,25 @@ export default function Navigation() {
             </button>
 
             {isLoading ? null : isAuthenticated ? (
-              <button
-                onClick={() => navigate("/profile")}
-                className="flex items-center gap-2 outline-none"
-              >
-                <Avatar className="h-12 w-12 border border-white/20">
-                  {userImg ? (
-                    <img src={userImg} alt="User" className="h-full w-full object-cover" />
-                  ) : (
-                    <AvatarFallback className={avatarFallbackClass}>{userInitial}</AvatarFallback>
-                  )}
+              <>
+                <NotificationPanel />
+                <button
+                  onClick={() => navigate("/profile")}
+                  className="flex items-center gap-2 outline-none"
+                >
+                  <Avatar className="h-12 w-12 border border-white/20">
+                    {userImg ? (
+                      <img src={userImg} alt="User" className="h-full w-full object-cover" />
+                    ) : (
+                      <AvatarFallback className={avatarFallbackClass}>{userInitial}</AvatarFallback>
+                    )}
 
-                </Avatar>
-                <span className={`font-medium transition ${linkColor}`}>
-                  {user?.name || "Profile"}
-                </span>
-              </button>
+                  </Avatar>
+                  <span className={`font-medium transition ${linkColor}`}>
+                    {user?.name || "Profile"}
+                  </span>
+                </button>
+              </>
             ) : (
               <>
                 <button
@@ -166,6 +170,9 @@ export default function Navigation() {
             </button>
             {isLoading ? null : isAuthenticated ? (
               <>
+                <div className="py-2">
+                  <NotificationPanel />
+                </div>
                 <button
                   onClick={() => {
                     navigate("/profile");
