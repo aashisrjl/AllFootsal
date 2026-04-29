@@ -17,13 +17,25 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({ timeSlots }) => {
     selectedTimeSlotId 
   } = useBooking();
 
-  // Convert selectedDate string to Date object for the Calendar component
-  const dateObj = selectedDate ? new Date(selectedDate) : new Date();
+  // Helper to format date as YYYY-MM-DD in local timezone
+  const formatDateLocal = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Convert selectedDate string (YYYY-MM-DD) to a local Date object for the Calendar
+  const dateObj = React.useMemo(() => {
+    if (!selectedDate) return new Date();
+    const [year, month, day] = selectedDate.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }, [selectedDate]);
 
   // Handle date change
   const handleDateChange = (date: Date | undefined) => {
     if (date) {
-      const dateStr = date.toISOString().split("T")[0];
+      const dateStr = formatDateLocal(date);
       setSelectedDate(dateStr);
     }
   };

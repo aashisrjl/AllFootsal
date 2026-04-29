@@ -8,11 +8,11 @@ import {
   DollarSign,
   Wallet,
   Settings,
-  Bell,
   LogOut,
   Image as ImageIcon
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import NotificationPanel from './NotificationPanel';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -109,10 +109,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {getHeaderTitle()}
             </h2>
             <div className="flex items-center space-x-5 relative z-10">
-              <button className="rounded-full bg-slate-800/80 p-2.5 relative border border-slate-700/50 hover:border-slate-600 hover:bg-slate-700 transition-all shadow-inner hover:shadow-lg">
-                <Bell className="h-4 w-4 text-slate-300" />
-                <span className="absolute -top-1 -right-1 h-3 w-3 border-2 border-[#121827] bg-rose-500 rounded-full animate-pulse"></span>
-              </button>
+              <NotificationPanel />
               <div className="flex items-center gap-3 pl-4 border-l border-slate-700/50 cursor-pointer group">
                 <div className="text-right">
                   <span className="block text-sm font-bold text-slate-200 group-hover:text-white transition-colors">{futsalProfile?.futsalName || 'Futsal Arena'}</span>

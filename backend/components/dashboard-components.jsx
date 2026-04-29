@@ -3,8 +3,6 @@ import { ApiClient } from 'adminjs'
 
 const api = new ApiClient()
 
-// Get super admin key from backend (component runs server-side in AdminJS)
-// For client-side: use REACT_APP_SUPER_ADMIN_KEY from .env
 const SUPER_ADMIN_KEY = typeof process !== 'undefined' && process.env.SUPER_ADMIN_API_KEY 
   ? process.env.SUPER_ADMIN_API_KEY 
   : 'super-admin-secret-key-futsal-2024'
@@ -68,7 +66,7 @@ const Dashboard = () => {
         const res = await apiCall('/super-admin/tenants')
         setTenants(res.data || [])
       } catch (err) {
-        setTenantError('Failed to load tenant data. Check SUPER_ADMIN_KEY.')
+        setTenantError('Failed to load tenant data. Verify API key.')
       } finally {
         setTenantsLoading(false)
       }
@@ -93,7 +91,7 @@ const Dashboard = () => {
   }
 
   const handleDropTenant = async (futsalCode) => {
-    if (!window.confirm(`Are you sure you want to drop tenant tables for ${futsalCode}?`)) return
+    if (!window.confirm(`DANGER: Are you sure you want to drop all tables for ${futsalCode}? Data will be lost.`)) return
     try {
       setActionLoading((prev) => ({ ...prev, [`drop-${futsalCode}`]: true }))
       await apiCall(`/super-admin/tenants/${futsalCode}/drop`, 'DELETE')
@@ -111,198 +109,185 @@ const Dashboard = () => {
   const recentPayments = data?.recentPayments || []
 
   const metricCards = [
-    { label: 'Total Users', value: stats.totalUsers ?? 0 },
-    { label: 'Active Users', value: stats.activeUsers ?? 0 },
-    { label: 'Total Futsals', value: stats.totalFutsals ?? 0 },
-    { label: 'Active Subscriptions', value: stats.activeSubscriptions ?? 0 },
-    { label: 'Forum Posts', value: stats.totalForums ?? 0 },
-    { label: 'Forum Replies', value: stats.totalReplies ?? 0 },
-    { label: 'Forum Likes', value: stats.totalLikes ?? 0 },
-    { label: 'Completed Revenue', value: formatCurrency(stats.monthlyRevenue ?? 0) },
+    { label: 'Total Users', value: stats.totalUsers ?? 0, icon: '👥' },
+    { label: 'Active Users', value: stats.activeUsers ?? 0, icon: '✅' },
+    { label: 'Total Futsals', value: stats.totalFutsals ?? 0, icon: '🏟️' },
+    { label: 'Active Subscriptions', value: stats.activeSubscriptions ?? 0, icon: '💳' },
+    { label: 'Forum Posts', value: stats.totalForums ?? 0, icon: '📝' },
+    { label: 'Monthly Revenue', value: formatCurrency(stats.monthlyRevenue ?? 0), icon: '💰' },
   ]
 
   return (
-    <div style={styles.page}>
-      <div style={styles.header}>
-        <h1 style={styles.title}>Admin Dashboard</h1>
-        <p style={styles.subtitle}>Operational snapshot of your futsal platform</p>
-      </div>
+    <div style={styles.container}>
+      <header style={styles.header}>
+        <div>
+          <h1 style={styles.title}>System Overview</h1>
+          <p style={styles.subtitle}>Real-time metrics and infrastructure management</p>
+        </div>
+      </header>
 
-      {loading && <p style={styles.info}>Loading dashboard data...</p>}
-      {!loading && error && <p style={styles.error}>{error}</p>}
-
-      {!loading && !error && (
+      {loading ? (
+        <div style={styles.loadingState}>
+          <div style={styles.spinner}></div>
+          <p>Analyzing platform data...</p>
+        </div>
+      ) : error ? (
+        <div style={styles.errorBox}>{error}</div>
+      ) : (
         <>
-          <div style={styles.grid}>
+          <section style={styles.metricsGrid}>
             {metricCards.map((card) => (
-              <div key={card.label} style={styles.card}>
-                <p style={styles.cardLabel}>{card.label}</p>
-                <p style={styles.cardValue}>{card.value}</p>
+              <div key={card.label} style={styles.metricCard}>
+                <div style={styles.metricIcon}>{card.icon}</div>
+                <div>
+                  <p style={styles.metricLabel}>{card.label}</p>
+                  <p style={styles.metricValue}>{card.value}</p>
+                </div>
               </div>
             ))}
-          </div>
+          </section>
 
-          <div style={styles.tableSection}>
-            <h2 style={styles.sectionTitle}>Recent Payments</h2>
-            {recentPayments.length === 0 ? (
-              <p style={styles.info}>No payment data available yet.</p>
-            ) : (
-              <div style={styles.tableWrap}>
-                <table style={styles.table}>
+          <main style={styles.contentGrid}>
+            {/* Tenant Management */}
+            <div style={styles.mainCard}>
+              <div style={styles.cardHeader}>
+                <h2 style={styles.cardTitle}>Tenant Infrastructure</h2>
+                <span style={styles.countBadge}>{tenants.length} Total</span>
+              </div>
+              
+              {tenantError && <div style={styles.errorText}>{tenantError}</div>}
+              
+              <div style={styles.tenantListContainer}>
+                {tenantsLoading ? (
+                  <p style={styles.placeholderText}>Refreshing tenant status...</p>
+                ) : tenants.length === 0 ? (
+                  <p style={styles.placeholderText}>No tenants found in system.</p>
+                ) : (
+                  tenants.map((tenant) => {
+                    const isExpanded = expandedTenant === tenant.futsal.futsalCode
+                    const allTablesExist = tenant.tenantSummary.missingTables === 0
+                    
+                    return (
+                      <div key={tenant.futsal.id} style={{
+                        ...styles.tenantItem,
+                        borderLeft: `4px solid ${allTablesExist ? '#10b981' : '#f59e0b'}`
+                      }}>
+                        <div style={styles.tenantSummary} onClick={() => setExpandedTenant(isExpanded ? null : tenant.futsal.futsalCode)}>
+                          <div style={styles.tenantInfo}>
+                            <p style={styles.tenantName}>{tenant.futsal.futsalName}</p>
+                            <p style={styles.tenantMeta}>Code: {tenant.futsal.futsalCode} • {tenant.futsal.email}</p>
+                          </div>
+                          <div style={styles.tenantStatus}>
+                            <span style={{
+                              ...styles.statusBadge,
+                              backgroundColor: allTablesExist ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                              color: allTablesExist ? '#10b981' : '#f59e0b'
+                            }}>
+                              {tenant.tenantSummary.existingTables}/{tenant.tenantSummary.totalExpectedTables}
+                            </span>
+                            <span style={styles.dropdownArrow}>{isExpanded ? '▴' : '▾'}</span>
+                          </div>
+                        </div>
+
+                        {isExpanded && (
+                          <div style={styles.tenantDetails}>
+                            <div style={styles.detailsGrid}>
+                              <div>
+                                <p style={styles.detailLabel}>Owner Info</p>
+                                <p style={styles.detailValue}>{tenant.futsal.ownerName}</p>
+                                <p style={styles.detailValue}>{tenant.futsal.phoneNumber}</p>
+                              </div>
+                              <div>
+                                <p style={styles.detailLabel}>System Status</p>
+                                <p style={styles.detailValue}>{tenant.futsal.isActive ? '✅ Active' : '❌ Inactive'}</p>
+                                <p style={styles.detailValue}>{tenant.futsal.isVerified ? '🛡️ Verified' : '⚠️ Unverified'}</p>
+                              </div>
+                            </div>
+
+                            <div style={styles.tableStatusGrid}>
+                              <p style={styles.detailLabel}>Infrastructure Integrity</p>
+                              <div style={styles.tableChips}>
+                                {tenant.tables.map(table => (
+                                  <span key={table.tableName} style={{
+                                    ...styles.tableChip,
+                                    color: table.exists ? '#10b981' : '#ef4444',
+                                    borderColor: table.exists ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'
+                                  }}>
+                                    {table.tableName}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div style={styles.actionRow}>
+                              {!allTablesExist ? (
+                                <button 
+                                  style={styles.btnPrimary}
+                                  onClick={() => handleCreateTenant(tenant.futsal.futsalCode)}
+                                  disabled={actionLoading[`create-${tenant.futsal.futsalCode}`]}
+                                >
+                                  {actionLoading[`create-${tenant.futsal.futsalCode}`] ? 'Initializing...' : 'Initialize Infrastructure'}
+                                </button>
+                              ) : (
+                                <button 
+                                  style={styles.btnDanger}
+                                  onClick={() => handleDropTenant(tenant.futsal.futsalCode)}
+                                  disabled={actionLoading[`drop-${tenant.futsal.futsalCode}`]}
+                                >
+                                  {actionLoading[`drop-${tenant.futsal.futsalCode}`] ? 'Dropping...' : 'Drop Infrastructure'}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })
+                )}
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div style={styles.mainCard}>
+              <div style={styles.cardHeader}>
+                <h2 style={styles.cardTitle}>Recent Financial Activity</h2>
+              </div>
+              <div style={styles.tableWrapper}>
+                <table style={styles.customTable}>
                   <thead>
                     <tr>
-                      <th style={styles.th}>ID</th>
-                      <th style={styles.th}>Amount</th>
-                      <th style={styles.th}>Method</th>
-                      <th style={styles.th}>Status</th>
-                      <th style={styles.th}>Date</th>
+                      <th style={styles.tableTh}>ID</th>
+                      <th style={styles.tableTh}>Amount</th>
+                      <th style={styles.tableTh}>Method</th>
+                      <th style={styles.tableTh}>Status</th>
+                      <th style={styles.tableTh}>Date</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {recentPayments.map((payment) => (
-                      <tr key={payment.id}>
-                        <td style={styles.td}>#{payment.id}</td>
-                        <td style={styles.td}>{formatCurrency(payment.amount)}</td>
-                        <td style={styles.td}>{payment.method}</td>
-                        <td style={styles.td}>{payment.status}</td>
-                        <td style={styles.td}>{formatDate(payment.date)}</td>
-                      </tr>
-                    ))}
+                    {recentPayments.length === 0 ? (
+                      <tr><td colSpan="5" style={styles.emptyTd}>No recent transactions</td></tr>
+                    ) : (
+                      recentPayments.map((p) => (
+                        <tr key={p.id} style={styles.tableTr}>
+                          <td style={styles.tableTd}>#{p.id}</td>
+                          <td style={{...styles.tableTd, fontWeight: 'bold'}}>{formatCurrency(p.amount)}</td>
+                          <td style={styles.tableTd}>{p.method}</td>
+                          <td style={styles.tableTd}>
+                            <span style={{
+                              ...styles.statusDot,
+                              backgroundColor: p.status === 'completed' ? '#10b981' : '#f59e0b'
+                            }}></span>
+                            {p.status}
+                          </td>
+                          <td style={styles.tableTd}>{formatDate(p.date)}</td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
-            )}
-          </div>
-
-          <div style={styles.tableSection}>
-            <h2 style={styles.sectionTitle}>
-              Tenant Management ({tenants.length})
-            </h2>
-            {tenantError && <p style={styles.error}>{tenantError}</p>}
-            {tenantsLoading && <p style={styles.info}>Loading tenant data...</p>}
-            {!tenantsLoading && tenants.length === 0 && (
-              <p style={styles.info}>No futsal tenants found.</p>
-            )}
-            {!tenantsLoading && tenants.length > 0 && (
-              <div style={styles.tenantCards}>
-                {tenants.map((tenant) => {
-                  const isExpanded = expandedTenant === tenant.futsal.futsalCode
-                  const allTablesExist =
-                    tenant.tenantSummary.missingTables === 0
-                  return (
-                    <div
-                      key={tenant.futsal.id}
-                      style={styles.tenantCard}
-                    >
-                      <div
-                        style={styles.tenantCardHeader}
-                        onClick={() =>
-                          setExpandedTenant(
-                            isExpanded ? null : tenant.futsal.futsalCode
-                          )
-                        }
-                      >
-                        <div>
-                          <p style={styles.tenantCardTitle}>
-                            {tenant.futsal.futsalName} (Code: {tenant.futsal.futsalCode})
-                          </p>
-                          <p style={styles.tenantCardSubtitle}>
-                            Owner: {tenant.futsal.ownerName}
-                          </p>
-                        </div>
-                        <div style={styles.tenantCardStatus}>
-                          <span
-                            style={{
-                              ...styles.badge,
-                              ...(allTablesExist
-                                ? styles.badgeSuccess
-                                : styles.badgeWarning),
-                            }}
-                          >
-                            {tenant.tenantSummary.existingTables}/{tenant.tenantSummary.totalExpectedTables} Tables
-                          </span>
-                          <span
-                            style={{
-                              ...styles.badge,
-                              ...(tenant.futsal.isActive
-                                ? styles.badgeActive
-                                : styles.badgeInactive),
-                            }}
-                          >
-                            {tenant.futsal.isActive ? 'Active' : 'Inactive'}
-                          </span>
-                          <span style={styles.toggleIcon}>
-                            {isExpanded ? '▼' : '▶'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {isExpanded && (
-                        <div style={styles.tenantCardDetails}>
-                          <p style={styles.detailText}>
-                            <strong>Email:</strong> {tenant.futsal.email}
-                          </p>
-                          <p style={styles.detailText}>
-                            <strong>Phone:</strong> {tenant.futsal.phoneNumber}
-                          </p>
-                          <p style={styles.detailText}>
-                            <strong>Status:</strong> {tenant.futsal.isVerified ? '✓ Verified' : '✗ Not Verified'}
-                          </p>
-
-                          <div style={styles.tableList}>
-                            <h4>Tenant Tables:</h4>
-                            <ul style={styles.tableListUl}>
-                              {tenant.tables.map((table) => (
-                                <li
-                                  key={table.tableName}
-                                  style={{
-                                    color: table.exists ? '#4ade80' : '#f87171',
-                                  }}
-                                >
-                                  {table.tableName} {table.exists ? '✓' : '✗'}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div style={styles.actionButtons}>
-                            {!allTablesExist && (
-                              <button
-                                style={{
-                                  ...styles.button,
-                                  ...styles.buttonPrimary,
-                                }}
-                                onClick={() => handleCreateTenant(tenant.futsal.futsalCode)}
-                                disabled={actionLoading[`create-${tenant.futsal.futsalCode}`]}
-                              >
-                                {actionLoading[`create-${tenant.futsal.futsalCode}`]
-                                  ? 'Creating...'
-                                  : 'Create Tables'}
-                              </button>
-                            )}
-                            {allTablesExist && (
-                              <button
-                                style={{
-                                  ...styles.button,
-                                  ...styles.buttonDanger,
-                                }}
-                                onClick={() => handleDropTenant(tenant.futsal.futsalCode)}
-                                disabled={actionLoading[`drop-${tenant.futsal.futsalCode}`]}
-                              >
-                                {actionLoading[`drop-${tenant.futsal.futsalCode}`]
-                                  ? 'Dropping...'
-                                  : 'Drop Tables'}
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
+            </div>
+          </main>
         </>
       )}
     </div>
@@ -310,191 +295,280 @@ const Dashboard = () => {
 }
 
 const styles = {
-  page: {
+  container: {
     padding: '24px',
-    background: '#0b1220',
-    minHeight: '100vh',
-    fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+    width: '100%',
+    margin: '0',
+    color: '#f8fafc',
+    fontFamily: "'Inter', sans-serif",
+    boxSizing: 'border-box',
   },
   header: {
-    marginBottom: '20px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginBottom: '32px',
   },
   title: {
+    fontSize: '32px',
+    fontWeight: 800,
     margin: 0,
-    fontSize: '28px',
-    fontWeight: 700,
-    color: '#f8fafc',
+    background: 'linear-gradient(135deg, #fff 0%, #94a3b8 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
   },
   subtitle: {
-    marginTop: '8px',
     color: '#94a3b8',
+    margin: '8px 0 0',
+    fontSize: '15px',
   },
-  grid: {
+  metricsGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: '16px',
-    marginBottom: '20px',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+    gap: '20px',
+    marginBottom: '32px',
   },
-  card: {
+  metricCard: {
     background: '#111827',
     border: '1px solid #1f2937',
-    borderRadius: '12px',
-    padding: '16px',
+    borderRadius: '16px',
+    padding: '24px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '20px',
+    transition: 'transform 0.2s, border-color 0.2s',
   },
-  cardLabel: {
+  metricIcon: {
+    fontSize: '28px',
+    background: 'rgba(255,255,255,0.05)',
+    width: '56px',
+    height: '56px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '12px',
+  },
+  metricLabel: {
     margin: 0,
     fontSize: '13px',
-    color: '#9ca3af',
+    color: '#94a3b8',
+    fontWeight: 500,
+    textTransform: 'uppercase',
+    letterSpacing: '0.025em',
   },
-  cardValue: {
-    margin: '8px 0 0',
+  metricValue: {
+    margin: '4px 0 0',
     fontSize: '24px',
     fontWeight: 700,
     color: '#f8fafc',
   },
-  tableSection: {
+  contentGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))',
+    gap: '24px',
+  },
+  mainCard: {
     background: '#111827',
     border: '1px solid #1f2937',
-    borderRadius: '12px',
-    padding: '16px',
-    marginTop: '20px',
-  },
-  sectionTitle: {
-    margin: '0 0 12px',
-    fontSize: '18px',
-    color: '#f8fafc',
-  },
-  tableWrap: {
-    overflowX: 'auto',
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-  },
-  th: {
-    textAlign: 'left',
-    fontSize: '13px',
-    color: '#cbd5e1',
-    borderBottom: '1px solid #1f2937',
-    padding: '10px 8px',
-  },
-  td: {
-    fontSize: '14px',
-    color: '#e5e7eb',
-    borderBottom: '1px solid #1f2937',
-    padding: '10px 8px',
-  },
-  info: {
-    color: '#94a3b8',
-  },
-  error: {
-    color: '#fca5a5',
-  },
-  tenantCards: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-    gap: '12px',
-  },
-  tenantCard: {
-    background: '#0f172a',
-    border: '1px solid #1e293b',
-    borderRadius: '8px',
+    borderRadius: '16px',
+    display: 'flex',
+    flexDirection: 'column',
     overflow: 'hidden',
   },
-  tenantCardHeader: {
+  cardHeader: {
+    padding: '20px 24px',
+    borderBottom: '1px solid #1f2937',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '12px',
-    cursor: 'pointer',
-    backgroundColor: '#111827',
-    borderBottom: '1px solid #1e293b',
+    background: 'rgba(255,255,255,0.01)',
   },
-  tenantCardTitle: {
-    margin: '0 0 4px',
-    fontSize: '15px',
-    fontWeight: 600,
-    color: '#f8fafc',
-  },
-  tenantCardSubtitle: {
+  cardTitle: {
     margin: 0,
+    fontSize: '18px',
+    fontWeight: 600,
+  },
+  countBadge: {
     fontSize: '12px',
+    background: '#1e293b',
+    padding: '4px 10px',
+    borderRadius: '20px',
     color: '#94a3b8',
   },
-  tenantCardStatus: {
+  tenantListContainer: {
+    padding: '16px',
     display: 'flex',
-    gap: '8px',
+    flexDirection: 'column',
+    gap: '12px',
+  },
+  tenantItem: {
+    background: '#0f172a',
+    borderRadius: '12px',
+    border: '1px solid #1e293b',
+    overflow: 'hidden',
+  },
+  tenantSummary: {
+    padding: '16px',
+    display: 'flex',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    cursor: 'pointer',
   },
-  badge: {
-    display: 'inline-block',
-    padding: '4px 8px',
-    borderRadius: '4px',
-    fontSize: '11px',
+  tenantName: {
+    margin: 0,
+    fontSize: '15px',
     fontWeight: 600,
-    whiteSpace: 'nowrap',
+    color: '#f1f5f9',
   },
-  badgeSuccess: {
-    backgroundColor: '#14532d',
-    color: '#bbf7d0',
-  },
-  badgeWarning: {
-    backgroundColor: '#78350f',
-    color: '#fde68a',
-  },
-  badgeActive: {
-    backgroundColor: '#1e3a8a',
-    color: '#bfdbfe',
-  },
-  badgeInactive: {
-    backgroundColor: '#7f1d1d',
-    color: '#fecaca',
-  },
-  toggleIcon: {
+  tenantMeta: {
+    margin: '4px 0 0',
     fontSize: '12px',
-    color: '#9ca3af',
+    color: '#64748b',
   },
-  tenantCardDetails: {
-    padding: '12px',
-    borderTop: '1px solid #1e293b',
-  },
-  detailText: {
-    margin: '0 0 8px',
-    fontSize: '12px',
-    color: '#cbd5e1',
-  },
-  tableList: {
-    marginTop: '12px',
-    marginBottom: '12px',
-  },
-  tableListUl: {
-    margin: '8px 0 0',
-    paddingLeft: '20px',
-    fontSize: '12px',
-  },
-  actionButtons: {
+  tenantStatus: {
     display: 'flex',
-    gap: '8px',
-    marginTop: '12px',
+    alignItems: 'center',
+    gap: '12px',
   },
-  button: {
-    flex: 1,
-    padding: '8px 12px',
-    border: 'none',
+  statusBadge: {
+    padding: '4px 8px',
     borderRadius: '6px',
-    fontSize: '12px',
+    fontSize: '11px',
+    fontWeight: 700,
+  },
+  dropdownArrow: {
+    fontSize: '10px',
+    color: '#475569',
+  },
+  tenantDetails: {
+    padding: '0 20px 20px',
+    borderTop: '1px solid rgba(255,255,255,0.03)',
+    marginTop: '-4px',
+    paddingTop: '20px',
+  },
+  detailsGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '24px',
+    marginBottom: '24px',
+  },
+  detailLabel: {
+    fontSize: '11px',
+    textTransform: 'uppercase',
+    color: '#475569',
+    fontWeight: 700,
+    letterSpacing: '0.05em',
+    marginBottom: '8px',
+  },
+  detailValue: {
+    fontSize: '13px',
+    color: '#94a3b8',
+    margin: '0 0 4px',
+  },
+  tableChips: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '8px',
+  },
+  tableChip: {
+    fontSize: '10px',
+    padding: '3px 8px',
+    borderRadius: '4px',
+    border: '1px solid',
+    background: 'rgba(255,255,255,0.02)',
+  },
+  actionRow: {
+    marginTop: '24px',
+    display: 'flex',
+    gap: '12px',
+  },
+  btnPrimary: {
+    backgroundColor: '#3b82f6',
+    color: 'white',
+    border: 'none',
+    padding: '10px 16px',
+    borderRadius: '8px',
+    fontSize: '13px',
     fontWeight: 600,
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    flex: 1,
   },
-  buttonPrimary: {
-    backgroundColor: '#3b82f6',
-    color: '#ffffff',
+  btnDanger: {
+    backgroundColor: '#991b1b',
+    color: '#fecaca',
+    border: '1px solid #7f1d1d',
+    padding: '10px 16px',
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    flex: 1,
   },
-  buttonDanger: {
-    backgroundColor: '#ef4444',
-    color: '#ffffff',
+  tableWrapper: {
+    overflowX: 'auto',
   },
+  customTable: {
+    width: '100%',
+    borderCollapse: 'collapse',
+  },
+  tableTh: {
+    textAlign: 'left',
+    padding: '16px 24px',
+    fontSize: '12px',
+    color: '#475569',
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    borderBottom: '1px solid #1f2937',
+    background: 'rgba(255,255,255,0.01)',
+  },
+  tableTd: {
+    padding: '16px 24px',
+    fontSize: '14px',
+    color: '#94a3b8',
+    borderBottom: '1px solid #1f2937',
+  },
+  tableTr: {
+    transition: 'background 0.2s',
+  },
+  statusDot: {
+    display: 'inline-block',
+    width: '8px',
+    height: '8px',
+    borderRadius: '50%',
+    marginRight: '8px',
+  },
+  loadingState: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '400px',
+    color: '#64748b',
+  },
+  spinner: {
+    width: '40px',
+    height: '40px',
+    border: '3px solid rgba(59,130,246,0.1)',
+    borderTopColor: '#3b82f6',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
+    marginBottom: '16px',
+  },
+  placeholderText: {
+    textAlign: 'center',
+    color: '#475569',
+    padding: '40px',
+    fontSize: '14px',
+  },
+  errorText: {
+    margin: '16px',
+    padding: '12px',
+    background: 'rgba(239, 68, 68, 0.1)',
+    color: '#ef4444',
+    borderRadius: '8px',
+    fontSize: '13px',
+    border: '1px solid rgba(239, 68, 68, 0.2)',
+  }
 }
 
 export default Dashboard

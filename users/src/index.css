@@ -145,7 +145,7 @@
 }
 
 .time-slot-booked {
-  @apply bg-gray-200 text-gray-500 cursor-not-allowed;
+  @apply bg-rose-500 text-white border-rose-600 cursor-not-allowed;
 }
 
 .time-slot-selected {
