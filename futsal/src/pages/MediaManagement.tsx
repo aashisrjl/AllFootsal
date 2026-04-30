@@ -20,10 +20,15 @@ const MediaManagement = () => {
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState<string | null>(null);
 
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
+
   const categories = [
-    { value: 'pitch', label: 'Pitch Photos', icon: ImageIcon, color: 'emerald' },
-    { value: 'facility', label: 'Facility Photos', icon: ImageIcon, color: 'blue' },
-    { value: 'event', label: 'Event Videos', icon: VideoIcon, color: 'purple' },
+    { value: 'home', label: 'Home Media', icon: ImageIcon, color: 'emerald' },
+    { value: 'pitch', label: 'Pitch Photos', icon: ImageIcon, color: 'blue' },
+    { value: 'facility', label: 'Facility Photos', icon: ImageIcon, color: 'purple' },
+    { value: 'event', label: 'Event Videos', icon: VideoIcon, color: 'violet' },
+    { value: 'logo', label: 'Logo', icon: ImageIcon, color: 'yellow' },
+    { value: 'banner', label: 'Banner', icon: ImageIcon, color: 'cyan' },
     { value: 'other', label: 'Other Media', icon: Upload, color: 'slate' },
   ];
 
@@ -38,17 +43,20 @@ const MediaManagement = () => {
       const futsalId = futsalProfile?.id;
       
       const response = await fetch(
-        `/api/v1/futsal/${futsalId}/media/?category=${selectedCategory}`,
+        `${apiBaseUrl}/futsal/${futsalId}/media/?category=${selectedCategory}`,
         {
+          credentials: 'include',
           headers: {
             'Authorization': `Bearer ${token}`,
           },
         }
       );
 
+      const responseBody = await response.json().catch(() => null);
       if (response.ok) {
-        const data = await response.json();
-        setMedia(data.data || []);
+        setMedia(responseBody?.data || []);
+      } else {
+        setError(responseBody?.message || responseBody?.error || 'Failed to load media.');
       }
     } catch (err) {
       console.log('Using mock data for demonstration');
@@ -92,16 +100,19 @@ const MediaManagement = () => {
       });
       formData.append('category', selectedCategory);
 
-      const response = await fetch('/api/v1/futsal/media/upload', {
+      const response = await fetch(`${apiBaseUrl}/futsal/media/upload`, {
         method: 'POST',
+        credentials: 'include',
         body: formData,
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
 
+      const responseBody = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error('Upload failed');
+        setError(responseBody?.message || responseBody?.error || 'Failed to upload files. Please try again.');
+        return;
       }
 
       setSuccess(`Successfully uploaded ${selectedFiles.length} file(s)!`);
@@ -127,8 +138,9 @@ const MediaManagement = () => {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`/api/v1/futsal/media/${id}`, {
+      const response = await fetch(`${apiBaseUrl}/futsal/media/${id}`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
           'Authorization': `Bearer ${token}`,
         },

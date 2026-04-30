@@ -23,6 +23,20 @@ const safeDeleteLocalFile = (filePath) => {
   }
 };
 
+const ensureMediaTableExists = async (code) => {
+  await sequelize.query(`
+    CREATE TABLE IF NOT EXISTS media_${code} (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      type ENUM('image','video') NOT NULL,
+      category ENUM('home','pitch','facility','event','other','logo','banner') NOT NULL,
+      url VARCHAR(500) NOT NULL,
+      description TEXT,
+      pitch_id INT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;
+  `);
+};
+
 const uploadMedia = async (req, res) => {
   try {
     const code = req.futsalCode || req.tanent?.code;
@@ -32,6 +46,8 @@ const uploadMedia = async (req, res) => {
         message: "futsal code is required",
       });
     }
+
+    await ensureMediaTableExists(code);
 
     const mediaFiles = getUploadedMediaFiles(req);
     const { category, description, pitchId } = req.body || {};
@@ -50,7 +66,7 @@ const uploadMedia = async (req, res) => {
     }
 
     // Only pitches should have pitch_id.
-    const normalizedPitchId = category === "pitch" ? pitchId : null;
+    const normalizedPitchId = pitchId || null;
 
     if (category === "pitch" && !normalizedPitchId) {
       // Allow null for general pitch media
@@ -118,6 +134,8 @@ const getHomeMedia = async (req, res) => {
         message: "futsal code is required",
       });
     }
+
+    await ensureMediaTableExists(code);
 
     const homeMedia = await sequelize.query(
       `SELECT * FROM media_${code} WHERE category = 'home'`,
@@ -242,6 +260,8 @@ const getFacilityMedia = async (req, res) => {
       });
     }
 
+    await ensureMediaTableExists(code);
+
     const facilityMedia = await sequelize.query(
       `SELECT * FROM media_${code} WHERE category = 'facility'`,
       { type: QueryTypes.SELECT }
@@ -278,6 +298,8 @@ const getEventMedia = async (req, res) => {
       });
     }
 
+    await ensureMediaTableExists(code);
+
     const eventMedia = await sequelize.query(
       `SELECT * FROM media_${code} WHERE category = 'event'`,
       { type: QueryTypes.SELECT }
@@ -313,6 +335,8 @@ const getOtherMedia = async (req, res) => {
         message: "futsal code is required",
       });
     }
+
+    await ensureMediaTableExists(code);
 
     const otherMedia = await sequelize.query(
       `SELECT * FROM media_${code} WHERE category = 'other'`,
@@ -352,6 +376,8 @@ const uploadPitchMedia = async (req, res) => {
         message: "futsal code is required",
       });
     }
+
+    await ensureMediaTableExists(code);
     if (!pitchId) {
       return res.status(400).json({
         success: false,
@@ -433,6 +459,8 @@ const uploadFacilitiesMediaByPitchId = async (req, res) => {
         message: "futsal code is required",
       });
     }
+
+    await ensureMediaTableExists(code);
     if (!pitchId) {
       return res.status(400).json({
         success: false,
@@ -516,6 +544,8 @@ const deleteMediaByCategory = async (req, res) => {
         message: "futsal code is required",
       });
     }
+
+    await ensureMediaTableExists(code);
     if (!category) {
       return res.status(400).json({
         success: false,
@@ -561,6 +591,8 @@ const deleteMediaById = async (req, res) => {
         message: "futsal code is required",
       });
     }
+
+    await ensureMediaTableExists(code);
     if (!mediaId) {
       return res.status(400).json({
         success: false,
@@ -602,7 +634,10 @@ const getMediaBycategory = async (req, res) => {
         success: false,
         message: "futsal code is required",
       });
-    } 
+    }
+
+    await ensureMediaTableExists(code);
+
     const category = req.query?.category;
     if (!category) {
       return res.status(400).json({
@@ -649,6 +684,8 @@ if (!code) {
     message: "futsal code is required",
   });
 }
+
+  await ensureMediaTableExists(code);
   const mediaFiles = getUploadedMediaFiles(req);
   if (!mediaFiles.length) {
     return res.status(400).json({
@@ -701,6 +738,8 @@ const uploadBanner = async (req,res)=>{
       message: "futsal code is required",
     });
   }
+
+    await ensureMediaTableExists(code);
     const mediaFiles = getUploadedMediaFiles(req);
     if (!mediaFiles.length) {
       return res.status(400).json({

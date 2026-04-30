@@ -109,6 +109,18 @@ module.exports = {
     ) ENGINE=InnoDB;
   `,
 
+  media: (code) => `
+    CREATE TABLE IF NOT EXISTS media_${code} (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      type ENUM('image','video') NOT NULL,
+      category ENUM('home','pitch','facility','event','other','logo','banner') NOT NULL,
+      url VARCHAR(500) NOT NULL,
+      description TEXT,
+      pitch_id INT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;
+  `,
+
   analytics: (code) => `
     CREATE TABLE IF NOT EXISTS analytics_${code} (
       id INT AUTO_INCREMENT PRIMARY KEY,
