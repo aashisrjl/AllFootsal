@@ -20,7 +20,7 @@ const MediaManagement = () => {
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
+  const apiBaseUrl = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
 
   const categories = [
     { value: 'home', label: 'Home Media', icon: ImageIcon, color: 'emerald' },

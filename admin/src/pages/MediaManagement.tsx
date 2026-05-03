@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, Trash2, ImageIcon, VideoIcon, Loader, AlertCircle } from 'lucide-react';
+import { Upload, Trash2, ImageIcon, VideoIcon, Loader, AlertCircle, Star, MessageSquare } from 'lucide-react';
 
 interface MediaItem {
   id: string;
@@ -9,6 +9,16 @@ interface MediaItem {
   uploadedAt: string;
 }
 
+interface RatingItem {
+  id: number;
+  rating: number;
+  review: string;
+  sentiment_score: number;
+  sentiment_label: string;
+  createdAt: string;
+  reviewerName: string;
+}
+
 const MediaManagement = () => {
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -16,6 +26,9 @@ const MediaManagement = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const [ratings, setRatings] = useState<RatingItem[]>([]);
+  const [ratingsLoading, setRatingsLoading] = useState(true);
 
   const categories = [
     { value: 'pitch', label: 'Pitch Photos' },
@@ -27,13 +40,19 @@ const MediaManagement = () => {
   useEffect(() => {
     // Fetch existing media
     fetchMedia();
+    fetchRatings();
   }, [selectedCategory]);
 
   const fetchMedia = async () => {
     try {
       setLoading(true);
-      // Simulating API call - replace with actual endpoint
-      // const response = await fetch(`/api/futsal/media/${selectedCategory}`);
+      // TODO: Replace with actual media API endpoint
+      // const token = localStorage.getItem('token'); // or however auth is handled
+      // const response = await fetch(`/api/futsal/media/${selectedCategory}`, {
+      //   headers: {
+      //     'Authorization': `Bearer ${token}`
+      //   }
+      // });
       // const data = await response.json();
       // setMedia(data);
       
@@ -58,6 +77,58 @@ const MediaManagement = () => {
       setError('Failed to load media');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRatings = async () => {
+    try {
+      setRatingsLoading(true);
+      // TODO: Replace with actual ratings API endpoint
+      // const token = localStorage.getItem('token'); // or however auth is handled
+      // const response = await fetch('/api/v1/futsal-ratings', {
+      //   headers: {
+      //     'Authorization': `Bearer ${token}`
+      //   }
+      // });
+      // const result = await response.json();
+      // if (result.success) {
+      //   setRatings(result.data);
+      // }
+      
+      // Mock data for demonstration
+      setRatings([
+        {
+          id: 1,
+          rating: 5,
+          review: 'Excellent facility! Clean and well-maintained.',
+          sentiment_score: 0.95,
+          sentiment_label: 'positive',
+          createdAt: '2024-01-15T10:30:00Z',
+          reviewerName: 'John Doe',
+        },
+        {
+          id: 2,
+          rating: 4,
+          review: 'Good place to play, but parking could be better.',
+          sentiment_score: 0.75,
+          sentiment_label: 'positive',
+          createdAt: '2024-01-14T15:45:00Z',
+          reviewerName: 'Jane Smith',
+        },
+        {
+          id: 3,
+          rating: 2,
+          review: 'Facilities were okay but staff was rude.',
+          sentiment_score: 0.25,
+          sentiment_label: 'negative',
+          createdAt: '2024-01-13T20:15:00Z',
+          reviewerName: 'Mike Johnson',
+        },
+      ]);
+    } catch (err) {
+      setError('Failed to load ratings');
+    } finally {
+      setRatingsLoading(false);
     }
   };
 
@@ -144,6 +215,25 @@ const MediaManagement = () => {
       setMedia(media.filter(item => item.id !== id));
     } catch (err) {
       setError('Failed to delete media');
+    }
+  };
+
+  const handleDeleteRating = async (ratingId: number) => {
+    try {
+      // TODO: Replace with actual API endpoint
+      // const token = localStorage.getItem('token'); // or however auth is handled
+      // const response = await fetch(`/api/v1/futsal/ratings/${ratingId}`, {
+      //   method: 'DELETE',
+      //   headers: {
+      //     'Authorization': `Bearer ${token}`
+      //   }
+      // });
+
+      // if (!response.ok) throw new Error('Delete failed');
+      
+      setRatings(ratings.filter(item => item.id !== ratingId));
+    } catch (err) {
+      setError('Failed to delete rating');
     }
   };
 
@@ -321,6 +411,72 @@ const MediaManagement = () => {
                   </button>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">{item.uploadedAt}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Ratings and Reviews Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Ratings and Reviews</h3>
+
+        {ratingsLoading ? (
+          <div className="flex justify-center items-center h-48">
+            <Loader className="h-8 w-8 text-blue-600 animate-spin" />
+          </div>
+        ) : ratings.length === 0 ? (
+          <div className="text-center py-12">
+            <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+            <p className="text-gray-500">No ratings or reviews yet</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {ratings.map(item => (
+              <div key={item.id} className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="flex items-center">
+                        {[1, 2, 3, 4, 5].map(star => (
+                          <Star
+                            key={star}
+                            className={`h-4 w-4 ${
+                              star <= item.rating
+                                ? 'text-yellow-400 fill-current'
+                                : 'text-gray-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">
+                        {item.rating}/5
+                      </span>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        item.sentiment_label === 'positive'
+                          ? 'bg-green-100 text-green-800'
+                          : item.sentiment_label === 'negative'
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {item.sentiment_label}
+                      </span>
+                    </div>
+                    <p className="text-gray-700 mb-2">{item.review}</p>
+                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                      <span>By {item.reviewerName}</span>
+                      <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+                      <span>Sentiment: {(item.sentiment_score * 100).toFixed(1)}%</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteRating(item.id)}
+                    className="ml-4 p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-full transition-colors"
+                    title="Delete review"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
