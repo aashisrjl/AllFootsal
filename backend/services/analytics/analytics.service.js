@@ -1,6 +1,30 @@
 const { sequelize } = require('../../models');
 const { QueryTypes } = require('sequelize');
 
+const tableExists = async (tableName) => {
+  const result = await sequelize.query(
+    `SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = :tableName`,
+    {
+      replacements: { tableName },
+      type: QueryTypes.SELECT,
+    }
+  );
+  return result[0]?.count > 0;
+};
+
+const queryOrDefault = async (tableNames, query, defaultValue, replacements = {}) => {
+  const exists = await Promise.all(tableNames.map((name) => tableExists(name)));
+  if (!exists.every(Boolean)) {
+    return defaultValue;
+  }
+  try {
+    return await sequelize.query(query, { replacements, type: QueryTypes.SELECT });
+  } catch (error) {
+    console.warn(`Analytics query failed for tables [${tableNames.join(", ")}]:`, error.message);
+    return defaultValue;
+  }
+};
+
 const getAnalyticsData = async (futsalCode) => {
 
   const [
@@ -18,67 +42,76 @@ const getAnalyticsData = async (futsalCode) => {
     totalVisitors
   ] = await Promise.all([
 
-    sequelize.query(
+    queryOrDefault(
+      [`booking_${futsalCode}`],
       `SELECT COUNT(*) as total FROM booking_${futsalCode}`,
-      { type: QueryTypes.SELECT }
+      [{ total: 0 }]
     ),
 
-    sequelize.query(
+    queryOrDefault(
+      [`booking_${futsalCode}`, `timeslot_${futsalCode}`],
       `SELECT SUM(t.price) as revenue 
        FROM booking_${futsalCode} b
        JOIN timeslot_${futsalCode} t ON b.timeslot_id = t.id`,
-      { type: QueryTypes.SELECT }
+      [{ revenue: 0 }]
     ),
 
-    sequelize.query(
-      `SELECT COUNT(DISTINCT user_id) as contactedUsers 
+    queryOrDefault(
+      [`contact_${futsalCode}`],
+      `SELECT COUNT(*) as contactedUsers 
        FROM contact_${futsalCode}`,
-      { type: QueryTypes.SELECT }
+      [{ contactedUsers: 0 }]
     ),
 
-    sequelize.query(
+    queryOrDefault(
+      [`booking_${futsalCode}`, `pitch_${futsalCode}`],
       `SELECT p.name, COUNT(*) as bookings
        FROM booking_${futsalCode} b
        JOIN pitch_${futsalCode} p ON b.pitch_id = p.id
        GROUP BY b.pitch_id
        ORDER BY bookings DESC
        LIMIT 1`,
-      { type: QueryTypes.SELECT }
+      []
     ),
 
-    sequelize.query(
+    queryOrDefault(
+      [`booking_${futsalCode}`, `timeslot_${futsalCode}`],
       `SELECT t.start_time, t.end_time, COUNT(*) as bookings
        FROM booking_${futsalCode} b
        JOIN timeslot_${futsalCode} t ON b.timeslot_id = t.id
        GROUP BY b.timeslot_id
        ORDER BY bookings DESC
        LIMIT 1`,
-      { type: QueryTypes.SELECT }
+      []
     ),
 
-    sequelize.query(
+    queryOrDefault(
+      [`payment_${futsalCode}`],
       `SELECT gateway, COUNT(*) as usage
        FROM payment_${futsalCode}
        GROUP BY gateway
        ORDER BY usage DESC
        LIMIT 1`,
-      { type: QueryTypes.SELECT }
+      []
     ),
 
-    sequelize.query(
+    queryOrDefault(
+      [`ratings_${futsalCode}`],
       `SELECT rating, COUNT(*) as count
        FROM ratings_${futsalCode}
        GROUP BY rating`,
-      { type: QueryTypes.SELECT }
+      []
     ),
 
-    sequelize.query(
+    queryOrDefault(
+      [`ratings_${futsalCode}`],
       `SELECT AVG(rating) as averageRating
        FROM ratings_${futsalCode}`,
-      { type: QueryTypes.SELECT }
+      [{ averageRating: 0 }]
     ),
 
-    sequelize.query(
+    queryOrDefault(
+      [`ratings_${futsalCode}`],
       `SELECT review,
         CASE
           WHEN sentiment_score > 0.5 THEN 'positive'
@@ -87,31 +120,34 @@ const getAnalyticsData = async (futsalCode) => {
         END as sentiment
        FROM ratings_${futsalCode}
        WHERE review IS NOT NULL AND review != ''`,
-      { type: QueryTypes.SELECT }
+      []
     ),
 
-    sequelize.query(
+    queryOrDefault(
+      [`ratings_${futsalCode}`],
       `SELECT review, sentiment_score
        FROM ratings_${futsalCode}
        WHERE sentiment_score > 0.5
        ORDER BY sentiment_score DESC
        LIMIT 5`,
-      { type: QueryTypes.SELECT }
+      []
     ),
 
-    sequelize.query(
+    queryOrDefault(
+      [`ratings_${futsalCode}`],
       `SELECT review, sentiment_score
        FROM ratings_${futsalCode}
        WHERE sentiment_score < 0.5
        ORDER BY sentiment_score ASC
        LIMIT 5`,
-      { type: QueryTypes.SELECT }
+      []
     ),
 
-    sequelize.query(
+    queryOrDefault(
+      [`visit_${futsalCode}`],
       `SELECT COUNT(DISTINCT user_id) as totalVisitors
        FROM visit_${futsalCode}`,
-      { type: QueryTypes.SELECT }
+      [{ totalVisitors: 0 }]
     )
   ]);
 
