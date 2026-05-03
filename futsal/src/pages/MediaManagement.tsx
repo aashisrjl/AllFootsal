@@ -33,14 +33,20 @@ const MediaManagement = () => {
   ];
 
   useEffect(() => {
-    fetchMedia();
-  }, [selectedCategory]);
+    if (futsalProfile?.id) {
+      fetchMedia();
+    }
+  }, [selectedCategory, futsalProfile?.id]);
 
   const fetchMedia = async () => {
+    if (!futsalProfile?.id) {
+      return;
+    }
+
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const futsalId = futsalProfile?.id;
+      const futsalId = futsalProfile.id;
       
       const response = await fetch(
         `${apiBaseUrl}/futsal/${futsalId}/media/?category=${selectedCategory}`,
@@ -121,10 +127,9 @@ const MediaManagement = () => {
       const fileInput = document.getElementById('file-input') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
       
-      setTimeout(() => {
-        fetchMedia();
-        setSuccess(null);
-      }, 1500);
+      // Refresh media immediately after successful upload
+      await fetchMedia();
+      setSuccess(null);
     } catch (err) {
       setError('Failed to upload files. Please try again.');
     } finally {
@@ -328,6 +333,7 @@ const MediaManagement = () => {
                   ) : (
                     <video
                       src={item.url}
+                      controls
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                   )}

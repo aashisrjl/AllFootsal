@@ -654,17 +654,10 @@ const getMediaBycategory = async (req, res) => {
       }
     );
 
-    if (!media || media.length < 1) {
-      return res.status(400).json({
-        success: false,
-        message: "media not found for this category",
-      });
-    }
-
     return res.status(200).json({
       success: true,
       message: "media fetch successfully",
-      data: media,
+      data: media || [],
     });
   } catch (error) {
     return res.status(500).json({
