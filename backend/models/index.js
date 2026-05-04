@@ -126,6 +126,30 @@ db.ForumLike.belongsTo(db.ForumReply, {
   foreignKey: "reply_id"
 });
 
+// Forum → User
+db.Forum.belongsTo(db.User, {
+  foreignKey: "user_id",
+  as: "user"
+});
+
+// User → Forum
+db.User.hasMany(db.Forum, {
+  foreignKey: "user_id",
+  as: "forums"
+});
+
+// Forum → Footsal
+db.Forum.belongsTo(db.Footsal, {
+  foreignKey: "futsal_id",
+  as: "futsal"
+});
+
+// Footsal → Forum
+db.Footsal.hasMany(db.Forum, {
+  foreignKey: "futsal_id",
+  as: "forums"
+});
+
 // Notifications
 db.UserNotification = require("./notifications/userNotificationModel")(sequelize, DataTypes);
 db.FutsalNotification = require("./notifications/futsalNotificationModel")(sequelize, DataTypes);

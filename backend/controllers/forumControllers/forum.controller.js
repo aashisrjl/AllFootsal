@@ -1,5 +1,5 @@
 //create 
-const { Forum } = require('../../models');
+const { Forum, User } = require('../../models');
 
 const createForum = async (req,res)=>{
     const {title, content,slug, category} = req.body;
@@ -84,16 +84,28 @@ const getForumsByFutsalId = async (req,res)=>{
             message:"Futsal ID is required"});
     }
     try {
-        const forums = await Forum.findAll({where:{futsal_id:futsalId}});
+        const forums = await Forum.findAll({
+            where:{futsal_id:futsalId},
+            include: [{
+                model: User,
+                as: 'user',
+                attributes: ['username']
+            }]
+        });
         if(forums.length === 0){
             return res.status(404).json({
                 success:false,
                 message:"No forums found for this futsal"});
         }
+        // Map to include user_name
+        const forumsWithUser = forums.map(forum => ({
+            ...forum.toJSON(),
+            user_name: forum.user?.username || 'Anonymous'
+        }));
         res.status(200).json({  
             success:true,
             message:"Forums fetched successfully",
-            data:forums
+            data:forumsWithUser
         });
     } catch (error) {
         console.error("Error fetching forums by futsal ID:", error);

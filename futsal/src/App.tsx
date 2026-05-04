@@ -6,6 +6,7 @@ import PitchManagement from './pages/PitchManagement';
 import MediaManagement from './pages/MediaManagement';
 import Revenue from './pages/Revenue';
 import Ratings from './pages/Ratings';
+import Forums from './pages/Forums';
 import Settings from './pages/Settings';
 import Subscription from './pages/Subscription';
 import Layout from './components/Layout';
@@ -58,6 +59,7 @@ function App() {
                     <Route path="/pitches" element={<PitchManagement />} />
                     <Route path="/media" element={<MediaManagement />} />
                     <Route path="/ratings" element={<Ratings />} />
+                    <Route path="/forums" element={<Forums />} />
                     <Route path="/revenue" element={<Revenue />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/subscription" element={<Subscription />} />
