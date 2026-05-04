@@ -113,7 +113,7 @@ module.exports = {
     CREATE TABLE IF NOT EXISTS media_${code} (
       id INT AUTO_INCREMENT PRIMARY KEY,
       type ENUM('image','video') NOT NULL,
-      category ENUM('home','pitch','facility','event','other','logo','banner') NOT NULL,
+      category VARCHAR(50) NOT NULL,
       url VARCHAR(500) NOT NULL,
       description TEXT,
       pitch_id INT,

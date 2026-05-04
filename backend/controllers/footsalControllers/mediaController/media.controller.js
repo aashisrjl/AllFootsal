@@ -28,13 +28,20 @@ const ensureMediaTableExists = async (code) => {
     CREATE TABLE IF NOT EXISTS media_${code} (
       id INT AUTO_INCREMENT PRIMARY KEY,
       type ENUM('image','video') NOT NULL,
-      category ENUM('home','pitch','facility','event','other','logo','banner') NOT NULL,
+      category VARCHAR(50) NOT NULL,
       url VARCHAR(500) NOT NULL,
       description TEXT,
       pitch_id INT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;
   `);
+
+  // Ensure existing tables are updated to VARCHAR to avoid "Data truncated" errors when new categories are added
+  try {
+    await sequelize.query(`ALTER TABLE media_${code} MODIFY COLUMN category VARCHAR(50) NOT NULL`);
+  } catch (error) {
+    // If table doesn't exist or column is already fixed, ignore
+  }
 };
 
 const uploadMedia = async (req, res) => {
@@ -793,5 +800,7 @@ module.exports = {
   uploadFacilitiesMediaByPitchId,
   deleteMediaByCategory,
   deleteMediaById,
-  getMediaBycategory
+  getMediaBycategory,
+  uploadLogo,
+  uploadBanner
 };
