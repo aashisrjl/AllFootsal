@@ -35,6 +35,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'Pitch Management', href: '/pitches', icon: MapPin },
     { name: 'Media Management', href: '/media', icon: ImageIcon },
     { name: 'Ratings', href: '/ratings', icon: MessageSquare },
+    { name: 'Your Forums', href: '/forums', icon: MessageSquare },
     { name: 'Revenue', href: '/revenue', icon: DollarSign },
     { name: 'Subscription', href: '/subscription', icon: Wallet },
     { name: 'Notifications', href: '/notifications', icon: Bell },
