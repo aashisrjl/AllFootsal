@@ -239,6 +239,104 @@ const deleteReplyLike = async (req, res) => {
   }
 };
 
+// toggle forum like
+const toggleForumLike = async (req, res) => {
+  const forumId = req.params.forumId;
+  const userId = req?.userId;
+  const futsalId = req?.futsalId;
+
+  if (!forumId) {
+    return res.status(400).json({ success: false, message: "Forum ID is required" });
+  }
+
+  try {
+    let existingLike;
+    if (userId) {
+      existingLike = await ForumLike.findOne({ where: { forum_id: forumId, user_id: userId } });
+    } else if (futsalId) {
+      existingLike = await ForumLike.findOne({ where: { forum_id: forumId, futsal_id: futsalId } });
+    }
+
+    if (existingLike) {
+      await existingLike.destroy();
+      return res.status(200).json({
+        success: true,
+        message: "Unliked successfully",
+        action: "unliked",
+        data: { forumId }
+      });
+    } else {
+      const newLike = await ForumLike.create({
+        forum_id: forumId,
+        user_id: userId,
+        futsal_id: futsalId,
+      });
+      return res.status(201).json({
+        success: true,
+        message: "Liked successfully",
+        action: "liked",
+        data: newLike,
+      });
+    }
+  } catch (err) {
+    console.error("Error toggling forum like:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Error toggling like",
+      error: err.message,
+    });
+  }
+};
+
+// toggle reply like
+const toggleReplyLike = async (req, res) => {
+  const replyId = req.params.replyId;
+  const userId = req?.userId;
+  const futsalId = req?.futsalId;
+
+  if (!replyId) {
+    return res.status(400).json({ success: false, message: "Reply ID is required" });
+  }
+
+  try {
+    let existingLike;
+    if (userId) {
+      existingLike = await ForumLike.findOne({ where: { reply_id: replyId, user_id: userId } });
+    } else if (futsalId) {
+      existingLike = await ForumLike.findOne({ where: { reply_id: replyId, futsal_id: futsalId } });
+    }
+
+    if (existingLike) {
+      await existingLike.destroy();
+      return res.status(200).json({
+        success: true,
+        message: "Unliked successfully",
+        action: "unliked",
+        data: { replyId }
+      });
+    } else {
+      const newLike = await ForumLike.create({
+        reply_id: replyId,
+        user_id: userId,
+        futsal_id: futsalId,
+      });
+      return res.status(201).json({
+        success: true,
+        message: "Liked successfully",
+        action: "liked",
+        data: newLike,
+      });
+    }
+  } catch (err) {
+    console.error("Error toggling reply like:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Error toggling like",
+      error: err.message,
+    });
+  }
+};
+
 module.exports = {
   createForumLike,
   createReplyLike,
@@ -246,4 +344,6 @@ module.exports = {
   countLikesByReplyId,
   deleteForumLike,
   deleteReplyLike,
+  toggleForumLike,
+  toggleReplyLike
 };

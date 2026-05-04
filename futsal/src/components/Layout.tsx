@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Building2, 
-  Calendar, 
-  MapPin, 
+import {
+  LayoutDashboard,
+  Building2,
+  Calendar,
+  MapPin,
   DollarSign,
   Wallet,
   Settings,
@@ -34,7 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'Bookings', href: '/bookings', icon: Calendar },
     { name: 'Pitch Management', href: '/pitches', icon: MapPin },
     { name: 'Media Management', href: '/media', icon: ImageIcon },
-    { name: 'Ratings', href: '/ratings', icon: MessageSquare },
+    { name: 'Ratings & Reviews', href: '/ratings', icon: MessageSquare },
     { name: 'Your Forums', href: '/forums', icon: MessageSquare },
     { name: 'Revenue', href: '/revenue', icon: DollarSign },
     { name: 'Subscription', href: '/subscription', icon: Wallet },
@@ -67,36 +67,35 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="flex h-16 items-center justify-center border-b border-slate-800/80 px-4 relative">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)]">
-             <span className="font-bold text-white text-lg leading-none pt-0.5">F</span>
+            <span className="font-bold text-white text-lg leading-none pt-0.5">F</span>
           </div>
           <h1 className="text-xl font-black tracking-tight bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent uppercase pt-0.5">
             Owner Panel
           </h1>
         </div>
         {/* Mobile close button */}
-        <button 
+        <button
           onClick={() => setIsSidebarOpen(false)}
           className="lg:hidden absolute right-4 p-2 text-slate-400 hover:text-white"
         >
           <X className="h-6 w-6" />
         </button>
       </div>
-      
+
       <nav className="mt-8 px-4 flex-1 overflow-y-auto">
         <ul className="space-y-2">
           {navigation.map((item) => {
             const Icon = item.icon;
             const isActive = isNavItemActive(item.href);
-            
+
             return (
               <li key={item.name}>
                 <Link
                   to={item.href}
-                  className={`flex items-center rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 ${
-                    isActive
+                  className={`flex items-center rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 ${isActive
                       ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-inner'
                       : 'text-slate-400 border border-transparent hover:bg-slate-800/50 hover:text-slate-200'
-                  }`}
+                    }`}
                 >
                   <Icon className={`mr-3 h-5 w-5 transition-transform ${isActive ? 'text-emerald-400 scale-110' : 'text-slate-500'}`} />
                   {item.name}
@@ -108,9 +107,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </nav>
 
       <div className="p-4 border-t border-slate-800/50">
-        <button 
-           onClick={logout}
-           className="flex w-full items-center rounded-xl px-4 py-3 text-sm font-semibold text-slate-400 transition-colors border border-transparent hover:bg-slate-800/50 hover:text-rose-400 group">
+        <button
+          onClick={logout}
+          className="flex w-full items-center rounded-xl px-4 py-3 text-sm font-semibold text-slate-400 transition-colors border border-transparent hover:bg-slate-800/50 hover:text-rose-400 group">
           <LogOut className="mr-3 h-5 w-5 text-slate-500 group-hover:text-rose-400 transition-colors" />
           Logout
         </button>
@@ -121,8 +120,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-[#0a0f1c] text-slate-200 font-sans selection:bg-emerald-500/30">
       {/* Dynamic Background Glyphs */}
-       <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none z-0" />
-       <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none z-0" />
+      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none z-0" />
+      <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none z-0" />
 
       {/* Desktop Sidebar */}
       <aside className="hidden lg:block fixed inset-y-0 left-0 z-50 w-64 bg-slate-900/60 backdrop-blur-xl border-r border-slate-800 shadow-2xl">
@@ -161,7 +160,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {/* Mobile menu toggle */}
-              <button 
+              <button
                 onClick={() => setIsSidebarOpen(true)}
                 className="lg:hidden p-2 rounded-xl bg-slate-800/50 text-slate-300 hover:text-white transition-colors"
               >
@@ -191,7 +190,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
           </div>
         </header>
-        
+
         <main className="flex-1 p-4 lg:p-8 relative z-10">
           {children}
         </main>

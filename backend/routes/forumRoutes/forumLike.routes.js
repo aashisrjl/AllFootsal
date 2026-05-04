@@ -1,18 +1,18 @@
 const express = require('express')
-const { createForumLike, createReplyLike, countLikesByForumId, countLikesByReplyId, deleteForumLike, deleteReplyLike } = require('../../controllers/forumControllers/forumLike.controller')
+const { toggleForumLike, toggleReplyLike, countLikesByForumId, countLikesByReplyId, deleteForumLike, deleteReplyLike } = require('../../controllers/forumControllers/forumLike.controller')
 const isBothAuthenticated = require('../../middleware/authMiddleware/bothAuthenticated')
 const router = express.Router()
 
 router.post(
     '/forum/:forumId/create/like', // #swagger.tags=['Forum/Like']
     isBothAuthenticated,
-    createForumLike
+    toggleForumLike
 )
 
 router.post(
     '/forum/reply/:replyId/create/like', // #swagger.tags=['Forum/Like']
     isBothAuthenticated,
-    createReplyLike
+    toggleReplyLike
 )
 
 router.get(
