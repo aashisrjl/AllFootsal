@@ -90,7 +90,8 @@ const ForumsAndPosts = () => {
           {forums.map((forum) => (
             <div
               key={forum.id}
-              className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 hover:bg-slate-800/70 transition-colors"
+              onClick={() => window.open(`http://localhost:3001/forum/${forum.id}`, '_blank')}
+              className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 hover:bg-slate-800/70 transition-colors cursor-pointer"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">

@@ -106,6 +106,30 @@ db.ForumReply.belongsTo(db.Forum, {
   foreignKey: "forum_id"
 });
 
+// ForumReply → User
+db.ForumReply.belongsTo(db.User, {
+  foreignKey: "user_id",
+  as: "user"
+});
+
+// User → ForumReply
+db.User.hasMany(db.ForumReply, {
+  foreignKey: "user_id",
+  as: "replies"
+});
+
+// ForumReply → Footsal
+db.ForumReply.belongsTo(db.Footsal, {
+  foreignKey: "footsal_id",
+  as: "futsal"
+});
+
+// Footsal → ForumReply
+db.Footsal.hasMany(db.ForumReply, {
+  foreignKey: "footsal_id",
+  as: "replies"
+});
+
 // Forum → ForumLike
 db.Forum.hasMany(db.ForumLike, {
   foreignKey: "forum_id",
