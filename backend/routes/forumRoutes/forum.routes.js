@@ -24,7 +24,7 @@ router.get(
 )
 
 router.get(
-    '/forum/futsal0', // #swagger.tags=['Forum']
+    '/forum/futsal', // #swagger.tags=['Forum']
     isFutsalAuthenticated,
     getForumsByFutsalId
 )

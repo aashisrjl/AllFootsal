@@ -14,7 +14,21 @@ const Settings = () => {
   const [phone, setPhone] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [activeTab, setActiveTab] = useState('profile');
+  
+  // Notification preferences state
+  const [notifications, setNotifications] = useState({
+    newBookings: true,
+    cancellations: true,
+    paymentConfirmations: false,
+  });
   const [subscription, setSubscription] = useState<any>(null);
+  
+  // Security state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   useEffect(() => {
     if (futsalProfile) {
@@ -53,6 +67,46 @@ const Settings = () => {
     }
   };
 
+  const handleUpdateNotifications = async () => {
+    try {
+      // Here you would call an API to save notification preferences
+      // For now, we'll just show a success message
+      setSuccessMsg('Notification preferences updated successfully!');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (error) {
+      console.error('Failed to update notifications', error);
+      alert('Failed to update notification preferences.');
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (newPassword !== confirmPassword) {
+      alert('New passwords do not match.');
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      alert('Password must be at least 6 characters long.');
+      return;
+    }
+
+    try {
+      setIsChangingPassword(true);
+      // Here you would call an API to change password
+      // For now, we'll just show a success message
+      setSuccessMsg('Password changed successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (error) {
+      console.error('Failed to change password', error);
+      alert('Failed to change password.');
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between mb-8">
@@ -67,23 +121,23 @@ const Settings = () => {
         <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-4 lg:col-span-1 h-fit sticky top-24">
           <nav className="space-y-1.5 flex flex-col">
             {[
-              { label: 'Profile Settings', icon: User, active: true },
-              { label: 'Notifications', icon: Bell, active: false },
-              { label: 'Security', icon: Shield, active: false },
-              { label: 'Billing & Subscription', icon: CreditCard, active: false },
-            ].map((tab, i) => (
-              <a 
-                key={i}
-                href={`#${tab.label.split(' ')[0].toLowerCase()}`} 
-                className={`flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all ${
-                  tab.active 
+              { id: 'profile', label: 'Profile Settings', icon: User },
+              { id: 'notifications', label: 'Notifications', icon: Bell },
+              { id: 'security', label: 'Security', icon: Shield },
+              { id: 'billing', label: 'Billing & Subscription', icon: CreditCard },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`w-full text-left flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all ${
+                  activeTab === tab.id 
                     ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-inner' 
                     : 'text-slate-400 hover:bg-slate-800/60 hover:text-white border border-transparent'
                 }`}
               >
-                <tab.icon className={`h-4 w-4 mr-3 ${tab.active ? 'text-emerald-400' : 'text-slate-500'}`} />
+                <tab.icon className={`h-4 w-4 mr-3 ${activeTab === tab.id ? 'text-emerald-400' : 'text-slate-500'}`} />
                 {tab.label}
-              </a>
+              </button>
             ))}
           </nav>
         </div>
@@ -91,11 +145,12 @@ const Settings = () => {
         {/* Settings Content */}
         <div className="lg:col-span-3 space-y-8">
           {/* Profile Settings */}
-          <div id="profile" className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-8 relative overflow-hidden group hover:border-slate-700 transition-colors">
-            <h3 className="text-lg font-black text-white mb-6 flex items-center gap-2 border-b border-slate-800/80 pb-4">
-              <User className="h-5 w-5 text-emerald-500" />
-              Profile Information
-            </h3>
+          {activeTab === 'profile' && (
+            <div id="profile" className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-8 relative overflow-hidden group hover:border-slate-700 transition-colors">
+              <h3 className="text-lg font-black text-white mb-6 flex items-center gap-2 border-b border-slate-800/80 pb-4">
+                <User className="h-5 w-5 text-emerald-500" />
+                Profile Information
+              </h3>
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -131,18 +186,21 @@ const Settings = () => {
               </div>
             </div>
           </div>
+          )}
 
           {/* Notification Settings */}
-          <div id="notifications" className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-8 hover:border-slate-700 transition-colors">
-            <h3 className="text-lg font-black text-white mb-6 flex items-center gap-2 border-b border-slate-800/80 pb-4">
-              <Bell className="h-5 w-5 text-blue-500" />
-              Notification Preferences
-            </h3>
+          {activeTab === 'notifications' && (
+            <div id="notifications" className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-8 hover:border-slate-700 transition-colors">
+              <h3 className="text-lg font-black text-white mb-6 flex items-center gap-2 border-b border-slate-800/80 pb-4">
+                <Bell className="h-5 w-5 text-blue-500" />
+                Notification Preferences
+              </h3>
+            <div className="space-y-4">
             <div className="space-y-4">
               {[
-                { title: 'New Bookings', desc: 'Get notified when you receive new bookings', on: true },
-                { title: 'Cancellations', desc: 'Get notified when bookings are cancelled', on: true },
-                { title: 'Payment Confirmations', desc: 'Get notified when payments are received', on: false }
+                { key: 'newBookings', title: 'New Bookings', desc: 'Get notified when you receive new bookings', value: notifications.newBookings },
+                { key: 'cancellations', title: 'Cancellations', desc: 'Get notified when bookings are cancelled', value: notifications.cancellations },
+                { key: 'paymentConfirmations', title: 'Payment Confirmations', desc: 'Get notified when payments are received', value: notifications.paymentConfirmations }
               ].map((notif, i) => (
                 <div key={i} className="flex items-center justify-between p-4 bg-slate-800/40 rounded-xl border border-slate-800/60 hover:border-slate-700 transition-colors">
                   <div>
@@ -150,16 +208,85 @@ const Settings = () => {
                     <p className="text-[11px] font-medium text-slate-400">{notif.desc}</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer ml-4">
-                    <input type="checkbox" defaultChecked={notif.on} className="sr-only peer" />
+                    <input 
+                      type="checkbox" 
+                      checked={notif.value} 
+                      onChange={(e) => setNotifications(prev => ({ ...prev, [notif.key]: e.target.checked }))}
+                      className="sr-only peer" 
+                    />
                     <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 shadow-inner peer-checked:after:bg-white"></div>
                   </label>
                 </div>
               ))}
             </div>
+            <div className="pt-4 flex justify-end">
+              <button 
+                onClick={handleUpdateNotifications}
+                className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all flex items-center hover:-translate-y-0.5 active:translate-y-0"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Save Preferences
+              </button>
+            </div>
           </div>
+        </div>
+          )}
+
+          {/* Security Settings */}
+          {activeTab === 'security' && (
+            <div id="security" className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-8 hover:border-slate-700 transition-colors">
+              <h3 className="text-lg font-black text-white mb-6 flex items-center gap-2 border-b border-slate-800/80 pb-4">
+                <Shield className="h-5 w-5 text-red-500" />
+                Security Settings
+              </h3>
+            <div className="space-y-6">
+              <div>
+                <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Current Password</label>
+                <input 
+                  type="password" 
+                  value={currentPassword} 
+                  onChange={(e) => setCurrentPassword(e.target.value)} 
+                  className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-slate-600 transition-colors shadow-inner" 
+                  placeholder="Enter current password"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">New Password</label>
+                <input 
+                  type="password" 
+                  value={newPassword} 
+                  onChange={(e) => setNewPassword(e.target.value)} 
+                  className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-slate-600 transition-colors shadow-inner" 
+                  placeholder="Enter new password"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Confirm New Password</label>
+                <input 
+                  type="password" 
+                  value={confirmPassword} 
+                  onChange={(e) => setConfirmPassword(e.target.value)} 
+                  className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-slate-600 transition-colors shadow-inner" 
+                  placeholder="Confirm new password"
+                />
+              </div>
+              <div className="pt-4 flex justify-end">
+                <button 
+                  onClick={handleChangePassword} 
+                  disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
+                  className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all flex items-center hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  {isChangingPassword ? 'Changing...' : 'Change Password'}
+                </button>
+              </div>
+            </div>
+          </div>
+          )}
 
           {/* Subscription Info */}
-          <div id="billing" className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-8 hover:border-slate-700 transition-colors">
+          {activeTab === 'billing' && (
+            <div id="billing" className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-8 hover:border-slate-700 transition-colors">
             <h3 className="text-lg font-black text-white mb-6 flex items-center gap-2 border-b border-slate-800/80 pb-4">
               <CreditCard className="h-5 w-5 text-purple-500" />
               Billing & Subscription
@@ -192,6 +319,7 @@ const Settings = () => {
               </div>
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>

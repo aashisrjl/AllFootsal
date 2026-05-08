@@ -10,28 +10,28 @@ module.exports = (sequelize, DataTypes) => {
 
     user_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      References: {
+      references: {
         model: "users",
         key: "id",
       },
+      allowNull: true
     },
     footsal_id: {
       type: DataTypes.INTEGER,
-      allowNull: true,
-         References: {
+      references: {
         model: "footsals",
         key: "id",
       },
+      allowNull: true
     },
 
     forum_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-        References: {
+      references: {
         model: "forums",
         key: "id",
-        }
+      }
     },
   });
 
