@@ -3,13 +3,14 @@ services:
     build: .
     container_name: futsal-backend
     restart: always
-    # Load app/env vars solely from docker-mariadb-pma/.env
     env_file:
       - .env
     ports:
       - "${PORT:-3000}:3000"
     networks:
       - services
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 networks:
   services:

@@ -1,5 +1,6 @@
 const { sequelize, Footsal } = require("../../../models");
 const { QueryTypes } = require("sequelize");
+const { ML_URL } = process.env;
 // import axios
 const axios = require("axios");
 
@@ -82,7 +83,7 @@ const postRating = async (req, res) => {
     }
 
     // check the sentiment of the review
-    const sentiment = await axios.get("http://localhost:8000/api/sentiment/predict", {
+    const sentiment = await axios.get(ML_URL + "/api/sentiment/predict", {
       params: { text: review },
     });
     console.log(sentiment.data);
@@ -138,7 +139,7 @@ const updateRating = async (req, res) => {
       });
     }
     // check the sentiment of the review
-    const sentiment = await axios.get("http://localhost:8000/api/sentiment/predict", {
+    const sentiment = await axios.get(ML_URL + "/api/sentiment/predict", {
       params: { text: review },
     });
     console.log(sentiment.data);
