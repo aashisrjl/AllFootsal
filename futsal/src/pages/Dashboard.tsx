@@ -27,7 +27,15 @@ const Dashboard = () => {
 
         if (bookingsRes?.success) {
           const bookings = bookingsRes.data;
-          const todayDate = new Date().toISOString().split('T')[0];
+          
+          const getLocalDateString = (d: Date) => {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+          };
+
+          const todayDate = getLocalDateString(new Date());
           
           const todays = bookings.filter((b: any) => b.booking_date?.split('T')[0] === todayDate).map((b: any) => ({
             time: `${b.start_time?.substring(0, 5) || ''} - ${b.end_time?.substring(0, 5) || ''}`,
@@ -44,7 +52,7 @@ const Dashboard = () => {
           for (let i = 6; i >= 0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
-            const dateStr = d.toISOString().split('T')[0];
+            const dateStr = getLocalDateString(d);
             tempWeekly[dateStr] = {
               day: days[d.getDay()],
               value: 0

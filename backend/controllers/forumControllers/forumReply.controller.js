@@ -47,10 +47,37 @@ const createForumReply = async (req,res)=>{
                 const forumOwner = await User.findByPk(forum.user_id);
                 recipientEmail = forumOwner?.email || null;
                 recipientName = forumOwner?.username || recipientName;
+
+                // Fire in-app user notification if someone else replied
+                if (forum.user_id != userId) {
+                    const { createUserNotification } = require("../../services/notifications/notificationService");
+                    await createUserNotification({
+                        userId: forum.user_id,
+                        type: "forum_reply",
+                        title: "New Reply on Your Post 💬",
+                        message: `Someone replied: "${content.substring(0, 50)}${content.length > 50 ? '...' : ''}"`,
+                        relatedId: forum.id,
+                        relatedType: "forum_reply",
+                    }).catch(console.error);
+                }
+
             } else if (forum.futsal_id) {
                 const forumOwner = await Footsal.findByPk(forum.futsal_id);
                 recipientEmail = forumOwner?.email || null;
                 recipientName = forumOwner?.futsalName || recipientName;
+
+                // Fire in-app futsal notification if someone else replied
+                if (forum.futsal_id != futsalId) {
+                    const { createFutsalNotification } = require("../../services/notifications/notificationService");
+                    await createFutsalNotification({
+                        futsalId: forum.futsal_id,
+                        type: "forum_reply",
+                        title: "New Forum Reply 💬",
+                        message: `Someone replied to your post: "${content.substring(0, 50)}${content.length > 50 ? '...' : ''}"`,
+                        relatedId: forum.id,
+                        relatedType: "forum_reply",
+                    }).catch(console.error);
+                }
             }
 
             if (recipientEmail) {

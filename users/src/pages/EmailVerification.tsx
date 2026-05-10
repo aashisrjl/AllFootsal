@@ -27,7 +27,9 @@ const Button: React.FC<ButtonProps> = ({ children, onClick, disabled, className,
         className={`px-4 py-2 font-semibold rounded-lg transition-all duration-300 ${className} ${
             disabled ? 'opacity-50 cursor-not-allowed' : ''
         } ${
-            variant === 'outline' ? 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50' : 'bg-green-600 text-white hover:bg-green-700'
+            variant === 'outline' 
+              ? 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700' 
+              : 'bg-green-600 text-white hover:bg-green-700 dark:bg-emerald-600 dark:hover:bg-emerald-700'
         }`}
     >
         {children}
@@ -56,7 +58,7 @@ const Input: React.FC<InputProps> = ({ id, type, placeholder, value, onChange, r
         value={value}
         onChange={onChange}
         required={required}
-        className={`w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${className}`}
+        className={`w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-emerald-500 ${className}`}
     />
 );
 
@@ -65,7 +67,7 @@ interface LabelProps {
 }
 
 const Label: React.FC<LabelProps> = ({ children }) => (
-    <label className="block text-sm font-medium text-gray-700 mb-1">{children}</label>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{children}</label>
 );
 
 
@@ -153,7 +155,7 @@ const EmailVerification: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-white to-green-100"
+      className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-white to-green-100 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800"
       style={{
         backgroundImage: `url(${AuthBackground})`,
         backgroundSize: "cover",
@@ -161,7 +163,7 @@ const EmailVerification: React.FC = () => {
       }}
     >
       <main className="flex flex-1 items-center justify-center py-10 px-4 mt-8">
-        <div className="bg-white/90 backdrop-blur-lg shadow-2xl rounded-3xl flex flex-col md:flex-row overflow-hidden max-w-5xl w-full border border-green-100">
+        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg shadow-2xl rounded-3xl flex flex-col md:flex-row overflow-hidden max-w-5xl w-full border border-green-100 dark:border-slate-800">
           {/* Left Section (OTP Form) */}
           <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
             {/* Logo */}
@@ -178,7 +180,7 @@ const EmailVerification: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={() => navigate(-1)}
-                className="flex items-center bg-green-200 gap-1 w-auto px-3 py-1"
+                className="flex items-center bg-green-200 dark:bg-emerald-900/30 gap-1 w-auto px-3 py-1 border-none"
               >
                 <ArrowLeft size={16} /> Back
               </Button>
@@ -186,11 +188,11 @@ const EmailVerification: React.FC = () => {
 
             {/* OTP Verification Content */}
             <>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                   Verify Account
                 </h2>
-                <p className="text-gray-600 mb-6">
-                  Please enter the 6-digit OTP sent to <b>{email}</b>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  Please enter the 6-digit OTP sent to <b className="text-gray-900 dark:text-gray-200">{email}</b>
                 </p>
 
                 <div className="space-y-5 mt-6">
@@ -210,19 +212,19 @@ const EmailVerification: React.FC = () => {
                   <Button
                     onClick={handleVerifyOTP}
                     disabled={isLoading || otp.length !== 6}
-                    className="w-full h-11 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all duration-300"
+                    className="w-full h-11 bg-green-600 hover:bg-green-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-semibold rounded-lg transition-all duration-300"
                   >
                     {isLoading ? "Verifying..." : "Verify OTP"}
                   </Button>
 
-                  <div className="text-center text-sm text-gray-600">
+                  <div className="text-center text-sm text-gray-600 dark:text-gray-400">
                     {resendTimer > 0 ? (
                       <p>Resend OTP in {resendTimer}s</p>
                     ) : (
                       <button
                         onClick={handleResendOTP}
                         disabled={isLoading}
-                        className={`font-semibold ${isLoading ? 'text-gray-400' : 'text-green-600 hover:underline'}`}
+                        className={`font-semibold ${isLoading ? 'text-gray-400 dark:text-gray-600' : 'text-green-600 hover:underline dark:text-emerald-400'}`}
                       >
                         Resend OTP
                       </button>
@@ -233,12 +235,12 @@ const EmailVerification: React.FC = () => {
           </div>
 
           {/* Right Illustration */}
-          <div className="hidden md:flex w-1/2 bg-white justify-center items-center">
+          <div className="hidden md:flex w-1/2 bg-white dark:bg-slate-900 border-l border-green-100 dark:border-slate-800 justify-center items-center">
             {/* The illustration remains, showing the OTP theme */}
             <img
               src={OTPIllustration}
               alt="OTP Illustration"
-              className="w-96 h-auto object-contain p-8"
+              className="w-96 h-auto object-contain p-8 dark:opacity-90"
             />
           </div>
         </div>

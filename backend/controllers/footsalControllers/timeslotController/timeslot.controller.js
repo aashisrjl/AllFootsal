@@ -21,15 +21,29 @@ const getTimeslot = async(req,res)=>{
             error: "futsal code is required"
         });
     }
-    const {pitch_id, day_of_week} = req.query;
+    const {pitch_id, day_of_week, date} = req.query;
 
     if(!pitch_id || day_of_week === undefined){
         return res.status(400).json({error: "pitch_id and day_of_week are required"});
     }
 
-    const query = `SELECT * FROM timeslot_${code} WHERE pitch_id = :pitch_id AND day_of_week = :day_of_week`;
+    let query = `SELECT * FROM timeslot_${code} WHERE pitch_id = :pitch_id AND day_of_week = :day_of_week`;
+    
+    if (date) {
+        query = `
+            SELECT t.*, 
+                   IF(b.id IS NOT NULL, 1, 0) AS is_actually_booked
+            FROM timeslot_${code} t
+            LEFT JOIN booking_${code} b 
+                   ON t.id = b.timeslot_id 
+                  AND b.booking_date = :date 
+                  AND b.status != 'cancelled'
+            WHERE t.pitch_id = :pitch_id AND t.day_of_week = :day_of_week
+        `;
+    }
+
     sequelize.query(query, {
-        replacements: { pitch_id, day_of_week },
+        replacements: { pitch_id, day_of_week, date },
         type: QueryTypes.SELECT,
     })
     .then(timeslots => {

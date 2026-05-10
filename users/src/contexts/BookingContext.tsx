@@ -45,7 +45,7 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
       const d = new Date(date);
       const dayOfWeek = d.getDay() + 1; // Maps JS getDay (0=Sun, 6=Sat) to MySQL DAYOFWEEK (1=Sun, 7=Sat)
       
-      const res = await getFutsalTimeSlots(facilityId, pitchId, dayOfWeek);
+      const res = await getFutsalTimeSlots(facilityId, pitchId, dayOfWeek, date);
       const slotsArray = res.timeslots || [];
       
       const formattedSlots: TimeSlot[] = slotsArray.map((t: any) => ({
@@ -55,7 +55,8 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
         startTime: t.start_time.substring(0, 5), // "07:00:00" -> "07:00"
         endTime: t.end_time.substring(0, 5),
         date: date,
-        isBooked: t.is_available === 0,
+        // It's unavailable if the time slot definition is inactive OR if there is an actual booking overlapping
+        isBooked: t.is_available === 0 || t.is_actually_booked === 1,
         isEnabled: true
       }));
 
