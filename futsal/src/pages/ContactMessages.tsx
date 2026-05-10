@@ -33,9 +33,15 @@ const ContactMessages = () => {
       setLoading(true);
       setError(null);
       const res = await getContactMessages();
-      setMessages(res?.data || []);
+      if (res?.success) {
+        setMessages(res?.data || []);
+      } else {
+        setError(res?.message || 'Failed to load messages');
+      }
     } catch (err: any) {
-      setError(err?.response?.data?.message || 'Failed to load messages');
+      const status = err?.response?.status;
+      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.message || 'Failed to load messages';
+      setError(status ? `Error ${status}: ${msg}` : msg);
     } finally {
       setLoading(false);
     }

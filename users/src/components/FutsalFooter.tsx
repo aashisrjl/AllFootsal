@@ -34,12 +34,12 @@ export default function FutsalFooter() {
 
   const info = infoData?.data?.[0];
   const loc = locData?.data?.[0];
-  
+
   const logoData = Array.isArray(logoMedia) ? logoMedia : logoMedia?.data;
   const logoUrl = logoData?.[0]?.url || logoData?.[0]?.media_url;
 
   const socialLinks = info?.social_links ? safelyParse(info.social_links) : null;
-  
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
@@ -48,7 +48,7 @@ export default function FutsalFooter() {
       await sendContactMessage(id, message);
       toast.success("Message sent successfully!");
       setMessage("");
-    } catch(err) {
+    } catch (err) {
       toast.error("Failed to send message. Please log in or try again.");
     } finally {
       setIsSending(false);
@@ -56,18 +56,18 @@ export default function FutsalFooter() {
   };
 
   const handleNav = (hash: string) => {
-      if (hash === 'gallery') {
-          navigate(`/futsals/${id}/gallery`);
-          return;
-      }
-      if (location.pathname !== `/futsals/${id}`) {
-          navigate(`/futsals/${id}#${hash}`);
-          setTimeout(() => {
-              document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 300);
-      } else {
-          document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+    if (hash === 'gallery') {
+      navigate(`/futsals/${id}/gallery`);
+      return;
+    }
+    if (location.pathname !== `/futsals/${id}`) {
+      navigate(`/futsals/${id}#${hash}`);
+      setTimeout(() => {
+        document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+    } else {
+      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
   return (
@@ -80,19 +80,19 @@ export default function FutsalFooter() {
               <img
                 src={logoUrl}
                 alt={`${futsal.futsalName} Logo`}
-                className="h-20 w-auto object-contain mb-5 transition-transform duration-300 hover:scale-105 bg-white/10 rounded-2xl p-2 backdrop-blur-sm"
+                className="h-20 w-32 flex"
               />
             ) : (
-                <div className="h-20 w-20 flex items-center justify-center bg-emerald-500 text-white font-extrabold text-3xl rounded-2xl mb-5 shadow-lg shadow-emerald-500/30">
-                    {futsal.futsalName?.charAt(0) || "F"}
-                </div>
+              <div className="h-20 w-auto flex items-center justify-center bg-emerald-500 text-white font-extrabold text-3xl rounded-2xl mb-5 shadow-lg shadow-emerald-500/30">
+                {futsal.futsalName?.charAt(0) || "F"}
+              </div>
             )}
-            
+
             <h3 className="text-xl font-bold mb-3 text-emerald-400">{futsal.futsalName}</h3>
             <p className="text-slate-300/80 mb-4 leading-relaxed text-sm">
               {info?.additional_info?.substring(0, 120)}{info?.additional_info?.length > 120 ? "..." : ""}
             </p>
-            
+
             <div className="flex gap-4">
               {socialLinks?.facebook && (
                 <a href={socialLinks.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className="text-white/70 hover:text-[#1877F2] transition hover:scale-110">
@@ -115,7 +115,7 @@ export default function FutsalFooter() {
           {/* Column 2: Quick Links */}
           <div>
             <h4 className="text-lg font-bold mb-5 flex items-center gap-2">
-                <span className="w-8 h-1 bg-emerald-500 rounded-full"></span> Quick Links
+              <span className="w-8 h-1 bg-emerald-500 rounded-full"></span> Quick Links
             </h4>
             <ul className="space-y-3">
               <li>
@@ -144,36 +144,36 @@ export default function FutsalFooter() {
           {/* Column 3: Contact Us */}
           <div>
             <h4 className="text-lg font-bold mb-5 flex items-center gap-2">
-                <span className="w-8 h-1 bg-emerald-500 rounded-full"></span> Contact Info
+              <span className="w-8 h-1 bg-emerald-500 rounded-full"></span> Contact Info
             </h4>
             <ul className="space-y-4">
               <li className="flex items-start gap-4">
                 <div className="bg-white/10 p-2 rounded-lg text-emerald-400">
-                    <MapPin size={20} />
+                  <MapPin size={20} />
                 </div>
                 <div>
-                   <p className="text-sm font-bold text-white mb-0.5">Address</p>
-                   <span className="text-slate-300/80 text-sm max-w-[200px] block leading-snug">
-                     {loc?.address || "Address not provided"}, {loc?.city}
-                   </span>
+                  <p className="text-sm font-bold text-white mb-0.5">Address</p>
+                  <span className="text-slate-300/80 text-sm max-w-[200px] block leading-snug">
+                    {loc?.address || "Address not provided"}, {loc?.city}
+                  </span>
                 </div>
               </li>
               <li className="flex items-start gap-4">
                 <div className="bg-white/10 p-2 rounded-lg text-emerald-400">
-                    <Phone size={20} />
+                  <Phone size={20} />
                 </div>
                 <div>
-                    <p className="text-sm font-bold text-white mb-0.5">Phone</p>
-                    <span className="text-slate-300/80 text-sm block leading-snug">{futsal.phoneNumber || "Phone not provided"}</span>
+                  <p className="text-sm font-bold text-white mb-0.5">Phone</p>
+                  <span className="text-slate-300/80 text-sm block leading-snug">{futsal.phoneNumber || "Phone not provided"}</span>
                 </div>
               </li>
               <li className="flex items-start gap-4">
                 <div className="bg-white/10 p-2 rounded-lg text-emerald-400">
-                    <Mail size={20} />
+                  <Mail size={20} />
                 </div>
                 <div>
-                    <p className="text-sm font-bold text-white mb-0.5">Email</p>
-                    <span className="text-slate-300/80 text-sm block leading-snug">{futsal.email || "Email not provided"}</span>
+                  <p className="text-sm font-bold text-white mb-0.5">Email</p>
+                  <span className="text-slate-300/80 text-sm block leading-snug">{futsal.email || "Email not provided"}</span>
                 </div>
               </li>
             </ul>
@@ -181,8 +181,8 @@ export default function FutsalFooter() {
 
           {/* Column 4: Send Message */}
           <div>
-             <h4 className="text-lg font-bold mb-5 flex items-center gap-2">
-                <span className="w-8 h-1 bg-emerald-500 rounded-full"></span> Send Message
+            <h4 className="text-lg font-bold mb-5 flex items-center gap-2">
+              <span className="w-8 h-1 bg-emerald-500 rounded-full"></span> Send Message
             </h4>
             <p className="text-slate-300/80 mb-4 text-sm">
               Use this quick form to send us a direct message for any inquiries!
