@@ -1,0 +1,20 @@
+services:
+  users:
+    build: .
+    container_name: futsal-users
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    networks:
+      - services
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+networks:
+  services:
+    external: false
+    name: services
+    driver: bridge
