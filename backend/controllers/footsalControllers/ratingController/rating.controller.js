@@ -1,8 +1,8 @@
 const { sequelize, Footsal } = require("../../../models");
 const { QueryTypes } = require("sequelize");
 const { ML_URL } = process.env;
-// import axios
 const axios = require("axios");
+const { createFutsalNotification } = require("../../../services/notifications/notificationService");
 
 const resolveRatingTenantCode = async (req) => {
   const codeFromReq = req.futsalCode || req.tenant?.code || req.tanent?.code;
@@ -98,6 +98,19 @@ const postRating = async (req, res) => {
       }
     );
 
+    // Notify the futsal owner about the new review
+    const futsalRecord = await Footsal.findOne({ where: { futsalCode: code } }).catch(() => null);
+    if (futsalRecord) {
+      const stars = '⭐'.repeat(Math.min(rating, 5));
+      const reviewPreview = review ? `"${review.substring(0, 80)}${review.length > 80 ? '...' : ''}"` : 'No text.';
+      createFutsalNotification({
+        futsalId: futsalRecord.id,
+        type: "new_review",
+        title: `New Review Received ${stars}`,
+        message: `A user left a ${rating}-star review: ${reviewPreview}`,
+        relatedType: "review",
+      }).catch(() => {});
+    }
 
     return res.status(201).json({
       success: true,

@@ -1,5 +1,6 @@
 const { QueryTypes } = require("sequelize");
 const { sequelize, Footsal } = require("../../../models");
+const { createFutsalNotification } = require("../../../services/notifications/notificationService");
 
 //by admin and user
 const getPitches = async (req, res) => {
@@ -113,6 +114,19 @@ const createPitch = async (req, res) => {
       message: "failed to create pitch",
     });
   }
+
+  // Notify futsal owner
+  const futsalRecord = await Footsal.findOne({ where: { futsalCode: futsalCode } });
+  if (futsalRecord) {
+    createFutsalNotification({
+      futsalId: futsalRecord.id,
+      type: "pitch_created",
+      title: "New Pitch Added 🏟️",
+      message: `Pitch "${name}" (${pitch_type}) has been added successfully at Rs. ${price_per_hour}/hr.`,
+      relatedType: "pitch",
+    }).catch(() => {});
+  }
+
   res.status(201).json({
     success: true,
     message: "pitch created successfully",
@@ -158,6 +172,20 @@ const editPitch = async (req, res) => {
       message: "failed to update pitch",
     });
   }
+
+  // Notify futsal owner
+  const futsalRecord = await Footsal.findOne({ where: { futsalCode: futsalCode } });
+  if (futsalRecord) {
+    createFutsalNotification({
+      futsalId: futsalRecord.id,
+      type: "pitch_updated",
+      title: "Pitch Updated ✅",
+      message: `Pitch "${name}" has been updated successfully.`,
+      relatedId: id,
+      relatedType: "pitch",
+    }).catch(() => {});
+  }
+
   res.status(200).json({
     success: true,
     message: "pitch updated successfully",

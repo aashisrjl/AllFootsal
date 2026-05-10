@@ -2,6 +2,7 @@ const { sequelize, Footsal } = require("../../../models");
 const { QueryTypes } = require("sequelize");
 const fs = require("fs");
 const { uploadToCloudinary } = require("../../../services/cloudinary/cloudinary.service");
+const { createFutsalNotification } = require("../../../services/notifications/notificationService");
 
 const getUploadedMediaFiles = (req) => {
   if (Array.isArray(req.files) && req.files.length > 0) return req.files;
@@ -113,6 +114,28 @@ const uploadMedia = async (req, res) => {
       );
 
       uploaded.push(cloudinaryResult.secure_url);
+    }
+
+    const categoryLabels = {
+      logo: 'Logo',
+      banner: 'Banner',
+      home: 'Home Gallery',
+      facility: 'Facility Gallery',
+      pitch: 'Pitch',
+      event: 'Event',
+    };
+    const categoryLabel = categoryLabels[category] || category;
+
+    // Notify futsal owner about the upload
+    const futsalOwner = await Footsal.findOne({ where: { futsalCode: code } }).catch(() => null);
+    if (futsalOwner) {
+      createFutsalNotification({
+        futsalId: futsalOwner.id,
+        type: "media_uploaded",
+        title: `${categoryLabel} Uploaded 🖼️`,
+        message: `${uploaded.length} ${categoryLabel.toLowerCase()} file(s) uploaded successfully.`,
+        relatedType: "media",
+      }).catch(() => {});
     }
 
     return res.status(200).json({

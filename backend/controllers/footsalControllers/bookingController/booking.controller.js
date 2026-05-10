@@ -1,6 +1,7 @@
 const { sequelize, Footsal, User } = require("../../../models")
 const {QueryTypes} = require("sequelize");
 const sendEmail = require("../../../services/mail/sendEmail");
+const { createUserNotification, createFutsalNotification } = require("../../../services/notifications/notificationService");
 
 const resolveBookingTenantCode = async (req) => {
     const codeFromReq = req.futsalCode || req.tenant?.code || req.tanent?.code;
@@ -162,6 +163,26 @@ const cancelBooking = async (req,res) => {
                 },
             });
         }
+
+        // In-app notifications
+        await Promise.all([
+            createUserNotification({
+                userId,
+                type: "booking_cancelled",
+                title: "Booking Cancelled",
+                message: `Your booking for ${bookingItem.pitch_name} on ${bookingItem.booking_date} at ${bookingItem.start_time} - ${bookingItem.end_time} has been cancelled.`,
+                relatedId: bookingId,
+                relatedType: "booking",
+            }),
+            futsal && createFutsalNotification({
+                futsalId: futsal.id,
+                type: "booking_cancelled",
+                title: "Booking Cancelled by User",
+                message: `A booking for ${bookingItem.pitch_name} on ${bookingItem.booking_date} at ${bookingItem.start_time} - ${bookingItem.end_time} was cancelled by the user.`,
+                relatedId: bookingId,
+                relatedType: "booking",
+            }),
+        ]);
     } catch (notificationError) {
         console.error("Error sending booking cancellation notifications:", notificationError);
     }
@@ -228,6 +249,26 @@ const confirmBookingByAdmin = async (req,res) => {
                     text: `Your booking for ${booking[0].pitch_name} on ${booking[0].booking_date} at ${booking[0].start_time} - ${booking[0].end_time} has been confirmed.`,
                 },
             });
+
+            const futsalRecord = await Footsal.findOne({ where: { futsalCode: code } });
+            await Promise.all([
+                createUserNotification({
+                    userId: booking[0].user_id,
+                    type: "booking_confirmed",
+                    title: "Booking Confirmed! ✅",
+                    message: `Great news! Your booking for ${booking[0].pitch_name} on ${booking[0].booking_date} at ${booking[0].start_time} - ${booking[0].end_time} has been confirmed.`,
+                    relatedId: bookingId,
+                    relatedType: "booking",
+                }),
+                futsalRecord && createFutsalNotification({
+                    futsalId: futsalRecord.id,
+                    type: "booking_confirmed",
+                    title: "Booking Confirmed",
+                    message: `You confirmed booking for ${booking[0].pitch_name} on ${booking[0].booking_date} at ${booking[0].start_time} - ${booking[0].end_time}.`,
+                    relatedId: bookingId,
+                    relatedType: "booking",
+                }),
+            ]);
         } catch (notificationError) {
             console.error("Error sending booking confirmation email:", notificationError);
         }
@@ -276,8 +317,28 @@ const rejectBookingByAdmin = async (req,res) => {
                     text: `Your booking for ${booking[0].pitch_name} on ${booking[0].booking_date} at ${booking[0].start_time} - ${booking[0].end_time} has been rejected.${reason ? ` Reason: ${reason}` : ''}`,
                 },
             });
+
+            const futsalRecord = await Footsal.findOne({ where: { futsalCode: code } });
+            await Promise.all([
+                createUserNotification({
+                    userId: booking[0].user_id,
+                    type: "booking_rejected",
+                    title: "Booking Rejected ❌",
+                    message: `Your booking for ${booking[0].pitch_name} on ${booking[0].booking_date} has been rejected.${reason ? ` Reason: ${reason}` : ''}`,
+                    relatedId: bookingId,
+                    relatedType: "booking",
+                }),
+                futsalRecord && createFutsalNotification({
+                    futsalId: futsalRecord.id,
+                    type: "booking_rejected",
+                    title: "Booking Rejected",
+                    message: `You rejected a booking for ${booking[0].pitch_name} on ${booking[0].booking_date}.${reason ? ` Reason: ${reason}` : ''}`,
+                    relatedId: bookingId,
+                    relatedType: "booking",
+                }),
+            ]);
         } catch (notificationError) {
-            console.error("Error sending booking rejection email:", notificationError);
+            console.error("Error sending booking rejection notifications:", notificationError);
         }
     }
 
@@ -522,6 +583,26 @@ const createBooking = async (req,res) => {
                     },
                 });
             }
+
+            // In-app notifications
+            await Promise.all([
+                user && createUserNotification({
+                    userId: user.id,
+                    type: "booking_created",
+                    title: "Booking Request Received 🎉",
+                    message: `Your booking for ${pitchName} on ${booking_date} at ${reqSlot.start_time} - ${reqSlot.end_time} is pending. Amount: Rs. ${amount}.`,
+                    relatedId: insertedId,
+                    relatedType: "booking",
+                }),
+                futsal && createFutsalNotification({
+                    futsalId: futsal.id,
+                    type: "new_booking",
+                    title: "New Booking Request 📋",
+                    message: `New booking received for ${pitchName} on ${booking_date} at ${reqSlot.start_time} - ${reqSlot.end_time}. Amount: Rs. ${amount}.`,
+                    relatedId: insertedId,
+                    relatedType: "booking",
+                }),
+            ]);
         } catch (notificationError) {
             console.error("Error sending booking notifications:", notificationError);
         }
