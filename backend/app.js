@@ -65,9 +65,9 @@ app.use('/api/v1/', forumRoutes)
 app.use('/api/v1/', forumReplyRoutes)
 app.use('/api/v1/', forumlikesRoutes)
 
-//futsal routes
-const futsalRoutes = require("./routes/footsalRoutes/futsal.route")
-app.use('/api/v1/', futsalRoutes)
+// //futsal routes
+// const futsalRoutes = require("./routes/footsalRoutes/futsal.route")
+// app.use('/api/v1/', futsalRoutes)
 
 // super admin tenant operations
 const superAdminTenantRoutes = require("./routes/adminRoutes/superAdminTenant.route")
@@ -81,7 +81,7 @@ const ratingRoutes = require("./routes/footsalRoutes/ratingRoutes/rating.route")
 const bookingRoutes = require("./routes/footsalRoutes/bookingRoutes/booking.route")
 const infoRoutes = require("./routes/footsalRoutes/infoRoutes/info.routes")
 const mediaRoutes = require("./routes/footsalRoutes/mediaRoutes/media.route")
-const paymentFutsalRoutes = require("./routes/footsalRoutes/paymentRoutes/payment.route")
+const paymentFutsalRoutes = require("./routes/footsalRoutes/payment.route")
 const pitchRoutes = require("./routes/footsalRoutes/pitchRoutes/pitch.route")
 const timeslotRoutes = require("./routes/footsalRoutes/timeslotsRoutes/timeslot.route")
 const visitorRoutes = require("./routes/footsalRoutes/visitorRoutes/visitors.route")
@@ -99,6 +99,10 @@ app.use('/api/v1/', pitchRoutes)
 app.use('/api/v1/', timeslotRoutes)
 app.use('/api/v1/', visitorRoutes)
 app.use('/api/v1/', faqRoutes)
+
+//futsal routes (must come after specific tenant routes like contact, analytics)
+const futsalRoutes = require("./routes/footsalRoutes/futsal.route")
+app.use('/api/v1/', futsalRoutes)
 
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));

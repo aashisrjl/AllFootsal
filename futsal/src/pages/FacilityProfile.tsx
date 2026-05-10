@@ -9,6 +9,7 @@ import {
   updateOwnerLocation,
 } from '../lib/facilityApi';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'sonner';
 import MapPicker from '../components/MapPicker';
 
 interface LocationPayload {
@@ -58,8 +59,6 @@ const FacilityProfile = () => {
   const [loading, setLoading] = useState(true);
   const [savingLocation, setSavingLocation] = useState(false);
   const [savingInfo, setSavingInfo] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [facilityInput, setFacilityInput] = useState('');
 
   const [location, setLocation] = useState<LocationPayload>({
@@ -99,7 +98,6 @@ const FacilityProfile = () => {
 
     try {
       setLoading(true);
-      setError('');
 
       const [locationRes, infoRes] = await Promise.all([
         getOwnerLocation().catch(() => ({ data: [] })),
@@ -185,7 +183,7 @@ const FacilityProfile = () => {
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to load facility data';
-      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -229,7 +227,7 @@ const FacilityProfile = () => {
 
   const setCurrentLocation = () => {
     if (!navigator.geolocation) {
-      setError('Geolocation is not supported in this browser.');
+      toast.error('Geolocation is not supported in this browser.');
       return;
     }
 
@@ -242,7 +240,7 @@ const FacilityProfile = () => {
         }));
       },
       () => {
-        setError('Unable to get current location. Please select it from map.');
+        toast.error('Unable to get current location. Please select it from map.');
       }
     );
   };
@@ -250,8 +248,6 @@ const FacilityProfile = () => {
   const saveLocation = async () => {
     try {
       setSavingLocation(true);
-      setError('');
-      setSuccess('');
 
       validateLocation();
 
@@ -273,10 +269,10 @@ const FacilityProfile = () => {
 
       await refreshProfile();
       await fetchFacilityData();
-      setSuccess('Location saved successfully.');
+      toast.success('Location saved successfully.');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to save location';
-      setError(message);
+      toast.error(message);
     } finally {
       setSavingLocation(false);
     }
@@ -287,8 +283,6 @@ const FacilityProfile = () => {
 
     try {
       setSavingInfo(true);
-      setError('');
-      setSuccess('');
 
       validateInfo();
 
@@ -310,10 +304,10 @@ const FacilityProfile = () => {
 
       await refreshProfile();
       await fetchFacilityData();
-      setSuccess('Facility info saved successfully.');
+      toast.success('Facility info saved successfully.');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to save info';
-      setError(message);
+      toast.error(message);
     } finally {
       setSavingInfo(false);
     }
@@ -353,9 +347,6 @@ const FacilityProfile = () => {
           </span>
         </div>
       )}
-
-      {error ? <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">{error}</div> : null}
-      {success ? <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">{success}</div> : null}
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-6 space-y-4">

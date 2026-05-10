@@ -14,6 +14,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Notifications from './pages/Notifications';
 import { Loader2 } from 'lucide-react';
+import { Toaster } from 'sonner';
 import './index.css';
 
 // ProtectedRoute Component
@@ -44,6 +45,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <AuthProvider>
+      <Toaster richColors position="top-right" />
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />

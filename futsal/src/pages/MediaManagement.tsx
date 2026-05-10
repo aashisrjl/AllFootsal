@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, Trash2, Play, Loader, AlertCircle, Image as ImageIcon, VideoIcon, MapPin, Filter } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'sonner';
 
 interface MediaItem {
   id: number;
@@ -168,19 +169,25 @@ const MediaManagement = () => {
 
       const responseBody = await response.json().catch(() => null);
       if (!response.ok) {
-        setError(responseBody?.message || responseBody?.error || 'Failed to upload files. Please try again.');
+        const errorMsg = responseBody?.message || responseBody?.error || 'Failed to upload files. Please try again.';
+        setError(errorMsg);
+        toast.error(errorMsg);
         return;
       }
 
-      setSuccess(`Successfully uploaded ${selectedFiles.length} file(s) to ${getPitchName(selectedPitchId)}!`);
+      const successMsg = `Successfully uploaded ${selectedFiles.length} file(s) to ${getPitchName(selectedPitchId)}!`;
+      setSuccess(successMsg);
+      toast.success(successMsg);
+      
       setSelectedFiles([]);
       const fileInput = document.getElementById('file-input') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
 
       await fetchAllMedia();
-      setSuccess(null);
+      setTimeout(() => setSuccess(null), 3000);
     } catch {
       setError('Failed to upload files. Please try again.');
+      toast.error('Failed to upload files. Please try again.');
     } finally {
       setUploading(false);
     }
@@ -193,7 +200,6 @@ const MediaManagement = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this media?')) return;
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${apiBaseUrl}/futsal/media/${id}`, {
@@ -203,11 +209,12 @@ const MediaManagement = () => {
       });
       if (response.ok) {
         setAllMedia(prev => prev.filter((item: MediaItem) => item.id !== id));
-        setSuccess('Media deleted successfully');
-        setTimeout(() => setSuccess(null), 2000);
+        toast.success('Media deleted successfully');
+      } else {
+        toast.error('Failed to delete media');
       }
     } catch {
-      setError('Failed to delete media');
+      toast.error('Failed to delete media');
     }
   };
 

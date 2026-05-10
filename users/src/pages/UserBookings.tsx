@@ -263,9 +263,9 @@ const UserBookings = () => {
             setBookings((prev) =>
                 prev.map((b) => (b.id === bookingId ? { ...b, status: "cancelled" } : b))
             );
-            toast.success("Booking cancelled successfully");
-        } catch {
-            toast.error("Failed to cancel booking");
+            toast.success("Your booking was cancelled successfully.");
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "Failed to cancel the booking. Please try again.");
         }
     };
 

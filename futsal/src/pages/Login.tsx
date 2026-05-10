@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, Loader2, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,7 @@ const Login: React.FC = () => {
       // Basic detection for email vs phone
       const isPhone = /^\d+$/.test(emailOrPhone.trim());
       const credentials: any = { password };
-      
+
       if (isPhone) {
         credentials.phoneNumber = emailOrPhone.trim();
       } else {
@@ -42,9 +43,12 @@ const Login: React.FC = () => {
       }
 
       await login(credentials);
+      toast.success('Successfully logged in');
       navigate('/');
     } catch (err: any) {
-      setError(err.message || 'Failed to login. Please check your credentials.');
+      const msg = err.message || 'Failed to login. Please check your credentials.';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +67,7 @@ const Login: React.FC = () => {
         <div className="bg-slate-900 shadow-2xl rounded-3xl flex flex-col md:flex-row overflow-hidden max-w-5xl w-full border border-slate-800 transition-all duration-300">
           {/* Left side form */}
           <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-slate-900/40 backdrop-blur-sm relative overflow-hidden">
-            
+
             {/* Background Glows for consistent premium feel */}
             <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none z-0"></div>
 
@@ -78,7 +82,7 @@ const Login: React.FC = () => {
                 </div>
               </Link>
 
-              <h2 className="text-3xl font-black text-slate-50 mb-2 tracking-tight">Owner Portal</h2>
+              <h2 className="text-3xl font-black text-slate-50 mb-2 tracking-tight">Futsal Portal</h2>
               <p className="text-slate-400 mb-6 font-medium">
                 Sign in to manage your futsal facility.
               </p>

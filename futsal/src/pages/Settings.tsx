@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { User, Bell, Shield, CreditCard, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { updateFutsalProfile } from '../lib/authApi';
+import { toast } from 'sonner';
 import API from '@/lib/api';
 import { Link } from 'react-router-dom';
 
@@ -57,11 +58,12 @@ const Settings = () => {
       const ownerName = `${firstName} ${lastName}`.trim();
       await updateFutsalProfile({ ownerName, email, phoneNumber: phone });
       await refreshProfile();
+      toast.success('Profile updated successfully!');
       setSuccessMsg('Profile updated successfully!');
       setTimeout(() => setSuccessMsg(''), 3000);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update profile', error);
-      alert('Failed to update profile.');
+      toast.error(error.response?.data?.message || 'Failed to update profile.');
     } finally {
       setIsSaving(false);
     }
@@ -71,22 +73,23 @@ const Settings = () => {
     try {
       // Here you would call an API to save notification preferences
       // For now, we'll just show a success message
+      toast.success('Notification preferences updated successfully!');
       setSuccessMsg('Notification preferences updated successfully!');
       setTimeout(() => setSuccessMsg(''), 3000);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update notifications', error);
-      alert('Failed to update notification preferences.');
+      toast.error(error.response?.data?.message || 'Failed to update notification preferences.');
     }
   };
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
-      alert('New passwords do not match.');
+      toast.error('New passwords do not match.');
       return;
     }
     
     if (newPassword.length < 6) {
-      alert('Password must be at least 6 characters long.');
+      toast.error('Password must be at least 6 characters long.');
       return;
     }
 
@@ -94,14 +97,15 @@ const Settings = () => {
       setIsChangingPassword(true);
       // Here you would call an API to change password
       // For now, we'll just show a success message
+      toast.success('Password changed successfully!');
       setSuccessMsg('Password changed successfully!');
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
       setTimeout(() => setSuccessMsg(''), 3000);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to change password', error);
-      alert('Failed to change password.');
+      toast.error(error.response?.data?.message || 'Failed to change password.');
     } finally {
       setIsChangingPassword(false);
     }

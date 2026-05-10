@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Mail, Phone, Trash2, CheckCheck, MessageSquare, Loader,
-  AlertCircle, User, Clock, RefreshCw, Send, ExternalLink
+  AlertCircle, Clock, RefreshCw, ExternalLink
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { getContactMessages, markContactAsRead, deleteContactMessage } from '../lib/contactApi';
 
 interface ContactMessage {
@@ -47,7 +48,7 @@ const ContactMessages = () => {
       setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, is_read: true } : m));
       if (selectedMessage?.id === msg.id) setSelectedMessage({ ...msg, is_read: true });
     } catch {
-      /* silent */
+      toast.error('Failed to mark message as read');
     }
   };
 
@@ -58,8 +59,9 @@ const ContactMessages = () => {
       await deleteContactMessage(id);
       setMessages(prev => prev.filter(m => m.id !== id));
       if (selectedMessage?.id === id) setSelectedMessage(null);
+      toast.success('Message deleted successfully');
     } catch {
-      /* silent */
+      toast.error('Failed to delete message');
     } finally {
       setDeletingId(null);
     }

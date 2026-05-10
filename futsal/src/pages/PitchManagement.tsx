@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Plus, Edit, ToggleLeft, ToggleRight, Wrench } from 'lucide-react';
+import { MapPin, Plus, Edit, ToggleLeft, ToggleRight, Wrench, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'sonner';
 import PitchModal from '../components/PitchModal';
 import ScheduleModal from '../components/ScheduleModal';
 import { updatePitch } from '../lib/pitchApi';
@@ -63,6 +64,28 @@ const PitchManagement = () => {
       setPitches([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeletePitch = async (id: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      const apiBaseUrl = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
+      
+      const response = await fetch(`${apiBaseUrl}/futsal/pitch/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!response.ok) {
+        toast.error('Failed to delete pitch.');
+        return;
+      }
+
+      toast.success('Pitch deleted successfully.');
+      fetchPitches();
+    } catch {
+      toast.error('Error deleting pitch.');
     }
   };
 
@@ -209,16 +232,19 @@ const PitchManagement = () => {
                 </div>
               </div>
 
-              <div className="flex space-x-3 relative z-10 mt-auto pt-2">
+              <div className="flex space-x-2 relative z-10 mt-auto pt-2">
                 <button
                   onClick={() => editPitch(pitch)}
-                  className="flex-[1] flex items-center justify-center px-4 py-3 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold transition-all border border-slate-700 hover:text-white"
+                  className="flex-1 flex items-center justify-center px-2 py-3 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold transition-all border border-slate-700 hover:text-white"
                 >
-                  <Edit className="h-4 w-4 mr-2" />
+                  <Edit className="h-4 w-4 mr-1.5" />
                   Edit
                 </button>
-                <button onClick={() => schedulePitch(pitch)} className="flex-[1.5] px-4 py-3 bg-slate-800/40 text-emerald-400 border border-emerald-500/20 rounded-xl text-sm font-bold hover:bg-emerald-500 hover:text-white transition-all">
+                <button onClick={() => schedulePitch(pitch)} className="flex-1 px-2 py-3 bg-slate-800/40 text-emerald-400 border border-emerald-500/20 rounded-xl text-sm font-bold hover:bg-emerald-500 hover:text-white transition-all">
                   Schedule
+                </button>
+                <button onClick={() => handleDeletePitch(pitch.id)} className="flex items-center justify-center px-4 py-3 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl text-sm hover:bg-rose-500 hover:text-white transition-all" title="Delete Pitch">
+                  <Trash2 className="h-4 w-4" />
                 </button>
               </div>
             </div>
