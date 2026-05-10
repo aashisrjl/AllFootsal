@@ -295,13 +295,6 @@ const FacilityDetails = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="bg-card p-6 rounded-3xl border border-border shadow-sm flex flex-col gap-2 transition-transform hover:-translate-y-1">
-                    <Clock className="h-6 w-6 text-emerald-500 mb-2" />
-                    <h4 className="font-bold text-foreground">Operating Hours</h4>
-                    <p className="text-muted-foreground font-medium">
-                      {Array.isArray(dynamicFacility.operating_hours) ? dynamicFacility.operating_hours.join(", ") : dynamicFacility.operating_hours}
-                    </p>
-                  </div>
-                  <div className="bg-card p-6 rounded-3xl border border-border shadow-sm flex flex-col gap-2 transition-transform hover:-translate-y-1">
                     <Star className="h-6 w-6 text-emerald-500 mb-2" />
                     <h4 className="font-bold text-foreground">Avg. Rating</h4>
                     <p className="text-muted-foreground font-medium">{dynamicFacility.rating} out of 5 ({dynamicFacility.reviews})</p>
@@ -321,69 +314,124 @@ const FacilityDetails = () => {
                     </div>
                   )}
                 </div>
+                {/* Operating Hours - Full Width Dedicated Card */}
+                <div className="bg-emerald-50/50 dark:bg-emerald-950/10 p-6 sm:p-8 rounded-3xl border border-emerald-100 dark:border-emerald-900/30 shadow-sm transition-transform hover:-translate-y-1">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-3 bg-emerald-100 dark:bg-emerald-900/50 rounded-2xl">
+                      <Clock className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-foreground text-lg">Operating Hours</h4>
+                      <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">When you can play</p>
+                    </div>
+                  </div>
 
-                {/* Social Links rendering */}
+                  <div className="bg-white dark:bg-slate-900/50 rounded-2xl border border-border overflow-hidden">
+                    {Array.isArray(dynamicFacility.operating_hours) ? (
+                      <div className="p-5 text-muted-foreground font-medium">
+                        {dynamicFacility.operating_hours.join(", ")}
+                      </div>
+                    ) : typeof dynamicFacility.operating_hours === 'object' && dynamicFacility.operating_hours !== null ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 sm:p-5">
+                        {Object.entries(dynamicFacility.operating_hours)
+                          .filter(([k]) => isNaN(Number(k))) // Filter out array-like string keys '0', '1'
+                          .map(([day, hours]: [string, any]) => {
+                            const isClosed = typeof hours === 'object' && (!hours.open || !hours.close);
+                            const timeStr = typeof hours === 'object' && hours !== null
+                              ? (isClosed ? 'Closed' : `${hours.open} - ${hours.close}`)
+                              : String(hours);
+                            return (
+                              <div key={day} className="flex justify-between items-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 transition-colors">
+                                <span className="font-semibold text-foreground capitalize text-sm truncate mr-2">{day}</span>
+                                <span className={`font-medium px-3 py-1 rounded-lg text-xs whitespace-nowrap mt-0 ${isClosed || timeStr === 'Closed'
+                                  ? 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400'
+                                  : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
+                                  }`}>
+                                  {timeStr}
+                                </span>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    ) : (
+                      <div className="p-5 text-muted-foreground font-medium">
+                        {String(dynamicFacility.operating_hours || "6:00 AM - 10:00 PM")}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+
+              </div>
+
+
+              {/* RIGHT SIDE (Column 2): Top facilities + Social Links */}
+              <div className="space-y-24">
+                {/* Facilities Visualized Block */}
+                <div className="bg-card p-8 md:p-12 rounded-[3rem] border border-border shadow-inner min-w-0">
+                  <div className="mb-8">
+                    <h3 className="font-extrabold text-3xl mb-4 text-foreground">Top-Notch Facilities</h3>
+                    <div className="flex flex-wrap gap-3">
+                      {dynamicFacility.amenities.map((amenity: string, idx: number) => (
+                        <span key={idx} className="inline-flex items-center gap-2 bg-background px-4 py-2 rounded-xl text-emerald-700 dark:text-emerald-400 font-medium shadow-sm border border-border transition-transform hover:-translate-y-0.5">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                          {amenity}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Horizontal scrolling facility images */}
+                  <div className="relative">
+                    <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory pt-2">
+                      {facilityImageUrls.length > 0 ? facilityImageUrls.map((img: string, i: number) => (
+                        <div key={i} className="min-w-[260px] sm:min-w-[320px] h-[240px] rounded-3xl overflow-hidden snap-center shrink-0 shadow-md border border-border relative group">
+                          <img src={img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Facility detail" />
+                          <div className="absolute inset-0 bg-black/10 dark:bg-black/20 group-hover:bg-transparent transition-colors duration-500"></div>
+                        </div>
+                      )) : (
+                        <div className="w-full h-[240px] bg-background rounded-3xl flex items-center justify-center text-muted-foreground border border-border">
+                          <div className="text-center">
+                            <CheckCircle2 className="h-8 w-8 mx-auto mb-2 opacity-20" />
+                            <p>No special facility photos</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Social Links Block */}
                 {(socialLinks || dynamicFacility.websiteUrl) && (
-                  <div className="pt-6 border-t border-border">
-                    <h4 className="text-foreground font-bold mb-4">Connect with us:</h4>
-                    <div className="flex gap-4">
+                  <div className="bg-card mt-12 p-8 md:px-12 py-6 rounded-[3vw] border border-border flex flex-row sm:flex-row sm:items-center justify-between gap-6 shadow-sm">
+                    <div>
+                      <h4 className="text-emerald-600 font-bold tracking-wider uppercase text-sm mb-1">Connect with us</h4>
+                      <h3 className="text-xl font-bold text-foreground">Follow our updates</h3>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
                       {socialLinks?.facebook && (
-                        <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="p-3 bg-card rounded-2xl text-muted-foreground hover:text-[#1877F2] hover:bg-muted transition-colors shadow-sm border border-border">
+                        <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="p-3 bg-background rounded-2xl text-muted-foreground hover:text-white hover:bg-[#1877F2] hover:border-[#1877F2] transition-colors shadow-sm border border-border">
                           <Facebook className="h-6 w-6" />
                         </a>
                       )}
                       {socialLinks?.instagram && (
-                        <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="p-3 bg-card rounded-2xl text-muted-foreground hover:text-[#E4405F] hover:bg-muted transition-colors shadow-sm border border-border">
+                        <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="p-3 bg-background rounded-2xl text-muted-foreground hover:text-white hover:bg-[#E4405F] hover:border-[#E4405F] transition-colors shadow-sm border border-border">
                           <Instagram className="h-6 w-6" />
                         </a>
                       )}
                       {socialLinks?.tiktok && (
-                        <a href={socialLinks.tiktok} target="_blank" rel="noreferrer" className="p-3 bg-card rounded-2xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shadow-sm border border-border font-bold">
+                        <a href={socialLinks.tiktok} target="_blank" rel="noreferrer" className="p-3 bg-background rounded-2xl text-muted-foreground hover:text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-colors shadow-sm border border-border font-bold flex items-center justify-center">
                           TK
                         </a>
                       )}
                       {dynamicFacility.websiteUrl && (
-                        <a href={dynamicFacility.websiteUrl} target="_blank" rel="noreferrer" className="p-3 bg-card rounded-2xl text-muted-foreground hover:text-emerald-500 hover:bg-muted transition-colors shadow-sm border border-border">
+                        <a href={dynamicFacility.websiteUrl} target="_blank" rel="noreferrer" className="p-3 bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-2xl hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-white transition-colors shadow-sm border border-emerald-100 dark:border-emerald-500/20">
                           <Globe className="h-6 w-6" />
                         </a>
                       )}
                     </div>
                   </div>
                 )}
-              </div>
-
-              {/* Facilities Visualized Block */}
-              <div className="bg-card p-8 md:p-12 rounded-[3rem] border border-border shadow-inner min-w-0">
-                <div className="mb-8">
-                  <h3 className="font-extrabold text-3xl mb-4 text-foreground">Top-Notch Facilities</h3>
-                  <div className="flex flex-wrap gap-3">
-                    {dynamicFacility.amenities.map((amenity: string, idx: number) => (
-                      <span key={idx} className="inline-flex items-center gap-2 bg-background px-4 py-2 rounded-xl text-emerald-700 dark:text-emerald-400 font-medium shadow-sm border border-border transition-transform hover:-translate-y-0.5">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                        {amenity}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Horizontal scrolling facility images */}
-                <div className="relative">
-                  <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory pt-2">
-                    {facilityImageUrls.length > 0 ? facilityImageUrls.map((img: string, i: number) => (
-                      <div key={i} className="min-w-[260px] sm:min-w-[320px] h-[240px] rounded-3xl overflow-hidden snap-center shrink-0 shadow-md border border-border relative group">
-                        <img src={img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Facility detail" />
-                        <div className="absolute inset-0 bg-black/10 dark:bg-black/20 group-hover:bg-transparent transition-colors duration-500"></div>
-                      </div>
-                    )) : (
-                      <div className="w-full h-[240px] bg-background rounded-3xl flex items-center justify-center text-muted-foreground border border-border">
-                        <div className="text-center">
-                          <CheckCircle2 className="h-8 w-8 mx-auto mb-2 opacity-20" />
-                          <p>No special facility photos</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
               </div>
 
             </div>
