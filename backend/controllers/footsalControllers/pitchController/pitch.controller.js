@@ -115,17 +115,21 @@ const createPitch = async (req, res) => {
     });
   }
 
-  // Notify futsal owner
-  const futsalRecord = await Footsal.findOne({ where: { futsalCode: futsalCode } });
-  if (futsalRecord) {
-    createFutsalNotification({
-      futsalId: futsalRecord.id,
-      type: "pitch_created",
-      title: "New Pitch Added 🏟️",
-      message: `Pitch "${name}" (${pitch_type}) has been added successfully at Rs. ${price_per_hour}/hr.`,
-      relatedType: "pitch",
-    }).catch(() => {});
-  }
+  // Notify futsal owner - fire and forget, never crash the request
+  setImmediate(async () => {
+    try {
+      const futsalRecord = await Footsal.findOne({ where: { futsalCode: futsalCode } });
+      if (futsalRecord) {
+        await createFutsalNotification({
+          futsalId: futsalRecord.id,
+          type: "pitch_created",
+          title: "New Pitch Added 🏟️",
+          message: `Pitch "${name}" (${pitch_type}) has been added successfully at Rs. ${price_per_hour}/hr.`,
+          relatedType: "pitch",
+        });
+      }
+    } catch (e) { /* silent */ }
+  });
 
   res.status(201).json({
     success: true,
@@ -173,18 +177,22 @@ const editPitch = async (req, res) => {
     });
   }
 
-  // Notify futsal owner
-  const futsalRecord = await Footsal.findOne({ where: { futsalCode: futsalCode } });
-  if (futsalRecord) {
-    createFutsalNotification({
-      futsalId: futsalRecord.id,
-      type: "pitch_updated",
-      title: "Pitch Updated ✅",
-      message: `Pitch "${name}" has been updated successfully.`,
-      relatedId: id,
-      relatedType: "pitch",
-    }).catch(() => {});
-  }
+  // Notify futsal owner - fire and forget, never crash the request
+  setImmediate(async () => {
+    try {
+      const futsalRecord = await Footsal.findOne({ where: { futsalCode: futsalCode } });
+      if (futsalRecord) {
+        await createFutsalNotification({
+          futsalId: futsalRecord.id,
+          type: "pitch_updated",
+          title: "Pitch Updated ✅",
+          message: `Pitch "${name}" has been updated successfully.`,
+          relatedId: id,
+          relatedType: "pitch",
+        });
+      }
+    } catch (e) { /* silent */ }
+  });
 
   res.status(200).json({
     success: true,

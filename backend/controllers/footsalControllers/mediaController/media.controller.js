@@ -126,17 +126,21 @@ const uploadMedia = async (req, res) => {
     };
     const categoryLabel = categoryLabels[category] || category;
 
-    // Notify futsal owner about the upload
-    const futsalOwner = await Footsal.findOne({ where: { futsalCode: code } }).catch(() => null);
-    if (futsalOwner) {
-      createFutsalNotification({
-        futsalId: futsalOwner.id,
-        type: "media_uploaded",
-        title: `${categoryLabel} Uploaded 🖼️`,
-        message: `${uploaded.length} ${categoryLabel.toLowerCase()} file(s) uploaded successfully.`,
-        relatedType: "media",
-      }).catch(() => {});
-    }
+    // Notify futsal owner - fire and forget
+    setImmediate(async () => {
+      try {
+        const futsalOwner = await Footsal.findOne({ where: { futsalCode: code } });
+        if (futsalOwner) {
+          await createFutsalNotification({
+            futsalId: futsalOwner.id,
+            type: "media_uploaded",
+            title: `${categoryLabel} Uploaded 🖼️`,
+            message: `${uploaded.length} ${categoryLabel.toLowerCase()} file(s) uploaded successfully.`,
+            relatedType: "media",
+          });
+        }
+      } catch (e) { /* silent */ }
+    });
 
     return res.status(200).json({
       success: true,

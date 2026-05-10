@@ -103,6 +103,19 @@ const getContacts = async (req, res) => {
       });
     }
 
+    // Auto-create contact table if it does not exist yet
+    await sequelize.query(
+      `CREATE TABLE IF NOT EXISTS contact_${code} (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100),
+        email VARCHAR(150),
+        phone VARCHAR(20),
+        message TEXT,
+        is_read BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB`
+    ).catch(() => {});
+
     const contacts = await sequelize.query(
       `SELECT * FROM contact_${code} ORDER BY created_at DESC`,
       { type: QueryTypes.SELECT }
@@ -114,6 +127,7 @@ const getContacts = async (req, res) => {
       data: contacts,
     });
   } catch (error) {
+    console.error("getContacts error:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",

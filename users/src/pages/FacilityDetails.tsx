@@ -77,7 +77,7 @@ const FacilityDetails = () => {
   const { data: pitchesData, isLoading: pitchesLoading } = useQuery({ queryKey: ['futsal-pitches', id], queryFn: () => getFutsalPitches(id as string), enabled: !!id, retry: false });
   const { data: ratingsData, isLoading: ratingsLoading } = useQuery({ queryKey: ['futsal-ratings', id], queryFn: () => getFutsalRatings(id as string), enabled: !!id, retry: false });
   const { data: faqsData } = useQuery({ queryKey: ['futsal-faqs', id], queryFn: () => getFutsalFaqs(id as string), enabled: !!id, retry: false });
-  
+
   useEffect(() => {
     if (id) {
       trackVisitors(id).catch(err => console.error("Error tracking visitor:", err));
@@ -136,7 +136,7 @@ const FacilityDetails = () => {
     pitches: pitchesArray.map((p: any) => {
       const pitchImageObj = pitchMediaArray.find((media: any) => String(media.pitch_id) === String(p.id));
       const pitchImage = pitchImageObj?.url || pitchImageObj?.media_url || p.media_url || "https://images.unsplash.com/photo-1551946596-ce3ebc2efd97?q=80&w=800";
-      
+
       return {
         id: String(p.id),
         name: p.name || `Pitch ${p.id}`,
@@ -210,6 +210,7 @@ const FacilityDetails = () => {
     <div className="min-h-screen flex flex-col bg-background text-foreground font-sans selection:bg-emerald-500 selection:text-white">
       <FutsalNavigation name={dynamicFacility.name} />
 
+
       <main className="flex-1">
 
         {/* HERO SECTION */}
@@ -221,16 +222,14 @@ const FacilityDetails = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-tr from-slate-950/95 via-slate-900/80 to-emerald-900/40 mix-blend-multiply z-10" />
 
-        {/* Logo badge overlay */}
-          {logoUrl && (
-            <div className="absolute top-6 left-6 z-30">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-white/10 backdrop-blur-sm">
-                <img src={logoUrl} alt="Futsal Logo" className="w-full h-full object-cover" />
-              </div>
-            </div>
-          )}
 
           <div className="absolute inset-0 flex flex-col justify-center z-20 container mx-auto px-4 md:px-6">
+            {/* Logo badge overlay */}
+            {logoUrl && (
+              <div className="w-16 h-16 md:w-20 mb-4 md:h-20 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-white/10 backdrop-blur-sm">
+                <img src={logoUrl} alt="Futsal Logo" className="w-full h-full object-cover" />
+              </div>
+            )}
             <div className="max-w-3xl animate-in fade-in slide-in-from-bottom-10 duration-1000">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-emerald-300 text-sm font-semibold tracking-wide mb-6 uppercase shadow-lg">
                 <Star className="h-4 w-4 fill-emerald-400 text-emerald-400" />
@@ -403,7 +402,7 @@ const FacilityDetails = () => {
                 View Full Gallery
               </Button>
             </div>
-            
+
             {dynamicFacility.images.length > 0 ? (
               <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
                 {dynamicFacility.images.map((src: string, idx: number) => (
@@ -416,9 +415,9 @@ const FacilityDetails = () => {
                 ))}
               </div>
             ) : (
-                <div className="p-12 text-center bg-card rounded-3xl border border-border">
-                  <p className="text-muted-foreground text-lg">No photos have been uploaded for this facility yet.</p>
-                </div>
+              <div className="p-12 text-center bg-card rounded-3xl border border-border">
+                <p className="text-muted-foreground text-lg">No photos have been uploaded for this facility yet.</p>
+              </div>
             )}
           </div>
         </section>
@@ -521,28 +520,28 @@ const FacilityDetails = () => {
 
             <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
               <div className="flex flex-col lg:flex-row gap-16 items-start">
-                
+
                 {/* FAQ Header & Visual */}
                 <div className="lg:w-1/3 lg:sticky lg:top-32 space-y-6">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
                     <HelpCircle className="h-3.5 w-3.5" /> Assistance Center
                   </div>
                   <h2 className="text-4xl md:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
-                    Everything you <br /> 
+                    Everything you <br />
                     <span className="text-emerald-500">need to know</span>
                   </h2>
                   <p className="text-muted-foreground text-lg leading-relaxed max-w-md">
                     Find quick answers to common questions about our facilities, booking policies, and player guidelines.
                   </p>
-                  
+
                   <div className="pt-8">
                     <div className="p-10 rounded-[2.5rem] bg-emerald-600 text-white shadow-2xl shadow-emerald-500/20 relative overflow-hidden group transition-transform hover:-translate-y-1">
                       <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                         <MessageSquare className="h-24 w-24" />
+                        <MessageSquare className="h-24 w-24" />
                       </div>
                       <h4 className="text-xl font-bold mb-2 relative z-10">Still have questions?</h4>
                       <p className="text-emerald-50 mb-6 text-sm opacity-90 relative z-10">Our support team is always ready to help you with your inquiries.</p>
-                      <Button 
+                      <Button
                         onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
                         className="bg-white text-emerald-700 hover:bg-emerald-50 border-none rounded-2xl px-6 h-11 font-bold shadow-sm relative z-10"
                       >
@@ -555,22 +554,22 @@ const FacilityDetails = () => {
                 {/* FAQ Questions */}
                 <div className="lg:w-2/3 w-full space-y-5">
                   {faqs.map((faq: any, idx: number) => (
-                    <div 
-                      key={faq.id} 
+                    <div
+                      key={faq.id}
                       className="group bg-card hover:bg-emerald-50/30 dark:hover:bg-emerald-500/5 border border-border hover:border-emerald-500/30 rounded-[2rem] overflow-hidden transition-all duration-500 shadow-sm hover:shadow-xl hover:-translate-y-1"
                     >
                       <details className="group peer overflow-hidden">
                         <summary className="flex items-center justify-between p-8 cursor-pointer list-none select-none">
                           <div className="flex items-center gap-6">
                             <span className="flex items-center justify-center h-10 w-10 rounded-2xl bg-muted group-hover:bg-emerald-500/10 text-muted-foreground group-hover:text-emerald-600 font-bold text-sm transition-colors border border-transparent group-hover:border-emerald-500/20 shrink-0">
-                               {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
+                              {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
                             </span>
                             <h3 className="font-bold text-foreground text-lg md:text-xl tracking-tight leading-tight transition-colors group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
                               {faq.question}
                             </h3>
                           </div>
                           <div className="flex items-center justify-center h-10 w-10 rounded-full border border-border group-hover:border-emerald-500/20 group-hover:bg-emerald-500/5 transition-all text-muted-foreground group-open:bg-emerald-500 group-open:text-white group-open:border-emerald-500 group-open:rotate-180 shrink-0">
-                             <ChevronDown className="h-5 w-5" />
+                            <ChevronDown className="h-5 w-5" />
                           </div>
                         </summary>
                         <div className="px-8 pb-8 pt-2 animate-in fade-in slide-in-from-top-2 duration-500">

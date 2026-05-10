@@ -98,19 +98,23 @@ const postRating = async (req, res) => {
       }
     );
 
-    // Notify the futsal owner about the new review
-    const futsalRecord = await Footsal.findOne({ where: { futsalCode: code } }).catch(() => null);
-    if (futsalRecord) {
-      const stars = '⭐'.repeat(Math.min(rating, 5));
-      const reviewPreview = review ? `"${review.substring(0, 80)}${review.length > 80 ? '...' : ''}"` : 'No text.';
-      createFutsalNotification({
-        futsalId: futsalRecord.id,
-        type: "new_review",
-        title: `New Review Received ${stars}`,
-        message: `A user left a ${rating}-star review: ${reviewPreview}`,
-        relatedType: "review",
-      }).catch(() => {});
-    }
+    // Notify the futsal owner about the new review - fire and forget
+    setImmediate(async () => {
+      try {
+        const futsalRecord = await Footsal.findOne({ where: { futsalCode: code } });
+        if (futsalRecord) {
+          const stars = '⭐'.repeat(Math.min(rating, 5));
+          const reviewPreview = review ? `"${review.substring(0, 80)}${review.length > 80 ? '...' : ''}"` : 'No text.';
+          await createFutsalNotification({
+            futsalId: futsalRecord.id,
+            type: "new_review",
+            title: `New Review Received ${stars}`,
+            message: `A user left a ${rating}-star review: ${reviewPreview}`,
+            relatedType: "review",
+          });
+        }
+      } catch (e) { /* silent */ }
+    });
 
     return res.status(201).json({
       success: true,
