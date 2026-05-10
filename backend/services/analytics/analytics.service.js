@@ -96,37 +96,37 @@ const getAnalyticsData = async (futsalCode) => {
     ),
 
     queryOrDefault(
-      [`ratings_${futsalCode}`],
+      [`rating_${futsalCode}`],
       `SELECT rating, COUNT(*) as count
-       FROM ratings_${futsalCode}
+       FROM rating_${futsalCode}
        GROUP BY rating`,
       []
     ),
 
     queryOrDefault(
-      [`ratings_${futsalCode}`],
+      [`rating_${futsalCode}`],
       `SELECT AVG(rating) as averageRating
-       FROM ratings_${futsalCode}`,
+       FROM rating_${futsalCode}`,
       [{ averageRating: 0 }]
     ),
 
     queryOrDefault(
-      [`ratings_${futsalCode}`],
+      [`rating_${futsalCode}`],
       `SELECT review,
         CASE
           WHEN sentiment_score > 0.5 THEN 'positive'
           WHEN sentiment_score < 0.5 THEN 'negative'
           ELSE 'neutral'
         END as sentiment
-       FROM ratings_${futsalCode}
+       FROM rating_${futsalCode}
        WHERE review IS NOT NULL AND review != ''`,
       []
     ),
 
     queryOrDefault(
-      [`ratings_${futsalCode}`],
+      [`rating_${futsalCode}`],
       `SELECT review, sentiment_score
-       FROM ratings_${futsalCode}
+       FROM rating_${futsalCode}
        WHERE sentiment_score > 0.5
        ORDER BY sentiment_score DESC
        LIMIT 5`,
@@ -134,9 +134,9 @@ const getAnalyticsData = async (futsalCode) => {
     ),
 
     queryOrDefault(
-      [`ratings_${futsalCode}`],
+      [`rating_${futsalCode}`],
       `SELECT review, sentiment_score
-       FROM ratings_${futsalCode}
+       FROM rating_${futsalCode}
        WHERE sentiment_score < 0.5
        ORDER BY sentiment_score ASC
        LIMIT 5`,
@@ -144,9 +144,9 @@ const getAnalyticsData = async (futsalCode) => {
     ),
 
     queryOrDefault(
-      [`visit_${futsalCode}`],
+      [`visitor_${futsalCode}`],
       `SELECT COUNT(DISTINCT user_id) as totalVisitors
-       FROM visit_${futsalCode}`,
+       FROM visitor_${futsalCode}`,
       [{ totalVisitors: 0 }]
     )
   ]);

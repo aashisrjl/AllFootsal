@@ -14,7 +14,8 @@ import {
   Inbox,
   Menu,
   X,
-  Bell
+  Bell,
+  Users
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -68,6 +69,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'Your Forums', href: '/forums', icon: MessageSquare },
     { name: 'Revenue', href: '/revenue', icon: DollarSign },
     { name: 'Subscription', href: '/subscription', icon: Wallet },
+    { name: 'Visitors', href: '/visitors', icon: Users },
     { name: 'Notifications', href: '/notifications', icon: Bell },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];

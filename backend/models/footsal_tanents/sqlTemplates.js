@@ -160,6 +160,7 @@ module.exports = {
       last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       INDEX idx_user_id (user_id),
       INDEX idx_ip_hash (ip_hash),
+      UNIQUE KEY uq_user (user_id),
       UNIQUE KEY uq_session (session_id)
     ) ENGINE=InnoDB;
   `,

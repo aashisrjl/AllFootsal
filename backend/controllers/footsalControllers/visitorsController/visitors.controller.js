@@ -22,13 +22,20 @@ const trackVisitor = async (req, res) => {
   const ua = req.get("user-agent") || null;
 
   try{
+    // Ensure unique constraint exists for user_id to enable ON DUPLICATE KEY UPDATE for users
+    // Multiple NULLs for guests won't conflict in MySQL UNIQUE index
+    await sequelize.query(
+      `ALTER TABLE visitor_${code} ADD UNIQUE INDEX IF NOT EXISTS uq_user (user_id)`,
+      { type: QueryTypes.RAW }
+    ).catch(() => {}); // Ignore error if already exists or not supported by version
+
   await sequelize.query(
     `INSERT INTO visitor_${code}
       (user_id, ip_hash, user_agent)
      VALUES (?, ?, ?)
      ON DUPLICATE KEY UPDATE
-      ip_hash = COALESCE(VALUES(ip_hash), ip_hash),
-      user_agent = COALESCE(VALUES(user_agent), user_agent),
+      ip_hash = IFNULL(VALUES(ip_hash), ip_hash),
+      user_agent = IFNULL(VALUES(user_agent), user_agent),
       visit_count = visit_count + 1,
       last_seen_at = CURRENT_TIMESTAMP`,
         {
@@ -52,7 +59,20 @@ const trackVisitor = async (req, res) => {
 const getVisitorsDetails = async (req,res) => {
     const futsalCode = req.futsalCode;
     const visitors = await sequelize.query(
-        `select v.*, u.username, u.email, u.phoneNumber from visitor_${futsalCode} v left join users u on v.user_id = u.id order by v.last_seen_at desc`,
+        `SELECT 
+            v.user_id,
+            MAX(v.ip_hash) as ip_hash,
+            MAX(v.user_agent) as user_agent,
+            SUM(v.visit_count) as visit_count,
+            MIN(v.first_seen_at) as first_seen_at,
+            MAX(v.last_seen_at) as last_seen_at,
+            u.username, 
+            u.email, 
+            u.phoneNumber 
+         FROM visitor_${futsalCode} v 
+         LEFT JOIN users u ON v.user_id = u.id 
+         GROUP BY v.user_id, IF(v.user_id IS NULL, v.id, NULL)
+         ORDER BY last_seen_at DESC`,
         {
             type: QueryTypes.SELECT,
         }

@@ -5,15 +5,7 @@ services:
     restart: always
     env_file:
       - .env
-    ports:
-      - "${PORT:-3000}:3000"
-    networks:
-      - services
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
-networks:
-  services:
-    external: false
-    name: services
-    driver: bridge
+    network_mode: "host"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules

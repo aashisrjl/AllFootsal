@@ -9,6 +9,8 @@ services:
       - "3003:8000"
     environment:
       - PYTHONUNBUFFERED=1
+    volumes:
+      - .:/app
     networks:
       - services
 

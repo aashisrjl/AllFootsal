@@ -9,6 +9,9 @@ services:
       - "3002:3002"
     environment:
       - VITE_API_URL=http://localhost:3000
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     networks:
       - services
 

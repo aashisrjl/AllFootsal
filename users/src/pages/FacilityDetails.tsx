@@ -4,7 +4,7 @@ import FutsalNavigation from "@/components/FutsalNavigation";
 import FutsalFooter from "@/components/FutsalFooter";
 import PitchCard from "@/components/PitchCard";
 import { useQuery } from "@tanstack/react-query";
-import { getFutsalById, getFutsalInfo, getFutsalLocation, getFutsalMedia, getFutsalPitches, sendContactMessage, getFutsalRatings, getEventMedia, getFutsalFaqs } from "@/lib/futsalApi";
+import { getFutsalById, getFutsalInfo, getFutsalLocation, getFutsalMedia, getFutsalPitches, sendContactMessage, getFutsalRatings, getEventMedia, getFutsalFaqs, trackVisitors } from "@/lib/futsalApi";
 import { useBooking } from "@/contexts/BookingContext";
 import { MapPin, Star, Clock, ArrowLeft, Loader2, CheckCircle2, Phone, Mail, CalendarDays, Navigation2, Facebook, Instagram, Globe, Send, MessageSquare, User, HelpCircle, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -77,6 +77,12 @@ const FacilityDetails = () => {
   const { data: pitchesData, isLoading: pitchesLoading } = useQuery({ queryKey: ['futsal-pitches', id], queryFn: () => getFutsalPitches(id as string), enabled: !!id, retry: false });
   const { data: ratingsData, isLoading: ratingsLoading } = useQuery({ queryKey: ['futsal-ratings', id], queryFn: () => getFutsalRatings(id as string), enabled: !!id, retry: false });
   const { data: faqsData } = useQuery({ queryKey: ['futsal-faqs', id], queryFn: () => getFutsalFaqs(id as string), enabled: !!id, retry: false });
+  
+  useEffect(() => {
+    if (id) {
+      trackVisitors(id).catch(err => console.error("Error tracking visitor:", err));
+    }
+  }, [id]);
 
   const isPageLoading = baseLoading || infoLoading || locLoading || pitchesLoading || homeMediaLoading;
 
