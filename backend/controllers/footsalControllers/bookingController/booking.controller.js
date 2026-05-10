@@ -501,10 +501,11 @@ const createBooking = async (req,res) => {
             }
         }
 
-        // 2. Double-Booking Protection: No one can book an already booked confirmed/pending slot
+        // 2. Double-Booking Protection: 
+        // Hard fail if confirmed or completed
         const existingSlot = await sequelize.query(
             `SELECT * FROM booking_${code} 
-             WHERE pitch_id = ? AND timeslot_id = ? AND booking_date = ? AND status != 'cancelled'`,
+             WHERE pitch_id = ? AND timeslot_id = ? AND booking_date = ? AND status IN ('confirmed', 'completed')`,
             {
                 replacements: [pitch_id, timeslot_id, booking_date],
                 type: QueryTypes.SELECT
@@ -513,6 +514,21 @@ const createBooking = async (req,res) => {
 
         if (existingSlot.length > 0) {
             return res.status(400).json({ success: false, message: "This slot is already booked by another user." });
+        }
+
+        // Soft fail if someone else is currently in the 5-minute checkout window
+        const pendingSlot = await sequelize.query(
+            `SELECT * FROM booking_${code} 
+             WHERE pitch_id = ? AND timeslot_id = ? AND booking_date = ? 
+               AND status = 'pending' AND user_id != ? AND created_at > (NOW() - INTERVAL 5 MINUTE)`,
+            {
+                replacements: [pitch_id, timeslot_id, booking_date, userId],
+                type: QueryTypes.SELECT
+            }
+        );
+
+        if (pendingSlot.length > 0) {
+            return res.status(400).json({ success: false, message: "This slot is currently being reviewed by another user. Please try again in 5 minutes." });
         }
 
         // 3. Simultaneous Booking Prevention: Ensure user's existing bookings don't overlap with this time
@@ -531,6 +547,10 @@ const createBooking = async (req,res) => {
         const requestedEnd = reqSlot.end_time;
 
         const isOverlapping = userActiveBookings.some(booking => {
+            // Ignore the exact same slot so the user can retry checkout for it
+            if (Number(booking.pitch_id) === Number(pitch_id) && Number(booking.timeslot_id) === Number(timeslot_id)) {
+                return false;
+            }
             return (requestedStart < booking.end_time && requestedEnd > booking.start_time);
         });
 
@@ -538,15 +558,28 @@ const createBooking = async (req,res) => {
              return res.status(400).json({ success: false, message: "You already have a booking that overlaps with this time." });
         }
 
-        // Insert validated booking
-        const [insertedId] = await sequelize.query(
-            `INSERT INTO booking_${code} (user_id, pitch_id, timeslot_id, booking_date, amount, notes) 
-             VALUES (?, ?, ?, ?, ?, ?)`,
+        // Insert validated booking using upsert so we can overwrite abandoned pending bookings
+        await sequelize.query(
+            `INSERT INTO booking_${code} (user_id, pitch_id, timeslot_id, booking_date, amount, notes, status, created_at) 
+             VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())
+             ON DUPLICATE KEY UPDATE 
+                user_id = VALUES(user_id),
+                amount = VALUES(amount),
+                notes = VALUES(notes),
+                status = 'pending',
+                created_at = NOW()`,
             {
                 replacements: [userId, pitch_id, timeslot_id, booking_date, amount, notes],
                 type: QueryTypes.INSERT,
             }
         );
+
+        // Fetch the ID directly safely
+        const fetchInserted = await sequelize.query(
+             `SELECT id FROM booking_${code} WHERE pitch_id = ? AND timeslot_id = ? AND booking_date = ?`,
+             { replacements: [pitch_id, timeslot_id, booking_date], type: QueryTypes.SELECT }
+        );
+        const insertedId = fetchInserted[0].id;
 
         try {
             const [user, futsal, pitch] = await Promise.all([

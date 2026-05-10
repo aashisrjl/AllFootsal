@@ -78,8 +78,11 @@ export const getFutsalPitches = async (id: number | string) => {
 };
 
 // get futsal timeslots
-export const getFutsalTimeSlots = async (futsalId: number | string, pitchId: number | string, dayOfWeek: number) => {
-    const res = await API.get(`/futsal/${futsalId}/timeslots?pitch_id=${pitchId}&day_of_week=${dayOfWeek}`);
+export const getFutsalTimeSlots = async (futsalId: number | string, pitchId: number | string, dayOfWeek: number, dateStr?: string) => {
+    const url = dateStr 
+        ? `/futsal/${futsalId}/timeslots?pitch_id=${pitchId}&day_of_week=${dayOfWeek}&date=${dateStr}`
+        : `/futsal/${futsalId}/timeslots?pitch_id=${pitchId}&day_of_week=${dayOfWeek}`;
+    const res = await API.get(url);
     return res.data;
 };
 

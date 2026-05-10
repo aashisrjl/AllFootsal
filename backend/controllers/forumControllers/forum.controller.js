@@ -16,6 +16,32 @@ const createForum = async (req,res)=>{
             futsal_id: futsalId
         });
 
+        try {
+            if (userId) {
+                const { createUserNotification } = require("../../services/notifications/notificationService");
+                await createUserNotification({
+                    userId: userId,
+                    type: "forum_created",
+                    title: "Forum Post Published 🎉",
+                    message: `Your post "${title}" is now live!`,
+                    relatedId: newForum.id,
+                    relatedType: "forum",
+                }).catch(console.error);
+            } else if (futsalId) {
+                const { createFutsalNotification } = require("../../services/notifications/notificationService");
+                await createFutsalNotification({
+                    futsalId: futsalId,
+                    type: "forum_created",
+                    title: "Forum Post Published 🎉",
+                    message: `Your post "${title}" is now live!`,
+                    relatedId: newForum.id,
+                    relatedType: "forum",
+                }).catch(console.error);
+            }
+        } catch (notifyErr) {
+            console.error("Error sending forum creation notification:", notifyErr);
+        }
+
         res.status(201).json({
             success:true,
             message:"Forum created successfully",

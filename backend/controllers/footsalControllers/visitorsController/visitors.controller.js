@@ -23,26 +23,50 @@ const trackVisitor = async (req, res) => {
 
   try{
     // Ensure unique constraint exists for user_id to enable ON DUPLICATE KEY UPDATE for users
-    // Multiple NULLs for guests won't conflict in MySQL UNIQUE index
     await sequelize.query(
       `ALTER TABLE visitor_${code} ADD UNIQUE INDEX IF NOT EXISTS uq_user (user_id)`,
       { type: QueryTypes.RAW }
     ).catch(() => {}); // Ignore error if already exists or not supported by version
 
-  await sequelize.query(
-    `INSERT INTO visitor_${code}
-      (user_id, ip_hash, user_agent)
-     VALUES (?, ?, ?)
-     ON DUPLICATE KEY UPDATE
-      ip_hash = IFNULL(VALUES(ip_hash), ip_hash),
-      user_agent = IFNULL(VALUES(user_agent), user_agent),
-      visit_count = visit_count + 1,
-      last_seen_at = CURRENT_TIMESTAMP`,
-        {
-            replacements: [userId,ipHash, ua],
-            type: QueryTypes.INSERT,
-        }
-  );
+    if (userId) {
+      // Logged in user: utilize ON DUPLICATE KEY UPDATE on uq_user
+      await sequelize.query(
+        `INSERT INTO visitor_${code}
+          (user_id, ip_hash, user_agent)
+         VALUES (?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+          ip_hash = IFNULL(VALUES(ip_hash), ip_hash),
+          user_agent = IFNULL(VALUES(user_agent), user_agent),
+          visit_count = visit_count + 1,
+          last_seen_at = CURRENT_TIMESTAMP`,
+            {
+                replacements: [userId, ipHash, ua],
+                type: QueryTypes.INSERT,
+            }
+      );
+    } else {
+      // Guest visitor: manually check for existing ip_hash to consolidate visits
+      const existingGuest = await sequelize.query(
+          `SELECT id FROM visitor_${code} WHERE ip_hash = ? AND user_id IS NULL LIMIT 1`,
+          { replacements: [ipHash], type: QueryTypes.SELECT }
+      );
+
+      if (existingGuest.length > 0) {
+          await sequelize.query(
+              `UPDATE visitor_${code} 
+               SET visit_count = visit_count + 1, 
+                   last_seen_at = CURRENT_TIMESTAMP, 
+                   user_agent = ? 
+               WHERE id = ?`,
+              { replacements: [ua, existingGuest[0].id], type: QueryTypes.UPDATE }
+          );
+      } else {
+          await sequelize.query(
+              `INSERT INTO visitor_${code} (user_id, ip_hash, user_agent) VALUES (NULL, ?, ?)`,
+              { replacements: [ipHash, ua], type: QueryTypes.INSERT }
+          );
+      }
+    }
   }catch(err){
     console.error("Error tracking visitor:", err);
     return res.status(500).json({

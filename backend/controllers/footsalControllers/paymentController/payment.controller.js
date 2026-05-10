@@ -10,6 +10,7 @@ const {
     initiateKhaltiPayment,
     verifyKhaltiPayment
 } = require("../../../services/khalti/usersToFutsal.khalti.service");
+const { createUserNotification, createFutsalNotification } = require("../../../services/notifications/notificationService");
 
 const VALID_GATEWAYS = new Set(["cash", "khalti", "esewa", "bank_transfer"]);
 const VALID_STATUSES = new Set(["pending", "success", "failed", "refunded"]);
@@ -1062,8 +1063,31 @@ const verifyPayment = async (req, res) => {
                         },
                     });
                 }
+                
+                // In-app Notifications
+                if (booking) {
+                    await Promise.all([
+                        user && createUserNotification({
+                            userId: user.id,
+                            type: "booking_confirmed",
+                            title: "Payment Verified & Booking Confirmed 🎉",
+                            message: `Your payment was successful and your booking for ${booking.pitch_name} on ${booking.booking_date} is now confirmed.`,
+                            relatedId: booking.id,
+                            relatedType: "booking",
+                        }),
+                        futsal && createFutsalNotification({
+                            futsalId: futsal.id,
+                            type: "booking_confirmed",
+                            title: "Booking Payment Confirmed 💰",
+                            message: `Payment verified via ${payment.gateway}. Booking #${booking.id} (${booking.pitch_name}) is now confirmed.`,
+                            relatedId: booking.id,
+                            relatedType: "booking",
+                        })
+                    ].filter(Boolean));
+                }
+
             } catch (notifyErr) {
-                console.error("Error sending automated payment confirmation emails:", notifyErr);
+                console.error("Error sending automated payment confirmation notifications:", notifyErr);
             }
         }
 
