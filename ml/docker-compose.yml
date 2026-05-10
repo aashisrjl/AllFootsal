@@ -1,6 +1,8 @@
 services:
   ml:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: futsal-ml
     restart: always
     ports:
@@ -9,8 +11,6 @@ services:
       - PYTHONUNBUFFERED=1
     networks:
       - services
-    volumes:
-      - .:/app
 
 networks:
   services:

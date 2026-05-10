@@ -1,6 +1,8 @@
 services:
   futsal:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: futsal-dashboard
     restart: always
     ports:
@@ -9,9 +11,6 @@ services:
       - VITE_API_URL=http://localhost:3000
     networks:
       - services
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
 
 networks:
   services:

@@ -11,6 +11,7 @@ import {
   LogOut,
   Image as ImageIcon,
   MessageSquare,
+  Inbox,
   Menu,
   X,
   Bell
@@ -27,6 +28,34 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const { futsalProfile, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [unreadMessages, setUnreadMessages] = useState(0);
+
+  const apiBaseUrl = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
+
+  useEffect(() => {
+    if (!futsalProfile?.id) return;
+    const token = localStorage.getItem('token');
+    fetch(`${apiBaseUrl}/futsal/${futsalProfile.id}/media/logo`, {
+      credentials: 'include',
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then(r => r.json())
+      .then(body => { if (body?.data?.url) setLogoUrl(body.data.url); })
+      .catch(() => {});
+
+    // Fetch unread contact count
+    fetch(`${apiBaseUrl}/futsal/contact`, {
+      credentials: 'include',
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then(r => r.json())
+      .then(body => {
+        const msgs = body?.data || [];
+        setUnreadMessages(msgs.filter((m: any) => !m.is_read).length);
+      })
+      .catch(() => {});
+  }, [futsalProfile?.id]);
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -34,6 +63,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'Bookings', href: '/bookings', icon: Calendar },
     { name: 'Pitch Management', href: '/pitches', icon: MapPin },
     { name: 'Media Management', href: '/media', icon: ImageIcon },
+    { name: 'Messages', href: '/messages', icon: Inbox, badge: unreadMessages },
     { name: 'Ratings & Reviews', href: '/ratings', icon: MessageSquare },
     { name: 'Your Forums', href: '/forums', icon: MessageSquare },
     { name: 'Revenue', href: '/revenue', icon: DollarSign },
@@ -66,8 +96,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="flex flex-col h-full">
       <div className="flex h-16 items-center justify-center border-b border-slate-800/80 px-4 relative">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)]">
-            <span className="font-bold text-white text-lg leading-none pt-0.5">F</span>
+          <div className="w-8 h-8 rounded-lg overflow-hidden bg-emerald-500 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)] flex-shrink-0">
+            {logoUrl ? (
+              <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+            ) : (
+              <span className="font-bold text-white text-lg leading-none pt-0.5">F</span>
+            )}
           </div>
           <h1 className="text-xl font-black tracking-tight bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent uppercase pt-0.5">
             Owner Panel
@@ -182,8 +216,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     {futsalProfile?.ownerName || 'Owner'}
                   </span>
                 </div>
-                <div className="w-8 h-8 lg:w-9 lg:h-9 text-xs rounded-full bg-gradient-to-tr from-emerald-500 to-emerald-700 flex items-center justify-center text-white font-black shadow-lg border-2 border-slate-800/80 relative overflow-hidden group-hover:scale-105 transition-transform">
-                  {futsalProfile?.futsalName?.substring(0, 2).toUpperCase() || 'FA'}
+                <div className="w-8 h-8 lg:w-9 lg:h-9 text-xs rounded-full overflow-hidden bg-gradient-to-tr from-emerald-500 to-emerald-700 flex items-center justify-center text-white font-black shadow-lg border-2 border-slate-800/80 relative group-hover:scale-105 transition-transform">
+                  {logoUrl ? (
+                    <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                  ) : (
+                    <>{futsalProfile?.futsalName?.substring(0, 2).toUpperCase() || 'FA'}</>
+                  )}
                   <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
               </div>
