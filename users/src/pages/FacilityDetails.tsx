@@ -4,7 +4,7 @@ import FutsalNavigation from "@/components/FutsalNavigation";
 import FutsalFooter from "@/components/FutsalFooter";
 import PitchCard from "@/components/PitchCard";
 import { useQuery } from "@tanstack/react-query";
-import { getFutsalById, getFutsalInfo, getFutsalLocation, getFutsalMedia, getFutsalPitches, sendContactMessage, getFutsalRatings, getEventMedia, getFutsalFaqs } from "@/lib/futsalApi";
+import { getFutsalById, getFutsalInfo, getFutsalLocation, getFutsalMedia, getFutsalPitches, sendContactMessage, getFutsalRatings, getEventMedia, getFutsalFaqs, trackVisitors } from "@/lib/futsalApi";
 import { useBooking } from "@/contexts/BookingContext";
 import { MapPin, Star, Clock, ArrowLeft, Loader2, CheckCircle2, Phone, Mail, CalendarDays, Navigation2, Facebook, Instagram, Globe, Send, MessageSquare, User, HelpCircle, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -72,9 +72,17 @@ const FacilityDetails = () => {
   const { data: facilityMediaData, isLoading: facilityMediaLoading } = useQuery({ queryKey: ['futsal-media-facility', id], queryFn: () => getFutsalMedia(id as string, 'facility'), enabled: !!id, retry: false });
   const { data: eventMediaData, isLoading: eventLoading } = useQuery({ queryKey: ['futsal-media-event', id], queryFn: () => getEventMedia(id as string), enabled: !!id, retry: false });
   const { data: pitchMediaData } = useQuery({ queryKey: ['futsal-media-pitch', id], queryFn: () => getFutsalMedia(id as string, 'pitch'), enabled: !!id, retry: false });
+  const { data: logoData } = useQuery({ queryKey: ['futsal-media-logo', id], queryFn: () => getFutsalMedia(id as string, 'logo'), enabled: !!id, retry: false });
+  const { data: bannerData } = useQuery({ queryKey: ['futsal-media-banner', id], queryFn: () => getFutsalMedia(id as string, 'banner'), enabled: !!id, retry: false });
   const { data: pitchesData, isLoading: pitchesLoading } = useQuery({ queryKey: ['futsal-pitches', id], queryFn: () => getFutsalPitches(id as string), enabled: !!id, retry: false });
   const { data: ratingsData, isLoading: ratingsLoading } = useQuery({ queryKey: ['futsal-ratings', id], queryFn: () => getFutsalRatings(id as string), enabled: !!id, retry: false });
   const { data: faqsData } = useQuery({ queryKey: ['futsal-faqs', id], queryFn: () => getFutsalFaqs(id as string), enabled: !!id, retry: false });
+  
+  useEffect(() => {
+    if (id) {
+      trackVisitors(id).catch(err => console.error("Error tracking visitor:", err));
+    }
+  }, [id]);
 
   const isPageLoading = baseLoading || infoLoading || locLoading || pitchesLoading || homeMediaLoading;
 
@@ -83,6 +91,10 @@ const FacilityDetails = () => {
   const loc = locData?.data?.[0];
   const reviews = ratingsData?.data?.slice(0, 5) || [];
   const faqs = faqsData?.data || [];
+
+  // Logo & banner
+  const logoUrl: string | null = logoData?.data?.url || (logoData?.data?.[0]?.url) || null;
+  const bannerUrl: string | null = bannerData?.data?.url || (bannerData?.data?.[0]?.url) || null;
 
   // Collect images
   const allHomeMedia = homeMediaData?.data || [];
@@ -113,7 +125,7 @@ const FacilityDetails = () => {
     location: loc ? `${loc.address || ''}, ${loc.city || ''}`.replace(/^,\s*/, '') : "Location not provided",
     description: info?.additional_info || "Premium Futsal arena matching strictly maintained grounds standards and top-tier facilities for the best playing experience.",
     images: combinedPreviewImages,
-    coverImage: homeImageUrls[0],
+    coverImage: bannerUrl || homeImageUrls[0],
     latitude: loc?.latitude,
     longitude: loc?.longitude,
     contactPhone: futsal.phoneNumber || "+977-9800000000",
@@ -208,6 +220,15 @@ const FacilityDetails = () => {
             className="absolute inset-0 w-full h-full object-cover z-0"
           />
           <div className="absolute inset-0 bg-gradient-to-tr from-slate-950/95 via-slate-900/80 to-emerald-900/40 mix-blend-multiply z-10" />
+
+        {/* Logo badge overlay */}
+          {logoUrl && (
+            <div className="absolute top-6 left-6 z-30">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-white/10 backdrop-blur-sm">
+                <img src={logoUrl} alt="Futsal Logo" className="w-full h-full object-cover" />
+              </div>
+            </div>
+          )}
 
           <div className="absolute inset-0 flex flex-col justify-center z-20 container mx-auto px-4 md:px-6">
             <div className="max-w-3xl animate-in fade-in slide-in-from-bottom-10 duration-1000">

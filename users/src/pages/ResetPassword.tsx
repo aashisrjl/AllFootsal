@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 import {
   AuthBackground,
@@ -20,7 +20,6 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(180);
-  const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -42,16 +41,9 @@ const ResetPassword = () => {
     try {
       await resendOtp(email, 'forgot_password');
       setResendTimer(180);
-      toast({
-        title: "OTP Resent",
-        description: "Check your email for the new OTP.",
-      });
+      toast.success("OTP Resent: Check your email for the new OTP.");
     } catch {
-      toast({
-        title: "Error",
-        description: "Failed to resend OTP.",
-        variant: "destructive",
-      });
+      toast.error("Error: Failed to resend OTP.");
     } finally {
       setIsLoading(false);
     }
@@ -60,18 +52,11 @@ const ResetPassword = () => {
   // Verify OTP
   const handleVerifyOTP = () => {
     if (otp.length !== 6 || isNaN(Number(otp))) {
-      toast({
-        title: "Invalid OTP",
-        description: "Please enter a valid 6-digit numeric OTP.",
-        variant: "destructive",
-      });
+      toast.error("Invalid OTP: Please enter a valid 6-digit numeric OTP.");
       return;
     }
     setOtpVerified(true);
-    toast({
-      title: "OTP Verified",
-      description: "Now you can set a new password.",
-    });
+    toast.success("OTP Verified: Now you can set a new password.");
   };
 
   // Handle password reset
@@ -79,37 +64,22 @@ const ResetPassword = () => {
     e.preventDefault();
 
     if (!newPassword || !confirmPassword) {
-      toast({
-        title: "Fields Required",
-        description: "Please enter and confirm your new password.",
-        variant: "destructive",
-      });
+      toast.error("Fields Required: Please enter and confirm your new password.");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast({
-        title: "Password Mismatch",
-        description: "New password and confirm password do not match.",
-        variant: "destructive",
-      });
+      toast.error("Password Mismatch: New password and confirm password do not match.");
       return;
     }
 
     setIsLoading(true);
     try {
       await resetPassword({ email, otp, newPassword, cNewPassword: confirmPassword });
-      toast({
-        title: "Success",
-        description: "Your password has been reset successfully.",
-      });
+      toast.success("Success: Your password has been reset successfully.");
       navigate("/auth/login");
     } catch {
-      toast({
-        title: "Error",
-        description: "Failed to reset password. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Error: Failed to reset password. Please try again.");
     } finally {
       setIsLoading(false);
     }

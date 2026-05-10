@@ -1,17 +1,19 @@
 services:
   users:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: futsal-users
     restart: always
     ports:
       - "3001:3001"
     environment:
       - VITE_API_URL=http://localhost:3000
-    networks:
-      - services
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    networks:
+      - services
 
 networks:
   services:

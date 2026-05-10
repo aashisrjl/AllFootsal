@@ -59,10 +59,10 @@ help:
 
 build:
 	@echo "$(YELLOW)Building all service images...$(NC)"
-	@docker-compose -f $(BACKEND_DIR)/docker-compose.yml \
-	                -f $(USERS_DIR)/docker-compose.yml \
-	                -f $(FUTSAL_DIR)/docker-compose.yml \
-	                -f $(ML_DIR)/docker-compose.yml build
+	@cd $(BACKEND_DIR) && docker-compose build backend
+	@cd $(USERS_DIR) && docker-compose build users
+	@cd $(FUTSAL_DIR) && docker-compose build futsal
+	@cd $(ML_DIR) && docker-compose build ml
 	@echo "$(GREEN)✓ All images built successfully$(NC)"
 
 build-backend:
@@ -96,18 +96,17 @@ up:
 	@echo "$(YELLOW)Futsal dashboard on: http://localhost:3002$(NC)"
 	@echo "$(YELLOW)ML service on: http://localhost:3003$(NC)"
 	@echo ""
-	@docker-compose -f $(BACKEND_DIR)/docker-compose.yml \
-	                -f $(USERS_DIR)/docker-compose.yml \
-	                -f $(FUTSAL_DIR)/docker-compose.yml \
-	                -f $(ML_DIR)/docker-compose.yml up -d
+	@cd $(BACKEND_DIR) && docker-compose up -d backend
+	@cd $(USERS_DIR) && docker-compose up -d users
+	@cd $(FUTSAL_DIR) && docker-compose up -d futsal
+	@cd $(ML_DIR) && docker-compose up -d ml
 	@echo "$(GREEN)✓ All services started$(NC)"
 
 down:
 	@echo "$(YELLOW)Stopping all services...$(NC)"
-	@docker-compose -f $(BACKEND_DIR)/docker-compose.yml \
-	                -f $(USERS_DIR)/docker-compose.yml \
-	                -f $(FUTSAL_DIR)/docker-compose.yml \
-	                -f $(ML_DIR)/docker-compose.yml down
+	@docker stop futsal-backend futsal-users futsal-dashboard futsal-ml 2>/dev/null || true
+	@docker rm futsal-backend futsal-users futsal-dashboard futsal-ml 2>/dev/null || true
+	@docker network rm services 2>/dev/null || true
 	@echo "$(GREEN)✓ All services stopped$(NC)"
 
 restart: down up
@@ -143,22 +142,26 @@ up-ml:
 
 down-backend:
 	@echo "$(YELLOW)Stopping backend...$(NC)"
-	@docker-compose -f $(BACKEND_DIR)/docker-compose.yml down
+	@docker stop futsal-backend 2>/dev/null || true
+	@docker rm futsal-backend 2>/dev/null || true
 	@echo "$(GREEN)✓ Backend stopped$(NC)"
 
 down-users:
 	@echo "$(YELLOW)Stopping users...$(NC)"
-	@docker-compose -f $(USERS_DIR)/docker-compose.yml down
+	@docker stop futsal-users 2>/dev/null || true
+	@docker rm futsal-users 2>/dev/null || true
 	@echo "$(GREEN)✓ Users stopped$(NC)"
 
 down-futsal:
 	@echo "$(YELLOW)Stopping futsal...$(NC)"
-	@docker-compose -f $(FUTSAL_DIR)/docker-compose.yml down
+	@docker stop futsal-dashboard 2>/dev/null || true
+	@docker rm futsal-dashboard 2>/dev/null || true
 	@echo "$(GREEN)✓ Futsal stopped$(NC)"
 
 down-ml:
 	@echo "$(YELLOW)Stopping ML...$(NC)"
-	@docker-compose -f $(ML_DIR)/docker-compose.yml down
+	@docker stop futsal-ml 2>/dev/null || true
+	@docker rm futsal-ml 2>/dev/null || true
 	@echo "$(GREEN)✓ ML stopped$(NC)"
 
 # ============================================================================
@@ -166,11 +169,21 @@ down-ml:
 # ============================================================================
 
 logs:
-	@echo "$(BLUE)Viewing all service logs...$(NC)"
-	@docker-compose -f $(BACKEND_DIR)/docker-compose.yml \
-	                -f $(USERS_DIR)/docker-compose.yml \
-	                -f $(FUTSAL_DIR)/docker-compose.yml \
-	                -f $(ML_DIR)/docker-compose.yml logs -f
+	@echo "$(BLUE)Showing recent logs from all services:$(NC)"
+	@echo ""
+	@echo "$(YELLOW)=== Backend ====$(NC)"
+	@docker logs -n 20 --tail=20 futsal-backend 2>/dev/null || echo "Backend container not running"
+	@echo ""
+	@echo "$(YELLOW)=== Users ====$(NC)"
+	@docker logs -n 20 --tail=20 futsal-users 2>/dev/null || echo "Users container not running"
+	@echo ""
+	@echo "$(YELLOW)=== Futsal ====$(NC)"
+	@docker logs -n 20 --tail=20 futsal-dashboard 2>/dev/null || echo "Futsal container not running"
+	@echo ""
+	@echo "$(YELLOW)=== ML ====$(NC)"
+	@docker logs -n 20 --tail=20 futsal-ml 2>/dev/null || echo "ML container not running"
+	@echo ""
+	@echo "$(BLUE)Tip: Use 'make logs-backend' for live backend logs$(NC)"
 
 logs-backend:
 	@docker-compose -f $(BACKEND_DIR)/docker-compose.yml logs -f backend
@@ -191,10 +204,10 @@ logs-ml:
 status:
 	@echo "$(BLUE)Service Status:$(NC)"
 	@echo ""
-	@docker-compose -f $(BACKEND_DIR)/docker-compose.yml \
-	                -f $(USERS_DIR)/docker-compose.yml \
-	                -f $(FUTSAL_DIR)/docker-compose.yml \
-	                -f $(ML_DIR)/docker-compose.yml ps
+	@docker-compose -f $(BACKEND_DIR)/docker-compose.yml ps
+	@docker-compose -f $(USERS_DIR)/docker-compose.yml ps
+	@docker-compose -f $(FUTSAL_DIR)/docker-compose.yml ps
+	@docker-compose -f $(ML_DIR)/docker-compose.yml ps
 
 # ============================================================================
 # Cleanup Commands
@@ -202,10 +215,10 @@ status:
 
 clean:
 	@echo "$(YELLOW)Stopping and removing all containers...$(NC)"
-	@docker-compose -f $(BACKEND_DIR)/docker-compose.yml \
-	                -f $(USERS_DIR)/docker-compose.yml \
-	                -f $(FUTSAL_DIR)/docker-compose.yml \
-	                -f $(ML_DIR)/docker-compose.yml down 2>/dev/null || true
+	@cd $(BACKEND_DIR) && docker-compose down 2>/dev/null || true
+	@cd $(USERS_DIR) && docker-compose down 2>/dev/null || true
+	@cd $(FUTSAL_DIR) && docker-compose down 2>/dev/null || true
+	@cd $(ML_DIR) && docker-compose down 2>/dev/null || true
 	@echo "$(GREEN)✓ Cleanup complete$(NC)"
 
 clean-all: clean

@@ -20,25 +20,7 @@ import {
   Instagram
 } from "lucide-react";
 import { FaTiktok } from "react-icons/fa";
-
-// --- START: PLACEHOLDER UI COMPONENTS (Simulating external dependencies like shadcn/ui) ---
-
-// 1. Toast Utility
-interface ToastParams {
-    title: string;
-    description: string;
-    variant?: 'default' | 'destructive';
-}
-const useToast = () => {
-    // In a real app, this would show a notification, here we just log.
-    return {
-        toast: ({ title, description, variant }: ToastParams) => {
-            console.log(`[TOAST - ${variant || 'default'}] ${title}: ${description}`);
-            // In a real browser context, you might alert or set a temporary state to show a banner
-        }
-    };
-};
-const toast = useToast().toast;
+import { toast } from "sonner";
 
 // 2. Button
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -171,10 +153,7 @@ const Contact: React.FC = () => {
     
     // Simulate network request
     setTimeout(() => {
-      toast({
-        title: "Message Sent Successfully",
-        description: "Thank you for reaching out! We aim to respond within 24 hours.",
-      });
+      toast.success("Message Sent Successfully: Thank you for reaching out! We aim to respond within 24 hours.");
       
       setShowSuccess(true);
       setFormData({ name: "", email: "", subject: "", message: "" });

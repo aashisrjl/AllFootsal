@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { LogIn } from "lucide-react";
 import {
   AuthBackground,
@@ -18,16 +18,13 @@ const ForgotPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email) {
-      toast({
-        title: "Email Required",
+      toast.error("Email Required", {
         description: "Please enter your registered email.",
-        variant: "destructive",
       });
       return;
     }
@@ -36,17 +33,14 @@ const ForgotPassword = () => {
     try {
       await forgotPassword(email);
 
-      toast({
-        title: "OTP Sent",
+      toast.success("OTP Sent", {
         description: "Check your email for the OTP to reset your password.",
       });
 
       navigate("/auth/reset-password", { state: { email } });
     } catch (error) {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to send OTP. Please try again later.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);

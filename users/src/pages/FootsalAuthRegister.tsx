@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { LogIn, ArrowLeft } from "lucide-react";
 import {
   AuthBackground,
@@ -14,7 +14,6 @@ import {
 
 const FootsalAuthRegister = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { registerFootsal } = useAuth();
 
   const [step, setStep] = useState(1); // step 1 = futsal info, step 2 = credentials
@@ -39,37 +38,22 @@ const FootsalAuthRegister = () => {
     e.preventDefault();
 
     if (!formData.footsalName || !formData.ownerName || !formData.ownerEmail || !formData.phoneNumber) {
-      toast({
-        title: "Missing Fields",
-        description: "Please fill all required fields.",
-        variant: "destructive",
-      });
+      toast.warning("Please fill all required fields.");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.ownerEmail)) {
-      toast({
-        title: "Invalid Email",
-        description: "Please enter a valid owner email.",
-        variant: "destructive",
-      });
+      toast.error("Please enter a valid owner email.");
       return;
     }
 
     if (!/^[0-9]{10}$/.test(formData.phoneNumber)) {
-      toast({
-        title: "Invalid Phone",
-        description: "Please enter a valid 10-digit phone number.",
-        variant: "destructive",
-      });
+      toast.error("Please enter a valid 10-digit phone number.");
       return;
     }
 
-    toast({
-      title: "Info Saved",
-      description: "Now set your credentials to complete registration.",
-    });
+    toast.success("Info Saved. Now set your credentials to complete registration.");
     setStep(2);
   };
 
@@ -78,39 +62,23 @@ const FootsalAuthRegister = () => {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      toast({
-        title: "Missing Fields",
-        description: "Please enter email and password.",
-        variant: "destructive",
-      });
+      toast.warning("Please enter email and password.");
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Password Mismatch",
-        description: "Password and confirm password must match.",
-        variant: "destructive",
-      });
+      toast.error("Password and confirm password must match.");
       return;
     }
 
     if (formData.password.length < 6) {
-      toast({
-        title: "Weak Password",
-        description: "Password must be at least 6 characters.",
-        variant: "destructive",
-      });
+      toast.warning("Password must be at least 6 characters.");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      toast({
-        title: "Invalid Email",
-        description: "Please enter a valid futsal account email.",
-        variant: "destructive",
-      });
+      toast.error("Please enter a valid futsal account email.");
       return;
     }
 

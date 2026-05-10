@@ -16,6 +16,10 @@ const {
   deleteMediaByCategory,
   deleteMediaById,
   getMediaBycategory,
+  getLogo,
+  getBanner,
+  uploadLogo,
+  uploadBanner,
 } = require("../../../controllers/footsalControllers/mediaController/media.controller");
 const resolveFutsalTenant = require("../../../middleware/tanentMiddleware/tanent.middleware");
 
@@ -96,5 +100,28 @@ router.delete(
   deleteMediaById
 );
 
-module.exports = router;
+// logo & banner — public GET (by futsalId)
+router.get(
+  "/futsal/:futsalId/media/logo", // #swagger.tags = ['Futsal/Tenant/Media']
+  getLogo
+);
+router.get(
+  "/futsal/:futsalId/media/banner", // #swagger.tags = ['Futsal/Tenant/Media']
+  getBanner
+);
 
+// logo & banner — owner POST (replaces existing)
+router.post(
+  "/futsal/media/logo/upload", // #swagger.tags = ['Futsal/Tenant/Media']
+  isFutsalAuthenticated,
+  mediaUpload.single("media"),
+  uploadLogo
+);
+router.post(
+  "/futsal/media/banner/upload", // #swagger.tags = ['Futsal/Tenant/Media']
+  isFutsalAuthenticated,
+  mediaUpload.single("media"),
+  uploadBanner
+);
+
+module.exports = router;

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Calendar, Filter, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { cancelOwnerBooking, confirmOwnerBooking, getOwnerBookings, unconfirmOwnerBooking } from '../lib/bookingApi';
+import { toast } from 'sonner';
 
 const BookingManagement = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -37,37 +38,37 @@ const BookingManagement = () => {
   }, []);
 
   const handleCancelBooking = async (id: number) => {
-    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
     try {
       // Optimistic
       setBookings(bookings.map(b => b.id === id ? { ...b, status: 'cancelled' } : b));
       await cancelOwnerBooking(id);
-    } catch (error) {
-      console.error('Failed to cancel booking', error);
+      toast.success('Booking cancelled successfully');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to cancel booking');
       fetchBookings(); // revert
     }
   };
 
   const handleConfirmBooking = async (id: number) => {
-    if (!window.confirm("Are you sure you want to confirm this booking?")) return;
     try {
       // Optimistic
       setBookings(bookings.map(b => b.id === id ? { ...b, status: 'confirmed' } : b));
       await confirmOwnerBooking(id);
-    } catch (error) {
-      console.error('Failed to confirm booking', error);
+      toast.success('Booking confirmed');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to confirm booking');
       fetchBookings(); // revert
     }
   };
 
   const handleUnconfirmBooking = async (id: number) => {
-    if (!window.confirm("Are you sure you want to unconfirm this booking?")) return;
     try {
       // Optimistic
       setBookings(bookings.map(b => b.id === id ? { ...b, status: 'pending' } : b));
       await unconfirmOwnerBooking(id);
-    } catch (error) {
-      console.error('Failed to unconfirm booking', error);
+      toast.success('Booking marked as pending');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to unconfirm booking');
       fetchBookings(); // revert
     }
   };

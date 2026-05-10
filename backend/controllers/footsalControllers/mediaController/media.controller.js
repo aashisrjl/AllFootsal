@@ -2,6 +2,7 @@ const { sequelize, Footsal } = require("../../../models");
 const { QueryTypes } = require("sequelize");
 const fs = require("fs");
 const { uploadToCloudinary } = require("../../../services/cloudinary/cloudinary.service");
+const { createFutsalNotification } = require("../../../services/notifications/notificationService");
 
 const getUploadedMediaFiles = (req) => {
   if (Array.isArray(req.files) && req.files.length > 0) return req.files;
@@ -113,6 +114,28 @@ const uploadMedia = async (req, res) => {
       );
 
       uploaded.push(cloudinaryResult.secure_url);
+    }
+
+    const categoryLabels = {
+      logo: 'Logo',
+      banner: 'Banner',
+      home: 'Home Gallery',
+      facility: 'Facility Gallery',
+      pitch: 'Pitch',
+      event: 'Event',
+    };
+    const categoryLabel = categoryLabels[category] || category;
+
+    // Notify futsal owner about the upload
+    const futsalOwner = await Footsal.findOne({ where: { futsalCode: code } }).catch(() => null);
+    if (futsalOwner) {
+      createFutsalNotification({
+        futsalId: futsalOwner.id,
+        type: "media_uploaded",
+        title: `${categoryLabel} Uploaded 🖼️`,
+        message: `${uploaded.length} ${categoryLabel.toLowerCase()} file(s) uploaded successfully.`,
+        relatedType: "media",
+      }).catch(() => {});
     }
 
     return res.status(200).json({
@@ -676,109 +699,122 @@ const getMediaBycategory = async (req, res) => {
 }
 
 
-const uploadLogo = async (req,res)=>{
-const code = req.futsalCode || req.tanent?.code;
-if (!code) {
-  return res.status(400).json({
-    success: false,
-    message: "futsal code is required",
-  });
-}
+const getLogo = async (req, res) => {
+  try {
+    const code = req.futsalCode || req.tanent?.code ||
+      await (async () => {
+        const id = req.params?.futsalId;
+        if (!id) return null;
+        const f = await Footsal.findOne({ where: { id } });
+        return f?.futsalCode || null;
+      })();
+
+    if (!code) return res.status(400).json({ success: false, message: "futsal code is required" });
+    await ensureMediaTableExists(code);
+    const rows = await sequelize.query(
+      `SELECT * FROM media_${code} WHERE category = 'logo' ORDER BY id DESC LIMIT 1`,
+      { type: QueryTypes.SELECT }
+    );
+    return res.status(200).json({ success: true, data: rows[0] || null });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+  }
+};
+
+const uploadLogo = async (req, res) => {
+  const code = req.futsalCode || req.tanent?.code;
+  if (!code) {
+    return res.status(400).json({ success: false, message: "futsal code is required" });
+  }
 
   await ensureMediaTableExists(code);
   const mediaFiles = getUploadedMediaFiles(req);
   if (!mediaFiles.length) {
-    return res.status(400).json({
-      success: false,
-      message: "media is required",
-    });
+    return res.status(400).json({ success: false, message: "media is required" });
   }
   const media = mediaFiles[0];
   const mediaType = getMediaType(media.mimetype);
   if (!mediaType) {
-    return res.status(400).json({
-      success: false,
-      message: "invalid media type",
-    });
+    return res.status(400).json({ success: false, message: "invalid media type" });
   }
 
   const cloudinaryResult = await uploadToCloudinary(media.path, {
     folder: `allfutsal/media/${code}/logo`,
     resource_type: mediaType === "video" ? "video" : "image",
   });
-
   safeDeleteLocalFile(media.path);
 
+  // Replace existing logo (delete then insert)
+  await sequelize.query(`DELETE FROM media_${code} WHERE category = 'logo'`, { type: QueryTypes.DELETE });
   await sequelize.query(
-    `INSERT INTO media_${code} (type, category, url)
-     VALUES (:mediaType, 'logo', :mediaUrl)`,
-    {
-      replacements: {
-        mediaType,
-        mediaUrl: cloudinaryResult.secure_url,
-      },
-      type: QueryTypes.INSERT,
-    }
+    `INSERT INTO media_${code} (type, category, url) VALUES (:mediaType, 'logo', :mediaUrl)`,
+    { replacements: { mediaType, mediaUrl: cloudinaryResult.secure_url }, type: QueryTypes.INSERT }
   );
 
   return res.status(200).json({
     success: true,
     message: "logo uploaded successfully",
-    data: {
-      url: cloudinaryResult.secure_url,
-    },
+    data: { url: cloudinaryResult.secure_url },
   });
 }
 
-const uploadBanner = async (req,res)=>{
+const getBanner = async (req, res) => {
+  try {
+    const code = req.futsalCode || req.tanent?.code ||
+      await (async () => {
+        const id = req.params?.futsalId;
+        if (!id) return null;
+        const f = await Footsal.findOne({ where: { id } });
+        return f?.futsalCode || null;
+      })();
+
+    if (!code) return res.status(400).json({ success: false, message: "futsal code is required" });
+    await ensureMediaTableExists(code);
+    const rows = await sequelize.query(
+      `SELECT * FROM media_${code} WHERE category = 'banner' ORDER BY id DESC LIMIT 1`,
+      { type: QueryTypes.SELECT }
+    );
+    return res.status(200).json({ success: true, data: rows[0] || null });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+  }
+};
+
+const uploadBanner = async (req, res) => {
   const code = req.futsalCode || req.tanent?.code;
   if (!code) {
-    return res.status(400).json({
-      success: false,
-      message: "futsal code is required",
-    });
+    return res.status(400).json({ success: false, message: "futsal code is required" });
   }
 
-    await ensureMediaTableExists(code);
-    const mediaFiles = getUploadedMediaFiles(req);
-    if (!mediaFiles.length) {
-      return res.status(400).json({
-        success: false,
-        message: "media is required",
-      });
-    }
-    const media = mediaFiles[0];
-    const mediaType = getMediaType(media.mimetype);
-    if (!mediaType) {
-      return res.status(400).json({
-        success: false,
-        message: "invalid media type",
-      });
-    }
-  
-    const cloudinaryResult = await uploadToCloudinary(media.path, {
-      folder: `allfutsal/media/${code}/banner`,
-      resource_type: mediaType === "video" ? "video" : "image",
-    });
-  
-    safeDeleteLocalFile(media.path);
-  
-    await sequelize.query(
-      `INSERT INTO media_${code} (type, category, url)
-       VALUES (:mediaType, 'banner', :mediaUrl)`,
-      {
-        replacements: { mediaType, mediaUrl: cloudinaryResult.secure_url },
-        type: QueryTypes.INSERT,
-      }
-    );
-  
-    return res.status(200).json({
-      success: true,
-      message: "banner uploaded successfully",
-      data: {
-        url: cloudinaryResult.secure_url,
-      },
-    });
+  await ensureMediaTableExists(code);
+  const mediaFiles = getUploadedMediaFiles(req);
+  if (!mediaFiles.length) {
+    return res.status(400).json({ success: false, message: "media is required" });
+  }
+  const media = mediaFiles[0];
+  const mediaType = getMediaType(media.mimetype);
+  if (!mediaType) {
+    return res.status(400).json({ success: false, message: "invalid media type" });
+  }
+
+  const cloudinaryResult = await uploadToCloudinary(media.path, {
+    folder: `allfutsal/media/${code}/banner`,
+    resource_type: mediaType === "video" ? "video" : "image",
+  });
+  safeDeleteLocalFile(media.path);
+
+  // Replace existing banner (delete then insert)
+  await sequelize.query(`DELETE FROM media_${code} WHERE category = 'banner'`, { type: QueryTypes.DELETE });
+  await sequelize.query(
+    `INSERT INTO media_${code} (type, category, url) VALUES (:mediaType, 'banner', :mediaUrl)`,
+    { replacements: { mediaType, mediaUrl: cloudinaryResult.secure_url }, type: QueryTypes.INSERT }
+  );
+
+  return res.status(200).json({
+    success: true,
+    message: "banner uploaded successfully",
+    data: { url: cloudinaryResult.secure_url },
+  });
 }
   
 module.exports = {
@@ -795,5 +831,7 @@ module.exports = {
   deleteMediaById,
   getMediaBycategory,
   uploadLogo,
-  uploadBanner
+  uploadBanner,
+  getLogo,
+  getBanner,
 };

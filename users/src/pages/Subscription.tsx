@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { logo_transparent } from "@/assets/images";
 
 const plans = [
@@ -56,7 +56,6 @@ const Subscription = () => {
   const [selectedPlan, setSelectedPlan] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const handleSubscribe = async (planId: string) => {
     setSelectedPlan(planId);
@@ -65,10 +64,7 @@ const Subscription = () => {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    toast({
-      title: "Subscription Successful",
-      description: `You have subscribed to the ${plans.find(p => p.id === planId)?.name} plan.`,
-    });
+    toast.success(`You have subscribed to the ${plans.find(p => p.id === planId)?.name} plan.`);
 
     setIsLoading(false);
     navigate("/");

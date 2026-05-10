@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from "sonner";
 import { ArrowLeft } from 'lucide-react';
 import { AuthBackground, logo_transparent, OTPIllustration } from '@/assets/images';
 import { verifyOtp, resendOtp } from '@/lib/authApi';
@@ -8,20 +9,6 @@ import { verifyOtp, resendOtp } from '@/lib/authApi';
 // are replaced with local placeholder constants, similar to the previous version.
 
 // --- Type Definitions for Placeholder Components ---
-
-interface ToastParams {
-    title: string;
-    description: string;
-    variant?: 'default' | 'destructive';
-}
-const useToast = () => {
-    return {
-        toast: ({ title, description, variant }: ToastParams) => {
-            console.log(`Toast: ${title} - ${description} (Variant: ${variant})`);
-            // Placeholder for displaying notifications
-        }
-    };
-};
 
 interface ButtonProps {
     children: React.ReactNode;
@@ -86,7 +73,6 @@ const Label: React.FC<LabelProps> = ({ children }) => (
 const EmailVerification: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { toast } = useToast();
   
   // Safely retrieve the email and type passed via navigation state
   const state = location.state as { email?: string; type?: string } | null;
@@ -119,7 +105,7 @@ const EmailVerification: React.FC = () => {
 
   const handleVerifyOTP = async () => {
     if (otp.length !== 6) {
-      toast({ title: "Invalid OTP", description: "Please enter the complete 6-digit code.", variant: "destructive" });
+      toast.error("Please enter the complete 6-digit code.");
       return;
     }
 
@@ -128,7 +114,7 @@ const EmailVerification: React.FC = () => {
       await verifyOtp(email, otp);
       
       // On successful verification: Since the next step is removed, we redirect or show success.
-      toast({ title: "OTP Verified", description: "Verification successful. Redirecting to login...", });
+      toast.success("Verification successful. Redirecting to login...");
 
       // Simulate redirection after successful verification
       setTimeout(() => {
@@ -137,7 +123,7 @@ const EmailVerification: React.FC = () => {
 
 
     } catch (error) {
-      toast({ title: "Verification Failed", description: "The OTP entered is incorrect or expired.", variant: "destructive" });
+      toast.error("The OTP entered is incorrect or expired.");
     } finally {
       setIsLoading(false);
     }
@@ -150,10 +136,10 @@ const EmailVerification: React.FC = () => {
       
       setResendTimer(60); // Reset timer to 60 seconds
       setOtp(''); // Clear previous OTP
-      toast({ title: "OTP Sent", description: "A new OTP has been sent to your email.", });
+      toast.success("A new OTP has been sent to your email.");
 
     } catch (error) {
-      toast({ title: "Resend Failed", description: "Could not send a new OTP. Try again.", variant: "destructive" });
+      toast.error("Could not send a new OTP. Try again.");
     } finally {
       setIsLoading(false);
     }

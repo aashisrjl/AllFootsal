@@ -13,7 +13,9 @@ import Layout from './components/Layout';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Notifications from './pages/Notifications';
+import Visitors from './pages/Visitors';
 import { Loader2 } from 'lucide-react';
+import { Toaster } from 'sonner';
 import './index.css';
 
 // ProtectedRoute Component
@@ -44,6 +46,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <AuthProvider>
+      <Toaster richColors position="top-right" />
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -64,6 +67,7 @@ function App() {
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/subscription" element={<Subscription />} />
                     <Route path="/notifications" element={<Notifications />} />
+                    <Route path="/visitors" element={<Visitors />} />
                     <Route path="/payment/success" element={<Subscription />} />
                     <Route path="/payment/failure" element={<Subscription />} />
                   </Routes>

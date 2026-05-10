@@ -1,5 +1,6 @@
 const { sequelize, User, Footsal } = require("../../../models");
 const { QueryTypes } = require("sequelize");
+const { createFutsalNotification } = require("../../../services/notifications/notificationService");
 
 // user/public -> create contact message for a futsal
 const createContact = async (req, res) => {
@@ -66,6 +67,16 @@ const createContact = async (req, res) => {
         type: QueryTypes.INSERT,
       }
     );
+
+    // Notify the futsal owner about the new message
+    createFutsalNotification({
+      futsalId: futsal.id,
+      type: "new_message",
+      title: "New Message Received 💬",
+      message: `${user.username || 'A user'} sent you a message: "${message.substring(0, 80)}${message.length > 80 ? '...' : ''}"`,
+      relatedId: result[0],
+      relatedType: "contact",
+    }).catch(err => console.error("Failed to create futsal notification:", err));
 
     return res.status(201).json({
       success: true,

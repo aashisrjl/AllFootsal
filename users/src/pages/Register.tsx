@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { LogIn, ArrowLeft } from "lucide-react";
 import {
@@ -17,7 +17,6 @@ import { FaGoogle, FaFacebookF } from "react-icons/fa";
 
 const Register = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { registerUser } = useAuth();
 
   const [step, setStep] = useState(1); // step 1 = info, step 2 = password
@@ -40,30 +39,18 @@ const Register = () => {
     e.preventDefault();
 
     if (!formData.fullName || !formData.email || !formData.phone) {
-      toast({
-        title: "Missing Fields",
-        description: "Please fill all required fields.",
-        variant: "destructive",
-      });
+      toast.error("Please fill all required fields.");
       return;
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      toast({
-        title: "Invalid Email",
-        description: "Please enter a valid email address.",
-        variant: "destructive",
-      });
+      toast.error("Please enter a valid email address.");
       return;
     }
 
     // Just move to step 2, no API call at this stage
-    toast({
-      title: "Info Saved",
-      description: "Now set your password to complete registration.",
-    });
+    toast.info("Now set your password to complete registration.");
 
     setStep(2); // show password fields
   };
@@ -73,20 +60,12 @@ const Register = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Password Mismatch",
-        description: "Password and confirm password must match.",
-        variant: "destructive",
-      });
+      toast.error("Password and confirm password must match.");
       return;
     }
 
     if (formData.password.length < 6) {
-      toast({
-        title: "Weak Password",
-        description: "Password must be at least 6 characters.",
-        variant: "destructive",
-      });
+      toast.error("Password must be at least 6 characters.");
       return;
     }
 

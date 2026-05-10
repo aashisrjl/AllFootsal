@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { LogIn } from "lucide-react";
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
 
@@ -21,20 +21,18 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
       const success = await login(email, password);
-      if (success) navigate("/");
+      if (success) {
+        toast.success("Successfully logged in");
+        navigate("/");
+      }
     } catch (error) {
-      toast({
-        title: "Login failed",
-        description: "Invalid credentials or server issue.",
-        variant: "destructive",
-      });
+      toast.error("Invalid credentials or server issue.");
     } finally {
       setIsLoading(false);
     }
