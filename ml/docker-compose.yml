@@ -1,0 +1,19 @@
+services:
+  ml:
+    build: .
+    container_name: futsal-ml
+    restart: always
+    ports:
+      - "3003:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - services
+    volumes:
+      - .:/app
+
+networks:
+  services:
+    external: false
+    name: services
+    driver: bridge
