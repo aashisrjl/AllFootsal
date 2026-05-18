@@ -96,7 +96,7 @@ const ContactMessages = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-slate-100">Contact Messages</h2>
+          <h2 className="text-2xl font-bold text-app-heading">Contact Messages</h2>
           <p className="text-sm text-app-muted mt-0.5">
             Messages sent by users from your facility's "Get In Touch" form
           </p>
@@ -113,7 +113,7 @@ const ContactMessages = () => {
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: 'Total', value: messages.length, color: 'text-slate-200', bg: 'bg-slate-700/40', border: 'border-app-border-subtle' },
+          { label: 'Total', value: messages.length, color: 'text-app-heading', bg: 'bg-app-surface-solid', border: 'border-app-border-subtle' },
           { label: 'Unread', value: unreadCount, color: 'text-amber-300', bg: 'bg-amber-500/10', border: 'border-amber-500/30' },
           { label: 'Read', value: messages.length - unreadCount, color: 'text-emerald-300', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30' },
         ].map(stat => (
@@ -132,7 +132,7 @@ const ContactMessages = () => {
             onClick={() => setFilter(f)}
             className={`px-4 py-1.5 rounded-lg text-sm font-semibold capitalize transition-all ${filter === f
                 ? 'bg-emerald-500 text-white shadow-md'
-                : 'bg-slate-700/40 text-app-muted hover:text-app-text hover:bg-slate-700'
+                : 'bg-app-surface-solid text-app-muted hover:text-app-text hover:bg-app-input'
               }`}
           >
             {f} {f === 'unread' && unreadCount > 0 && (
@@ -171,25 +171,25 @@ const ContactMessages = () => {
                     ? 'border-emerald-500/50 bg-emerald-500/10'
                     : !msg.is_read
                       ? 'border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10'
-                      : 'border-app-border-subtle bg-app-surface-solid hover:bg-slate-700/40'
+                      : 'border-app-border-subtle bg-app-surface-solid hover:bg-app-input'
                   }`}
               >
                 {/* Unread dot */}
                 {!msg.is_read && (
-                  <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-amber-400 shadow-sm shadow-amber-400/60" />
+                  <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-amber-500 shadow-sm shadow-amber-500/60" />
                 )}
 
                 <div className="flex items-start gap-3">
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm ${!msg.is_read ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-700 text-slate-400'
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm ${!msg.is_read ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400' : 'bg-app-surface-solid border border-app-border-subtle text-app-muted'
                     }`}>
                     {msg.name?.charAt(0).toUpperCase() || '?'}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className={`text-sm font-semibold truncate ${!msg.is_read ? 'text-slate-100' : 'text-slate-300'}`}>
+                    <p className={`text-sm font-semibold truncate ${!msg.is_read ? 'text-app-heading' : 'text-app-text'}`}>
                       {msg.name || 'Anonymous'}
                     </p>
                     <p className="text-xs text-app-muted truncate mt-0.5">{msg.message}</p>
-                    <p className="text-[10px] text-slate-600 mt-1">
+                    <p className="text-[10px] text-app-muted mt-1">
                       {msg.created_at ? formatDate(msg.created_at) : ''}
                     </p>
                   </div>
@@ -209,15 +209,15 @@ const ContactMessages = () => {
                       {selectedMessage.name?.charAt(0).toUpperCase() || '?'}
                     </div>
                     <div>
-                      <h3 className="font-bold text-slate-100 text-base">{selectedMessage.name || 'Anonymous'}</h3>
+                      <h3 className="font-bold text-app-heading text-base">{selectedMessage.name || 'Anonymous'}</h3>
                       <div className="flex flex-wrap gap-3 mt-1">
                         {selectedMessage.email && (
-                          <span className="flex items-center gap-1 text-xs text-slate-400">
+                          <span className="flex items-center gap-1 text-xs text-app-muted">
                             <Mail className="h-3 w-3" />{selectedMessage.email}
                           </span>
                         )}
                         {selectedMessage.phone && (
-                          <span className="flex items-center gap-1 text-xs text-slate-400">
+                          <span className="flex items-center gap-1 text-xs text-app-muted">
                             <Phone className="h-3 w-3" />{selectedMessage.phone}
                           </span>
                         )}
@@ -244,7 +244,7 @@ const ContactMessages = () => {
 
                 {/* Message body */}
                 <div className="p-5 flex-1">
-                  <div className="bg-slate-900/50 border border-app-border rounded-xl p-4">
+                  <div className="bg-app-input border border-app-border rounded-xl p-4">
                     <p className="text-app-text text-sm leading-relaxed whitespace-pre-wrap">
                       {selectedMessage.message}
                     </p>
@@ -314,7 +314,7 @@ const ContactMessages = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center h-60 lg:h-full bg-slate-800/20 border border-dashed border-app-border-subtle rounded-xl text-center p-8">
+              <div className="flex flex-col items-center justify-center h-60 lg:h-full bg-app-surface border border-dashed border-app-border-subtle rounded-xl text-center p-8">
                 <MessageSquare className="h-10 w-10 text-slate-600 mb-3" />
                 <p className="text-app-muted font-medium text-sm">Select a message to view details</p>
                 <p className="text-xs text-app-muted mt-1">Click any message on the left to read it and reply</p>

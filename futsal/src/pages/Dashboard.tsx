@@ -268,7 +268,7 @@ const Dashboard = () => {
                 key={index} 
                 className="group flex gap-3 lg:gap-4 p-3 lg:p-4 rounded-xl hover:bg-app-surface-solid transition-all cursor-pointer border border-transparent hover:border-app-border-subtle/50 hover:shadow-lg"
               >
-                <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-slate-800 flex items-center justify-center text-xs text-app-text font-bold border border-app-border-subtle group-hover:border-slate-600 group-hover:text-white transition-colors shadow-inner shrink-0">
+                <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-xs text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20 group-hover:border-emerald-500/40 transition-colors shadow-inner shrink-0">
                   {booking.avatar}
                 </div>
                 
@@ -301,7 +301,7 @@ const Dashboard = () => {
             )}
           </div>
           <div className="p-4 border-t border-app-border">
-            <button onClick={() => navigate(`/bookings`)} className="w-full py-2.5 rounded-xl text-xs lg:text-sm font-semibold text-app-muted bg-app-surface-solid hover:text-white hover:bg-slate-700/50 border border-app-border-subtle hover:border-slate-600 transition-all">
+            <button onClick={() => navigate(`/bookings`)} className="w-full py-2.5 rounded-xl text-xs lg:text-sm font-semibold text-app-muted bg-app-surface-solid hover:text-app-heading hover:bg-app-input border border-app-border-subtle hover:border-app-border transition-all">
               View Complete Schedule
             </button>
           </div>

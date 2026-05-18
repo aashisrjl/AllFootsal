@@ -332,7 +332,7 @@ const Subscription = () => {
                 className={`text-left rounded-xl p-4 border transition-all ${
                   active
                     ? 'border-emerald-500/60 bg-emerald-500/10'
-                    : 'border-app-border-subtle bg-slate-900/50 hover:border-slate-500'
+                    : 'border-app-border-subtle bg-app-surface-solid hover:border-emerald-500/30'
                 }`}
               >
                 <p className="text-sm font-bold text-app-heading capitalize">{option.label}</p>
@@ -360,19 +360,19 @@ const Subscription = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             <div className="rounded-xl bg-app-surface-solid border border-app-border-subtle p-4">
               <p className="text-[11px] uppercase tracking-widest text-slate-500">Plan</p>
-              <p className="text-white font-bold capitalize">{subscription.subscription_plan}</p>
+              <p className="text-app-heading font-bold capitalize">{subscription.subscription_plan}</p>
             </div>
             <div className="rounded-xl bg-app-surface-solid border border-app-border-subtle p-4">
               <p className="text-[11px] uppercase tracking-widest text-slate-500">Status</p>
-              <p className="text-white font-bold capitalize">{subscription.status}</p>
+              <p className="text-app-heading font-bold capitalize">{subscription.status}</p>
             </div>
             <div className="rounded-xl bg-app-surface-solid border border-app-border-subtle p-4">
               <p className="text-[11px] uppercase tracking-widest text-slate-500">Fee</p>
-              <p className="text-white font-bold">Rs {Number(subscription.subscription_fee || 0).toLocaleString()}</p>
+              <p className="text-app-heading font-bold">Rs {Number(subscription.subscription_fee || 0).toLocaleString()}</p>
             </div>
             <div className="rounded-xl bg-app-surface-solid border border-app-border-subtle p-4">
               <p className="text-[11px] uppercase tracking-widest text-slate-500">Valid Till</p>
-              <p className="text-white font-bold">{new Date(subscription.subscription_end).toLocaleDateString()}</p>
+              <p className="text-app-heading font-bold">{new Date(subscription.subscription_end).toLocaleDateString()}</p>
             </div>
           </div>
         ) : (
@@ -394,7 +394,7 @@ const Subscription = () => {
               key={method}
               disabled={!canPay || actionLoading}
               onClick={() => void handleInitiatePayment(method)}
-              className="px-4 py-3 rounded-xl border border-app-border-subtle bg-app-surface-solid text-white font-semibold capitalize disabled:opacity-40 hover:border-slate-500"
+              className="px-4 py-3 rounded-xl border border-app-border-subtle bg-app-surface-solid text-app-heading font-semibold capitalize disabled:opacity-40 hover:border-emerald-500/40 hover:bg-emerald-500/5"
             >
               Pay with {method.replace('_', ' ')}
             </button>
@@ -414,7 +414,7 @@ const Subscription = () => {
             {payments.slice(0, 6).map((payment) => (
               <div key={payment.id} className="rounded-xl border border-app-border-subtle bg-app-surface-solid p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div>
-                  <p className="text-white font-semibold">Rs {Number(payment.amount).toLocaleString()}</p>
+                  <p className="text-app-heading font-semibold">Rs {Number(payment.amount).toLocaleString()}</p>
                   <p className="text-xs text-slate-400">
                     {payment.payment_method} • {new Date(payment.createdAt).toLocaleString()}
                   </p>

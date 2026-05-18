@@ -223,11 +223,11 @@ const PitchManagement = () => {
                   </div>
                   <div className="flex justify-between items-center py-2.5 border-b border-app-border">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Dimensions</span>
-                    <span className="text-[11px] font-black text-app-text bg-slate-800 px-2.5 py-1 rounded-md border border-app-border-subtle">{pitch.size}</span>
+                     <span className="text-[11px] font-black text-app-text bg-app-surface-solid px-2.5 py-1 rounded-md border border-app-border-subtle">{pitch.size}</span>
                   </div>
                    <div className="flex justify-between items-center py-2.5">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Today's Bookings</span>
-                    <span className="text-sm font-black text-app-heading px-2.5 py-0.5 bg-slate-800 rounded-md">{pitch.bookingsToday}</span>
+                     <span className="text-sm font-black text-app-heading px-2.5 py-0.5 bg-app-input rounded-md">{pitch.bookingsToday}</span>
                   </div>
                 </div>
               </div>
@@ -235,7 +235,7 @@ const PitchManagement = () => {
               <div className="flex space-x-2 relative z-10 mt-auto pt-2">
                 <button
                   onClick={() => editPitch(pitch)}
-                  className="flex-1 flex items-center justify-center px-2 py-3 bg-app-surface-solid hover:bg-slate-700 text-app-text rounded-xl text-sm font-bold transition-all border border-app-border-subtle hover:text-white"
+                  className="flex-1 flex items-center justify-center px-2 py-3 bg-app-surface-solid hover:bg-app-border text-app-text rounded-xl text-sm font-bold transition-all border border-app-border-subtle"
                 >
                   <Edit className="h-4 w-4 mr-1.5" />
                   Edit

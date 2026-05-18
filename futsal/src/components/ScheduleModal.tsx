@@ -71,7 +71,7 @@ export default function ScheduleModal({ isOpen, onClose, pitch, futsalId }: any)
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-app-surface-solid border border-app-border rounded-2xl shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh]">
-        <div className="p-5 border-b border-app-border flex items-center justify-between bg-slate-900/80">
+        <div className="p-5 border-b border-app-border flex items-center justify-between bg-app-surface-solid">
           <div>
             <h2 className="text-xl font-bold text-app-heading flex items-center">
                <Clock className="w-5 h-5 mr-2 text-emerald-500" />
@@ -98,19 +98,19 @@ export default function ScheduleModal({ isOpen, onClose, pitch, futsalId }: any)
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 bg-slate-900/40">
+        <div className="flex-1 overflow-y-auto p-5">
           <form onSubmit={handleAddSubmit} className="flex gap-3 mb-6 p-4 bg-app-surface-solid border border-app-border rounded-xl items-end">
             <div className="flex-1">
               <label className="block text-[10px] font-black text-app-muted uppercase tracking-widest mb-1.5">Start Time</label>
-              <input required type="time" value={newSlot.start_time} onChange={e => setNewSlot({...newSlot, start_time: e.target.value})} className="w-full px-3 py-2 bg-slate-800 border border-app-border-subtle text-white rounded-lg text-sm" />
+              <input required type="time" value={newSlot.start_time} onChange={e => setNewSlot({...newSlot, start_time: e.target.value})} className="w-full px-3 py-2 bg-app-input border border-app-border-subtle text-app-text rounded-lg text-sm" />
             </div>
             <div className="flex-1">
               <label className="block text-[10px] font-black text-app-muted uppercase tracking-widest mb-1.5">End Time</label>
-              <input required type="time" value={newSlot.end_time} onChange={e => setNewSlot({...newSlot, end_time: e.target.value})} className="w-full px-3 py-2 bg-slate-800 border border-app-border-subtle text-white rounded-lg text-sm" />
+              <input required type="time" value={newSlot.end_time} onChange={e => setNewSlot({...newSlot, end_time: e.target.value})} className="w-full px-3 py-2 bg-app-input border border-app-border-subtle text-app-text rounded-lg text-sm" />
             </div>
             <div className="w-24">
               <label className="block text-[10px] font-black text-app-muted uppercase tracking-widest mb-1.5">Price ($)</label>
-              <input type="number" placeholder={pitch.pricePerHour?.toString() || '0'} value={newSlot.price} onChange={e => setNewSlot({...newSlot, price: e.target.value})} className="w-full px-3 py-2 bg-slate-800 border border-app-border-subtle text-white rounded-lg text-sm placeholder:text-slate-600" />
+              <input type="number" placeholder={pitch.pricePerHour?.toString() || '0'} value={newSlot.price} onChange={e => setNewSlot({...newSlot, price: e.target.value})} className="w-full px-3 py-2 bg-app-input border border-app-border-subtle text-app-text rounded-lg text-sm placeholder:text-app-muted" />
             </div>
             <button disabled={adding} type="submit" className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white font-bold rounded-lg transition-colors flex items-center h-[38px]">
               <Plus className="w-4 h-4 mr-1" /> Add

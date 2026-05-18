@@ -172,7 +172,7 @@ const BookingManagement = () => {
               type="date"
               value={filterDate}
               onChange={(e) => setFilterDate(e.target.value)}
-              className="flex-1 sm:flex-none w-full sm:w-auto px-4 py-2 font-medium bg-app-surface-solid border border-app-border-subtle text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 appearance-none [&::-webkit-calendar-picker-indicator]:filter-[invert(1)] hover:border-slate-600 transition-colors shadow-inner text-sm"
+              className="flex-1 sm:flex-none w-full sm:w-auto px-4 py-2 font-medium bg-app-surface-solid border border-app-border-subtle text-app-text rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 appearance-none dark:[&::-webkit-calendar-picker-indicator]:filter-[invert(1)] hover:border-app-border transition-colors shadow-inner text-sm"
             />
             {filterDate && (
               <button
@@ -235,11 +235,11 @@ const BookingManagement = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="bg-transparent text-[11px] lg:text-sm font-bold text-app-text pr-5 py-1.5 border-none focus:outline-none focus:ring-0 cursor-pointer appearance-none w-full"
             >
-              <option value="all" className="bg-app-surface-solid text-white font-medium">All Statuses</option>
-              <option value="pending" className="bg-app-surface-solid text-white font-medium">Pending Only</option>
-              <option value="confirmed" className="bg-app-surface-solid text-white font-medium">Confirmed Only</option>
-              <option value="completed" className="bg-app-surface-solid text-white font-medium">Completed Only</option>
-              <option value="cancelled" className="bg-app-surface-solid text-white font-medium">Cancelled Only</option>
+              <option value="all" className="bg-app-surface-solid text-app-text font-medium">All Statuses</option>
+              <option value="pending" className="bg-app-surface-solid text-app-text font-medium">Pending Only</option>
+              <option value="confirmed" className="bg-app-surface-solid text-app-text font-medium">Confirmed Only</option>
+              <option value="completed" className="bg-app-surface-solid text-app-text font-medium">Completed Only</option>
+              <option value="cancelled" className="bg-app-surface-solid text-app-text font-medium">Cancelled Only</option>
             </select>
           </div>
         </div>

@@ -21,7 +21,7 @@ const createForum = async (req,res)=>{
                 const { createUserNotification } = require("../../services/notifications/notificationService");
                 await createUserNotification({
                     userId: userId,
-                    type: "forum_created",
+                    type: "general_notification",
                     title: "Forum Post Published 🎉",
                     message: `Your post "${title}" is now live!`,
                     relatedId: newForum.id,
@@ -31,7 +31,7 @@ const createForum = async (req,res)=>{
                 const { createFutsalNotification } = require("../../services/notifications/notificationService");
                 await createFutsalNotification({
                     futsalId: futsalId,
-                    type: "forum_created",
+                    type: "forum_activity",
                     title: "Forum Post Published 🎉",
                     message: `Your post "${title}" is now live!`,
                     relatedId: newForum.id,

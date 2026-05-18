@@ -38,7 +38,7 @@ const statusStyles: Record<string, string> = {
 
 const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div>
-    <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">{label}</p>
+    <p className="text-[10px] uppercase tracking-wider font-bold text-app-muted">{label}</p>
     <p className="text-sm font-semibold text-app-text mt-0.5">{value ?? '—'}</p>
   </div>
 );
@@ -123,7 +123,7 @@ const BookingDetail = () => {
           <button
             type="button"
             onClick={() => navigate('/bookings')}
-            className="p-2.5 rounded-xl bg-app-surface-solid border border-app-border text-app-muted hover:text-white hover:border-slate-600 transition-colors"
+            className="p-2.5 rounded-xl bg-app-surface-solid border border-app-border text-app-muted hover:text-app-heading transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -166,7 +166,7 @@ const BookingDetail = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Customer */}
-        <section className="bg-slate-900/40 border border-app-border rounded-2xl p-5 lg:p-6">
+        <section className="bg-app-surface border border-app-border rounded-2xl p-5 lg:p-6">
           <h2 className="text-sm font-black uppercase tracking-widest text-app-muted mb-4 flex items-center gap-2">
             <User className="w-4 h-4 text-emerald-400" /> Customer
           </h2>
@@ -176,7 +176,7 @@ const BookingDetail = () => {
               label="Phone"
               value={
                 <span className="flex items-center gap-1.5">
-                  <Phone className="w-3.5 h-3.5 text-slate-500" />
+                  <Phone className="w-3.5 h-3.5 text-app-muted" />
                   {customer.phone || 'N/A'}
                 </span>
               }
@@ -198,7 +198,7 @@ const BookingDetail = () => {
         </section>
 
         {/* Pitch & timeslot */}
-        <section className="bg-slate-900/40 border border-app-border rounded-2xl p-5 lg:p-6">
+        <section className="bg-app-surface border border-app-border rounded-2xl p-5 lg:p-6">
           <h2 className="text-sm font-black uppercase tracking-widest text-app-muted mb-4 flex items-center gap-2">
             <MapPin className="w-4 h-4 text-emerald-400" /> Pitch &amp; Slot
           </h2>
@@ -210,7 +210,7 @@ const BookingDetail = () => {
               label="Time"
               value={
                 <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-slate-500" />
+                  <Clock className="w-3.5 h-3.5 text-app-muted" />
                   {timeslot.start_time?.slice(0, 5)} – {timeslot.end_time?.slice(0, 5)}
                   {timeslot.day_of_week != null && (
                     <span className="text-app-muted text-xs">
@@ -225,7 +225,7 @@ const BookingDetail = () => {
         </section>
 
         {/* Booking info */}
-        <section className="bg-slate-900/40 border border-app-border rounded-2xl p-5 lg:p-6">
+        <section className="bg-app-surface border border-app-border rounded-2xl p-5 lg:p-6">
           <h2 className="text-sm font-black uppercase tracking-widest text-app-muted mb-4 flex items-center gap-2">
             <Calendar className="w-4 h-4 text-emerald-400" /> Booking
           </h2>
@@ -236,7 +236,7 @@ const BookingDetail = () => {
             <InfoRow label="Created" value={booking.created_at ? new Date(booking.created_at).toLocaleString() : '—'} />
             {booking.notes && (
               <div>
-                <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Notes</p>
+                <p className="text-[10px] uppercase tracking-wider font-bold text-app-muted">Notes</p>
                 <p className="text-sm text-app-text mt-1 p-3 bg-app-surface-solid rounded-xl border border-app-border whitespace-pre-wrap">
                   {booking.notes}
                 </p>
@@ -246,7 +246,7 @@ const BookingDetail = () => {
         </section>
 
         {/* Payment */}
-        <section className="bg-slate-900/40 border border-app-border rounded-2xl p-5 lg:p-6">
+        <section className="bg-app-surface border border-app-border rounded-2xl p-5 lg:p-6">
           <h2 className="text-sm font-black uppercase tracking-widest text-app-muted mb-4 flex items-center gap-2">
             <CreditCard className="w-4 h-4 text-emerald-400" /> Payment
           </h2>
@@ -285,7 +285,7 @@ const BookingDetail = () => {
 
       {/* Actions */}
       {isPast ? (
-        <p className="text-sm text-app-muted border border-app-border rounded-xl px-4 py-3 bg-slate-900/40">
+        <p className="text-sm text-app-muted border border-app-border rounded-xl px-4 py-3 bg-app-surface">
           This booking&apos;s date or timeslot has passed. Confirm, reject, cancel, and unconfirm are not available.
         </p>
       ) : (

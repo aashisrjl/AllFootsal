@@ -163,21 +163,21 @@ const Settings = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-[11px] font-black text-app-muted uppercase tracking-widest mb-2">First Name</label>
-                  <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-app-text font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-app-border transition-colors shadow-inner" />
                 </div>
                 <div>
                   <label className="block text-[11px] font-black text-app-muted uppercase tracking-widest mb-2">Last Name</label>
-                  <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-app-text font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-app-border transition-colors shadow-inner" />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div>
                   <label className="block text-[11px] font-black text-app-muted uppercase tracking-widest mb-2">Email Address</label>
-                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-app-text font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-app-border transition-colors shadow-inner" />
                 </div>
                 <div>
                   <label className="block text-[11px] font-black text-app-muted uppercase tracking-widest mb-2">Phone Number</label>
-                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-app-text font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-app-border transition-colors shadow-inner" />
                 </div>
               </div>
               <div className="pt-4 flex justify-between items-center gap-3 mt-4">
@@ -270,7 +270,7 @@ const Settings = () => {
                   type="password" 
                   value={currentPassword} 
                   onChange={(e) => setCurrentPassword(e.target.value)} 
-                  className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-slate-600 transition-colors shadow-inner" 
+                  className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-app-text font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-app-border transition-colors shadow-inner" 
                   placeholder="Enter current password"
                 />
               </div>
@@ -280,7 +280,7 @@ const Settings = () => {
                   type="password" 
                   value={newPassword} 
                   onChange={(e) => setNewPassword(e.target.value)} 
-                  className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-slate-600 transition-colors shadow-inner" 
+                  className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-app-text font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-app-border transition-colors shadow-inner" 
                   placeholder="Enter new password"
                 />
               </div>
@@ -290,7 +290,7 @@ const Settings = () => {
                   type="password" 
                   value={confirmPassword} 
                   onChange={(e) => setConfirmPassword(e.target.value)} 
-                  className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-slate-600 transition-colors shadow-inner" 
+                  className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-app-text font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-app-border transition-colors shadow-inner" 
                   placeholder="Confirm new password"
                 />
               </div>

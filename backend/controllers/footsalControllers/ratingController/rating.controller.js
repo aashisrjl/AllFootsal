@@ -107,7 +107,7 @@ const postRating = async (req, res) => {
           const reviewPreview = review ? `"${review.substring(0, 80)}${review.length > 80 ? '...' : ''}"` : 'No text.';
           await createFutsalNotification({
             futsalId: futsalRecord.id,
-            type: "new_review",
+            type: "rating_posted",
             title: `New Review Received ${stars}`,
             message: `A user left a ${rating}-star review: ${reviewPreview}`,
             relatedType: "review",

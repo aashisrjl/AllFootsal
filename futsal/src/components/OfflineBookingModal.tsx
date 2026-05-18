@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { X, Phone } from 'lucide-react';
 import { toast } from 'sonner';
 import { createOfflineBooking } from '../lib/bookingApi';
-import { getLocalDateString, isBookingDateBeforeToday } from '../lib/bookingDateUtils';
+import { getLocalDateString, isBookingDateBeforeToday, isBookingInPast } from '../lib/bookingDateUtils';
 import { getFutsalPitches } from '../lib/pitchApi';
 import { getFutsalTimeslots } from '../lib/timeslotApi';
 
@@ -122,9 +122,17 @@ export default function OfflineBookingModal({ isOpen, onClose, futsalId, onCreat
 
   if (!isOpen) return null;
 
-  const availableSlots = timeslots.filter(
-    (slot) => !slot.is_actually_booked && (slot.is_available === 1 || slot.is_available === true)
-  );
+  const availableSlots = timeslots.filter((slot) => {
+    if (slot.is_actually_booked || (slot.is_available !== 1 && slot.is_available !== true)) {
+      return false;
+    }
+    if (form.booking_date && slot.start_time) {
+      if (isBookingInPast(form.booking_date, slot.start_time)) {
+        return false;
+      }
+    }
+    return true;
+  });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
@@ -144,17 +152,17 @@ export default function OfflineBookingModal({ isOpen, onClose, futsalId, onCreat
               <label className="text-xs font-semibold text-app-muted uppercase">Phone *</label>
               <div className="relative mt-1">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input type="tel" value={form.phoneNumber} onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })} placeholder="98XXXXXXXX" className="w-full pl-10 pr-3 py-2.5 bg-slate-950 border border-app-border-subtle rounded-xl text-white text-sm outline-none focus:ring-2 focus:ring-emerald-500/40" required />
+                <input type="tel" value={form.phoneNumber} onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })} placeholder="98XXXXXXXX" className="w-full pl-10 pr-3 py-2.5 bg-app-input border border-app-border-subtle rounded-xl text-app-text text-sm outline-none focus:ring-2 focus:ring-emerald-500/40" required />
               </div>
             </div>
             <div>
               <label className="text-xs font-semibold text-app-muted uppercase">Customer name</label>
-              <input type="text" value={form.customerName} onChange={(e) => setForm({ ...form, customerName: e.target.value })} placeholder="Optional" className="w-full mt-1 px-3 py-2.5 bg-slate-950 border border-app-border-subtle rounded-xl text-white text-sm outline-none focus:ring-2 focus:ring-emerald-500/40" />
+              <input type="text" value={form.customerName} onChange={(e) => setForm({ ...form, customerName: e.target.value })} placeholder="Optional" className="w-full mt-1 px-3 py-2.5 bg-app-input border border-app-border-subtle rounded-xl text-app-text text-sm outline-none focus:ring-2 focus:ring-emerald-500/40" />
             </div>
           </div>
           <div>
             <label className="text-xs font-semibold text-app-muted uppercase">Pitch *</label>
-            <select value={form.pitch_id} onChange={(e) => setForm({ ...form, pitch_id: e.target.value, timeslot_id: '', amount: '' })} className="w-full mt-1 px-3 py-2.5 bg-slate-950 border border-app-border-subtle rounded-xl text-white text-sm outline-none" required>
+            <select value={form.pitch_id} onChange={(e) => setForm({ ...form, pitch_id: e.target.value, timeslot_id: '', amount: '' })} className="w-full mt-1 px-3 py-2.5 bg-app-input border border-app-border-subtle rounded-xl text-app-text text-sm outline-none" required>
               <option value="">Select pitch</option>
               {pitches.map((p) => (<option key={p.id} value={p.id}>{p.name}</option>))}
             </select>
@@ -162,11 +170,11 @@ export default function OfflineBookingModal({ isOpen, onClose, futsalId, onCreat
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-semibold text-app-muted uppercase">Date *</label>
-              <input type="date" min={today} value={form.booking_date} onChange={(e) => setForm({ ...form, booking_date: e.target.value, timeslot_id: '', amount: '' })} className="w-full mt-1 px-3 py-2.5 bg-slate-950 border border-app-border-subtle rounded-xl text-white text-sm outline-none" required />
+              <input type="date" min={today} value={form.booking_date} onChange={(e) => setForm({ ...form, booking_date: e.target.value, timeslot_id: '', amount: '' })} className="w-full mt-1 px-3 py-2.5 bg-app-input border border-app-border-subtle rounded-xl text-app-text text-sm outline-none" required />
             </div>
             <div>
               <label className="text-xs font-semibold text-app-muted uppercase">Timeslot *</label>
-              <select value={form.timeslot_id} onChange={(e) => setForm({ ...form, timeslot_id: e.target.value })} className="w-full mt-1 px-3 py-2.5 bg-slate-950 border border-app-border-subtle rounded-xl text-white text-sm outline-none" required disabled={!form.pitch_id || loadingSlots}>
+              <select value={form.timeslot_id} onChange={(e) => setForm({ ...form, timeslot_id: e.target.value })} className="w-full mt-1 px-3 py-2.5 bg-app-input border border-app-border-subtle rounded-xl text-app-text text-sm outline-none" required disabled={!form.pitch_id || loadingSlots}>
                 <option value="">{loadingSlots ? 'Loading...' : 'Select timeslot'}</option>
                 {availableSlots.map((slot) => (<option key={slot.id} value={slot.id}>{slot.start_time} - {slot.end_time}</option>))}
               </select>
@@ -175,11 +183,11 @@ export default function OfflineBookingModal({ isOpen, onClose, futsalId, onCreat
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-semibold text-app-muted uppercase">Amount (Rs) *</label>
-              <input type="number" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} className="w-full mt-1 px-3 py-2.5 bg-slate-950 border border-app-border-subtle rounded-xl text-white text-sm outline-none" required />
+              <input type="number" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} className="w-full mt-1 px-3 py-2.5 bg-app-input border border-app-border-subtle rounded-xl text-app-text text-sm outline-none" required />
             </div>
             <div>
               <label className="text-xs font-semibold text-app-muted uppercase">Status</label>
-              <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as typeof form.status })} className="w-full mt-1 px-3 py-2.5 bg-slate-950 border border-app-border-subtle rounded-xl text-white text-sm outline-none">
+              <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as typeof form.status })} className="w-full mt-1 px-3 py-2.5 bg-app-input border border-app-border-subtle rounded-xl text-app-text text-sm outline-none">
                 <option value="confirmed">Confirmed</option>
                 <option value="pending">Pending</option>
                 <option value="completed">Completed</option>
@@ -188,7 +196,7 @@ export default function OfflineBookingModal({ isOpen, onClose, futsalId, onCreat
           </div>
           <div>
             <label className="text-xs font-semibold text-app-muted uppercase">Description / notes</label>
-            <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Paid cash, booked via phone..." rows={3} className="w-full mt-1 px-3 py-2.5 bg-slate-950 border border-app-border-subtle rounded-xl text-white text-sm outline-none resize-none" />
+            <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Paid cash, booked via phone..." rows={3} className="w-full mt-1 px-3 py-2.5 bg-app-input border border-app-border-subtle rounded-xl text-app-text text-sm outline-none resize-none" />
           </div>
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-app-border-subtle text-app-text font-semibold hover:bg-app-surface-solid">Cancel</button>

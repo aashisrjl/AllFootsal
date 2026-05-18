@@ -558,7 +558,7 @@ const rejectBookingByAdmin = async (req,res) => {
                 }),
                 futsalRecord && createFutsalNotification({
                     futsalId: futsalRecord.id,
-                    type: "booking_rejected",
+                    type: "booking_cancelled",
                     title: "Booking Rejected",
                     message: `You rejected a booking for ${row.pitch_name} on ${row.booking_date}.${reason ? ` Reason: ${reason}` : ''}`,
                     relatedId: bookingId,
@@ -804,7 +804,7 @@ const createBookingByAdmin = async (req, res) => {
             try {
                 await createFutsalNotification({
                     futsalId: futsal.id,
-                    type: "offline_booking_created",
+                    type: "booking_confirmed",
                     title: "Walk-in Booking Added",
                     message: `Walk-in booking for ${pitchName} on ${booking_date} (${reqSlot.start_time}-${reqSlot.end_time}). Phone: ${normalizedPhone}.`,
                     relatedId: bookingId,
@@ -1041,7 +1041,7 @@ const createBooking = async (req,res) => {
                 }),
                 futsal && createFutsalNotification({
                     futsalId: futsal.id,
-                    type: "new_booking",
+                    type: "booking_request",
                     title: "New Booking Request 📋",
                     message: `New booking received for ${pitchName} on ${booking_date} at ${reqSlot.start_time} - ${reqSlot.end_time}. Amount: Rs. ${amount}.`,
                     relatedId: insertedId,

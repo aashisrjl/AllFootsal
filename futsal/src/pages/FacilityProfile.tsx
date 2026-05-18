@@ -357,22 +357,22 @@ const FacilityProfile = () => {
 
           <div>
             <label className="block text-xs font-bold text-app-muted mb-2 uppercase tracking-wide">District</label>
-            <input value={location.district} onChange={(e) => setLocation((prev) => ({ ...prev, district: e.target.value }))} placeholder="Enter district" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
+            <input value={location.district} onChange={(e) => setLocation((prev) => ({ ...prev, district: e.target.value }))} placeholder="Enter district" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl" />
           </div>
 
           <div>
             <label className="block text-xs font-bold text-app-muted mb-2 uppercase tracking-wide">City</label>
-            <input value={location.city} onChange={(e) => setLocation((prev) => ({ ...prev, city: e.target.value }))} placeholder="Enter city" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
+            <input value={location.city} onChange={(e) => setLocation((prev) => ({ ...prev, city: e.target.value }))} placeholder="Enter city" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl" />
           </div>
 
           <div>
             <label className="block text-xs font-bold text-app-muted mb-2 uppercase tracking-wide">Street Address</label>
-            <input value={location.address} onChange={(e) => setLocation((prev) => ({ ...prev, address: e.target.value }))} placeholder="Street, lane, or landmark" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
+            <input value={location.address} onChange={(e) => setLocation((prev) => ({ ...prev, address: e.target.value }))} placeholder="Street, lane, or landmark" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl" />
           </div>
 
           <div>
             <label className="block text-xs font-bold text-app-muted mb-2 uppercase tracking-wide">Postal Code</label>
-            <input value={location.postal_code} onChange={(e) => setLocation((prev) => ({ ...prev, postal_code: e.target.value }))} placeholder="Postal code" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
+            <input value={location.postal_code} onChange={(e) => setLocation((prev) => ({ ...prev, postal_code: e.target.value }))} placeholder="Postal code" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl" />
           </div>
 
           <div className="rounded-xl border border-app-border-subtle bg-app-surface-solid p-3 text-xs text-slate-400">
@@ -399,12 +399,12 @@ const FacilityProfile = () => {
             </div>
           </div>
 
-          <button onClick={setCurrentLocation} type="button" className="inline-flex items-center gap-2 px-3 py-2 bg-slate-800 border border-app-border-subtle text-app-text rounded-lg text-sm hover:border-slate-500 w-fit">
+          <button onClick={setCurrentLocation} type="button" className="inline-flex items-center gap-2 px-3 py-2 bg-app-surface-solid border border-app-border-subtle text-app-text rounded-lg text-sm hover:border-app-border w-fit">
             <Crosshair className="w-4 h-4" />
             Use My Current Location
           </button>
 
-          <textarea value={location.full_address} onChange={(e) => setLocation((prev) => ({ ...prev, full_address: e.target.value }))} placeholder="Full Address" rows={3} className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
+          <textarea value={location.full_address} onChange={(e) => setLocation((prev) => ({ ...prev, full_address: e.target.value }))} placeholder="Full Address" rows={3} className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl" />
 
           <button
             onClick={() => void saveLocation()}
@@ -424,14 +424,14 @@ const FacilityProfile = () => {
 
           <div>
             <label className="block text-xs font-bold text-app-muted mb-2 uppercase tracking-wide">Established Year</label>
-            <input value={info.established_year} onChange={(e) => setInfo((prev) => ({ ...prev, established_year: e.target.value }))} placeholder="e.g. 2023" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
+            <input value={info.established_year} onChange={(e) => setInfo((prev) => ({ ...prev, established_year: e.target.value }))} placeholder="e.g. 2023" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl" />
           </div>
           <div>
             <label className="text-xs font-bold text-app-muted mb-2 uppercase tracking-wide flex items-center gap-2">
               <Globe className="w-3.5 h-3.5 text-emerald-400" />
               Website Link
             </label>
-            <input value={info.website_url} onChange={(e) => setInfo((prev) => ({ ...prev, website_url: e.target.value }))} placeholder="https://your-futsal-website.com" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
+            <input value={info.website_url} onChange={(e) => setInfo((prev) => ({ ...prev, website_url: e.target.value }))} placeholder="https://your-futsal-website.com" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl" />
           </div>
 
           <div>
@@ -441,9 +441,9 @@ const FacilityProfile = () => {
                 value={facilityInput}
                 onChange={(e) => setFacilityInput(e.target.value)}
                 placeholder="Add facility (e.g. Parking)"
-                className="flex-1 px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl"
+                className="flex-1 px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl"
               />
-              <button type="button" onClick={addFacility} className="px-3 py-2.5 bg-slate-800 border border-app-border-subtle rounded-xl text-app-text hover:border-slate-500">
+              <button type="button" onClick={addFacility} className="px-3 py-2.5 bg-app-surface-solid border border-app-border-subtle rounded-xl text-app-text hover:border-app-border">
                 <Plus className="w-4 h-4" />
               </button>
             </div>
@@ -478,7 +478,7 @@ const FacilityProfile = () => {
                         },
                       }))
                     }
-                    className="px-3 py-2 bg-app-input border border-app-border-subtle rounded-lg text-white"
+                    className="px-3 py-2 bg-app-input border border-app-border-subtle rounded-lg text-app-text"
                   />
                   <input
                     type="time"
@@ -493,7 +493,7 @@ const FacilityProfile = () => {
                         },
                       }))
                     }
-                    className="px-3 py-2 bg-app-input border border-app-border-subtle rounded-lg text-white"
+                    className="px-3 py-2 bg-app-input border border-app-border-subtle rounded-lg text-app-text"
                   />
                   <label className="text-xs text-app-muted inline-flex items-center gap-1">
                     <input
@@ -522,36 +522,36 @@ const FacilityProfile = () => {
                 <Facebook className="w-3.5 h-3.5 text-blue-400" />
                 Facebook URL
               </label>
-              <input value={info.social_links.facebook} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, facebook: e.target.value } }))} placeholder="https://facebook.com/yourpage" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
+              <input value={info.social_links.facebook} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, facebook: e.target.value } }))} placeholder="https://facebook.com/yourpage" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl" />
             </div>
             <div>
               <label className="text-xs font-bold text-app-muted mb-2 uppercase tracking-wide flex items-center gap-2">
                 <Instagram className="w-3.5 h-3.5 text-pink-400" />
                 Instagram URL
               </label>
-              <input value={info.social_links.instagram} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, instagram: e.target.value } }))} placeholder="https://instagram.com/yourpage" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
+              <input value={info.social_links.instagram} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, instagram: e.target.value } }))} placeholder="https://instagram.com/yourpage" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl" />
             </div>
             <div>
               <label className="text-xs font-bold text-app-muted mb-2 uppercase tracking-wide flex items-center gap-2">
                 <Youtube className="w-3.5 h-3.5 text-rose-400" />
                 YouTube URL
               </label>
-              <input value={info.social_links.youtube} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, youtube: e.target.value } }))} placeholder="https://youtube.com/@yourchannel" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
+              <input value={info.social_links.youtube} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, youtube: e.target.value } }))} placeholder="https://youtube.com/@yourchannel" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl" />
             </div>
             <div>
               <label className="text-xs font-bold text-app-muted mb-2 uppercase tracking-wide flex items-center gap-2">
                 <Twitter className="w-3.5 h-3.5 text-sky-400" />
                 X / Twitter URL
               </label>
-              <input value={info.social_links.x} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, x: e.target.value } }))} placeholder="https://x.com/yourpage" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
+              <input value={info.social_links.x} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, x: e.target.value } }))} placeholder="https://x.com/yourpage" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl" />
             </div>
             <div className="md:col-span-2">
               <label className="block text-xs font-bold text-app-muted mb-2 uppercase tracking-wide">TikTok URL</label>
-              <input value={info.social_links.tiktok} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, tiktok: e.target.value } }))} placeholder="https://tiktok.com/@yourpage" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
+              <input value={info.social_links.tiktok} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, tiktok: e.target.value } }))} placeholder="https://tiktok.com/@yourpage" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl" />
             </div>
           </div>
-          <textarea value={info.parking_info} onChange={(e) => setInfo((prev) => ({ ...prev, parking_info: e.target.value }))} placeholder="Parking Info" rows={2} className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
-          <textarea value={info.additional_info} onChange={(e) => setInfo((prev) => ({ ...prev, additional_info: e.target.value }))} placeholder="Additional Info" rows={2} className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
+          <textarea value={info.parking_info} onChange={(e) => setInfo((prev) => ({ ...prev, parking_info: e.target.value }))} placeholder="Parking Info" rows={2} className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl" />
+          <textarea value={info.additional_info} onChange={(e) => setInfo((prev) => ({ ...prev, additional_info: e.target.value }))} placeholder="Additional Info" rows={2} className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl" />
 
           <button
             onClick={() => void saveInfo()}

@@ -102,7 +102,7 @@ const Visitors = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button className="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-app-text rounded-xl border border-app-border-subtle transition-colors text-sm font-semibold">
+        <button className="flex items-center gap-2 px-4 py-2.5 bg-app-surface-solid hover:bg-app-input text-app-text rounded-xl border border-app-border-subtle transition-colors text-sm font-semibold">
           <Filter className="w-4 h-4" />
           More Filters
         </button>
@@ -122,12 +122,12 @@ const Visitors = () => {
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/50">
+            <tbody className="divide-y divide-app-border">
               {filteredVisitors.map((visitor, idx) => (
                 <tr key={idx} className="hover:bg-app-surface-solid transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-slate-800 to-slate-700 flex items-center justify-center text-xs font-bold text-app-text border border-app-border-subtle group-hover:border-emerald-500/30 transition-colors shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 group-hover:border-emerald-500/40 transition-colors shrink-0">
                         {visitor.username ? visitor.username.substring(0, 2).toUpperCase() : 'GV'}
                       </div>
                       <div className="min-w-0">
@@ -183,7 +183,7 @@ const Visitors = () => {
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center">
-                      <Globe className="w-12 h-12 text-slate-800 mb-4 animate-pulse" />
+                       <Globe className="w-12 h-12 text-app-muted mb-4 animate-pulse" />
                       <p className="text-app-muted font-medium italic">No visitors found matching your search.</p>
                     </div>
                   </td>
