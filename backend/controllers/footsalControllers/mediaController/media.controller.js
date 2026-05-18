@@ -133,7 +133,7 @@ const uploadMedia = async (req, res) => {
         if (futsalOwner) {
           await createFutsalNotification({
             futsalId: futsalOwner.id,
-            type: "media_uploaded",
+            type: "general_notification",
             title: `${categoryLabel} Uploaded 🖼️`,
             message: `${uploaded.length} ${categoryLabel.toLowerCase()} file(s) uploaded successfully.`,
             relatedType: "media",

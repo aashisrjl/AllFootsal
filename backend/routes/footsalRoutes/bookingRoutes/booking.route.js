@@ -1,6 +1,6 @@
 const express = require("express");
 const isFutsalAuthenticated = require("../../../middleware/authMiddleware/futsalAuthenticated");
-const { getBookingStats, cancelBookingByAdmin, confirmBookingByAdmin, rejectBookingByAdmin, unconfirmBookingByAdmin, deleteBookingByAdmin, getBookingsByUser, createBooking, cancelBooking, deleteBookingByUser, getBookingsByAdmin } = require("../../../controllers/footsalControllers/bookingController/booking.controller");
+const { getBookingStats, getBookingByIdAdmin, cancelBookingByAdmin, confirmBookingByAdmin, rejectBookingByAdmin, unconfirmBookingByAdmin, deleteBookingByAdmin, getBookingsByUser, createBooking, createBookingByAdmin, cancelBooking, deleteBookingByUser, getBookingsByAdmin } = require("../../../controllers/footsalControllers/bookingController/booking.controller");
 const resolveFutsalTenant = require("../../../middleware/tanentMiddleware/tanent.middleware");
 const isUserAuthenticated = require("../../../middleware/authMiddleware/userAuthenticate");
 
@@ -13,10 +13,22 @@ router.get(
     getBookingsByAdmin
   );
 
+router.post(
+  "/futsal/bookings/offline", // #swagger.tags = ['Futsal/Tenant/Bookings']
+  isFutsalAuthenticated,
+  createBookingByAdmin
+);
+
 router.get(
   "/futsal/bookings/stats", // #swagger.tags = ['Futsal/Tenant/Bookings']
   isFutsalAuthenticated,
   getBookingStats
+);
+
+router.get(
+  "/futsal/bookings/:bookingId", // #swagger.tags = ['Futsal/Tenant/Bookings']
+  isFutsalAuthenticated,
+  getBookingByIdAdmin
 );
 
 router.patch(

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { User, Bell, Shield, CreditCard, Check } from 'lucide-react';
+import { User, Bell, Shield, CreditCard, Check, Palette } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
+import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { updateFutsalProfile } from '../lib/authApi';
 import { toast } from 'sonner';
@@ -8,6 +10,7 @@ import { Link } from 'react-router-dom';
 
 const Settings = () => {
   const { futsalProfile, refreshProfile } = useAuth();
+  const { theme, resolvedTheme } = useTheme();
   
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -115,17 +118,18 @@ const Settings = () => {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between mb-8">
         <div>
-           <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Company Settings</h1>
-           <p className="text-slate-400 mt-1 text-sm font-medium">Manage your personal and business preferences.</p>
+           <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">Company Settings</h1>
+           <p className="text-app-muted mt-1 text-sm font-medium">Manage your personal and business preferences.</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Settings Navigation */}
-        <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-4 lg:col-span-1 h-fit sticky top-24">
+        <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-xl p-4 lg:col-span-1 h-fit sticky top-24">
           <nav className="space-y-1.5 flex flex-col">
             {[
               { id: 'profile', label: 'Profile Settings', icon: User },
+              { id: 'appearance', label: 'Appearance', icon: Palette },
               { id: 'notifications', label: 'Notifications', icon: Bell },
               { id: 'security', label: 'Security', icon: Shield },
               { id: 'billing', label: 'Billing & Subscription', icon: CreditCard },
@@ -136,7 +140,7 @@ const Settings = () => {
                 className={`w-full text-left flex items-center px-4 py-3 text-sm font-bold rounded-xl transition-all ${
                   activeTab === tab.id 
                     ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-inner' 
-                    : 'text-slate-400 hover:bg-slate-800/60 hover:text-white border border-transparent'
+                    : 'text-app-muted hover:bg-app-input hover:text-app-heading border border-transparent'
                 }`}
               >
                 <tab.icon className={`h-4 w-4 mr-3 ${activeTab === tab.id ? 'text-emerald-400' : 'text-slate-500'}`} />
@@ -150,36 +154,36 @@ const Settings = () => {
         <div className="lg:col-span-3 space-y-8">
           {/* Profile Settings */}
           {activeTab === 'profile' && (
-            <div id="profile" className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-8 relative overflow-hidden group hover:border-slate-700 transition-colors">
-              <h3 className="text-lg font-black text-white mb-6 flex items-center gap-2 border-b border-slate-800/80 pb-4">
+            <div id="profile" className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-xl p-8 relative overflow-hidden group hover:border-app-border-subtle transition-colors">
+              <h3 className="text-lg font-black text-app-heading mb-6 flex items-center gap-2 border-b border-app-border pb-4">
                 <User className="h-5 w-5 text-emerald-500" />
                 Profile Information
               </h3>
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">First Name</label>
-                  <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <label className="block text-[11px] font-black text-app-muted uppercase tracking-widest mb-2">First Name</label>
+                  <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-app-text font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-app-border transition-colors shadow-inner" />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Last Name</label>
-                  <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <label className="block text-[11px] font-black text-app-muted uppercase tracking-widest mb-2">Last Name</label>
+                  <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-app-text font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-app-border transition-colors shadow-inner" />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div>
-                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Email Address</label>
-                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <label className="block text-[11px] font-black text-app-muted uppercase tracking-widest mb-2">Email Address</label>
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-app-text font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-app-border transition-colors shadow-inner" />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Phone Number</label>
-                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-slate-600 transition-colors shadow-inner" />
+                  <label className="block text-[11px] font-black text-app-muted uppercase tracking-widest mb-2">Phone Number</label>
+                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-app-text font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:border-app-border transition-colors shadow-inner" />
                 </div>
               </div>
               <div className="pt-4 flex justify-between items-center gap-3 mt-4">
                 <span className="text-sm font-bold text-emerald-400">{successMsg}</span>
                 <div className="flex gap-3">
-                  <button className="px-6 py-2.5 bg-transparent text-slate-400 border border-slate-700 font-bold rounded-xl hover:bg-slate-800 hover:text-white transition-all shadow-sm">
+                  <button className="px-6 py-2.5 bg-transparent text-app-muted border border-app-border-subtle font-bold rounded-xl hover:bg-app-surface-solid hover:text-app-heading transition-all shadow-sm">
                     Cancel
                   </button>
                   <button onClick={handleUpdateProfile} disabled={isSaving} className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all flex items-center hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50">
@@ -192,10 +196,26 @@ const Settings = () => {
           </div>
           )}
 
+          {/* Appearance */}
+          {activeTab === 'appearance' && (
+            <div id="appearance" className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-xl p-8 hover:border-app-border-subtle transition-colors">
+              <h3 className="text-lg font-black text-app-heading mb-2 flex items-center gap-2 border-b border-app-border pb-4">
+                <Palette className="h-5 w-5 text-emerald-500" />
+                Appearance
+              </h3>
+              <p className="text-sm text-app-muted mb-6">
+                Choose light mode, dark mode, or match your device system setting. Currently using{' '}
+                <strong className="text-app-heading">{resolvedTheme}</strong> theme
+                {theme === 'system' ? ' (system)' : ''}.
+              </p>
+              <ThemeToggle variant="settings" />
+            </div>
+          )}
+
           {/* Notification Settings */}
           {activeTab === 'notifications' && (
-            <div id="notifications" className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-8 hover:border-slate-700 transition-colors">
-              <h3 className="text-lg font-black text-white mb-6 flex items-center gap-2 border-b border-slate-800/80 pb-4">
+            <div id="notifications" className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-xl p-8 hover:border-app-border-subtle transition-colors">
+              <h3 className="text-lg font-black text-app-heading mb-6 flex items-center gap-2 border-b border-app-border pb-4">
                 <Bell className="h-5 w-5 text-blue-500" />
                 Notification Preferences
               </h3>
@@ -206,9 +226,9 @@ const Settings = () => {
                 { key: 'cancellations', title: 'Cancellations', desc: 'Get notified when bookings are cancelled', value: notifications.cancellations },
                 { key: 'paymentConfirmations', title: 'Payment Confirmations', desc: 'Get notified when payments are received', value: notifications.paymentConfirmations }
               ].map((notif, i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-slate-800/40 rounded-xl border border-slate-800/60 hover:border-slate-700 transition-colors">
+                <div key={i} className="flex items-center justify-between p-4 bg-app-surface-solid rounded-xl border border-app-border hover:border-app-border-subtle transition-colors">
                   <div>
-                    <p className="text-sm font-bold text-white mb-0.5">{notif.title}</p>
+                    <p className="text-sm font-bold text-app-heading mb-0.5">{notif.title}</p>
                     <p className="text-[11px] font-medium text-slate-400">{notif.desc}</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer ml-4">
@@ -238,39 +258,39 @@ const Settings = () => {
 
           {/* Security Settings */}
           {activeTab === 'security' && (
-            <div id="security" className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-8 hover:border-slate-700 transition-colors">
-              <h3 className="text-lg font-black text-white mb-6 flex items-center gap-2 border-b border-slate-800/80 pb-4">
+            <div id="security" className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-xl p-8 hover:border-app-border-subtle transition-colors">
+              <h3 className="text-lg font-black text-app-heading mb-6 flex items-center gap-2 border-b border-app-border pb-4">
                 <Shield className="h-5 w-5 text-red-500" />
                 Security Settings
               </h3>
             <div className="space-y-6">
               <div>
-                <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Current Password</label>
+                <label className="block text-[11px] font-black text-app-muted uppercase tracking-widest mb-2">Current Password</label>
                 <input 
                   type="password" 
                   value={currentPassword} 
                   onChange={(e) => setCurrentPassword(e.target.value)} 
-                  className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-slate-600 transition-colors shadow-inner" 
+                  className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-app-text font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-app-border transition-colors shadow-inner" 
                   placeholder="Enter current password"
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">New Password</label>
+                <label className="block text-[11px] font-black text-app-muted uppercase tracking-widest mb-2">New Password</label>
                 <input 
                   type="password" 
                   value={newPassword} 
                   onChange={(e) => setNewPassword(e.target.value)} 
-                  className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-slate-600 transition-colors shadow-inner" 
+                  className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-app-text font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-app-border transition-colors shadow-inner" 
                   placeholder="Enter new password"
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Confirm New Password</label>
+                <label className="block text-[11px] font-black text-app-muted uppercase tracking-widest mb-2">Confirm New Password</label>
                 <input 
                   type="password" 
                   value={confirmPassword} 
                   onChange={(e) => setConfirmPassword(e.target.value)} 
-                  className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-white font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-slate-600 transition-colors shadow-inner" 
+                  className="w-full px-4 py-3 bg-app-input border border-app-border-subtle text-app-text font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 hover:border-app-border transition-colors shadow-inner" 
                   placeholder="Confirm new password"
                 />
               </div>
@@ -290,8 +310,8 @@ const Settings = () => {
 
           {/* Subscription Info */}
           {activeTab === 'billing' && (
-            <div id="billing" className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-8 hover:border-slate-700 transition-colors">
-            <h3 className="text-lg font-black text-white mb-6 flex items-center gap-2 border-b border-slate-800/80 pb-4">
+            <div id="billing" className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-xl p-8 hover:border-app-border-subtle transition-colors">
+            <h3 className="text-lg font-black text-app-heading mb-6 flex items-center gap-2 border-b border-app-border pb-4">
               <CreditCard className="h-5 w-5 text-purple-500" />
               Billing & Subscription
             </h3>
@@ -299,7 +319,7 @@ const Settings = () => {
               <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-3xl rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none group-hover:bg-emerald-500/10 transition-colors duration-700"></div>
               
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 relative z-10 gap-3">
-                <span className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+                <span className="text-2xl font-black text-app-heading tracking-tight flex items-center gap-3">
                   {subscription ? (subscription.plan_type || 'Custom Plan') : 'No Active Plan'}
                   <span className={`px-2.5 py-1 text-[10px] uppercase tracking-widest rounded-lg font-black shadow-sm ${subscription && subscription.status === 'active' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'}`}>
                     {subscription ? subscription.status : 'Inactive'}
@@ -307,17 +327,17 @@ const Settings = () => {
                 </span>
               </div>
               {subscription ? (
-                <p className="text-slate-300 font-medium text-sm mb-6 relative z-10 leading-relaxed max-w-lg">
+                <p className="text-app-text font-medium text-sm mb-6 relative z-10 leading-relaxed max-w-lg">
                   You are currently on the {subscription.plan_type || 'Custom Plan'} billed at <strong className="text-emerald-400 font-black px-1.5 py-0.5 bg-emerald-500/10 rounded-md border border-emerald-500/20 mx-1">Rs. {subscription.price || 0}</strong>. <br className="hidden sm:block" />
                   Your current billing cycle will end on <strong className="text-white">{subscription.end_date ? new Date(subscription.end_date).toLocaleDateString() : 'N/A'}</strong>.
                 </p>
               ) : (
-                <p className="text-slate-300 font-medium text-sm mb-6 relative z-10 leading-relaxed max-w-lg">
+                <p className="text-app-text font-medium text-sm mb-6 relative z-10 leading-relaxed max-w-lg">
                   You do not have an active subscription. Please subscribe to a plan to continue using all features.
                 </p>
               )}
               <div className="flex flex-col sm:flex-row gap-3 relative z-10">
-                <Link to="/subscription" className="px-5 py-2.5 bg-slate-800/80 text-emerald-400 border border-emerald-500/30 font-bold rounded-xl hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all shadow-sm text-center">
+                <Link to="/subscription" className="px-5 py-2.5 bg-app-surface-solid text-emerald-400 border border-emerald-500/30 font-bold rounded-xl hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all shadow-sm text-center">
                   Go to Subscription Center
                 </Link>
               </div>

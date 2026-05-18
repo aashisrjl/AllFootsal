@@ -71,7 +71,7 @@ const createContact = async (req, res) => {
     // Notify the futsal owner about the new message
     createFutsalNotification({
       futsalId: futsal.id,
-      type: "new_message",
+      type: "general_notification",
       title: "New Message Received 💬",
       message: `${user.username || 'A user'} sent you a message: "${message.substring(0, 80)}${message.length > 80 ? '...' : ''}"`,
       relatedId: result[0],

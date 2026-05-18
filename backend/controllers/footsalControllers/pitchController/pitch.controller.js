@@ -122,7 +122,7 @@ const createPitch = async (req, res) => {
       if (futsalRecord) {
         await createFutsalNotification({
           futsalId: futsalRecord.id,
-          type: "pitch_created",
+          type: "general_notification",
           title: "New Pitch Added 🏟️",
           message: `Pitch "${name}" (${pitch_type}) has been added successfully at Rs. ${price_per_hour}/hr.`,
           relatedType: "pitch",
@@ -184,7 +184,7 @@ const editPitch = async (req, res) => {
       if (futsalRecord) {
         await createFutsalNotification({
           futsalId: futsalRecord.id,
-          type: "pitch_updated",
+          type: "general_notification",
           title: "Pitch Updated ✅",
           message: `Pitch "${name}" has been updated successfully.`,
           relatedId: id,

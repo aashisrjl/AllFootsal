@@ -298,12 +298,12 @@ const Subscription = () => {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Subscription & Payments</h1>
-          <p className="text-slate-400 mt-1 text-sm font-medium">Manage your futsal subscription and complete payments securely.</p>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">Subscription & Payments</h1>
+          <p className="text-app-muted mt-1 text-sm font-medium">Manage your futsal subscription and complete payments securely.</p>
         </div>
         <button
           onClick={() => void loadSubscriptionData()}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900/60 border border-slate-700 rounded-xl text-sm font-semibold text-slate-200 hover:border-slate-500"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-app-surface-solid border border-app-border-subtle rounded-xl text-sm font-semibold text-app-text hover:border-slate-500"
         >
           <RefreshCw className="w-4 h-4" />
           Refresh
@@ -317,8 +317,8 @@ const Subscription = () => {
         <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">{error}</div>
       ) : null}
 
-      <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-6">
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+      <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-xl p-6">
+        <h2 className="text-xl font-bold text-app-heading mb-4 flex items-center gap-2">
           <ShieldCheck className="w-5 h-5 text-emerald-400" />
           Choose a Plan
         </h2>
@@ -332,11 +332,11 @@ const Subscription = () => {
                 className={`text-left rounded-xl p-4 border transition-all ${
                   active
                     ? 'border-emerald-500/60 bg-emerald-500/10'
-                    : 'border-slate-700 bg-slate-900/50 hover:border-slate-500'
+                    : 'border-app-border-subtle bg-app-surface-solid hover:border-emerald-500/30'
                 }`}
               >
-                <p className="text-sm font-bold text-white capitalize">{option.label}</p>
-                <p className="text-xs text-slate-400 mt-1">{option.price}</p>
+                <p className="text-sm font-bold text-app-heading capitalize">{option.label}</p>
+                <p className="text-xs text-app-muted mt-1">{option.price}</p>
               </button>
             );
           })}
@@ -352,40 +352,40 @@ const Subscription = () => {
         </div>
       </div>
 
-      <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-6">
-        <h2 className="text-xl font-bold text-white mb-4">Current Subscription</h2>
+      <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-xl p-6">
+        <h2 className="text-xl font-bold text-app-heading mb-4">Current Subscription</h2>
         {loading ? (
-          <p className="text-slate-400 text-sm">Loading subscription...</p>
+          <p className="text-app-muted text-sm">Loading subscription...</p>
         ) : subscription ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            <div className="rounded-xl bg-slate-900/60 border border-slate-700 p-4">
+            <div className="rounded-xl bg-app-surface-solid border border-app-border-subtle p-4">
               <p className="text-[11px] uppercase tracking-widest text-slate-500">Plan</p>
-              <p className="text-white font-bold capitalize">{subscription.subscription_plan}</p>
+              <p className="text-app-heading font-bold capitalize">{subscription.subscription_plan}</p>
             </div>
-            <div className="rounded-xl bg-slate-900/60 border border-slate-700 p-4">
+            <div className="rounded-xl bg-app-surface-solid border border-app-border-subtle p-4">
               <p className="text-[11px] uppercase tracking-widest text-slate-500">Status</p>
-              <p className="text-white font-bold capitalize">{subscription.status}</p>
+              <p className="text-app-heading font-bold capitalize">{subscription.status}</p>
             </div>
-            <div className="rounded-xl bg-slate-900/60 border border-slate-700 p-4">
+            <div className="rounded-xl bg-app-surface-solid border border-app-border-subtle p-4">
               <p className="text-[11px] uppercase tracking-widest text-slate-500">Fee</p>
-              <p className="text-white font-bold">Rs {Number(subscription.subscription_fee || 0).toLocaleString()}</p>
+              <p className="text-app-heading font-bold">Rs {Number(subscription.subscription_fee || 0).toLocaleString()}</p>
             </div>
-            <div className="rounded-xl bg-slate-900/60 border border-slate-700 p-4">
+            <div className="rounded-xl bg-app-surface-solid border border-app-border-subtle p-4">
               <p className="text-[11px] uppercase tracking-widest text-slate-500">Valid Till</p>
-              <p className="text-white font-bold">{new Date(subscription.subscription_end).toLocaleDateString()}</p>
+              <p className="text-app-heading font-bold">{new Date(subscription.subscription_end).toLocaleDateString()}</p>
             </div>
           </div>
         ) : (
-          <p className="text-slate-400 text-sm">No subscription found. Create one from the section above.</p>
+          <p className="text-app-muted text-sm">No subscription found. Create one from the section above.</p>
         )}
       </div>
 
-      <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-6">
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+      <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-xl p-6">
+        <h2 className="text-xl font-bold text-app-heading mb-4 flex items-center gap-2">
           <CreditCard className="w-5 h-5 text-blue-400" />
           Complete Payment
         </h2>
-        <p className="text-sm text-slate-400 mb-4">
+        <p className="text-sm text-app-muted mb-4">
           Choose a method below. Online payments redirect to gateway and return here for verification.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
@@ -394,7 +394,7 @@ const Subscription = () => {
               key={method}
               disabled={!canPay || actionLoading}
               onClick={() => void handleInitiatePayment(method)}
-              className="px-4 py-3 rounded-xl border border-slate-700 bg-slate-900/60 text-white font-semibold capitalize disabled:opacity-40 hover:border-slate-500"
+              className="px-4 py-3 rounded-xl border border-app-border-subtle bg-app-surface-solid text-app-heading font-semibold capitalize disabled:opacity-40 hover:border-emerald-500/40 hover:bg-emerald-500/5"
             >
               Pay with {method.replace('_', ' ')}
             </button>
@@ -405,22 +405,22 @@ const Subscription = () => {
         ) : null}
       </div>
 
-      <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-6">
-        <h2 className="text-xl font-bold text-white mb-4">Recent Payments</h2>
+      <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-xl p-6">
+        <h2 className="text-xl font-bold text-app-heading mb-4">Recent Payments</h2>
         {payments.length === 0 ? (
-          <p className="text-slate-400 text-sm">No payments found yet.</p>
+          <p className="text-app-muted text-sm">No payments found yet.</p>
         ) : (
           <div className="space-y-3">
             {payments.slice(0, 6).map((payment) => (
-              <div key={payment.id} className="rounded-xl border border-slate-700 bg-slate-900/60 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div key={payment.id} className="rounded-xl border border-app-border-subtle bg-app-surface-solid p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div>
-                  <p className="text-white font-semibold">Rs {Number(payment.amount).toLocaleString()}</p>
+                  <p className="text-app-heading font-semibold">Rs {Number(payment.amount).toLocaleString()}</p>
                   <p className="text-xs text-slate-400">
                     {payment.payment_method} • {new Date(payment.createdAt).toLocaleString()}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold capitalize text-slate-200">{payment.payment_status}</p>
+                  <p className="text-sm font-semibold capitalize text-app-text">{payment.payment_status}</p>
                   <p className="text-xs text-slate-500">{payment.transaction_id}</p>
                 </div>
               </div>

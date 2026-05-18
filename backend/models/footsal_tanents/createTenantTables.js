@@ -1,4 +1,5 @@
 const db = require('../index');
+const { ensureBookingOfflineColumns } = require('./ensureBookingOfflineColumns');
 
 async function createTenantTables(footsalCode) {
   const { sequelize } = db;
@@ -12,6 +13,8 @@ async function createTenantTables(footsalCode) {
   for (const name of tableCreators) {
     await sequelize.query(templates[name](footsalCode));
   }
+
+  await ensureBookingOfflineColumns(footsalCode);
 }
 
 async function dropTenantTables(footsalCode) {

@@ -71,7 +71,7 @@ const createForumReply = async (req,res)=>{
                     const { createFutsalNotification } = require("../../services/notifications/notificationService");
                     await createFutsalNotification({
                         futsalId: forum.futsal_id,
-                        type: "forum_reply",
+                        type: "forum_activity",
                         title: "New Forum Reply 💬",
                         message: `Someone replied to your post: "${content.substring(0, 50)}${content.length > 50 ? '...' : ''}"`,
                         relatedId: forum.id,
