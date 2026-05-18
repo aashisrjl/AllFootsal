@@ -32,7 +32,9 @@ module.exports = {
   booking: (code) => `
     CREATE TABLE IF NOT EXISTS booking_${code} (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      user_id INT NOT NULL,
+      user_id INT NULL COMMENT 'Website/app user; NULL for admin walk-in bookings',
+      offline_username VARCHAR(100) NULL COMMENT 'Walk-in customer name (admin offline booking)',
+      offline_phone VARCHAR(20) NULL COMMENT 'Walk-in customer phone (admin offline booking)',
       pitch_id INT NOT NULL,
       timeslot_id INT NOT NULL,
       booking_date DATE NOT NULL,
@@ -42,6 +44,7 @@ module.exports = {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       INDEX idx_user (user_id),
+      INDEX idx_offline_phone (offline_phone),
       INDEX idx_pitch_date (pitch_id, booking_date),
       INDEX idx_status (status),
       UNIQUE KEY no_double_book (pitch_id, timeslot_id, booking_date)
