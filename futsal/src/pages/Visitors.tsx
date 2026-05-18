@@ -75,10 +75,10 @@ const Visitors = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+          <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
             Website Visitors
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-app-muted mt-1">
             Track and analyze users visiting your facility page.
           </p>
         </div>
@@ -91,50 +91,50 @@ const Visitors = () => {
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center">
+      <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
           <input
             type="text"
             placeholder="Search by username, email or IP hash..."
-            className="w-full bg-slate-800/50 border border-slate-700 rounded-xl py-2.5 pl-11 pr-4 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+            className="w-full bg-app-surface-solid border border-app-border-subtle rounded-xl py-2.5 pl-11 pr-4 text-sm text-app-text focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button className="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition-colors text-sm font-semibold">
+        <button className="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-app-text rounded-xl border border-app-border-subtle transition-colors text-sm font-semibold">
           <Filter className="w-4 h-4" />
           More Filters
         </button>
       </div>
 
       {/* Visitors List */}
-      <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+      <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-800/30">
+              <tr className="border-b border-app-border bg-app-surface-solid">
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Visitor Info</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-center">IP Hash</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-center">Device</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-center">Visits</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-app-muted text-center">IP Hash</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-app-muted text-center">Device</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-app-muted text-center">Visits</th>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Last Seen</th>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/50">
               {filteredVisitors.map((visitor, idx) => (
-                <tr key={idx} className="hover:bg-slate-800/30 transition-colors group">
+                <tr key={idx} className="hover:bg-app-surface-solid transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-slate-800 to-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 border border-slate-700 group-hover:border-emerald-500/30 transition-colors shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-slate-800 to-slate-700 flex items-center justify-center text-xs font-bold text-app-text border border-app-border-subtle group-hover:border-emerald-500/30 transition-colors shrink-0">
                         {visitor.username ? visitor.username.substring(0, 2).toUpperCase() : 'GV'}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-bold text-slate-200 truncate">
+                        <p className="text-sm font-bold text-app-text truncate">
                           {visitor.username || 'Guest Visitor'}
                         </p>
-                        <p className="text-xs text-slate-500 truncate">
+                        <p className="text-xs text-app-muted truncate">
                           {visitor.email || 'Anonymous Session'}
                         </p>
                       </div>
@@ -142,14 +142,14 @@ const Visitors = () => {
                   </td>
                   <td className="px-6 py-4">
                      <div className="flex justify-center">
-                        <code className="text-[10px] bg-slate-800/80 px-2 py-1 rounded text-slate-400 font-mono border border-slate-700/50">
+                        <code className="text-[10px] bg-app-surface-solid px-2 py-1 rounded text-app-muted font-mono border border-app-border">
                             {visitor.ip_hash.substring(0, 12)}...
                         </code>
                      </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center text-slate-400">
-                      <div className="flex items-center gap-1.5 bg-slate-800/50 px-2 py-1 rounded-lg border border-slate-700/50">
+                      <div className="flex items-center gap-1.5 bg-app-surface-solid px-2 py-1 rounded-lg border border-app-border">
                         {getDeviceIcon(visitor.user_agent)}
                         <span className="text-[10px] uppercase font-bold tracking-tight">
                             {/mobile/i.test(visitor.user_agent) ? 'Mobile' : 'Desktop'}
@@ -184,7 +184,7 @@ const Visitors = () => {
                   <td colSpan={6} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center">
                       <Globe className="w-12 h-12 text-slate-800 mb-4 animate-pulse" />
-                      <p className="text-slate-500 font-medium italic">No visitors found matching your search.</p>
+                      <p className="text-app-muted font-medium italic">No visitors found matching your search.</p>
                     </div>
                   </td>
                 </tr>

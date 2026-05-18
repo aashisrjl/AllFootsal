@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import Dashboard from './pages/Dashboard';
 import FacilityProfile from './pages/FacilityProfile';
 import BookingManagement from './pages/BookingManagement';
+import BookingDetail from './pages/BookingDetail';
 import PitchManagement from './pages/PitchManagement';
 import MediaManagement from './pages/MediaManagement';
 import Revenue from './pages/Revenue';
@@ -17,6 +18,7 @@ import Visitors from './pages/Visitors';
 import ContactMessages from './pages/ContactMessages';
 import { Loader2 } from 'lucide-react';
 import { Toaster } from 'sonner';
+import { useTheme } from './context/ThemeContext';
 import './index.css';
 
 // ProtectedRoute Component
@@ -26,7 +28,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0f1c] flex items-center justify-center">
+      <div className="min-h-screen bg-app-bg flex items-center justify-center">
         <Loader2 className="w-10 h-10 text-emerald-500 animate-spin" />
       </div>
     );
@@ -44,10 +46,15 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+function ThemedToaster() {
+  const { resolvedTheme } = useTheme();
+  return <Toaster richColors position="top-right" theme={resolvedTheme} />;
+}
+
 function App() {
   return (
     <AuthProvider>
-      <Toaster richColors position="top-right" />
+      <ThemedToaster />
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -60,6 +67,7 @@ function App() {
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/facility" element={<FacilityProfile />} />
                     <Route path="/bookings" element={<BookingManagement />} />
+                    <Route path="/bookings/:bookingId" element={<BookingDetail />} />
                     <Route path="/pitches" element={<PitchManagement />} />
                     <Route path="/media" element={<MediaManagement />} />
                     <Route path="/ratings" element={<Ratings />} />

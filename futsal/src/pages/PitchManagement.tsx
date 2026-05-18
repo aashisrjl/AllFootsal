@@ -137,8 +137,8 @@ const PitchManagement = () => {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-           <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Pitch Management</h1>
-           <p className="text-slate-400 mt-1 text-sm font-medium">Add, configure, and maintain your futsal pitches.</p>
+           <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">Pitch Management</h1>
+           <p className="text-app-muted mt-1 text-sm font-medium">Add, configure, and maintain your futsal pitches.</p>
         </div>
         <button onClick={handleAddPitchClick} className="flex items-center px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:-translate-y-0.5 active:translate-y-0">
           <Plus className="h-5 w-5 mr-1" />
@@ -154,7 +154,7 @@ const PitchManagement = () => {
           { icon: Wrench, color: 'text-amber-400', bg: 'bg-amber-500/10', label: 'Maintenance', val: pitches.filter(p => p.isUnderMaintenance).length },
           { icon: null, textIcon: "Rs", color: 'text-emerald-400', bg: 'bg-emerald-500/10', label: "Today's Revenue", val: `Rs ${pitches.reduce((sum, p) => sum + p.revenue, 0)}` },
         ].map((stat, i) => (
-          <div key={i} className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-6 transition-all hover:-translate-y-1 hover:border-slate-700 hover:shadow-2xl">
+          <div key={i} className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-xl p-6 transition-all hover:-translate-y-1 hover:border-app-border-subtle hover:shadow-2xl">
              <div className="flex items-center">
               {stat.icon ? (
                 <div className={`p-3.5 rounded-xl ${stat.bg}`}>
@@ -166,8 +166,8 @@ const PitchManagement = () => {
                 </div>
               )}
               <div className="ml-5">
-                <p className="text-sm font-semibold text-slate-400 mb-0.5 tracking-wide">{stat.label}</p>
-                <p className="text-3xl font-black text-white tracking-tight">{stat.val}</p>
+                <p className="text-sm font-semibold text-app-muted mb-0.5 tracking-wide">{stat.label}</p>
+                <p className="text-3xl font-black text-app-heading tracking-tight">{stat.val}</p>
               </div>
             </div>
           </div>
@@ -177,12 +177,12 @@ const PitchManagement = () => {
       {/* Pitches Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {pitches.map((pitch) => (
-          <div key={pitch.id} className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl overflow-hidden group hover:border-slate-700 hover:shadow-2xl transition-all">
+          <div key={pitch.id} className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-xl overflow-hidden group hover:border-app-border-subtle hover:shadow-2xl transition-all">
             <div className="p-6 pb-7 relative flex flex-col h-full">
               {pitch.isActive && <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[50px] group-hover:bg-emerald-500/15 rounded-full transition-all duration-700 pointer-events-none" />}
               
               <div className="flex items-center justify-between mb-8 relative z-10">
-                <h3 className="text-2xl font-black text-white tracking-tight flex items-center">
+                <h3 className="text-2xl font-black text-app-heading tracking-tight flex items-center">
                    {pitch.name}
                    {pitch.isActive && <span className="ml-3 w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)] animate-pulse"></span>}
                 </h3>
@@ -199,7 +199,7 @@ const PitchManagement = () => {
                       {pitch.isActive ? (
                         <ToggleRight className="h-10 w-10 text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)] transition-all hover:scale-105" />
                       ) : (
-                        <ToggleLeft className="h-10 w-10 text-slate-600 hover:text-slate-500 transition-colors" />
+                        <ToggleLeft className="h-10 w-10 text-slate-600 hover:text-app-muted transition-colors" />
                       )}
                     </button>
                   )}
@@ -207,27 +207,27 @@ const PitchManagement = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-8 relative z-10 flex-1">
-                <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50 shadow-inner flex flex-col justify-center">
-                  <span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Price / Hr</span>
+                <div className="bg-app-input p-4 rounded-xl border border-app-border shadow-inner flex flex-col justify-center">
+                  <span className="block text-[10px] font-black text-app-muted uppercase tracking-widest mb-1.5">Price / Hr</span>
                   <span className="text-xl font-black text-emerald-400">Rs {pitch.pricePerHour}</span>
                 </div>
-                <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50 shadow-inner flex flex-col justify-center">
-                  <span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Daily Revenue</span>
-                   <span className="text-xl font-black text-white">Rs {pitch.revenue}</span>
+                <div className="bg-app-input p-4 rounded-xl border border-app-border shadow-inner flex flex-col justify-center">
+                  <span className="block text-[10px] font-black text-app-muted uppercase tracking-widest mb-1.5">Daily Revenue</span>
+                   <span className="text-xl font-black text-app-heading">Rs {pitch.revenue}</span>
                 </div>
                 
                 <div className="col-span-2 flex flex-col gap-3 mt-2">
-                  <div className="flex justify-between items-center py-2.5 border-b border-slate-800/80">
+                  <div className="flex justify-between items-center py-2.5 border-b border-app-border">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Surface Type</span>
-                    <span className="text-sm font-bold text-slate-200">{pitch.surface}</span>
+                    <span className="text-sm font-bold text-app-text">{pitch.surface}</span>
                   </div>
-                  <div className="flex justify-between items-center py-2.5 border-b border-slate-800/80">
+                  <div className="flex justify-between items-center py-2.5 border-b border-app-border">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Dimensions</span>
-                    <span className="text-[11px] font-black text-slate-300 bg-slate-800 px-2.5 py-1 rounded-md border border-slate-700">{pitch.size}</span>
+                    <span className="text-[11px] font-black text-app-text bg-slate-800 px-2.5 py-1 rounded-md border border-app-border-subtle">{pitch.size}</span>
                   </div>
                    <div className="flex justify-between items-center py-2.5">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Today's Bookings</span>
-                    <span className="text-sm font-black text-white px-2.5 py-0.5 bg-slate-800 rounded-md">{pitch.bookingsToday}</span>
+                    <span className="text-sm font-black text-app-heading px-2.5 py-0.5 bg-slate-800 rounded-md">{pitch.bookingsToday}</span>
                   </div>
                 </div>
               </div>
@@ -235,12 +235,12 @@ const PitchManagement = () => {
               <div className="flex space-x-2 relative z-10 mt-auto pt-2">
                 <button
                   onClick={() => editPitch(pitch)}
-                  className="flex-1 flex items-center justify-center px-2 py-3 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-bold transition-all border border-slate-700 hover:text-white"
+                  className="flex-1 flex items-center justify-center px-2 py-3 bg-app-surface-solid hover:bg-slate-700 text-app-text rounded-xl text-sm font-bold transition-all border border-app-border-subtle hover:text-white"
                 >
                   <Edit className="h-4 w-4 mr-1.5" />
                   Edit
                 </button>
-                <button onClick={() => schedulePitch(pitch)} className="flex-1 px-2 py-3 bg-slate-800/40 text-emerald-400 border border-emerald-500/20 rounded-xl text-sm font-bold hover:bg-emerald-500 hover:text-white transition-all">
+                <button onClick={() => schedulePitch(pitch)} className="flex-1 px-2 py-3 bg-app-surface-solid text-emerald-400 border border-emerald-500/20 rounded-xl text-sm font-bold hover:bg-emerald-500 hover:text-white transition-all">
                   Schedule
                 </button>
                 <button onClick={() => handleDeletePitch(pitch.id)} className="flex items-center justify-center px-4 py-3 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl text-sm hover:bg-rose-500 hover:text-white transition-all" title="Delete Pitch">

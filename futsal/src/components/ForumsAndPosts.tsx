@@ -73,7 +73,7 @@ const ForumsAndPosts = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">Your Forums</h2>
+        <h2 className="text-2xl font-bold text-app-heading">Your Forums</h2>
         <div className="text-sm text-slate-400">
           {forums.length} post{forums.length !== 1 ? 's' : ''}
         </div>
@@ -82,7 +82,7 @@ const ForumsAndPosts = () => {
       {forums.length === 0 ? (
         <div className="text-center py-12">
           <MessageSquare className="h-16 w-16 text-slate-600 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-slate-400 mb-2">No forum posts yet</h3>
+          <h3 className="text-xl font-semibold text-app-muted mb-2">No forum posts yet</h3>
           <p className="text-slate-500">Forum posts related to your futsal will appear here.</p>
         </div>
       ) : (
@@ -91,7 +91,7 @@ const ForumsAndPosts = () => {
             <div
               key={forum.id}
               onClick={() => window.open(`http://localhost:3001/forum/${forum.id}`, '_blank')}
-              className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 hover:bg-slate-800/70 transition-colors cursor-pointer"
+              className="bg-app-surface-solid border border-app-border rounded-xl p-6 hover:bg-app-surface-solid/70 transition-colors cursor-pointer"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
@@ -99,7 +99,7 @@ const ForumsAndPosts = () => {
                     <User className="h-5 w-5 text-emerald-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white">{forum.title}</h3>
+                    <h3 className="text-lg font-semibold text-app-heading">{forum.title}</h3>
                     <div className="flex items-center space-x-4 text-sm text-slate-400">
                       <span className="flex items-center">
                         <User className="h-4 w-4 mr-1" />
@@ -116,7 +116,7 @@ const ForumsAndPosts = () => {
                   </div>
                 </div>
               </div>
-              <p className="text-slate-300 leading-relaxed">{forum.content}</p>
+              <p className="text-app-text leading-relaxed">{forum.content}</p>
             </div>
           ))}
         </div>

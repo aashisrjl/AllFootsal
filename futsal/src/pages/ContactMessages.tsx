@@ -97,13 +97,13 @@ const ContactMessages = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-slate-100">Contact Messages</h2>
-          <p className="text-sm text-slate-400 mt-0.5">
+          <p className="text-sm text-app-muted mt-0.5">
             Messages sent by users from your facility's "Get In Touch" form
           </p>
         </div>
         <button
           onClick={fetchMessages}
-          className="flex items-center gap-2 px-4 py-2 border border-slate-700 rounded-lg text-slate-300 hover:bg-slate-700/40 text-sm font-medium transition-colors"
+          className="flex items-center gap-2 px-4 py-2 border border-app-border-subtle rounded-lg text-app-text hover:bg-slate-700/40 text-sm font-medium transition-colors"
         >
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -113,13 +113,13 @@ const ContactMessages = () => {
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: 'Total', value: messages.length, color: 'text-slate-200', bg: 'bg-slate-700/40', border: 'border-slate-700' },
+          { label: 'Total', value: messages.length, color: 'text-slate-200', bg: 'bg-slate-700/40', border: 'border-app-border-subtle' },
           { label: 'Unread', value: unreadCount, color: 'text-amber-300', bg: 'bg-amber-500/10', border: 'border-amber-500/30' },
           { label: 'Read', value: messages.length - unreadCount, color: 'text-emerald-300', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30' },
         ].map(stat => (
           <div key={stat.label} className={`${stat.bg} border ${stat.border} rounded-xl p-4 text-center`}>
             <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-            <p className="text-xs text-slate-400 mt-0.5">{stat.label}</p>
+            <p className="text-xs text-app-muted mt-0.5">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -132,7 +132,7 @@ const ContactMessages = () => {
             onClick={() => setFilter(f)}
             className={`px-4 py-1.5 rounded-lg text-sm font-semibold capitalize transition-all ${filter === f
                 ? 'bg-emerald-500 text-white shadow-md'
-                : 'bg-slate-700/40 text-slate-400 hover:text-slate-200 hover:bg-slate-700'
+                : 'bg-slate-700/40 text-app-muted hover:text-app-text hover:bg-slate-700'
               }`}
           >
             {f} {f === 'unread' && unreadCount > 0 && (
@@ -153,10 +153,10 @@ const ContactMessages = () => {
           <p className="text-sm text-red-300">{error}</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 bg-slate-800/40 rounded-xl border border-slate-700">
+        <div className="text-center py-16 bg-app-surface-solid rounded-xl border border-app-border-subtle">
           <MessageSquare className="h-12 w-12 text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-400 font-medium">No messages yet</p>
-          <p className="text-xs text-slate-500 mt-1">Messages from your facility page will appear here</p>
+          <p className="text-app-muted font-medium">No messages yet</p>
+          <p className="text-xs text-app-muted mt-1">Messages from your facility page will appear here</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
@@ -171,7 +171,7 @@ const ContactMessages = () => {
                     ? 'border-emerald-500/50 bg-emerald-500/10'
                     : !msg.is_read
                       ? 'border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10'
-                      : 'border-slate-700 bg-slate-800/40 hover:bg-slate-700/40'
+                      : 'border-app-border-subtle bg-app-surface-solid hover:bg-slate-700/40'
                   }`}
               >
                 {/* Unread dot */}
@@ -188,7 +188,7 @@ const ContactMessages = () => {
                     <p className={`text-sm font-semibold truncate ${!msg.is_read ? 'text-slate-100' : 'text-slate-300'}`}>
                       {msg.name || 'Anonymous'}
                     </p>
-                    <p className="text-xs text-slate-500 truncate mt-0.5">{msg.message}</p>
+                    <p className="text-xs text-app-muted truncate mt-0.5">{msg.message}</p>
                     <p className="text-[10px] text-slate-600 mt-1">
                       {msg.created_at ? formatDate(msg.created_at) : ''}
                     </p>
@@ -201,9 +201,9 @@ const ContactMessages = () => {
           {/* Detail panel */}
           <div className="lg:col-span-3">
             {selectedMessage ? (
-              <div className="bg-slate-800/40 border border-slate-700 rounded-xl overflow-hidden h-full flex flex-col">
+              <div className="bg-app-surface-solid border border-app-border-subtle rounded-xl overflow-hidden h-full flex flex-col">
                 {/* Detail header */}
-                <div className="p-5 border-b border-slate-700 flex items-start justify-between gap-3">
+                <div className="p-5 border-b border-app-border-subtle flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-300 font-bold text-lg">
                       {selectedMessage.name?.charAt(0).toUpperCase() || '?'}
@@ -222,7 +222,7 @@ const ContactMessages = () => {
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-500 mt-1 flex items-center gap-1">
+                      <p className="text-[10px] text-app-muted mt-1 flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         {selectedMessage.created_at ? formatDate(selectedMessage.created_at) : ''}
                       </p>
@@ -244,15 +244,15 @@ const ContactMessages = () => {
 
                 {/* Message body */}
                 <div className="p-5 flex-1">
-                  <div className="bg-slate-900/50 border border-slate-700/50 rounded-xl p-4">
-                    <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">
+                  <div className="bg-slate-900/50 border border-app-border rounded-xl p-4">
+                    <p className="text-app-text text-sm leading-relaxed whitespace-pre-wrap">
                       {selectedMessage.message}
                     </p>
                   </div>
 
                   {/* Reply options */}
                   <div className="mt-5">
-                    <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+                    <h4 className="text-xs font-semibold text-app-muted uppercase tracking-wider mb-3">
                       Reply via
                     </h4>
                     <div className="flex flex-wrap gap-3">
@@ -267,7 +267,7 @@ const ContactMessages = () => {
                           <ExternalLink className="h-3 w-3 opacity-60" />
                         </a>
                       ) : (
-                        <div className="flex items-center gap-2 px-5 py-2.5 bg-slate-700/30 border border-slate-700 text-slate-500 rounded-xl text-sm cursor-not-allowed">
+                        <div className="flex items-center gap-2 px-5 py-2.5 bg-slate-700/30 border border-app-border-subtle text-app-muted rounded-xl text-sm cursor-not-allowed">
                           <Mail className="h-4 w-4" />
                           No email provided
                         </div>
@@ -284,7 +284,7 @@ const ContactMessages = () => {
                           <ExternalLink className="h-3 w-3 opacity-60" />
                         </a>
                       ) : (
-                        <div className="flex items-center gap-2 px-5 py-2.5 bg-slate-700/30 border border-slate-700 text-slate-500 rounded-xl text-sm cursor-not-allowed">
+                        <div className="flex items-center gap-2 px-5 py-2.5 bg-slate-700/30 border border-app-border-subtle text-app-muted rounded-xl text-sm cursor-not-allowed">
                           <Phone className="h-4 w-4" />
                           No phone provided
                         </div>
@@ -314,10 +314,10 @@ const ContactMessages = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center h-60 lg:h-full bg-slate-800/20 border border-dashed border-slate-700 rounded-xl text-center p-8">
+              <div className="flex flex-col items-center justify-center h-60 lg:h-full bg-slate-800/20 border border-dashed border-app-border-subtle rounded-xl text-center p-8">
                 <MessageSquare className="h-10 w-10 text-slate-600 mb-3" />
-                <p className="text-slate-400 font-medium text-sm">Select a message to view details</p>
-                <p className="text-xs text-slate-500 mt-1">Click any message on the left to read it and reply</p>
+                <p className="text-app-muted font-medium text-sm">Select a message to view details</p>
+                <p className="text-xs text-app-muted mt-1">Click any message on the left to read it and reply</p>
               </div>
             )}
           </div>

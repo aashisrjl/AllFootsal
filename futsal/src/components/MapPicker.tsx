@@ -58,7 +58,7 @@ const MapPicker = ({ value, onChange }: MapPickerProps) => {
   }, [value]);
 
   return (
-    <div className="rounded-xl overflow-hidden border border-slate-700">
+    <div className="rounded-xl overflow-hidden border border-app-border-subtle">
       <div ref={containerRef} style={{ height: '280px', width: '100%' }} />
     </div>
   );

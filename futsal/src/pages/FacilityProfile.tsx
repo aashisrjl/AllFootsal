@@ -325,8 +325,8 @@ const FacilityProfile = () => {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Facility Profile</h1>
-          <p className="text-slate-400 mt-1 text-sm font-medium">Complete location and facility info to activate full owner dashboard access.</p>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">Facility Profile</h1>
+          <p className="text-app-muted mt-1 text-sm font-medium">Complete location and facility info to activate full owner dashboard access.</p>
         </div>
         <span
           className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${
@@ -349,33 +349,33 @@ const FacilityProfile = () => {
       )}
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-6 space-y-4">
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+        <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-xl p-6 space-y-4">
+          <h2 className="text-lg font-bold text-app-heading flex items-center gap-2">
             <MapPin className="w-5 h-5 text-emerald-400" />
             Location (Mandatory)
           </h2>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">District</label>
-            <input value={location.district} onChange={(e) => setLocation((prev) => ({ ...prev, district: e.target.value }))} placeholder="Enter district" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+            <label className="block text-xs font-bold text-app-muted mb-2 uppercase tracking-wide">District</label>
+            <input value={location.district} onChange={(e) => setLocation((prev) => ({ ...prev, district: e.target.value }))} placeholder="Enter district" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">City</label>
-            <input value={location.city} onChange={(e) => setLocation((prev) => ({ ...prev, city: e.target.value }))} placeholder="Enter city" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+            <label className="block text-xs font-bold text-app-muted mb-2 uppercase tracking-wide">City</label>
+            <input value={location.city} onChange={(e) => setLocation((prev) => ({ ...prev, city: e.target.value }))} placeholder="Enter city" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Street Address</label>
-            <input value={location.address} onChange={(e) => setLocation((prev) => ({ ...prev, address: e.target.value }))} placeholder="Street, lane, or landmark" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+            <label className="block text-xs font-bold text-app-muted mb-2 uppercase tracking-wide">Street Address</label>
+            <input value={location.address} onChange={(e) => setLocation((prev) => ({ ...prev, address: e.target.value }))} placeholder="Street, lane, or landmark" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Postal Code</label>
-            <input value={location.postal_code} onChange={(e) => setLocation((prev) => ({ ...prev, postal_code: e.target.value }))} placeholder="Postal code" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+            <label className="block text-xs font-bold text-app-muted mb-2 uppercase tracking-wide">Postal Code</label>
+            <input value={location.postal_code} onChange={(e) => setLocation((prev) => ({ ...prev, postal_code: e.target.value }))} placeholder="Postal code" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
           </div>
 
-          <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-3 text-xs text-slate-400">
+          <div className="rounded-xl border border-app-border-subtle bg-app-surface-solid p-3 text-xs text-slate-400">
             Click on the map to place the pin, or use your current location. The selected coordinates are saved automatically.
           </div>
 
@@ -391,20 +391,20 @@ const FacilityProfile = () => {
           />
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-slate-300 rounded-xl text-sm">
+            <div className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl text-sm">
               Latitude: {location.latitude ?? 'Not selected'}
             </div>
-            <div className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-slate-300 rounded-xl text-sm">
+            <div className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-app-text rounded-xl text-sm">
               Longitude: {location.longitude ?? 'Not selected'}
             </div>
           </div>
 
-          <button onClick={setCurrentLocation} type="button" className="inline-flex items-center gap-2 px-3 py-2 bg-slate-800 border border-slate-700 text-slate-200 rounded-lg text-sm hover:border-slate-500 w-fit">
+          <button onClick={setCurrentLocation} type="button" className="inline-flex items-center gap-2 px-3 py-2 bg-slate-800 border border-app-border-subtle text-app-text rounded-lg text-sm hover:border-slate-500 w-fit">
             <Crosshair className="w-4 h-4" />
             Use My Current Location
           </button>
 
-          <textarea value={location.full_address} onChange={(e) => setLocation((prev) => ({ ...prev, full_address: e.target.value }))} placeholder="Full Address" rows={3} className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+          <textarea value={location.full_address} onChange={(e) => setLocation((prev) => ({ ...prev, full_address: e.target.value }))} placeholder="Full Address" rows={3} className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
 
           <button
             onClick={() => void saveLocation()}
@@ -416,34 +416,34 @@ const FacilityProfile = () => {
           </button>
         </div>
 
-        <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl p-6 space-y-4">
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+        <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-xl p-6 space-y-4">
+          <h2 className="text-lg font-bold text-app-heading flex items-center gap-2">
             <Building2 className="w-5 h-5 text-blue-400" />
             Facility Info (Mandatory)
           </h2>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Established Year</label>
-            <input value={info.established_year} onChange={(e) => setInfo((prev) => ({ ...prev, established_year: e.target.value }))} placeholder="e.g. 2023" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+            <label className="block text-xs font-bold text-app-muted mb-2 uppercase tracking-wide">Established Year</label>
+            <input value={info.established_year} onChange={(e) => setInfo((prev) => ({ ...prev, established_year: e.target.value }))} placeholder="e.g. 2023" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
           </div>
           <div>
-            <label className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide flex items-center gap-2">
+            <label className="text-xs font-bold text-app-muted mb-2 uppercase tracking-wide flex items-center gap-2">
               <Globe className="w-3.5 h-3.5 text-emerald-400" />
               Website Link
             </label>
-            <input value={info.website_url} onChange={(e) => setInfo((prev) => ({ ...prev, website_url: e.target.value }))} placeholder="https://your-futsal-website.com" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+            <input value={info.website_url} onChange={(e) => setInfo((prev) => ({ ...prev, website_url: e.target.value }))} placeholder="https://your-futsal-website.com" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Facilities</label>
+            <label className="block text-xs font-bold text-app-muted mb-2 uppercase tracking-wide">Facilities</label>
             <div className="flex gap-2">
               <input
                 value={facilityInput}
                 onChange={(e) => setFacilityInput(e.target.value)}
                 placeholder="Add facility (e.g. Parking)"
-                className="flex-1 px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl"
+                className="flex-1 px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl"
               />
-              <button type="button" onClick={addFacility} className="px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-200 hover:border-slate-500">
+              <button type="button" onClick={addFacility} className="px-3 py-2.5 bg-slate-800 border border-app-border-subtle rounded-xl text-app-text hover:border-slate-500">
                 <Plus className="w-4 h-4" />
               </button>
             </div>
@@ -460,11 +460,11 @@ const FacilityProfile = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Operating Hours</label>
+            <label className="block text-xs font-bold text-app-muted mb-2 uppercase tracking-wide">Operating Hours</label>
             <div className="space-y-2">
               {DAYS.map((day) => (
                 <div key={day} className="grid grid-cols-[120px_1fr_1fr_auto] gap-2 items-center">
-                  <span className="capitalize text-slate-300 text-sm">{day}</span>
+                  <span className="capitalize text-app-text text-sm">{day}</span>
                   <input
                     type="time"
                     disabled={info.operating_hours[day]?.isClosed}
@@ -478,7 +478,7 @@ const FacilityProfile = () => {
                         },
                       }))
                     }
-                    className="px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-white"
+                    className="px-3 py-2 bg-app-input border border-app-border-subtle rounded-lg text-white"
                   />
                   <input
                     type="time"
@@ -493,9 +493,9 @@ const FacilityProfile = () => {
                         },
                       }))
                     }
-                    className="px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-white"
+                    className="px-3 py-2 bg-app-input border border-app-border-subtle rounded-lg text-white"
                   />
-                  <label className="text-xs text-slate-400 inline-flex items-center gap-1">
+                  <label className="text-xs text-app-muted inline-flex items-center gap-1">
                     <input
                       type="checkbox"
                       checked={info.operating_hours[day]?.isClosed || false}
@@ -518,40 +518,40 @@ const FacilityProfile = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide flex items-center gap-2">
+              <label className="text-xs font-bold text-app-muted mb-2 uppercase tracking-wide flex items-center gap-2">
                 <Facebook className="w-3.5 h-3.5 text-blue-400" />
                 Facebook URL
               </label>
-              <input value={info.social_links.facebook} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, facebook: e.target.value } }))} placeholder="https://facebook.com/yourpage" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+              <input value={info.social_links.facebook} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, facebook: e.target.value } }))} placeholder="https://facebook.com/yourpage" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
             </div>
             <div>
-              <label className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide flex items-center gap-2">
+              <label className="text-xs font-bold text-app-muted mb-2 uppercase tracking-wide flex items-center gap-2">
                 <Instagram className="w-3.5 h-3.5 text-pink-400" />
                 Instagram URL
               </label>
-              <input value={info.social_links.instagram} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, instagram: e.target.value } }))} placeholder="https://instagram.com/yourpage" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+              <input value={info.social_links.instagram} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, instagram: e.target.value } }))} placeholder="https://instagram.com/yourpage" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
             </div>
             <div>
-              <label className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide flex items-center gap-2">
+              <label className="text-xs font-bold text-app-muted mb-2 uppercase tracking-wide flex items-center gap-2">
                 <Youtube className="w-3.5 h-3.5 text-rose-400" />
                 YouTube URL
               </label>
-              <input value={info.social_links.youtube} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, youtube: e.target.value } }))} placeholder="https://youtube.com/@yourchannel" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+              <input value={info.social_links.youtube} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, youtube: e.target.value } }))} placeholder="https://youtube.com/@yourchannel" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
             </div>
             <div>
-              <label className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide flex items-center gap-2">
+              <label className="text-xs font-bold text-app-muted mb-2 uppercase tracking-wide flex items-center gap-2">
                 <Twitter className="w-3.5 h-3.5 text-sky-400" />
                 X / Twitter URL
               </label>
-              <input value={info.social_links.x} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, x: e.target.value } }))} placeholder="https://x.com/yourpage" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+              <input value={info.social_links.x} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, x: e.target.value } }))} placeholder="https://x.com/yourpage" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">TikTok URL</label>
-              <input value={info.social_links.tiktok} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, tiktok: e.target.value } }))} placeholder="https://tiktok.com/@yourpage" className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+              <label className="block text-xs font-bold text-app-muted mb-2 uppercase tracking-wide">TikTok URL</label>
+              <input value={info.social_links.tiktok} onChange={(e) => setInfo((prev) => ({ ...prev, social_links: { ...prev.social_links, tiktok: e.target.value } }))} placeholder="https://tiktok.com/@yourpage" className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
             </div>
           </div>
-          <textarea value={info.parking_info} onChange={(e) => setInfo((prev) => ({ ...prev, parking_info: e.target.value }))} placeholder="Parking Info" rows={2} className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
-          <textarea value={info.additional_info} onChange={(e) => setInfo((prev) => ({ ...prev, additional_info: e.target.value }))} placeholder="Additional Info" rows={2} className="w-full px-4 py-2.5 bg-slate-800/60 border border-slate-700 text-white rounded-xl" />
+          <textarea value={info.parking_info} onChange={(e) => setInfo((prev) => ({ ...prev, parking_info: e.target.value }))} placeholder="Parking Info" rows={2} className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
+          <textarea value={info.additional_info} onChange={(e) => setInfo((prev) => ({ ...prev, additional_info: e.target.value }))} placeholder="Additional Info" rows={2} className="w-full px-4 py-2.5 bg-app-input border border-app-border-subtle text-white rounded-xl" />
 
           <button
             onClick={() => void saveInfo()}

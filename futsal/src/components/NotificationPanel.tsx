@@ -116,11 +116,11 @@ export default function NotificationPanel() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label="Notifications"
-        className="rounded-full bg-slate-800/80 p-2.5 relative border border-slate-700/50 hover:border-slate-600 hover:bg-slate-700 transition-all shadow-inner hover:shadow-lg focus:outline-none"
+        className="rounded-full bg-app-surface-solid p-2.5 relative border border-app-border hover:border-slate-600 hover:bg-slate-700 transition-all shadow-inner hover:shadow-lg focus:outline-none"
       >
         <Bell className="h-4 w-4 text-slate-300" />
         {unreadCount > 0 ? (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white border-2 border-[#121827] leading-none">
+          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-app-heading border-2 border-[#121827] leading-none">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         ) : (
@@ -131,14 +131,14 @@ export default function NotificationPanel() {
       {/* Dropdown Panel */}
       {open && (
         <div
-          className="absolute right-0 mt-2 w-[340px] sm:w-[380px] rounded-2xl shadow-2xl z-[200] overflow-hidden border border-slate-700/60"
+          className="absolute right-0 mt-2 w-[340px] sm:w-[380px] rounded-2xl shadow-2xl z-[200] overflow-hidden border border-app-border-subtle/60"
           style={{ background: 'rgba(10,15,28,0.98)', backdropFilter: 'blur(20px)' }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-app-border">
             <div className="flex items-center gap-2">
               <Bell className="h-4 w-4 text-emerald-400" />
-              <span className="text-sm font-semibold text-white">Notifications</span>
+              <span className="text-sm font-semibold text-app-heading">Notifications</span>
               {unreadCount > 0 && (
                 <span className="text-xs bg-emerald-600/80 text-white rounded-full px-1.5 py-0.5 font-bold">
                   {unreadCount} new
@@ -158,7 +158,7 @@ export default function NotificationPanel() {
               )}
               <button
                 onClick={() => setOpen(false)}
-                className="p-1 text-slate-500 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+                className="p-1 text-app-muted hover:text-white rounded-lg hover:bg-white/5 transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -178,7 +178,7 @@ export default function NotificationPanel() {
                   <div
                     key={n.id}
                     onClick={() => handleMarkRead(n)}
-                    className={`group flex items-start gap-3 px-4 py-3 cursor-pointer transition-colors border-b border-slate-800/60 hover:bg-slate-800/40 ${
+                    className={`group flex items-start gap-3 px-4 py-3 cursor-pointer transition-colors border-b border-app-border hover:bg-app-surface-solid ${
                       !n.is_read ? 'bg-emerald-900/20' : ''
                     }`}
                   >
@@ -194,7 +194,7 @@ export default function NotificationPanel() {
                           <span className="flex-shrink-0 w-2 h-2 rounded-full bg-emerald-400 mt-1" />
                         )}
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-2 leading-snug">
+                      <p className="text-[11px] text-app-muted mt-0.5 line-clamp-2 leading-snug">
                         {n.message}
                       </p>
                       <p className="text-[10px] text-slate-600 mt-1">
@@ -220,10 +220,10 @@ export default function NotificationPanel() {
                   </button>
                 )}
                 {/* See All Notifications */}
-                <div className="p-3 border-t border-slate-800 bg-slate-900/50">
+                <div className="p-3 border-t border-app-border bg-slate-900/50">
                   <button
                     onClick={() => { setOpen(false); window.location.href = "/notifications"; }}
-                    className="w-full py-2 text-xs font-bold text-slate-500 hover:text-emerald-400 transition-colors"
+                    className="w-full py-2 text-xs font-bold text-app-muted hover:text-emerald-400 transition-colors"
                   >
                     See all notifications
                   </button>

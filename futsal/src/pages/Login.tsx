@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import ThemeToggle from '../components/ThemeToggle';
 
 import {
   AuthImage,
@@ -56,17 +57,20 @@ const Login: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-slate-950 transition-colors duration-500"
+      className="min-h-screen flex flex-col bg-app-bg transition-colors duration-500 relative"
       style={{
         backgroundImage: `url(${AuthBackground})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
+      </div>
       <main className="flex flex-1 items-center justify-center py-10 px-4 mt-10">
-        <div className="bg-slate-900 shadow-2xl rounded-3xl flex flex-col md:flex-row overflow-hidden max-w-5xl w-full border border-slate-800 transition-all duration-300">
+        <div className="bg-app-surface-solid shadow-2xl rounded-3xl flex flex-col md:flex-row overflow-hidden max-w-5xl w-full border border-app-border transition-all duration-300">
           {/* Left side form */}
-          <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-slate-900/40 backdrop-blur-sm relative overflow-hidden">
+          <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-app-surface backdrop-blur-sm relative overflow-hidden">
 
             {/* Background Glows for consistent premium feel */}
             <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none z-0"></div>
@@ -77,13 +81,13 @@ const Login: React.FC = () => {
                   <img
                     src={logo_transparent}
                     alt="AllFutsal Logo"
-                    className="h-20 w-auto object-contain transition-transform duration-300 hover:scale-105 invert brightness-100"
+                    className="h-20 w-auto object-contain transition-transform duration-300 hover:scale-105 dark:invert"
                   />
                 </div>
               </Link>
 
-              <h2 className="text-3xl font-black text-slate-50 mb-2 tracking-tight">Futsal Portal</h2>
-              <p className="text-slate-400 mb-6 font-medium">
+              <h2 className="text-3xl font-black text-app-heading mb-2 tracking-tight">Futsal Portal</h2>
+              <p className="text-app-muted mb-6 font-medium">
                 Sign in to manage your futsal facility.
               </p>
 
@@ -96,7 +100,7 @@ const Login: React.FC = () => {
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-semibold text-slate-300">
+                  <Label htmlFor="email" className="text-sm font-semibold text-app-text">
                     Email or Phone <span className="text-rose-500">*</span>
                   </Label>
                   <Input
@@ -107,13 +111,13 @@ const Login: React.FC = () => {
                     onChange={(e) => setEmailOrPhone(e.target.value)}
                     required
                     disabled={isLoading}
-                    className="h-12 bg-slate-800 border-slate-700 text-slate-50 placeholder:text-slate-500 focus-visible:ring-emerald-500 rounded-xl"
+                    className="h-12 bg-app-input border-app-border-subtle text-app-heading placeholder:text-app-muted focus-visible:ring-emerald-500 rounded-xl"
                   />
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password" title="Password" className="text-sm font-semibold text-slate-300">
+                    <Label htmlFor="password" title="Password" className="text-sm font-semibold text-app-text">
                       Password <span className="text-rose-500">*</span>
                     </Label>
                     <a
@@ -131,7 +135,7 @@ const Login: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={isLoading}
-                    className="h-12 bg-slate-800 border-slate-700 text-slate-50 placeholder:text-slate-500 focus-visible:ring-emerald-500 rounded-xl"
+                    className="h-12 bg-app-input border-app-border-subtle text-app-heading placeholder:text-app-muted focus-visible:ring-emerald-500 rounded-xl"
                   />
                 </div>
 
@@ -154,8 +158,8 @@ const Login: React.FC = () => {
                 </Button>
               </form>
 
-              <div className="mt-8 text-center border-t border-slate-800 pt-6">
-                <p className="text-slate-400 text-sm font-medium">
+              <div className="mt-8 text-center border-t border-app-border pt-6">
+                <p className="text-app-muted text-sm font-medium">
                   Need an account for your futsal?{" "}
                   <a
                     href="http://localhost:3001/auth/register/footsal"
@@ -169,7 +173,7 @@ const Login: React.FC = () => {
           </div>
 
           {/* Right side illustration */}
-          <div className="hidden md:flex w-1/2 bg-slate-800/30 backdrop-blur-sm justify-center items-center p-12">
+          <div className="hidden md:flex w-1/2 bg-app-surface-solid backdrop-blur-sm justify-center items-center p-12">
             <img
               src={AuthImage}
               alt="Login Illustration"

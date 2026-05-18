@@ -3,7 +3,19 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  :root,
+  .light {
+    --app-bg: #f1f5f9;
+    --app-surface: rgba(255, 255, 255, 0.92);
+    --app-surface-solid: #ffffff;
+    --app-border: #e2e8f0;
+    --app-border-subtle: #cbd5e1;
+    --app-text: #0f172a;
+    --app-text-muted: #64748b;
+    --app-heading: #0f172a;
+    --app-sidebar: rgba(255, 255, 255, 0.95);
+    --app-header: rgba(255, 255, 255, 0.9);
+    --app-input-bg: #f8fafc;
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -27,6 +39,17 @@
   }
 
   .dark {
+    --app-bg: #0a0f1c;
+    --app-surface: rgba(15, 23, 42, 0.45);
+    --app-surface-solid: rgba(15, 23, 42, 0.75);
+    --app-border: #1e293b;
+    --app-border-subtle: #334155;
+    --app-text: #e2e8f0;
+    --app-text-muted: #94a3b8;
+    --app-heading: #f8fafc;
+    --app-sidebar: rgba(15, 23, 42, 0.65);
+    --app-header: rgba(15, 23, 42, 0.45);
+    --app-input-bg: rgba(30, 41, 59, 0.65);
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;

@@ -113,8 +113,8 @@ const RatingsAndReviews = () => {
   return (
     <div className="space-y-6">
       {/* Ratings Overview */}
-      <div className="bg-slate-800/40 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6">
-        <h3 className="text-lg font-semibold text-slate-200 mb-4">Ratings & Reviews Overview</h3>
+      <div className="bg-app-surface-solid backdrop-blur-lg rounded-xl border border-app-border p-6">
+        <h3 className="text-lg font-semibold text-app-text mb-4">Ratings & Reviews Overview</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Average Rating */}
@@ -145,8 +145,8 @@ const RatingsAndReviews = () => {
       </div>
 
       {/* Reviews List */}
-      <div className="bg-slate-800/40 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6">
-        <h3 className="text-lg font-semibold text-slate-200 mb-4">Customer Reviews</h3>
+      <div className="bg-app-surface-solid backdrop-blur-lg rounded-xl border border-app-border p-6">
+        <h3 className="text-lg font-semibold text-app-text mb-4">Customer Reviews</h3>
 
         {loading ? (
           <div className="flex justify-center items-center h-48">
@@ -158,22 +158,22 @@ const RatingsAndReviews = () => {
             <p className="text-sm text-red-300">{error}</p>
           </div>
         ) : ratings.length === 0 ? (
-          <div className="text-center py-12 bg-slate-700/20 rounded-lg border border-slate-700">
-            <MessageSquare className="h-12 w-12 text-slate-500 mx-auto mb-3" />
+          <div className="text-center py-12 bg-slate-700/20 rounded-lg border border-app-border-subtle">
+            <MessageSquare className="h-12 w-12 text-app-muted mx-auto mb-3" />
             <p className="text-slate-400">No reviews yet</p>
-            <p className="text-sm text-slate-500 mt-1">Be the first to leave a review!</p>
+            <p className="text-sm text-app-muted mt-1">Be the first to leave a review!</p>
           </div>
         ) : (
           <div className="space-y-4 max-h-96 overflow-y-auto">
             {ratings.map((rating) => (
-              <div key={rating.id} className="border border-slate-700/50 rounded-lg p-4 bg-slate-700/20 hover:bg-slate-700/30 transition-colors">
+              <div key={rating.id} className="border border-app-border rounded-lg p-4 bg-slate-700/20 hover:bg-slate-700/30 transition-colors">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center">
                       <User className="h-5 w-5 text-slate-300" />
                     </div>
                     <div>
-                      <p className="font-semibold text-slate-200">{rating.reviewerName}</p>
+                      <p className="font-semibold text-app-text">{rating.reviewerName}</p>
                       <p className="text-xs text-slate-400">
                         {new Date(rating.createdAt).toLocaleDateString('en-US', {
                           year: 'numeric',
@@ -189,7 +189,7 @@ const RatingsAndReviews = () => {
                   </div>
                 </div>
 
-                <p className="text-slate-300 mb-3 leading-relaxed">{rating.review}</p>
+                <p className="text-app-text mb-3 leading-relaxed">{rating.review}</p>
 
                 <div className="flex items-center space-x-2">
                   {getSentimentIcon(rating.sentiment_label)}

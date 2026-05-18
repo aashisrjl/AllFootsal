@@ -100,22 +100,22 @@ export default function Notifications() {
              <Bell className="h-6 w-6 text-emerald-400" />
            </div>
            <div>
-             <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Notifications</h1>
-             <p className="text-slate-400 text-sm mt-1">Stay updated with your futsal activity.</p>
+             <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">Notifications</h1>
+             <p className="text-app-muted text-sm mt-1">Stay updated with your futsal activity.</p>
            </div>
         </div>
         
         <div className="flex items-center gap-3">
-          <div className="flex items-center bg-slate-900/60 p-1 rounded-xl border border-slate-800 shadow-inner">
+          <div className="flex items-center bg-app-surface-solid p-1 rounded-xl border border-app-border shadow-inner">
             <button 
               onClick={() => setFilter('all')}
-              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${filter === 'all' ? 'bg-emerald-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${filter === 'all' ? 'bg-emerald-500 text-white shadow-lg' : 'text-app-muted hover:text-white'}`}
             >
               All
             </button>
             <button 
               onClick={() => setFilter('unread')}
-              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${filter === 'unread' ? 'bg-emerald-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${filter === 'unread' ? 'bg-emerald-500 text-white shadow-lg' : 'text-app-muted hover:text-white'}`}
             >
               Unread
             </button>
@@ -124,7 +124,7 @@ export default function Notifications() {
           <button 
             onClick={handleMarkAll}
             disabled={unreadCount === 0}
-            className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-emerald-400 hover:bg-emerald-500/10 transition-all disabled:opacity-50"
+            className="p-2.5 rounded-xl bg-app-surface-solid border border-app-border text-emerald-400 hover:bg-emerald-500/10 transition-all disabled:opacity-50"
             title="Mark all as read"
           >
             <CheckCheck className="h-5 w-5" />
@@ -133,14 +133,14 @@ export default function Notifications() {
       </div>
 
       {/* Content Area */}
-      <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden shadow-2xl min-h-[60vh]">
+      <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-3xl overflow-hidden shadow-2xl min-h-[60vh]">
         {notifications.length === 0 && !loading ? (
           <div className="flex flex-col items-center justify-center py-32 text-center">
-            <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mb-6">
+            <div className="w-20 h-20 bg-app-surface-solid rounded-full flex items-center justify-center mb-6">
               <BellOff className="h-10 w-10 text-slate-600" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">No notifications yet</h3>
-            <p className="text-slate-500 max-w-xs mx-auto">We'll alert you here when there are new bookings or updates.</p>
+            <h3 className="text-xl font-bold text-app-heading mb-2">No notifications yet</h3>
+            <p className="text-app-muted max-w-xs mx-auto">We'll alert you here when there are new bookings or updates.</p>
           </div>
         ) : (
           <div className="divide-y divide-slate-800/50">
@@ -157,7 +157,7 @@ export default function Notifications() {
                 )}
 
                 <div className="flex-shrink-0">
-                  <div className="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-3xl shadow-inner group-hover:scale-110 transition-transform">
+                  <div className="w-14 h-14 rounded-2xl bg-slate-800 border border-app-border-subtle flex items-center justify-center text-3xl shadow-inner group-hover:scale-110 transition-transform">
                     {typeIcon[n.type] ?? '📣'}
                   </div>
                 </div>
@@ -167,17 +167,17 @@ export default function Notifications() {
                     <h4 className={`text-base font-bold truncate ${!n.is_read ? 'text-white' : 'text-slate-300'}`}>
                       {n.title}
                     </h4>
-                    <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-500 whitespace-nowrap">
+                    <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-app-muted whitespace-nowrap">
                       <Clock className="w-3 h-3" />
                       {relativeTime(n.createdAt)}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-400 line-clamp-2 leading-relaxed group-hover:text-slate-300 transition-colors">
+                  <p className="text-sm text-app-muted line-clamp-2 leading-relaxed group-hover:text-app-text transition-colors">
                     {n.message}
                   </p>
                   
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700/50 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <span className="px-2.5 py-1 rounded-lg bg-app-surface-solid border border-app-border text-[10px] font-black uppercase tracking-widest text-slate-400">
                       {n.type.replace('_', ' ')}
                     </span>
                     {n.related_type && (

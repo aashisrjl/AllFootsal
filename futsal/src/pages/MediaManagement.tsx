@@ -257,28 +257,28 @@ const MediaManagement = () => {
           </button>
         </div>
       </div>
-      <p className="text-xs text-slate-400 mt-2">
+      <p className="text-xs text-app-muted mt-2">
         {item.created_at ? new Date(item.created_at).toLocaleDateString() : 'Unknown'}
       </p>
     </div>
   );
 
   const colorClasses = {
-    emerald: { selected: 'border-emerald-500/50 bg-emerald-500/10', unselected: 'border-slate-700 hover:border-emerald-500/30 hover:bg-slate-700/50' },
-    blue: { selected: 'border-blue-500/50 bg-blue-500/10', unselected: 'border-slate-700 hover:border-blue-500/30 hover:bg-slate-700/50' },
-    purple: { selected: 'border-purple-500/50 bg-purple-500/10', unselected: 'border-slate-700 hover:border-purple-500/30 hover:bg-slate-700/50' },
-    violet: { selected: 'border-violet-500/50 bg-violet-500/10', unselected: 'border-slate-700 hover:border-violet-500/30 hover:bg-slate-700/50' },
-    yellow: { selected: 'border-yellow-500/50 bg-yellow-500/10', unselected: 'border-slate-700 hover:border-yellow-500/30 hover:bg-slate-700/50' },
-    cyan: { selected: 'border-cyan-500/50 bg-cyan-500/10', unselected: 'border-slate-700 hover:border-cyan-500/30 hover:bg-slate-700/50' },
-    slate: { selected: 'border-slate-500/50 bg-slate-700/50', unselected: 'border-slate-700 hover:border-slate-500/30 hover:bg-slate-700/50' },
+    emerald: { selected: 'border-emerald-500/50 bg-emerald-500/10', unselected: 'border-app-border-subtle hover:border-emerald-500/30 hover:bg-slate-700/50' },
+    blue: { selected: 'border-blue-500/50 bg-blue-500/10', unselected: 'border-app-border-subtle hover:border-blue-500/30 hover:bg-slate-700/50' },
+    purple: { selected: 'border-purple-500/50 bg-purple-500/10', unselected: 'border-app-border-subtle hover:border-purple-500/30 hover:bg-slate-700/50' },
+    violet: { selected: 'border-violet-500/50 bg-violet-500/10', unselected: 'border-app-border-subtle hover:border-violet-500/30 hover:bg-slate-700/50' },
+    yellow: { selected: 'border-yellow-500/50 bg-yellow-500/10', unselected: 'border-app-border-subtle hover:border-yellow-500/30 hover:bg-slate-700/50' },
+    cyan: { selected: 'border-cyan-500/50 bg-cyan-500/10', unselected: 'border-app-border-subtle hover:border-cyan-500/30 hover:bg-slate-700/50' },
+    slate: { selected: 'border-slate-500/50 bg-slate-700/50', unselected: 'border-app-border-subtle hover:border-slate-500/30 hover:bg-slate-700/50' },
   };
 
   return (
     <div className="space-y-6">
       {/* ── Category Selection (upload target) ── */}
-      <div className="bg-slate-800/40 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6">
-        <h3 className="text-lg font-semibold text-slate-200 mb-1">Select Category</h3>
-        <p className="text-xs text-slate-500 mb-4">Choose where your uploaded files will be saved</p>
+      <div className="bg-app-surface-solid backdrop-blur-lg rounded-xl border border-app-border p-6">
+        <h3 className="text-lg font-semibold text-app-text mb-1">Select Category</h3>
+        <p className="text-xs text-app-muted mb-4">Choose where your uploaded files will be saved</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {categories.map(category => {
             const Icon = category.icon;
@@ -302,17 +302,17 @@ const MediaManagement = () => {
 
       {/* ── Pitch Selector — only when "Pitch Photos" is active ── */}
       {selectedCategory === 'pitch' && (
-        <div className="bg-slate-800/40 backdrop-blur-lg rounded-xl border border-blue-500/30 p-6">
+        <div className="bg-app-surface-solid backdrop-blur-lg rounded-xl border border-blue-500/30 p-6">
           <div className="flex items-center gap-2 mb-4">
             <MapPin className="h-5 w-5 text-blue-400" />
-            <h3 className="text-lg font-semibold text-slate-200">Select Pitch</h3>
-            <span className="ml-auto text-xs text-slate-500 bg-slate-700/50 px-2 py-1 rounded-full">
+            <h3 className="text-lg font-semibold text-app-text">Select Pitch</h3>
+            <span className="ml-auto text-xs text-app-muted bg-slate-700/50 px-2 py-1 rounded-full">
               Photos will be linked to the selected pitch
             </span>
           </div>
 
           {pitchesLoading ? (
-            <div className="flex items-center gap-2 text-slate-400 text-sm">
+            <div className="flex items-center gap-2 text-app-muted text-sm">
               <Loader className="h-4 w-4 animate-spin" />
               Loading pitches...
             </div>
@@ -335,13 +335,13 @@ const MediaManagement = () => {
                     className={`relative flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left group ${
                       isSelected
                         ? 'border-blue-500 bg-blue-500/15 shadow-lg shadow-blue-500/10'
-                        : 'border-slate-700 hover:border-blue-400/40 hover:bg-slate-700/40'
+                        : 'border-app-border-subtle hover:border-blue-400/40 hover:bg-slate-700/40'
                     }`}
                   >
                     <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold transition-all ${
                       isSelected
                         ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
-                        : 'bg-slate-700 text-slate-400 group-hover:bg-slate-600'
+                        : 'bg-slate-700 text-app-muted group-hover:bg-slate-600'
                     }`}>
                       {label}
                     </div>
@@ -350,7 +350,7 @@ const MediaManagement = () => {
                         {pitch.name}
                       </p>
                       {pitch.pitch_type && (
-                        <p className="text-xs text-slate-500 truncate mt-0.5">{pitch.pitch_type}</p>
+                        <p className="text-xs text-app-muted truncate mt-0.5">{pitch.pitch_type}</p>
                       )}
                     </div>
                     {isSelected && (
@@ -365,8 +365,8 @@ const MediaManagement = () => {
       )}
 
       {/* ── Upload Section ── */}
-      <div className="bg-slate-800/40 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6">
-        <h3 className="text-lg font-semibold text-slate-200 mb-1">Upload Media</h3>
+      <div className="bg-app-surface-solid backdrop-blur-lg rounded-xl border border-app-border p-6">
+        <h3 className="text-lg font-semibold text-app-text mb-1">Upload Media</h3>
         {selectedCategory === 'pitch' && selectedPitchId && (
           <p className="text-sm text-blue-400 mb-2">
             Uploading to: <span className="font-semibold">{getPitchName(selectedPitchId)}</span>
@@ -375,25 +375,25 @@ const MediaManagement = () => {
 
         <div className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center hover:border-emerald-500 hover:bg-emerald-500/5 transition-all mt-4">
           <div className="flex flex-col items-center justify-center">
-            <Upload className="h-12 w-12 text-slate-400 mb-3" />
-            <p className="text-lg font-semibold text-slate-200 mb-1">Drag and drop files here</p>
-            <p className="text-sm text-slate-400 mb-4">or click to select files</p>
+            <Upload className="h-12 w-12 text-app-muted mb-3" />
+            <p className="text-lg font-semibold text-app-text mb-1">Drag and drop files here</p>
+            <p className="text-sm text-app-muted mb-4">or click to select files</p>
             <input id="file-input" type="file" multiple accept="image/*,video/*" onChange={handleFileSelect} className="hidden" />
             <label htmlFor="file-input" className="cursor-pointer">
               <span className="inline-flex items-center px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors shadow-lg hover:shadow-xl">
                 Select Files
               </span>
             </label>
-            <p className="text-xs text-slate-500 mt-3">Supported: JPG, PNG, GIF, MP4, WebM (Max 100MB each)</p>
+            <p className="text-xs text-app-muted mt-3">Supported: JPG, PNG, GIF, MP4, WebM (Max 100MB each)</p>
           </div>
         </div>
 
         {selectedFiles.length > 0 && (
           <div className="mt-6">
-            <h4 className="text-sm font-semibold text-slate-300 mb-3">Selected Files ({selectedFiles.length})</h4>
+            <h4 className="text-sm font-semibold text-app-text mb-3">Selected Files ({selectedFiles.length})</h4>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {selectedFiles.map((file, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-slate-700/30 border border-slate-700 rounded-lg hover:bg-slate-700/50 transition-colors">
+                <div key={index} className="flex items-center justify-between p-3 bg-slate-700/30 border border-app-border-subtle rounded-lg hover:bg-slate-700/50 transition-colors">
                   <div className="flex items-center space-x-3 flex-1 min-w-0">
                     {file.type.startsWith('image/') ? (
                       <ImageIcon className="h-5 w-5 text-blue-400 flex-shrink-0" />
@@ -401,7 +401,7 @@ const MediaManagement = () => {
                       <VideoIcon className="h-5 w-5 text-purple-400 flex-shrink-0" />
                     )}
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-slate-200 truncate">{file.name}</p>
+                      <p className="text-sm font-medium text-app-text truncate">{file.name}</p>
                       <p className="text-xs text-slate-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                     </div>
                   </div>
@@ -433,7 +433,7 @@ const MediaManagement = () => {
             disabled={uploading || selectedFiles.length === 0 || (selectedCategory === 'pitch' && !selectedPitchId)}
             className={`flex items-center px-6 py-2.5 rounded-lg font-semibold transition-all shadow-lg ${
               uploading || selectedFiles.length === 0 || (selectedCategory === 'pitch' && !selectedPitchId)
-                ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                ? 'bg-slate-700 text-app-muted cursor-not-allowed'
                 : 'bg-emerald-500 hover:bg-emerald-600 text-white hover:shadow-xl'
             }`}
           >
@@ -446,7 +446,7 @@ const MediaManagement = () => {
           {selectedFiles.length > 0 && (
             <button
               onClick={() => { setSelectedFiles([]); const fi = document.getElementById('file-input') as HTMLInputElement; if (fi) fi.value = ''; }}
-              className="px-6 py-2.5 border border-slate-600 rounded-lg text-slate-300 font-semibold hover:bg-slate-700/50 transition-colors"
+              className="px-6 py-2.5 border border-slate-600 rounded-lg text-app-text font-semibold hover:bg-slate-700/50 transition-colors"
             >
               Clear
             </button>
@@ -455,12 +455,12 @@ const MediaManagement = () => {
       </div>
 
       {/* ── Gallery — ALL categories ── */}
-      <div className="bg-slate-800/40 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6">
+      <div className="bg-app-surface-solid backdrop-blur-lg rounded-xl border border-app-border p-6">
         {/* Header + filter */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
           <div>
-            <h3 className="text-lg font-semibold text-slate-200">Media Gallery</h3>
-            <p className="text-xs text-slate-500 mt-0.5">{allMedia.length} total items across all categories</p>
+            <h3 className="text-lg font-semibold text-app-text">Media Gallery</h3>
+            <p className="text-xs text-app-muted mt-0.5">{allMedia.length} total items across all categories</p>
           </div>
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-slate-400" />
@@ -470,7 +470,7 @@ const MediaManagement = () => {
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   galleryFilter === 'all'
                     ? 'bg-emerald-500 text-white shadow-md'
-                    : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                    : 'bg-slate-700/50 text-app-muted hover:bg-slate-700 hover:text-slate-200'
                 }`}
               >
                 All ({allMedia.length})
@@ -485,7 +485,7 @@ const MediaManagement = () => {
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                       galleryFilter === cat.value
                         ? 'bg-blue-500 text-white shadow-md'
-                        : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                        : 'bg-slate-700/50 text-app-muted hover:bg-slate-700 hover:text-slate-200'
                     }`}
                   >
                     {cat.label} ({count})
@@ -501,14 +501,14 @@ const MediaManagement = () => {
             <Loader className="h-8 w-8 text-emerald-400 animate-spin" />
           </div>
         ) : allMedia.length === 0 ? (
-          <div className="text-center py-12 bg-slate-700/20 rounded-lg border border-slate-700">
-            <ImageIcon className="h-12 w-12 text-slate-500 mx-auto mb-3" />
+          <div className="text-center py-12 bg-slate-700/20 rounded-lg border border-app-border-subtle">
+            <ImageIcon className="h-12 w-12 text-app-muted mx-auto mb-3" />
             <p className="text-slate-400">No media uploaded yet</p>
-            <p className="text-xs text-slate-500 mt-1">Select a category above and upload your first file</p>
+            <p className="text-xs text-app-muted mt-1">Select a category above and upload your first file</p>
           </div>
         ) : mediaByCat.length === 0 ? (
-          <div className="text-center py-12 bg-slate-700/20 rounded-lg border border-slate-700">
-            <ImageIcon className="h-12 w-12 text-slate-500 mx-auto mb-3" />
+          <div className="text-center py-12 bg-slate-700/20 rounded-lg border border-app-border-subtle">
+            <ImageIcon className="h-12 w-12 text-app-muted mx-auto mb-3" />
             <p className="text-slate-400">No media in this category</p>
           </div>
         ) : (
@@ -524,7 +524,7 @@ const MediaManagement = () => {
                     cat.value === 'event' ? 'bg-violet-500/15 text-violet-300 border border-violet-500/30' :
                     cat.value === 'logo' ? 'bg-yellow-500/15 text-yellow-300 border border-yellow-500/30' :
                     cat.value === 'banner' ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30' :
-                    'bg-slate-700/50 text-slate-300 border border-slate-600'
+                    'bg-slate-700/50 text-app-text border border-slate-600'
                   }`}>
                     <cat.icon className="h-3.5 w-3.5" />
                     {cat.label}
