@@ -676,15 +676,15 @@ const UserProfileInfo = () => {
                  const isActive = activeSection === item.id;
                  const isDanger = item.danger;
                  
-                 let btnClasses = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ";
+                 let btnClasses = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all group ";
                  if (isActive) {
                     btnClasses += isDanger 
-                       ? "bg-rose-500/15 text-rose-400 border border-rose-500/30 shadow-sm" 
-                       : "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-sm";
+                       ? "bg-rose-100 dark:bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30 shadow-sm" 
+                       : "bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 shadow-sm";
                  } else {
                     btnClasses += isDanger
-                       ? "text-slate-400 hover:bg-rose-500/10 hover:text-rose-400 border border-transparent"
-                       : "text-slate-400 hover:bg-slate-800/70 hover:text-slate-200 border border-transparent";
+                       ? "text-slate-600 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 border border-transparent"
+                       : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent";
                  }
 
                  return (
@@ -693,7 +693,7 @@ const UserProfileInfo = () => {
                      onClick={() => setActiveSection(item.id as ProfileSection)}
                      className={btnClasses}
                    >
-                     <Icon className={`h-5 w-5 ${isActive && !isDanger ? 'text-emerald-400' : isActive && isDanger ? 'text-rose-400' : ''}`} />
+                     <Icon className={`h-5 w-5 ${isActive && !isDanger ? 'text-emerald-600 dark:text-emerald-400' : isActive && isDanger ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-300 transition-colors'}`} />
                      {item.label}
                      {isActive && <ChevronRight className="h-4 w-4 ml-auto opacity-70" />}
                    </button>
