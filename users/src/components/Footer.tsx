@@ -24,6 +24,17 @@ export default function Footer() {
   };
 
   const scrollToSection = (id: string) => {
+    if (window.location.pathname !== "/") {
+      navigate(`/#${id}`);
+      // Use a small timeout to allow navigation to complete before scrolling
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+      return;
+    }
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });

@@ -79,7 +79,7 @@ const BookingRow = ({ booking, onCancel }: { booking: any; onCancel: (id: string
 
     const canCancel =
         (booking.status === "confirmed" || booking.status === "pending") &&
-        bookingDate && new Date(`${bookingDate}T${startTime || "00:00"}`) > new Date();
+        bookingDate && (new Date(`${bookingDate}T${startTime || "00:00"}`).getTime() - new Date().getTime() >= 24 * 60 * 60 * 1000);
 
     const formattedDate = bookingDate
         ? new Date(bookingDate).toLocaleDateString("en-US", {
@@ -185,7 +185,7 @@ const BookingSection = ({
     onCancel: (id: string) => void;
     emptyText: string;
 }) => {
-    const [collapsed, setCollapsed] = useState(false);
+    const [collapsed, setCollapsed] = useState(true);
 
     return (
         <div className="space-y-3">
@@ -269,10 +269,18 @@ const UserBookings = () => {
         }
     };
 
-    const confirmed = bookings.filter((b) => b.status === "confirmed" || b.status === "approved");
-    const pending = bookings.filter((b) => b.status === "pending" || !b.status);
-    const completed = bookings.filter((b) => b.status === "completed");
-    const cancelled = bookings.filter((b) => b.status === "cancelled");
+    const now = new Date();
+    const isPast = (b: any) => {
+        const bDate = b.booking_date || b.date;
+        const bTime = b.end_time || b.endTime || b.start_time || b.startTime || "23:59";
+        if (!bDate) return false;
+        return new Date(`${bDate}T${bTime}`) < now;
+    };
+
+    const confirmed = bookings.filter((b) => (b.status === "confirmed" || b.status === "approved") && !isPast(b));
+    const pending = bookings.filter((b) => (b.status === "pending" || !b.status) && !isPast(b));
+    const completed = bookings.filter((b) => b.status === "completed" || ((b.status === "confirmed" || b.status === "approved") && isPast(b)));
+    const cancelled = bookings.filter((b) => b.status === "cancelled" || ((b.status === "pending" || !b.status) && isPast(b)));
 
     // Show spinner while auth is resolving
     if (authLoading || (isAuthenticated && isLoading)) {

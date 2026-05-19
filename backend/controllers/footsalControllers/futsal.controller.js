@@ -67,7 +67,7 @@ const getProfileCompletionStatus = async (futsalCode) => {
     };
 };
 
-const getAllFutsal = async (req,res)=>{
+const getAllFutsal = async (req, res) => {
     const now = new Date();
     const futsals = await Footsal.findAll({
         include: [{
@@ -82,80 +82,107 @@ const getAllFutsal = async (req,res)=>{
             },
         }],
     });
-    if(!futsals[0]){
+    if (!futsals[0]) {
         return res.status(400).json({
-            success:false,
-            message:"No futsal found"
+            success: false,
+            message: "No futsal found"
         })
     }
+
+    // Enrich with location data for global search support
+    const enrichedFutsals = await Promise.all(
+        futsals.map(async (futsal) => {
+            const code = normalizeTenantCode(futsal.futsalCode);
+            if (!code) return futsal.toJSON();
+
+            try {
+                const locationRows = await sequelize.query(
+                    `SELECT district, address, city, postal_code, latitude, longitude, full_address
+                     FROM location_${code}
+                     ORDER BY id DESC
+                     LIMIT 1`,
+                    { type: QueryTypes.SELECT }
+                ).catch(() => []);
+
+                const location = locationRows && locationRows.length > 0 ? locationRows[0] : null;
+                return {
+                    ...futsal.toJSON(),
+                    location
+                };
+            } catch (err) {
+                return futsal.toJSON();
+            }
+        })
+    );
+
     res.status(200).json({
-        success:true,
-        message:"Futsal fetch successfully",
-        data:futsals
+        success: true,
+        message: "Futsal fetch successfully",
+        data: enrichedFutsals
     })
 }
 
-const getFutsalById = async( req,res)=>{
-    const {id} = req.params;
+const getFutsalById = async (req, res) => {
+    const { id } = req.params;
     const futsal = await Footsal.findByPk(id);
-    if(!futsal){
+    if (!futsal) {
         return res.status(400).json({
-            success:false,
-            message:"No futsal found with this id"
+            success: false,
+            message: "No futsal found with this id"
         })
     }
     res.status(200).json({
-        success:true,
-        message:"Futsal fetch successfully",
-        data:futsal
+        success: true,
+        message: "Futsal fetch successfully",
+        data: futsal
     })
 }
 
 // this is without login functions
-const getFutsalbySubsciption_true = async (req,res)=>{
+const getFutsalbySubsciption_true = async (req, res) => {
     const now = new Date();
     const futsalSubscription = await Subscription.findAll({
-        where:{
-            status:"active",
+        where: {
+            status: "active",
             subscription_end: {
                 [require('sequelize').Op.gt]: now,
             },
         },
-        include:[
+        include: [
             {
-                model:Footsal,
-                as:"footsal",
-                attributes:["id","futsalCode","futsalName","email","phoneNumber","ownerName"]
+                model: Footsal,
+                as: "footsal",
+                attributes: ["id", "futsalCode", "futsalName", "email", "phoneNumber", "ownerName"]
             }
         ]
     });
-    if(!futsalSubscription[0]){
+    if (!futsalSubscription[0]) {
         return res.status(400).json({
-            success:false,
-            message:"No active subscription found"
+            success: false,
+            message: "No active subscription found"
         })
     }
     res.status(200).json({
-        success:true,
-        message:"Futsal with active subscription fetch successfully",
-        data:futsalSubscription
+        success: true,
+        message: "Futsal with active subscription fetch successfully",
+        data: futsalSubscription
     })
 }
 
-const getFutsalProfile = async (req,res)=>{
+const getFutsalProfile = async (req, res) => {
     const futsalId = req.futsalId;
     const futsal = await Footsal.findByPk(futsalId);
-    if(!futsal){
+    if (!futsal) {
         return res.status(400).json({
-            success:false,
-            message:"No futsal found with this id"
+            success: false,
+            message: "No futsal found with this id"
         })
     }
     const completion = await getProfileCompletionStatus(futsal.futsalCode);
 
     res.status(200).json({
-        success:true,
-        message:"Futsal profile fetch successfully",
+        success: true,
+        message: "Futsal profile fetch successfully",
         data: {
             ...futsal.toJSON(),
             profileCompletion: completion,
@@ -166,31 +193,31 @@ const getFutsalProfile = async (req,res)=>{
 const updateFutsalProfile = async (req, res) => {
     const futsalId = req.futsalId;
     const { ownerName, email, phoneNumber } = req.body;
-    
+
     const futsal = await Footsal.findByPk(futsalId);
-    if(!futsal){
+    if (!futsal) {
         return res.status(400).json({
-            success:false,
-            message:"No futsal found with this id"
+            success: false,
+            message: "No futsal found with this id"
         })
     }
 
     try {
-        if(ownerName) futsal.ownerName = ownerName;
-        if(email) futsal.email = email;
-        if(phoneNumber) futsal.phoneNumber = phoneNumber;
+        if (ownerName) futsal.ownerName = ownerName;
+        if (email) futsal.email = email;
+        if (phoneNumber) futsal.phoneNumber = phoneNumber;
 
         await futsal.save();
 
         res.status(200).json({
-            success:true,
-            message:"Futsal profile updated successfully",
-            data:futsal
+            success: true,
+            message: "Futsal profile updated successfully",
+            data: futsal
         })
-    } catch(err) {
+    } catch (err) {
         return res.status(500).json({
-            success:false,
-            message:"Error updating futsal profile",
+            success: false,
+            message: "Error updating futsal profile",
             error: err.message
         })
     }

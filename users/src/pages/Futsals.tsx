@@ -8,10 +8,11 @@ import { getAllFutsals, getRecommendedFutsals } from "@/lib/futsalApi";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, MapPin, Sparkles, Navigation2 } from "lucide-react";
+import { Search, MapPin, Sparkles, Navigation2, X } from "lucide-react";
 
 const Futsals = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [isSearchExpanded, setIsSearchExpanded] = React.useState(false);
   const [coords, setCoords] = React.useState<{ latitude: number; longitude: number } | null>(null);
   const [locationStatus, setLocationStatus] = React.useState<"idle" | "loading" | "ready" | "error">("idle");
   const [locationMessage, setLocationMessage] = React.useState<string>("");
@@ -70,7 +71,7 @@ const Futsals = () => {
   const dynamicFacilities = fetchedFacilities.map((f: any) => ({
     id: String(f.id),
     name: f.futsalName || "Unknown Futsal",
-    location: "Nepal", // Extend API to include joined location later
+    location: `${f.location?.address || ''} ${f.location?.city || ''} ${f.location?.district || ''} ${f.location?.full_address || ''}`.trim() || f.location?.full_address || "Nepal",
     description: "Experience professional futsal matches near you.",
     image: "https://images.unsplash.com/photo-1574629810360-7efbb1925846?q=80&w=800&auto=format&fit=crop",
     pitches: [],
@@ -103,59 +104,74 @@ const Futsals = () => {
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
       <Header />
 
-      <main className="flex-1">
+      <main className="flex-1 pt-24">
 
-        {/* Banner */}
-        <div className="bg-emerald-900 border-b border-emerald-800 py-16 px-4 md:px-6 mb-8 mt-20 text-center bg-[url('https://images.unsplash.com/photo-1574629810360-7efbb1925846?q=80&w=1200')] bg-cover bg-center relative">
-          <div className="absolute inset-0 bg-emerald-950/80 backdrop-blur-sm"></div>
-          <div className="relative z-10 max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-white">Find Your Next Match</h1>
-            <p className="text-emerald-100 text-lg md:text-xl mb-8">Discover and book premium futsal environments across the city instantly.</p>
+        {/* Floating Search Action */}
+        <div className="container mx-auto px-4 md:px-6 pb-16">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+            <div className="text-center sm:text-left">
+              <h1 className="text-4xl font-extrabold tracking-tight">All Futsals</h1>
+              <p className="text-muted-foreground mt-2 text-lg">Discover premium environments near you.</p>
+            </div>
 
-            <div className="flex flex-col items-center gap-3 mb-8">
+            <div className="flex items-center gap-3 self-start">
+              {/* Expandable Search Button (Top Left of actions area) */}
+              <div className={`relative flex items-center transition-all duration-300 ${isSearchExpanded ? 'w-64 md:w-80' : 'w-10'}`}>
+                {isSearchExpanded ? (
+                  <div className="relative w-full group">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-500 transition-colors group-focus-within:text-emerald-600" />
+                    <Input
+                      autoFocus
+                      placeholder="Search Venue..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onBlur={() => { if (!searchTerm) setIsSearchExpanded(false); }}
+                      className="pl-9 pr-10 h-10 w-full rounded-full border-emerald-500/20 bg-card/50 backdrop-blur-sm ring-emerald-500/10 transition-all focus:ring-emerald-500/20 focus:border-emerald-500/40"
+                    />
+                    {searchTerm && (
+                      <button
+                        onClick={() => { setSearchTerm(""); setIsSearchExpanded(false); }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setIsSearchExpanded(true)}
+                    className="h-10 w-10 rounded-full bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all shadow-sm"
+                  >
+                    <Search className="h-5 w-5" />
+                  </Button>
+                )}
+              </div>
+
+              {/* Recommend Action Button */}
               <Button
                 onClick={requestLocation}
-                className="rounded-full bg-white text-emerald-900 hover:bg-emerald-50 shadow-lg px-6"
+                className="h-10 px-5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-500/20 transition-all hover:-translate-y-0.5 active:scale-95"
               >
                 <Navigation2 className="h-4 w-4 mr-2" />
-                Show futsals near me
+                Recommend
               </Button>
-              <div className="flex items-center gap-2 text-emerald-100 text-sm flex-wrap justify-center">
-                <Badge variant="secondary" className="bg-white/10 text-white border-white/20">
-                  <MapPin className="h-3.5 w-3.5 mr-1" />
-                  Browser location only
-                </Badge>
-                <span>{locationMessage}</span>
-              </div>
-            </div>
-
-            {/* Search Bar */}
-            <div className="relative max-w-xl mx-auto shadow-2xl">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
-              <Input
-                placeholder="Search by futsal name or location..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 py-6 text-lg rounded-2xl border-0 ring-4 ring-emerald-500/20 bg-card text-foreground placeholder:text-muted-foreground"
-              />
             </div>
           </div>
-        </div>
 
-        <div className="container mx-auto pb-16 px-4 md:px-6">
-
-          {/* Recommended section */}
-          {coords && (
-            <div className="mb-10 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6 md:p-8 shadow-sm">
+          {/* Recommended section - Always show something if location is requested or active */}
+          {(coords || locationStatus === "loading") && (
+            <div className="mb-14 rounded-[2.5rem] border border-emerald-500/10 bg-emerald-500/5 p-6 md:p-10 shadow-sm transition-all">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                 <div>
                   <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 mb-2">
                     <Sparkles className="h-5 w-5" />
-                    <span className="font-semibold uppercase tracking-wide text-sm">Recommended for you</span>
+                    <span className="font-semibold uppercase tracking-wide text-sm">Recommended Futsals</span>
                   </div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">Nearest, most loved, and most booked futsals</h2>
+                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">Discover Top Rated Venues</h2>
                   <p className="text-muted-foreground mt-2">
-                    Ranked using your location, sentiment from reviews, and booking popularity.
+                    Personalized results based on ratings, reviews, and nearby availability.
                   </p>
                 </div>
                 <Button variant="outline" onClick={requestLocation} disabled={locationStatus === "loading"}>
@@ -173,7 +189,7 @@ const Futsals = () => {
                   Could not load recommendations. Showing all futsals below.
                 </div>
               ) : recommendedCards.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-start">
                   {recommendedCards.map((facility: any) => (
                     <FacilityCard key={`recommended-${facility.id}`} facility={facility} />
                   ))}
@@ -193,7 +209,7 @@ const Futsals = () => {
               <span className="text-muted-foreground">Loading Futsals...</span>
             </div>
           ) : filteredFacilities.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-start">
               {filteredFacilities.map((facility: any) => (
                 <FacilityCard key={facility.id} facility={facility} />
               ))}

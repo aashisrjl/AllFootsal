@@ -9,6 +9,25 @@
   --admin-text-dim: #94a3b8;
   --admin-primary: #3b82f6;
   --admin-accent: #10b981;
+  --admin-input-bg: #0f172a;
+  --admin-hover-bg: rgba(255, 255, 255, 0.05);
+  --admin-table-hover: rgba(255, 255, 255, 0.03);
+  --admin-th-bg: rgba(255, 255, 255, 0.02);
+}
+
+html.theme-light {
+  --admin-bg: #f8fafc;
+  --admin-card-bg: #ffffff;
+  --admin-sidebar-bg: #ffffff;
+  --admin-border: #e2e8f0;
+  --admin-text: #0f172a;
+  --admin-text-dim: #64748b;
+  --admin-primary: #3b82f6;
+  --admin-accent: #10b981;
+  --admin-input-bg: #ffffff;
+  --admin-hover-bg: rgba(0, 0, 0, 0.05);
+  --admin-table-hover: rgba(0, 0, 0, 0.03);
+  --admin-th-bg: rgba(0, 0, 0, 0.02);
 }
 
 html, body, #app, [data-css='content'], [data-css='main'], [class*='LayoutContent'] {
@@ -32,7 +51,7 @@ html, body, #app, [data-css='content'], [data-css='main'], [class*='LayoutConten
 }
 
 [data-css='sidebar'] a:hover, aside a:hover, [class*='NavLink']:hover {
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: var(--admin-hover-bg) !important;
   color: var(--admin-text) !important;
 }
 
@@ -58,7 +77,7 @@ table, thead, tbody, tr, th, td, [class*='Table'] {
 }
 
 th, thead th {
-  background: rgba(255, 255, 255, 0.02) !important;
+  background: var(--admin-th-bg) !important;
   color: var(--admin-text-dim) !important;
   font-size: 12px !important;
   text-transform: uppercase !important;
@@ -72,12 +91,12 @@ td {
 }
 
 tr:hover td, [class*='TableRow']:hover {
-  background: rgba(255, 255, 255, 0.03) !important;
+  background: var(--admin-table-hover) !important;
 }
 
 /* Form inputs & Buttons */
 input, select, textarea, [class*='Input'], [class*='Select'] {
-  background: #0f172a !important;
+  background: var(--admin-input-bg) !important;
   color: var(--admin-text) !important;
   border: 1px solid var(--admin-border) !important;
   border-radius: 6px !important;

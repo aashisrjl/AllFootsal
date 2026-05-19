@@ -50,7 +50,6 @@ router.get(
 
 router.get(
     '/user/recommendations', // #swagger.tags=['Users']
-    isUserAuthenticated,
     getRecommendedFutsals
 );
 

@@ -92,7 +92,9 @@ const BookingDetails = () => {
         toast.info("Rescheduling & Updates are handled manually. Please call the facility directly to shift this timeslot.");
     };
 
-    const canBeCancelled = (booking.status === "confirmed" || booking.status === "pending");
+    const bookingDateTime = new Date(`${booking.booking_date}T${booking.start_time || "00:00"}`);
+    const timeUntilBooking = bookingDateTime.getTime() - new Date().getTime();
+    const canBeCancelled = (booking.status === "confirmed" || booking.status === "pending") && (timeUntilBooking >= 24 * 60 * 60 * 1000);
 
     // Compute dynamic colors based on status
     const isCancelled = booking.status === 'cancelled';
