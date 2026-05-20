@@ -1,10 +1,11 @@
-import { logo_transparent, DashboardBanner } from "@/assets/images";
+import {  DashboardBanner } from "@/assets/images";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import NotificationPanel from "@/components/NotificationPanel";
+import logo_transparent from "/logo_transparent.png";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -77,8 +78,8 @@ export default function Navigation() {
           >
             <img
               src={logo_transparent}
-              alt="NepFutsal Logo"
-              className="h-24 w-auto object-contain transition-transform duration-300 hover:scale-105"
+              alt="AllFutsal Logo"
+              className="h-16 w-auto object-contain transition-transform duration-300 hover:scale-105"
             />
           </div>
 

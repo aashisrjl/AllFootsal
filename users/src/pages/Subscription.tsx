@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 import { logo_transparent } from "@/assets/images";
 
 const plans = [

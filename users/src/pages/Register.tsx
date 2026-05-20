@@ -3,17 +3,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 import { useAuth } from "@/contexts/AuthContext";
 import { LogIn, ArrowLeft } from "lucide-react";
 import {
   AuthBackground,
-  logo_transparent,
   LoginIllustration,
   RegisterIllustration,
   PasswordIllustration,
 } from "@/assets/images";
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
+import  logo_transparent  from "/logo_transparent.png";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -43,10 +43,19 @@ const Register = () => {
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email address.");
-      return;
+    // Gmail validation - must be @gmail.com
+    if (formData.email.toLowerCase().includes("@gmail")) {
+      if (!formData.email.toLowerCase().match(/^[^\s@]+@gmail\.com$/)) {
+        toast.error("Gmail email must be @gmail.com");
+        return;
+      }
+    } else {
+      // For custom domains, allow standard TLDs (at least 2 characters)
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(formData.email)) {
+        toast.error("Please enter a valid email address.");
+        return;
+      }
     }
 
     // Just move to step 2, no API call at this stage

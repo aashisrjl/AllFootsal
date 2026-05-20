@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, Trash2, Play, Loader, AlertCircle, Image as ImageIcon, VideoIcon, MapPin, Filter } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 
 interface MediaItem {
   id: number;

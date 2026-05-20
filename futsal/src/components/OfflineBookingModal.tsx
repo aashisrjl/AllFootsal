@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { X, Phone } from 'lucide-react';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 import { createOfflineBooking } from '../lib/bookingApi';
 import { getLocalDateString, isBookingDateBeforeToday, isBookingInPast } from '../lib/bookingDateUtils';
 import { getFutsalPitches } from '../lib/pitchApi';

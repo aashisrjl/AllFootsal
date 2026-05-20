@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserBookings } from "@/lib/userApi";
 import { useBooking } from "@/contexts/BookingContext";
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 import {
     CalendarDays, Clock, MapPin, ExternalLink, X, Loader2,
     CheckCircle2, AlertCircle, TimerIcon, Ban, Receipt, ChevronRight,
@@ -257,15 +257,22 @@ const UserBookings = () => {
     const handleCancel = async (bookingId: string) => {
         const booking = bookings.find((b) => b.id === bookingId);
         if (!booking) return;
+
+        if (!window.confirm("Are you sure you want to cancel this booking?")) return;
+
+        const toastId = toast.loading("Cancelling booking...");
         try {
             // cancelBooking from BookingContext — uses futsalId + bookingId
             await cancelBooking(bookingId, booking.futsal_id || booking.futsalId || "");
             setBookings((prev) =>
                 prev.map((b) => (b.id === bookingId ? { ...b, status: "cancelled" } : b))
             );
-            toast.success("Your booking was cancelled successfully.");
+            toast.dismiss(toastId);
+            toast.success("Booking cancelled successfully");
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to cancel the booking. Please try again.");
+            toast.dismiss(toastId);
+            const errorMsg = error?.response?.data?.message || "Failed to cancel booking";
+            toast.error(errorMsg);
         }
     };
 

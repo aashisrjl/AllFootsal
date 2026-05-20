@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { DollarSign, TrendingUp, Calendar, CreditCard } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { getOwnerAnalytics } from '../lib/analyticsApi';
 import { getOwnerBookings } from '../lib/bookingApi';
 
@@ -140,6 +141,7 @@ const Revenue = () => {
         }
       } catch (error) {
         console.error('Failed to fetch revenue stats', error);
+        toast.error('Failed to load revenue data');
       } finally {
         setLoading(false);
       }

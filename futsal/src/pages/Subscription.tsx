@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CreditCard, RefreshCw, ShieldCheck } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../lib/api';
 
 type SubscriptionPlan = 'trial' | 'monthly' | 'half-yearly' | 'yearly';
@@ -96,6 +97,7 @@ const Subscription = () => {
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : 'Failed to load subscription data';
       setError(errMsg);
+      toast.error(errMsg);
     } finally {
       setLoading(false);
     }

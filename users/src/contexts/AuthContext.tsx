@@ -107,13 +107,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (err: any) {
       setAuthState((prev) => ({ ...prev, isLoading: false }));
 
-      toast({
-        title: "Login failed",
-        description: err.response?.data?.message || "Invalid credentials",
-        variant: "destructive",
-      });
-
-      return false;
+      // Extract error message from different possible structures
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || err.message || "Invalid credentials";
+      
+      throw new Error(errorMessage);
     }
   };
 
@@ -143,13 +140,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (err: any) {
       setAuthState((prev) => ({ ...prev, isLoading: false }));
 
-      toast({
-        title: "Login failed",
-        description: err.response?.data?.message || "Invalid credentials",
-        variant: "destructive",
-      });
-
-      return false;
+      // Extract error message from different possible structures
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || err.message || "Invalid credentials";
+      
+      throw new Error(errorMessage);
     }
   };
 

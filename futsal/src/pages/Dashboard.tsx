@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Calendar, DollarSign, Users, TrendingUp, MoreVertical, Clock } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { getOwnerAnalytics } from '../lib/analyticsApi';
 import { getOwnerBookings } from '../lib/bookingApi';
@@ -130,6 +131,7 @@ const Dashboard = () => {
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+        toast.error('Failed to load dashboard data');
       } finally {
         setLoading(false);
       }

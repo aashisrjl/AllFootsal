@@ -20,7 +20,7 @@ import {
   Instagram
 } from "lucide-react";
 import { FaTiktok } from "react-icons/fa";
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 
 // 2. Button
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

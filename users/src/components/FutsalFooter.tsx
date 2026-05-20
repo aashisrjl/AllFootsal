@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getFutsalById, getFutsalInfo, getFutsalLocation, getFutsalMedia, sendContactMessage } from "@/lib/futsalApi";
 import { Mail, Phone, MapPin, Facebook, Instagram, Loader2, Globe, Send, Home, Info, Image, Map } from "lucide-react";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 import { Button } from "@/components/ui/button";
 
 const safelyParse = (str: string) => {

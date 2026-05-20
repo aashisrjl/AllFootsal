@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, Filter, CheckCircle, XCircle, Clock, Plus, Eye } from 'lucide-react';
 import { cancelOwnerBooking, confirmOwnerBooking, getOwnerBookings, unconfirmOwnerBooking } from '../lib/bookingApi';
 import { getLocalDateString, isBookingInPast, normalizeBookingDate } from '../lib/bookingDateUtils';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import OfflineBookingModal from '../components/OfflineBookingModal';
 

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 import { ArrowLeft } from 'lucide-react';
-import { AuthBackground, logo_transparent, OTPIllustration } from '@/assets/images';
+import { AuthBackground, OTPIllustration } from '@/assets/images';
+import logo_transparent  from '/logo_transparent.png';
 import { verifyOtp, resendOtp } from '@/lib/authApi';
 
 // NOTE: Since this must be a single, self-contained file, the external image imports
