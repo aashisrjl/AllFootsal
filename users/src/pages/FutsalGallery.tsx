@@ -1,42 +1,59 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import FutsalNavigation from "@/components/FutsalNavigation";
 import FutsalFooter from "@/components/FutsalFooter";
 import { useQuery } from "@tanstack/react-query";
-import { getFutsalMedia, getEventMedia, getFutsalById } from "@/lib/futsalApi";
+import { getFutsalMedia, getEventMedia, getFutsalById, getFutsalByName } from "@/lib/futsalApi";
 import { Loader2, ArrowLeft, Maximize2, X, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const FutsalGallery = () => {
-    const { id } = useParams<{ id: string }>();
+    const { id, slug } = useParams<{ id?: string; slug?: string }>();
     const navigate = useNavigate();
+    const paramValue = id || slug;
+    const isNumeric = /^\d+$/.test(paramValue || '');
+    const [resolvedId, setResolvedId] = useState<string | null>(isNumeric ? paramValue || null : null);
 
     const [activeFilter, setActiveFilter] = useState<string>("All");
     const [selectedImage, setSelectedImage] = useState<{url: string, category: string} | null>(null);
 
+    // If slug is not numeric, resolve it to ID first
+    const { data: nameData } = useQuery({
+        queryKey: ['futsal-resolve-name', paramValue],
+        queryFn: () => getFutsalByName(paramValue as string),
+        enabled: !!paramValue && !isNumeric && !resolvedId,
+        retry: false,
+    });
+
+    useEffect(() => {
+        if (nameData?.data?.id) {
+            setResolvedId(String(nameData.data.id));
+        }
+    }, [nameData]);
+
     // Fetch details for header
-    const { data: baseData, isLoading: baseLoading } = useQuery({ queryKey: ['futsal-base', id], queryFn: () => getFutsalById(id as string), enabled: !!id, retry: false });
+    const { data: baseData, isLoading: baseLoading } = useQuery({ queryKey: ['futsal-base', resolvedId], queryFn: () => getFutsalById(resolvedId as string), enabled: !!resolvedId, retry: false });
     const futsalName = baseData?.data?.futsalName || "Futsal Facility";
 
     // Fetch media categories
     const { data: homeMediaData, isLoading: homeLoading } = useQuery({ 
-        queryKey: ['futsal-media-home', id], 
-        queryFn: () => getFutsalMedia(id as string, 'home'), 
-        enabled: !!id,
+        queryKey: ['futsal-media-home', resolvedId], 
+        queryFn: () => getFutsalMedia(resolvedId as string, 'home'), 
+        enabled: !!resolvedId,
         retry: false
     });
     
     const { data: facilityMediaData, isLoading: facilityLoading } = useQuery({ 
-        queryKey: ['futsal-media-facility', id], 
-        queryFn: () => getFutsalMedia(id as string, 'facility'), 
-        enabled: !!id,
+        queryKey: ['futsal-media-facility', resolvedId], 
+        queryFn: () => getFutsalMedia(resolvedId as string, 'facility'), 
+        enabled: !!resolvedId,
         retry: false
     });
 
     const { data: eventMediaData, isLoading: eventLoading } = useQuery({ 
-        queryKey: ['futsal-media-event', id], 
-        queryFn: () => getEventMedia(id as string), 
-        enabled: !!id,
+        queryKey: ['futsal-media-event', resolvedId], 
+        queryFn: () => getEventMedia(resolvedId as string), 
+        enabled: !!resolvedId,
         retry: false
     });
     

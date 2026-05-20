@@ -59,32 +59,53 @@ const FullWidthMap = ({ latitude, longitude, address }: { latitude?: string | nu
 };
 
 const FacilityDetails = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const navigate = useNavigate();
+  const paramValue = id || slug;
+  const isNumeric = /^\d+$/.test(paramValue || '');
 
+  const [resolvedId, setResolvedId] = useState<string | null>(isNumeric ? paramValue || null : null);
   const [contactMessage, setContactMessage] = useState("");
   const [isSendingContact, setIsSendingContact] = useState(false);
 
-  const { data: baseData, isLoading: baseLoading } = useQuery({ queryKey: ['futsal-base', id], queryFn: () => getFutsalById(id as string), enabled: !!id, retry: false });
-  const { data: infoData, isLoading: infoLoading } = useQuery({ queryKey: ['futsal-info', id], queryFn: () => getFutsalInfo(id as string), enabled: !!id, retry: false });
-  const { data: locData, isLoading: locLoading } = useQuery({ queryKey: ['futsal-loc', id], queryFn: () => getFutsalLocation(id as string), enabled: !!id, retry: false });
-  const { data: homeMediaData, isLoading: homeMediaLoading } = useQuery({ queryKey: ['futsal-media-home', id], queryFn: () => getFutsalMedia(id as string, 'home'), enabled: !!id, retry: false });
-  const { data: facilityMediaData, isLoading: facilityMediaLoading } = useQuery({ queryKey: ['futsal-media-facility', id], queryFn: () => getFutsalMedia(id as string, 'facility'), enabled: !!id, retry: false });
-  const { data: eventMediaData, isLoading: eventLoading } = useQuery({ queryKey: ['futsal-media-event', id], queryFn: () => getEventMedia(id as string), enabled: !!id, retry: false });
-  const { data: pitchMediaData } = useQuery({ queryKey: ['futsal-media-pitch', id], queryFn: () => getFutsalMedia(id as string, 'pitch'), enabled: !!id, retry: false });
-  const { data: logoData } = useQuery({ queryKey: ['futsal-media-logo', id], queryFn: () => getFutsalMedia(id as string, 'logo'), enabled: !!id, retry: false });
-  const { data: bannerData } = useQuery({ queryKey: ['futsal-media-banner', id], queryFn: () => getFutsalMedia(id as string, 'banner'), enabled: !!id, retry: false });
-  const { data: pitchesData, isLoading: pitchesLoading } = useQuery({ queryKey: ['futsal-pitches', id], queryFn: () => getFutsalPitches(id as string), enabled: !!id, retry: false });
-  const { data: ratingsData, isLoading: ratingsLoading } = useQuery({ queryKey: ['futsal-ratings', id], queryFn: () => getFutsalRatings(id as string), enabled: !!id, retry: false });
-  const { data: faqsData } = useQuery({ queryKey: ['futsal-faqs', id], queryFn: () => getFutsalFaqs(id as string), enabled: !!id, retry: false });
+  // If slug is not numeric, resolve it to ID first
+  const { data: nameData, isLoading: nameLoading, error: nameError } = useQuery({
+    queryKey: ['futsal-resolve-name', paramValue],
+    queryFn: () => getFutsalByName(paramValue as string),
+    enabled: !!paramValue && !isNumeric && !resolvedId,
+    retry: false,
+  });
+
+  // Update resolvedId when nameData is received
+  useEffect(() => {
+    if (nameData?.data?.id) {
+      setResolvedId(String(nameData.data.id));
+    }
+  }, [nameData]);
+
+  // If name resolution failed, set a flag
+  const nameResolutionFailed = !isNumeric && nameError && !nameData?.data?.id;
+
+  const { data: baseData, isLoading: baseLoading } = useQuery({ queryKey: ['futsal-base', resolvedId], queryFn: () => getFutsalById(resolvedId as string), enabled: !!resolvedId, retry: false });
+  const { data: infoData, isLoading: infoLoading } = useQuery({ queryKey: ['futsal-info', resolvedId], queryFn: () => getFutsalInfo(resolvedId as string), enabled: !!resolvedId, retry: false });
+  const { data: locData, isLoading: locLoading } = useQuery({ queryKey: ['futsal-loc', resolvedId], queryFn: () => getFutsalLocation(resolvedId as string), enabled: !!resolvedId, retry: false });
+  const { data: homeMediaData, isLoading: homeMediaLoading } = useQuery({ queryKey: ['futsal-media-home', resolvedId], queryFn: () => getFutsalMedia(resolvedId as string, 'home'), enabled: !!resolvedId, retry: false });
+  const { data: facilityMediaData, isLoading: facilityMediaLoading } = useQuery({ queryKey: ['futsal-media-facility', resolvedId], queryFn: () => getFutsalMedia(resolvedId as string, 'facility'), enabled: !!resolvedId, retry: false });
+  const { data: eventMediaData, isLoading: eventLoading } = useQuery({ queryKey: ['futsal-media-event', resolvedId], queryFn: () => getEventMedia(resolvedId as string), enabled: !!resolvedId, retry: false });
+  const { data: pitchMediaData } = useQuery({ queryKey: ['futsal-media-pitch', resolvedId], queryFn: () => getFutsalMedia(resolvedId as string, 'pitch'), enabled: !!resolvedId, retry: false });
+  const { data: logoData } = useQuery({ queryKey: ['futsal-media-logo', resolvedId], queryFn: () => getFutsalMedia(resolvedId as string, 'logo'), enabled: !!resolvedId, retry: false });
+  const { data: bannerData } = useQuery({ queryKey: ['futsal-media-banner', resolvedId], queryFn: () => getFutsalMedia(resolvedId as string, 'banner'), enabled: !!resolvedId, retry: false });
+  const { data: pitchesData, isLoading: pitchesLoading } = useQuery({ queryKey: ['futsal-pitches', resolvedId], queryFn: () => getFutsalPitches(resolvedId as string), enabled: !!resolvedId, retry: false });
+  const { data: ratingsData, isLoading: ratingsLoading } = useQuery({ queryKey: ['futsal-ratings', resolvedId], queryFn: () => getFutsalRatings(resolvedId as string), enabled: !!resolvedId, retry: false });
+  const { data: faqsData } = useQuery({ queryKey: ['futsal-faqs', resolvedId], queryFn: () => getFutsalFaqs(resolvedId as string), enabled: !!resolvedId, retry: false });
 
   useEffect(() => {
-    if (id) {
-      trackVisitors(id).catch(err => console.error("Error tracking visitor:", err));
+    if (resolvedId) {
+      trackVisitors(resolvedId).catch(err => console.error("Error tracking visitor:", err));
     }
-  }, [id]);
+  }, [resolvedId]);
 
-  const isPageLoading = baseLoading || infoLoading || locLoading || pitchesLoading || homeMediaLoading;
+  const isPageLoading = nameLoading || baseLoading || infoLoading || locLoading || pitchesLoading || homeMediaLoading;
 
   const futsal = baseData?.data;
   const info = infoData?.data?.[0];
@@ -188,7 +209,7 @@ const FacilityDetails = () => {
     );
   }
 
-  if (!dynamicFacility) {
+  if (nameResolutionFailed || !dynamicFacility) {
     return (
       <div className="min-h-screen flex flex-col">
         <FutsalNavigation name="Facility Not Found" />

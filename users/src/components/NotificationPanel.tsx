@@ -149,11 +149,11 @@ export default function NotificationPanel() {
       <button
         onClick={handleOpen}
         aria-label="Notifications"
-        className="relative p-2 rounded-full transition-colors hover:bg-white/20 focus:outline-none"
+        className="relative p-2 rounded-full transition-colors hover:bg-muted focus:outline-none"
       >
-        <Bell className="h-5 w-5 text-white" />
+        <Bell className="h-5 w-5 text-foreground" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white leading-none ring-1 ring-white/30">
+          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white leading-none ring-1 ring-foreground/30">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
@@ -161,22 +161,16 @@ export default function NotificationPanel() {
 
       {/* Dropdown Panel */}
       {open && (
-        <div
-          className="absolute right-0 mt-2 w-[340px] sm:w-[380px] rounded-2xl shadow-2xl z-[200] overflow-hidden border border-white/20"
-          style={{
-            background: "rgba(15, 23, 42, 0.97)",
-            backdropFilter: "blur(16px)",
-          }}
-        >
+        <div className="absolute right-0 mt-2 w-[340px] sm:w-[380px] rounded-2xl shadow-2xl z-[200] overflow-hidden border border-border bg-card backdrop-blur-xl">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
-              <Bell className="h-4 w-4 text-green-400" />
-              <span className="text-sm font-semibold text-white">
+              <Bell className="h-4 w-4 text-emerald-600" />
+              <span className="text-sm font-semibold text-foreground">
                 Notifications
               </span>
               {unreadCount > 0 && (
-                <span className="text-xs bg-green-600 text-white rounded-full px-1.5 py-0.5 font-bold">
+                <span className="text-xs bg-emerald-600 text-white rounded-full px-1.5 py-0.5 font-bold">
                   {unreadCount} new
                 </span>
               )}
@@ -185,7 +179,7 @@ export default function NotificationPanel() {
               {unreadCount > 0 && (
                 <button
                   onClick={handleMarkAll}
-                  className="text-[11px] text-green-400 hover:text-green-300 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-white/10 transition-colors"
+                  className="text-[11px] text-emerald-600 hover:text-emerald-500 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-muted transition-colors"
                   title="Mark all as read"
                 >
                   <CheckCheck className="h-3 w-3" />
@@ -194,7 +188,7 @@ export default function NotificationPanel() {
               )}
               <button
                 onClick={() => setOpen(false)}
-                className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+                className="p-1 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -204,7 +198,7 @@ export default function NotificationPanel() {
           {/* List */}
           <div className="max-h-[380px] overflow-y-auto">
             {notifications.length === 0 && !loading ? (
-              <div className="flex flex-col items-center justify-center py-12 gap-3 text-slate-500">
+              <div className="flex flex-col items-center justify-center py-12 gap-3 text-muted-foreground">
                 <BellOff className="h-10 w-10 opacity-40" />
                 <p className="text-sm">No notifications yet</p>
               </div>
@@ -214,8 +208,8 @@ export default function NotificationPanel() {
                   <div
                     key={n.id}
                     onClick={() => handleMarkRead(n)}
-                    className={`group flex items-start gap-3 px-4 py-3 cursor-pointer transition-colors border-b border-white/5 hover:bg-white/5 ${
-                      !n.is_read ? "bg-green-900/20" : ""
+                    className={`group flex items-start gap-3 px-4 py-3 cursor-pointer transition-colors border-b border-border hover:bg-muted ${
+                      !n.is_read ? "bg-emerald-500/5 dark:bg-emerald-500/10" : ""
                     }`}
                   >
                     <span className="text-xl flex-shrink-0 mt-0.5">
@@ -225,25 +219,25 @@ export default function NotificationPanel() {
                       <div className="flex items-start justify-between gap-2">
                         <p
                           className={`text-xs font-semibold leading-tight ${
-                            !n.is_read ? "text-white" : "text-slate-300"
+                            !n.is_read ? "text-foreground" : "text-muted-foreground"
                           }`}
                         >
                           {n.title}
                         </p>
                         {!n.is_read && (
-                          <span className="flex-shrink-0 w-2 h-2 rounded-full bg-green-400 mt-1" />
+                          <span className="flex-shrink-0 w-2 h-2 rounded-full bg-emerald-600 mt-1" />
                         )}
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-2 leading-snug">
+                      <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2 leading-snug">
                         {n.message}
                       </p>
-                      <p className="text-[10px] text-slate-600 mt-1">
+                      <p className="text-[10px] text-muted-foreground/60 mt-1">
                         {relativeTime(n.createdAt)}
                       </p>
                     </div>
                     <button
                       onClick={(e) => handleDelete(e, n.id)}
-                      className="flex-shrink-0 p-1 text-slate-600 hover:text-red-400 rounded opacity-0 group-hover:opacity-100 transition-all"
+                      className="flex-shrink-0 p-1 text-muted-foreground hover:text-red-600 rounded opacity-0 group-hover:opacity-100 transition-all"
                       title="Dismiss"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -255,16 +249,16 @@ export default function NotificationPanel() {
                 {hasMore && !loading && (
                   <button
                     onClick={() => fetchPage(page + 1)}
-                    className="w-full py-2 text-xs text-green-400 hover:text-green-300 hover:bg-white/5 transition-colors"
+                    className="w-full py-2 text-xs text-emerald-600 hover:text-emerald-500 hover:bg-muted transition-colors"
                   >
                     Load more
                   </button>
                 )}
                 {/* See All link */}
-                <div className="p-2 border-t border-white/10 bg-slate-900/50">
+                <div className="p-2 border-t border-border bg-muted/30">
                   <button
                     onClick={() => { setOpen(false); navigate("/notifications"); }}
-                    className="w-full py-2 text-xs font-bold text-slate-400 hover:text-white transition-colors"
+                    className="w-full py-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
                   >
                     See all notifications
                   </button>

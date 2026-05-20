@@ -69,6 +69,7 @@ const App = () => (
               <Route path="/futsals/:id/bookings" element={<FutsalBookings />} />
               <Route path="/futsals/:id/reviews" element={<FutsalReviews />} />
               <Route path="/futsals/:id/gallery" element={<FutsalGallery />} />
+              
               <Route path="/auth/login" element={<Login />} />
               <Route path="/auth/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/reset-password" element={<ResetPassword />} />
@@ -79,7 +80,6 @@ const App = () => (
 
               <Route path="/bookings" element={<UserBookings />} />
               <Route path="/bookings/:id" element={<BookingDetails />} />
-              {/* <Route path="/admin" element={<AdminDashboard />} /> */}
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/forum" element={<Forum />} />
               <Route path="/forum/:id" element={<ForumDetails />} />
@@ -88,6 +88,13 @@ const App = () => (
               <Route path="/payment/success" element={<PaymentSuccess />} />
               <Route path="/payment/failure" element={<PaymentFailure />} />
               <Route path="/notifications" element={<Notifications />} />
+              
+              {/* Slug-based routes (futsal name or custom domain) - MUST BE LAST */}
+              <Route path="/:slug" element={<FacilityDetails />} />
+              <Route path="/:slug/bookings" element={<FutsalBookings />} />
+              <Route path="/:slug/reviews" element={<FutsalReviews />} />
+              <Route path="/:slug/gallery" element={<FutsalGallery />} />
+              
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

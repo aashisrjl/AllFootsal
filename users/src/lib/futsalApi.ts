@@ -34,6 +34,12 @@ export const getFutsalById = async (id: number | string): Promise<FutsalProfileR
     return res.data;
 };
 
+// get single futsal by name or slug
+export const getFutsalByName = async (name: string): Promise<FutsalProfileResponse> => {
+    const res = await API.get(`/futsal/name/${name}`);
+    return res.data;
+};
+
 // get all futsals
 export const getAllFutsals = async () => {
     const res = await API.get("/admin/futsals");
