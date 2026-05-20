@@ -223,10 +223,108 @@ const updateFutsalProfile = async (req, res) => {
     }
 }
 
+// Get futsal by name or slug
+const getFutsalByName = async (req, res) => {
+    try {
+        const { slug } = req.params;
+        let normalizedSlug = slug.toLowerCase().trim();
+        const { Op } = require('sequelize');
+        
+        console.log(`[getFutsalByName] Searching for futsal: "${slug}"`);
+        
+        // Try 1: Exact match (case-insensitive)
+        let futsal = await Footsal.findOne({
+            where: sequelize.where(
+                sequelize.fn('LOWER', sequelize.col('futsalName')),
+                Op.eq,
+                normalizedSlug
+            )
+        });
+
+        if (futsal) {
+            console.log(`[getFutsalByName] Found by exact match: ${futsal.futsalName}`);
+            return res.status(200).json({
+                success: true,
+                message: "Futsal fetched successfully",
+                data: futsal
+            });
+        }
+
+        // Try 2: Slug format (convert hyphens to spaces and search)
+        const slugWithSpaces = normalizedSlug.replace(/-/g, ' ');
+        futsal = await Footsal.findOne({
+            where: sequelize.where(
+                sequelize.fn('LOWER', sequelize.col('futsalName')),
+                Op.eq,
+                slugWithSpaces
+            )
+        });
+
+        if (futsal) {
+            console.log(`[getFutsalByName] Found by slug conversion: ${futsal.futsalName}`);
+            return res.status(200).json({
+                success: true,
+                message: "Futsal fetched successfully",
+                data: futsal
+            });
+        }
+
+        // Try 3: Slug format (search for futsal name as slug - replace spaces with hyphens)
+        futsal = await Footsal.findOne({
+            where: sequelize.where(
+                sequelize.fn('LOWER', sequelize.fn('REPLACE', sequelize.col('futsalName'), ' ', '-')),
+                Op.eq,
+                normalizedSlug
+            )
+        });
+
+        if (futsal) {
+            console.log(`[getFutsalByName] Found by slug format: ${futsal.futsalName}`);
+            return res.status(200).json({
+                success: true,
+                message: "Futsal fetched successfully",
+                data: futsal
+            });
+        }
+
+        // Try 4: Partial match (contains)
+        futsal = await Footsal.findOne({
+            where: sequelize.where(
+                sequelize.fn('LOWER', sequelize.col('futsalName')),
+                Op.like,
+                `%${normalizedSlug}%`
+            )
+        });
+
+        if (futsal) {
+            console.log(`[getFutsalByName] Found by partial match: ${futsal.futsalName}`);
+            return res.status(200).json({
+                success: true,
+                message: "Futsal fetched successfully",
+                data: futsal
+            });
+        }
+
+        console.log(`[getFutsalByName] No futsal found for: "${slug}"`);
+        return res.status(404).json({
+            success: false,
+            message: `No futsal found with name "${slug}"`
+        });
+    } catch (err) {
+        console.error('Error fetching futsal by name:', err);
+        return res.status(500).json({
+            success: false,
+            message: "Error fetching futsal by name",
+            error: err.message
+        });
+    }
+}
+
 
 module.exports = {
     getAllFutsal,
     getFutsalById,
+    getFutsalByName,
     getFutsalbySubsciption_true,
     getFutsalProfile,
     updateFutsalProfile

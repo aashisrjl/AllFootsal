@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAllFutsal, getFutsalById, getFutsalbySubsciption_true, getFutsalProfile, updateFutsalProfile } = require('../../controllers/footsalControllers/futsal.controller');
+const { getAllFutsal, getFutsalById, getFutsalbySubsciption_true, getFutsalProfile, updateFutsalProfile, getFutsalByName } = require('../../controllers/footsalControllers/futsal.controller');
 const isFutsalAuthenticated = require('../../middleware/authMiddleware/futsalAuthenticated');
 const router = express.Router();
 // #swagger.tags = ['Futsal']
@@ -11,6 +11,11 @@ router.get(
 router.get(
     '/futsal/:id', // #swagger.tags = ['Futsal']
     getFutsalById
+)
+
+router.get(
+    '/futsal/name/:slug', // #swagger.tags = ['Futsal']
+    getFutsalByName
 )
 
 router.get(
