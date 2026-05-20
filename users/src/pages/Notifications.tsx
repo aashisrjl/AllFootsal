@@ -111,7 +111,7 @@ export default function Notifications() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-background text-foreground">
       <Navigation />
       <div className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
@@ -120,27 +120,27 @@ export default function Notifications() {
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => navigate(-1)}
-                className="p-2 rounded-full bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-colors"
+                className="p-2 rounded-full bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Notifications</h1>
-                <p className="text-slate-400 text-sm mt-1">You have {unreadCount} unread messages.</p>
+                <h1 className="text-3xl font-bold text-foreground">Notifications</h1>
+                <p className="text-muted-foreground text-sm mt-1">You have {unreadCount} unread messages.</p>
               </div>
             </div>
             
             <div className="flex items-center gap-3">
-               <div className="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800">
+               <div className="flex items-center bg-muted p-1 rounded-xl border border-border">
                   <button 
                     onClick={() => setFilter("all")}
-                    className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${filter === 'all' ? 'bg-green-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                    className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${filter === 'all' ? 'bg-emerald-600 text-white shadow-lg' : 'text-muted-foreground hover:text-foreground'}`}
                   >
                     All
                   </button>
                   <button 
                     onClick={() => setFilter("unread")}
-                    className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${filter === 'unread' ? 'bg-green-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                    className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${filter === 'unread' ? 'bg-emerald-600 text-white shadow-lg' : 'text-muted-foreground hover:text-foreground'}`}
                   >
                     Unread
                   </button>
@@ -148,7 +148,7 @@ export default function Notifications() {
                {unreadCount > 0 && (
                  <button 
                   onClick={handleMarkAll}
-                  className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-green-400 hover:bg-green-500/10 transition-all shadow-inner"
+                  className="p-2.5 rounded-xl bg-muted border border-border text-emerald-600 hover:bg-emerald-500/10 transition-all shadow-inner"
                   title="Mark all as read"
                  >
                    <CheckCheck className="h-5 w-5" />
@@ -158,50 +158,50 @@ export default function Notifications() {
           </div>
 
           {/* List */}
-          <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl overflow-hidden min-h-[60vh]">
+          <div className="bg-card backdrop-blur-xl rounded-3xl border border-border shadow-lg overflow-hidden min-h-[60vh]">
             {notifications.length === 0 && !loading ? (
               <div className="flex flex-col items-center justify-center py-32 text-center">
-                <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mb-6">
-                  <BellOff className="h-10 w-10 text-slate-600" />
+                <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-6">
+                  <BellOff className="h-10 w-10 text-muted-foreground" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Clear as a whistle!</h3>
-                <p className="text-slate-500 max-w-xs mx-auto">No notifications found. We'll let you know when something happens.</p>
+                <h3 className="text-xl font-bold text-foreground mb-2">Clear as a whistle!</h3>
+                <p className="text-muted-foreground max-w-xs mx-auto">No notifications found. We'll let you know when something happens.</p>
               </div>
             ) : (
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-border">
                 {notifications.map((n) => (
                   <div
                     key={n.id}
                     onClick={() => handleMarkRead(n)}
-                    className={`group relative flex items-start gap-4 px-6 py-6 cursor-pointer transition-all hover:bg-white/[0.02] ${
-                      !n.is_read ? "bg-green-500/[0.03]" : ""
+                    className={`group relative flex items-start gap-4 px-6 py-6 cursor-pointer transition-all hover:bg-muted/50 ${
+                      !n.is_read ? "bg-emerald-500/5 dark:bg-emerald-500/10" : ""
                     }`}
                   >
                     {/* Indicator */}
                     {!n.is_read && (
-                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500" />
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-600" />
                     )}
 
                     <div className="flex-shrink-0 mt-1">
-                      <div className="w-12 h-12 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-2xl shadow-inner group-hover:scale-110 transition-transform">
+                      <div className="w-12 h-12 rounded-2xl bg-muted border border-border flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
                         {typeIcon[n.type] ?? "📣"}
                       </div>
                     </div>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-4 mb-1">
-                        <h4 className={`text-sm font-bold truncate ${!n.is_read ? 'text-white' : 'text-slate-300'}`}>
+                        <h4 className={`text-sm font-bold truncate ${!n.is_read ? 'text-foreground' : 'text-foreground/80'}`}>
                           {n.title}
                         </h4>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 whitespace-nowrap">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap">
                           {relativeTime(n.createdAt)}
                         </span>
                       </div>
-                      <p className="text-sm text-slate-400 line-clamp-2 leading-relaxed group-hover:text-slate-300 transition-colors">
+                      <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed group-hover:text-foreground/70 transition-colors">
                         {n.message}
                       </p>
-                      <div className="mt-3 flex items-center gap-4 text-xs font-bold uppercase tracking-wider text-slate-500">
-                         <span className="flex items-center gap-1.5 px-2 py-1 rounded bg-slate-800/50 border border-slate-700/50">
+                      <div className="mt-3 flex items-center gap-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                         <span className="flex items-center gap-1.5 px-2 py-1 rounded bg-muted border border-border">
                            {n.type.replace('_', ' ')}
                          </span>
                       </div>
@@ -209,7 +209,7 @@ export default function Notifications() {
 
                     <button
                       onClick={(e) => handleDelete(e, n.id)}
-                      className="p-2 text-slate-600 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                      className="p-2 text-muted-foreground hover:text-red-600 hover:bg-red-600/10 rounded-xl transition-all opacity-0 group-hover:opacity-100"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -222,7 +222,7 @@ export default function Notifications() {
                     <button
                       disabled={loading}
                       onClick={() => fetchNotifications(page + 1)}
-                      className="px-6 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 font-bold hover:text-white hover:border-slate-600 transition-all disabled:opacity-50"
+                      className="px-6 py-2 rounded-xl bg-muted border border-border text-foreground font-bold hover:bg-muted/80 transition-all disabled:opacity-50"
                     >
                       {loading ? "Loading..." : "Load More Notifications"}
                     </button>

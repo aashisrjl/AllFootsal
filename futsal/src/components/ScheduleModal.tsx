@@ -16,12 +16,19 @@ export default function ScheduleModal({ isOpen, onClose, pitch, futsalId }: any)
     if (!pitch || !futsalId) return;
     try {
       setLoading(true);
+      console.log(`📅 Fetching timeslots for day: ${day}, pitch: ${pitch.id}`);
       const res = await getFutsalTimeslots({ futsalId, pitchId: pitch.id, dayOfWeek: day });
-      if (res.data.timeslots) {
-        setTimeslots(res.data.timeslots);
+      console.log(`📋 API Response:`, res);
+      // res is already {timeslots: [...]} - not nested in res.data
+      if (res.timeslots) {
+        console.log(`✅ Found ${res.timeslots.length} timeslots`);
+        setTimeslots(res.timeslots);
+      } else {
+        console.warn(`❌ No timeslots property in response`);
+        setTimeslots([]);
       }
     } catch (err) {
-      console.error(err);
+      console.error("❌ Error fetching timeslots:", err);
       setTimeslots([]);
     } finally {
       setLoading(false);
@@ -44,11 +51,13 @@ export default function ScheduleModal({ isOpen, onClose, pitch, futsalId }: any)
         day_of_week: day,
         price: newSlot.price || pitch.pricePerHour || pitch.price_per_hour
       };
+      console.log(`➕ Creating timeslot with payload:`, payload);
       await createTimeslot(payload);
-      setNewSlot({ start_time: '', end_time: '', price: '', is_available: true });
+      console.log(`✅ Timeslot created successfully`);
+      setNewSlot({ start_time: '08:00', end_time: '09:00', price: '', is_available: true });
       fetchSchedule();
     } catch (err: any) {
-      console.error(err);
+      console.error("❌ Error creating timeslot:", err);
       alert(err.response?.data?.error || 'Failed to add timeslot');
     } finally {
       setAdding(false);
@@ -88,7 +97,11 @@ export default function ScheduleModal({ isOpen, onClose, pitch, futsalId }: any)
           {DAYS.map((d, index) => (
             <button
               key={d}
-              onClick={() => setDay(index + 1)}
+              onClick={() => {
+                const dayNum = index + 1;
+                console.log(`📅 Selected day: ${d} (${dayNum})`);
+                setDay(dayNum);
+              }}
               className={`px-4 py-3 text-sm font-bold whitespace-nowrap transition-colors border-b-2 ${
                 day === index + 1 ? 'border-emerald-500 text-emerald-400 bg-emerald-500/5' : 'border-transparent text-app-muted hover:text-app-text hover:bg-app-surface-solid'
               }`}

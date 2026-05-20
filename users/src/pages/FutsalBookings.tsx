@@ -5,16 +5,19 @@ import FutsalFooter from "@/components/FutsalFooter";
 import TimeSlotPicker from "@/components/TimeSlotPicker";
 import BookingSummary from "@/components/BookingSummary";
 import { useQuery } from "@tanstack/react-query";
-import { getFutsalById, getFutsalPitches } from "@/lib/futsalApi";
+import { getFutsalById, getFutsalPitches, getFutsalByName } from "@/lib/futsalApi";
 import { useBooking } from "@/contexts/BookingContext";
 import { Loader2, ArrowLeft, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const FutsalBookings = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const [searchParams] = useSearchParams();
   const initialPitchId = searchParams.get("pitch");
   const navigate = useNavigate();
+  const paramValue = id || slug;
+  const isNumeric = /^\d+$/.test(paramValue || '');
+  const [resolvedId, setResolvedId] = useState<string | null>(isNumeric ? paramValue || null : null);
 
   const {
     selectedDate,
@@ -24,8 +27,22 @@ const FutsalBookings = () => {
     fetchAvailableTimeSlots
   } = useBooking();
 
-  const { data: baseData, isLoading: baseLoading } = useQuery({ queryKey: ['futsal-base', id], queryFn: () => getFutsalById(id as string), enabled: !!id, retry: false });
-  const { data: pitchesData, isLoading: pitchesLoading } = useQuery({ queryKey: ['futsal-pitches', id], queryFn: () => getFutsalPitches(id as string), enabled: !!id, retry: false });
+  // If slug is not numeric, resolve it to ID first
+  const { data: nameData } = useQuery({
+    queryKey: ['futsal-resolve-name', paramValue],
+    queryFn: () => getFutsalByName(paramValue as string),
+    enabled: !!paramValue && !isNumeric && !resolvedId,
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (nameData?.data?.id) {
+      setResolvedId(String(nameData.data.id));
+    }
+  }, [nameData]);
+
+  const { data: baseData, isLoading: baseLoading } = useQuery({ queryKey: ['futsal-base', resolvedId], queryFn: () => getFutsalById(resolvedId as string), enabled: !!resolvedId, retry: false });
+  const { data: pitchesData, isLoading: pitchesLoading } = useQuery({ queryKey: ['futsal-pitches', resolvedId], queryFn: () => getFutsalPitches(resolvedId as string), enabled: !!resolvedId, retry: false });
 
   useEffect(() => {
     if (initialPitchId && !selectedPitchId) {
@@ -34,11 +51,11 @@ const FutsalBookings = () => {
   }, [initialPitchId, selectedPitchId, setSelectedPitchId]);
 
   useEffect(() => {
-    if (selectedPitchId && id) {
-      fetchAvailableTimeSlots(id, selectedPitchId, selectedDate);
+    if (selectedPitchId && resolvedId) {
+      fetchAvailableTimeSlots(resolvedId, selectedPitchId, selectedDate);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDate, selectedPitchId, id]);
+  }, [selectedDate, selectedPitchId, resolvedId]);
 
   const futsal = baseData?.data;
   const pitchesArray = pitchesData?.data || [];

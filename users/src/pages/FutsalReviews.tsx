@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import FutsalNavigation from "@/components/FutsalNavigation";
 import FutsalFooter from "@/components/FutsalFooter";
@@ -10,6 +10,7 @@ import {
     postRating,
     updateRating,
     deleteRating,
+    getFutsalByName,
 } from "@/lib/futsalApi";
 import {
     ArrowLeft,
@@ -384,21 +385,39 @@ const ReviewCard = ({ review }: { review: any }) => (
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 const FutsalReviews = () => {
-    const { id } = useParams<{ id: string }>();
+    const { id, slug } = useParams<{ id?: string; slug?: string }>();
     const navigate = useNavigate();
     const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+    const queryClient = useQueryClient();
+    const paramValue = id || slug;
+    const isNumeric = /^\d+$/.test(paramValue || '');
+    const [resolvedId, setResolvedId] = useState<string | null>(isNumeric ? paramValue || null : null);
+
+    // If slug is not numeric, resolve it to ID first
+    const { data: nameData } = useQuery({
+        queryKey: ['futsal-resolve-name', paramValue],
+        queryFn: () => getFutsalByName(paramValue as string),
+        enabled: !!paramValue && !isNumeric && !resolvedId,
+        retry: false,
+    });
+
+    useEffect(() => {
+        if (nameData?.data?.id) {
+            setResolvedId(String(nameData.data.id));
+        }
+    }, [nameData]);
 
     const { data: baseData, isLoading: baseLoading } = useQuery({
-        queryKey: ["futsal-base", id],
-        queryFn: () => getFutsalById(id as string),
-        enabled: !!id,
+        queryKey: ["futsal-base", resolvedId],
+        queryFn: () => getFutsalById(resolvedId as string),
+        enabled: !!resolvedId,
         retry: false,
     });
 
     const { data: ratingsData, isLoading: ratingsLoading } = useQuery({
-        queryKey: ["futsal-ratings", id],
-        queryFn: () => getFutsalRatings(id as string),
-        enabled: !!id,
+        queryKey: ["futsal-ratings", resolvedId],
+        queryFn: () => getFutsalRatings(resolvedId as string),
+        enabled: !!resolvedId,
         retry: false,
     });
 
@@ -406,9 +425,9 @@ const FutsalReviews = () => {
         data: myRatingData,
         isLoading: myRatingLoading,
     } = useQuery({
-        queryKey: ["my-rating", id],
-        queryFn: () => getMyRating(id as string),
-        enabled: !!id && isAuthenticated && !authLoading,
+        queryKey: ["my-rating", resolvedId],
+        queryFn: () => getMyRating(resolvedId as string),
+        enabled: !!resolvedId && isAuthenticated && !authLoading,
         retry: false,
     });
 
@@ -453,7 +472,7 @@ const FutsalReviews = () => {
                 <Button
                     variant="ghost"
                     className="mb-8 text-muted-foreground hover:text-foreground"
-                    onClick={() => navigate(`/futsals/${id}`)}
+                    onClick={() => navigate(`/futsals/${resolvedId}`)}
                 >
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to Facility Details
@@ -524,12 +543,12 @@ const FutsalReviews = () => {
                             // Has review — show it
                             <MyReviewCard
                                 review={myReview}
-                                futsalId={id as string}
+                                futsalId={resolvedId as string}
                                 userName={user?.name || "You"}
                             />
                         ) : (
                             // Authenticated, no review — show form
-                            <ReviewForm futsalId={id as string} />
+                            <ReviewForm futsalId={resolvedId as string} />
                         )}
                     </section>
 

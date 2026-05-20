@@ -36,7 +36,6 @@ import FutsalGallery from "./pages/FutsalGallery";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure";
 import FloatingThemeToggle from "@/components/FloatingThemeToggle";
-import FutsalResolver from "./pages/FutsalResolver";
 
 const queryClient = new QueryClient();
 

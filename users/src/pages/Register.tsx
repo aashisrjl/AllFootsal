@@ -31,14 +31,18 @@ const Register = () => {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    const { id, value } = e.target;
+    console.log(`📝 Input changed: ${id} = ${value}`);
+    setFormData({ ...formData, [id]: value });
   };
 
   // Step 1 - submit personal info
   const handleInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🔍 handleInfoSubmit called with formData:", formData);
 
     if (!formData.fullName || !formData.email || !formData.phone) {
+      console.warn("❌ Missing required fields:", { fullName: !formData.fullName, email: !formData.email, phone: !formData.phone });
       toast.error("Please fill all required fields.");
       return;
     }
@@ -46,6 +50,7 @@ const Register = () => {
     // Gmail validation - must be @gmail.com
     if (formData.email.toLowerCase().includes("@gmail")) {
       if (!formData.email.toLowerCase().match(/^[^\s@]+@gmail\.com$/)) {
+        console.warn("❌ Gmail validation failed:", formData.email);
         toast.error("Gmail email must be @gmail.com");
         return;
       }
@@ -53,13 +58,15 @@ const Register = () => {
       // For custom domains, allow standard TLDs (at least 2 characters)
       const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
       if (!emailRegex.test(formData.email)) {
+        console.warn("❌ Email validation failed:", formData.email);
         toast.error("Please enter a valid email address.");
         return;
       }
     }
 
+    console.log("✅ All validations passed, moving to step 2");
     // Just move to step 2, no API call at this stage
-    toast.info("Now set your password to complete registration.");
+    toast.success("Now set your password to complete registration.");
 
     setStep(2); // show password fields
   };
@@ -67,17 +74,21 @@ const Register = () => {
   // Step 2 - submit password and complete registration
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🔍 handlePasswordSubmit called");
 
     if (formData.password !== formData.confirmPassword) {
+      console.warn("❌ Passwords don't match");
       toast.error("Password and confirm password must match.");
       return;
     }
 
     if (formData.password.length < 6) {
+      console.warn("❌ Password too short:", formData.password.length);
       toast.error("Password must be at least 6 characters.");
       return;
     }
 
+    console.log("✅ Password validation passed, calling registerUser");
     setIsLoading(true);
     try {
       // Call registerUser API with mapped field names
@@ -91,11 +102,12 @@ const Register = () => {
 
       // Only navigate on successful registration
       if (success) {
+        console.log("✅ Registration successful, navigating to verify-email");
         navigate("/auth/verify-email", { state: { email: formData.email, type: 'user_registration' } });
       }
     } catch (error) {
       // Error handling is done in the context, just catch silently here
-      console.error(error);
+      console.error("❌ Registration error:", error);
     } finally {
       setIsLoading(false);
     }
