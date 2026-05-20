@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Users, Search, Filter, ArrowUpRight, Globe, Monitor, Smartphone, Clock } from 'lucide-react';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 import { getVisitors } from '../lib/visitorApi';
 
 interface Visitor {

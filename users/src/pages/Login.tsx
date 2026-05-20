@@ -4,16 +4,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 import { LogIn } from "lucide-react";
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
 
 import {
   AuthImage,
   AuthBackground,
-  logo_transparent,
+  // logo_transparent,
   Logo,
 } from "@/assets/images";
+import logo_transparent from "/logo_transparent.png";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -31,8 +32,16 @@ const Login = () => {
         toast.success("Successfully logged in");
         navigate("/");
       }
-    } catch (error) {
-      toast.error("Invalid credentials or server issue.");
+    } catch (error: any) {
+      const errorMessage = error?.message || error?.error || "Invalid credentials or server issue.";
+      
+      // Check if user is not verified
+      if (errorMessage.toLowerCase().includes("not verified") || errorMessage.toLowerCase().includes("verify")) {
+        toast.info("Please verify your account first");
+        navigate("/auth/verify-email", { state: { email, isFromLogin: true } });
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }

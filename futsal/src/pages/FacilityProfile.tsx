@@ -9,7 +9,7 @@ import {
   updateOwnerLocation,
 } from '../lib/facilityApi';
 import { useAuth } from '../context/AuthContext';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 import MapPicker from '../components/MapPicker';
 
 interface LocationPayload {
@@ -246,6 +246,7 @@ const FacilityProfile = () => {
   };
 
   const saveLocation = async () => {
+    const toastId = toast.loading('Saving location...');
     try {
       setSavingLocation(true);
 
@@ -269,9 +270,11 @@ const FacilityProfile = () => {
 
       await refreshProfile();
       await fetchFacilityData();
-      toast.success('Location saved successfully.');
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to save location';
+      toast.dismiss(toastId);
+      toast.success('Location saved successfully');
+    } catch (err: any) {
+      toast.dismiss(toastId);
+      const message = err?.response?.data?.message || err?.message || 'Failed to save location';
       toast.error(message);
     } finally {
       setSavingLocation(false);
@@ -281,6 +284,7 @@ const FacilityProfile = () => {
   const saveInfo = async () => {
     if (!futsalProfile?.id) return;
 
+    const toastId = toast.loading('Saving facility info...');
     try {
       setSavingInfo(true);
 
@@ -304,9 +308,11 @@ const FacilityProfile = () => {
 
       await refreshProfile();
       await fetchFacilityData();
-      toast.success('Facility info saved successfully.');
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to save info';
+      toast.dismiss(toastId);
+      toast.success('Facility info saved successfully');
+    } catch (err: any) {
+      toast.dismiss(toastId);
+      const message = err?.response?.data?.message || err?.message || 'Failed to save facility info';
       toast.error(message);
     } finally {
       setSavingInfo(false);

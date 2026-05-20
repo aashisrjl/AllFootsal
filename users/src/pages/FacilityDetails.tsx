@@ -8,7 +8,7 @@ import { getFutsalById, getFutsalInfo, getFutsalLocation, getFutsalMedia, getFut
 import { useBooking } from "@/contexts/BookingContext";
 import { MapPin, Star, Clock, ArrowLeft, Loader2, CheckCircle2, Phone, Mail, CalendarDays, Navigation2, Facebook, Instagram, Globe, Send, MessageSquare, User, HelpCircle, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 import SentimentBadge from "@/components/SentimentBadge";
 
 const safelyParse = (str: string) => {

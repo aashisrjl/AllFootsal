@@ -1,6 +1,6 @@
 
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster as HotToaster } from "react-hot-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -46,7 +46,20 @@ const App = () => (
       <AuthProvider>
         <BookingProvider>
           <Toaster />
-          <Sonner />
+          <HotToaster 
+            position="top-right"
+            reverseOrder={false}
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#1f2937',
+                color: '#fff',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+              },
+            }}
+          />
           <BrowserRouter>
               <FloatingThemeToggle />
               <Routes>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, Loader2, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -11,8 +11,9 @@ import ThemeToggle from '../components/ThemeToggle';
 import {
   AuthImage,
   AuthBackground,
-  logo_transparent,
 } from "@/assets/images";
+
+import logo_transparent from "/logo_transparent.png";
 
 const Login: React.FC = () => {
   const [emailOrPhone, setEmailOrPhone] = useState('');

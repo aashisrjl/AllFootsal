@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { CheckCircle2, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 import { verifyPayment } from "@/lib/futsalApi";
 import FutsalNavigation from "@/components/FutsalNavigation";
 import FutsalFooter from "@/components/FutsalFooter";

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MapPin, Plus, Edit, ToggleLeft, ToggleRight, Wrench, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 import PitchModal from '../components/PitchModal';
 import ScheduleModal from '../components/ScheduleModal';
 import { updatePitch } from '../lib/pitchApi';
@@ -68,6 +68,9 @@ const PitchManagement = () => {
   };
 
   const handleDeletePitch = async (id: number) => {
+    if (!window.confirm("Are you sure you want to delete this pitch?")) return;
+
+    const toastId = toast.loading("Deleting pitch...");
     try {
       const token = localStorage.getItem('token');
       const apiBaseUrl = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
@@ -78,14 +81,18 @@ const PitchManagement = () => {
       });
       
       if (!response.ok) {
-        toast.error('Failed to delete pitch.');
+        toast.dismiss(toastId);
+        toast.error('Failed to delete pitch');
         return;
       }
 
-      toast.success('Pitch deleted successfully.');
+      toast.dismiss(toastId);
+      toast.success('Pitch deleted successfully');
       fetchPitches();
-    } catch {
-      toast.error('Error deleting pitch.');
+    } catch (error: any) {
+      toast.dismiss(toastId);
+      const errorMsg = error?.message || 'Error deleting pitch';
+      toast.error(errorMsg);
     }
   };
 
@@ -94,6 +101,7 @@ const PitchManagement = () => {
   }, [futsalProfile]);
 
   const togglePitchStatus = async (pitch: any) => {
+    const toastId = toast.loading("Updating pitch status...");
     try {
       const updatedStatus = !pitch.isActive;
       // Optimistic update
@@ -103,8 +111,12 @@ const PitchManagement = () => {
         ...pitch,
         is_active: updatedStatus ? 1 : 0
       });
-    } catch (error) {
-      console.error('Failed to toggle status', error);
+      toast.dismiss(toastId);
+      toast.success(updatedStatus ? "Pitch activated" : "Pitch deactivated");
+    } catch (error: any) {
+      toast.dismiss(toastId);
+      const errorMsg = error?.message || 'Failed to update pitch status';
+      toast.error(errorMsg);
       // Revert if failed
       fetchPitches();
     }

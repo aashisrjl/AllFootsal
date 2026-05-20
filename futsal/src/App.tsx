@@ -17,7 +17,7 @@ import Notifications from './pages/Notifications';
 import Visitors from './pages/Visitors';
 import ContactMessages from './pages/ContactMessages';
 import { Loader2 } from 'lucide-react';
-import { Toaster } from 'sonner';
+import { Toaster as HotToaster } from 'react-hot-toast';
 import { useTheme } from './context/ThemeContext';
 import './index.css';
 
@@ -48,7 +48,24 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 function ThemedToaster() {
   const { resolvedTheme } = useTheme();
-  return <Toaster richColors position="top-right" theme={resolvedTheme} />;
+  return (
+    <HotToaster 
+      position="top-right"
+      reverseOrder={false}
+      toastOptions={{
+        duration: 4000,
+        style: {
+          background: resolvedTheme === 'dark' ? '#1f2937' : '#ffffff',
+          color: resolvedTheme === 'dark' ? '#f3f4f6' : '#111827',
+          borderRadius: '8px',
+          fontSize: '14px',
+          fontWeight: '500',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+          border: `1px solid ${resolvedTheme === 'dark' ? '#374151' : '#e5e7eb'}`,
+        },
+      }}
+    />
+  );
 }
 
 function App() {

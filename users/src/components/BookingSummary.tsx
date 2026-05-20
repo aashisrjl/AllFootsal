@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBooking } from "@/contexts/BookingContext";
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 import { createBooking, createPayment } from "@/lib/futsalApi";
 import { Loader2, Banknote, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";

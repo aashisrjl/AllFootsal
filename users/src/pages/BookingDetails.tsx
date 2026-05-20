@@ -10,7 +10,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, ArrowLeft, CalendarDays, Clock, MapPin, SearchX, X, RefreshCw, Phone, Download, ShieldCheck, Mail } from "lucide-react";
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 import { Separator } from "@/components/ui/separator";
 
 const BookingDetails = () => {

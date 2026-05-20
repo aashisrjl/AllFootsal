@@ -1,4 +1,4 @@
-import { logo_transparent } from "@/assets/images";
+import logo_transparent from "/logo_transparent.png";
 import {
   Mail,
   Phone,
@@ -56,7 +56,7 @@ export default function Footer() {
               Nepal's first all-in-one futsal management and booking platform.
             </p>
             <p className="text-slate-300/80 mb-4 font-semibold">
-              allfootsal.com
+              allfutsal.com
             </p>
             <div className="flex gap-4">
               <a

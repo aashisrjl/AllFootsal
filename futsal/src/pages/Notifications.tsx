@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Bell, CheckCheck, Trash2, BellOff, Clock } from 'lucide-react';
+import toast from 'react-hot-toast';
 import {
   getFutsalNotifications,
   getFutsalUnreadCount,
@@ -52,6 +53,7 @@ export default function Notifications() {
       setUnreadCount(countRes.unreadCount);
     } catch (error) {
       console.error('Failed to fetch notifications', error);
+      toast.error('Failed to load notifications');
     } finally {
       setLoading(false);
     }

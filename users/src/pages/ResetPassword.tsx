@@ -3,15 +3,15 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 import { ArrowLeft } from "lucide-react";
 import {
   AuthBackground,
-  logo_transparent,
   OTPIllustration,
   PasswordIllustration,
 } from "@/assets/images";
-import { resendOtp, resetPassword } from "@/lib/authApi";
+import logo_transparent from "/logo_transparent.png"
+import { resendOtp, resetPassword, verifyOtp } from "@/lib/authApi";
 
 const ResetPassword = () => {
   const [otp, setOtp] = useState("");
@@ -37,26 +37,40 @@ const ResetPassword = () => {
 
   // Send OTP again
   const handleResendOTP = async () => {
-    setIsLoading(true);
+    const toastId = toast.loading("Resending OTP...");
     try {
       await resendOtp(email, 'forgot_password');
+      toast.dismiss(toastId);
       setResendTimer(180);
-      toast.success("OTP Resent: Check your email for the new OTP.");
-    } catch {
-      toast.error("Error: Failed to resend OTP.");
-    } finally {
-      setIsLoading(false);
+      toast.success("Check your email for the new OTP");
+    } catch (error: any) {
+      toast.dismiss(toastId);
+      const errorMsg = error?.response?.data?.message || "Failed to resend OTP";
+      toast.error(errorMsg);
     }
   };
 
   // Verify OTP
-  const handleVerifyOTP = () => {
+  const handleVerifyOTP = async () => {
     if (otp.length !== 6 || isNaN(Number(otp))) {
-      toast.error("Invalid OTP: Please enter a valid 6-digit numeric OTP.");
+      toast.error("Please enter a valid 6-digit OTP");
       return;
     }
-    setOtpVerified(true);
-    toast.success("OTP Verified: Now you can set a new password.");
+
+    setIsLoading(true);
+    const toastId = toast.loading("Verifying OTP...");
+    try {
+      await verifyOtp(email, otp);
+      toast.dismiss(toastId);
+      setOtpVerified(true);
+      toast.success("OTP verified! Now set your new password");
+    } catch (error: any) {
+      toast.dismiss(toastId);
+      const errorMsg = error?.response?.data?.message || "Invalid OTP. Please try again.";
+      toast.error(errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle password reset
@@ -64,24 +78,30 @@ const ResetPassword = () => {
     e.preventDefault();
 
     if (!newPassword || !confirmPassword) {
-      toast.error("Fields Required: Please enter and confirm your new password.");
+      toast.error("Please enter and confirm your new password");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast.error("Password Mismatch: New password and confirm password do not match.");
+      toast.error("Passwords do not match");
       return;
     }
 
-    setIsLoading(true);
+    if (newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+
+    const toastId = toast.loading("Resetting password...");
     try {
       await resetPassword({ email, otp, newPassword, cNewPassword: confirmPassword });
-      toast.success("Success: Your password has been reset successfully.");
+      toast.dismiss(toastId);
+      toast.success("Password reset successfully!");
       navigate("/auth/login");
-    } catch {
-      toast.error("Error: Failed to reset password. Please try again.");
-    } finally {
-      setIsLoading(false);
+    } catch (error: any) {
+      toast.dismiss(toastId);
+      const errorMsg = error?.response?.data?.message || "Failed to reset password";
+      toast.error(errorMsg);
     }
   };
 

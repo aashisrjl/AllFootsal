@@ -4,13 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 import { LogIn } from "lucide-react";
 import {
   AuthBackground,
-  logo_transparent,
   ForgotPasswordImage,
 } from "@/assets/images";
+import logo_transparent from "/logo_transparent.png"
 import { forgotPassword } from "@/lib/authApi";
 
 const ForgotPassword = () => {
@@ -23,27 +23,23 @@ const ForgotPassword = () => {
     e.preventDefault();
 
     if (!email) {
-      toast.error("Email Required", {
-        description: "Please enter your registered email.",
-      });
+      toast.error("Please enter your registered email");
       return;
     }
 
-    setIsLoading(true);
+    const toastId = toast.loading("Sending OTP...");
+    
     try {
       await forgotPassword(email);
 
-      toast.success("OTP Sent", {
-        description: "Check your email for the OTP to reset your password.",
-      });
+      toast.dismiss(toastId);
+      toast.success("Check your email for the OTP to reset your password");
 
       navigate("/auth/reset-password", { state: { email } });
-    } catch (error) {
-      toast.error("Error", {
-        description: "Failed to send OTP. Please try again later.",
-      });
-    } finally {
-      setIsLoading(false);
+    } catch (error: any) {
+      toast.dismiss(toastId);
+      const errorMsg = error?.response?.data?.message || "Failed to send OTP. Please try again later.";
+      toast.error(errorMsg);
     }
   };
 

@@ -4,7 +4,7 @@ import ThemeToggle from '../components/ThemeToggle';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { updateFutsalProfile } from '../lib/authApi';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 import API from '@/lib/api';
 import { Link } from 'react-router-dom';
 

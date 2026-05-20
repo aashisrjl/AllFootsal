@@ -4,13 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
 import { LogIn, ArrowLeft } from "lucide-react";
 import {
   AuthBackground,
-  logo_transparent,
   RegisterIllustration,
 } from "@/assets/images";
+import  logo_transparent  from "/logo_transparent.png";
+
 
 const FootsalAuthRegister = () => {
   const navigate = useNavigate();
