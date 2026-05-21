@@ -23,7 +23,6 @@ const Login = async (req, res) => {
   const { email, password, phoneNumber } = req.body;
   //login using email or phone number
   console.log(req.body);
-  // basic validation
   if ((!email && !phoneNumber) || !password) {
     return res.status(400).json({
       error: "Please provide email or phone number and password",
