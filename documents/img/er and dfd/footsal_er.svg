@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 2400" width="1800" height="2400">
+<rect width="1800" height="2400" fill="white"/>
+<defs>
+  <style>
+    .eb{fill:white;stroke:black;stroke-width:2;}
+    .et{fill:black;font-size:15px;font-weight:bold;font-family:Arial,sans-serif;text-anchor:middle;}
+    .et-sm{fill:black;font-size:11px;font-family:Arial,sans-serif;text-anchor:middle;}
+    .rd{fill:white;stroke:black;stroke-width:2;}
+    .rt{fill:black;font-size:11px;font-style:italic;font-weight:bold;font-family:Arial,sans-serif;text-anchor:middle;}
+    .ao{fill:white;stroke:black;stroke-width:1.5;}
+    .at{fill:black;font-size:11px;font-family:Arial,sans-serif;text-anchor:middle;}
+    .ln{stroke:black;stroke-width:1.5;fill:none;}
+    .ld{stroke:black;stroke-width:1.5;fill:none;stroke-dasharray:6,4;}
+    .cd{fill:black;font-size:11px;font-weight:bold;font-style:italic;font-family:Arial,sans-serif;}
+    .hd{fill:black;font-size:18px;font-weight:bold;font-family:Arial,sans-serif;text-anchor:middle;}
+    .section{fill:none;stroke:#aaa;stroke-width:1;stroke-dasharray:8,4;}
+  </style>
+</defs>
+
+<!-- ===== TITLE ===== -->
+<text x="900" y="50" class="hd" style="font-size:26px;">Footsal Management System — ER Diagram</text>
+<line x1="60" y1="65" x2="1740" y2="65" class="ln" stroke-width="1"/>
+
+<!-- ============================== SECTION 1: USER & FORUM ============================== -->
+<text x="900" y="100" class="hd">Part 1: User, Roles &amp; Forum</text>
+
+<!-- USER entity -->
+<rect x="730" y="120" width="140" height="44" class="eb"/>
+<text x="800" y="147" class="et">USER</text>
+
+<!-- USER attributes -->
+<line x1="800" y1="120" x2="800" y2="90" class="ln"/>
+<ellipse cx="800" cy="74" rx="42" ry="16" class="ao"/>
+<text x="800" y="78" class="at" text-decoration="underline">user_id (PK)</text>
+
+<line x1="748" y1="122" x2="678" y2="98" class="ln"/>
+<ellipse cx="648" cy="88" rx="30" ry="16" class="ao"/>
+<text x="648" y="92" class="at">full_name</text>
+
+<line x1="735" y1="130" x2="618" y2="120" class="ln"/>
+<ellipse cx="584" cy="118" rx="34" ry="16" class="ao"/>
+<text x="584" y="122" class="at">email</text>
+
+<line x1="731" y1="142" x2="610" y2="146" class="ln"/>
+<ellipse cx="574" cy="147" rx="36" ry="16" class="ao"/>
+<text x="574" y="151" class="at">password</text>
+
+<line x1="732" y1="155" x2="614" y2="172" class="ln"/>
+<ellipse cx="582" cy="180" rx="30" ry="16" class="ao"/>
+<text x="582" y="184" class="at">contact</text>
+
+<line x1="732" y1="162" x2="620" y2="196" class="ln"/>
+<ellipse cx="594" cy="206" rx="26" ry="16" class="ao"/>
+<text x="594" y="210" class="at">role</text>
+
+<line x1="870" y1="130" x2="950" y2="108" class="ln"/>
+<ellipse cx="982" cy="98" rx="32" ry="16" class="ao"/>
+<text x="982" y="102" class="at">profile_pic</text>
+
+<line x1="870" y1="144" x2="958" y2="144" class="ln"/>
+<ellipse cx="992" cy="144" rx="34" ry="16" class="ao"/>
+<text x="992" y="148" class="at">created_at</text>
+
+<!-- Role specialisation boxes -->
+<line x1="730" y1="142" x2="560" y2="250" class="ld"/>
+<rect x="480" y="238" width="110" height="44" class="eb" style="stroke-dasharray:5,3;"/>
+<text x="535" y="256" class="et-sm" style="font-weight:bold;">CUSTOMER</text>
+<text x="535" y="272" class="et-sm">(role=user)</text>
+
+<line x1="870" y1="142" x2="1080" y2="250" class="ld"/>
+<rect x="1020" y="238" width="140" height="44" class="eb" style="stroke-dasharray:5,3;"/>
+<text x="1090" y="256" class="et-sm" style="font-weight:bold;">FUTSAL_OWNER</text>
+<text x="1090" y="272" class="et-sm">(role=owner)</text>
+
+<!-- USER writes FORUM -->
+<line x1="800" y1="164" x2="800" y2="198" class="ln"/>
+<polygon points="773,198 827,198 854,216 827,234 773,234 746,216" class="rd"/>
+<text x="800" y="219" class="rt">writes</text>
+<text x="812" y="195" class="cd">1..*</text>
+<text x="812" y="244" class="cd">1..*</text>
+<line x1="800" y1="234" x2="800" y2="264" class="ln"/>
+
+<!-- FORUM entity -->
+<rect x="730" y="264" width="140" height="44" class="eb"/>
+<text x="800" y="291" class="et">FORUM</text>
+
+<line x1="730" y1="276" x2="666" y2="260" class="ln"/>
+<ellipse cx="634" cy="252" rx="32" ry="16" class="ao"/>
+<text x="634" y="256" class="at" text-decoration="underline">forum_id</text>
+
+<line x1="730" y1="290" x2="660" y2="290" class="ln"/>
+<ellipse cx="626" cy="290" rx="34" ry="16" class="ao"/>
+<text x="626" y="294" class="at">title</text>
+
+<line x1="730" y1="300" x2="666" y2="316" class="ln"/>
+<ellipse cx="634" cy="324" rx="28" ry="16" class="ao"/>
+<text x="634" y="328" class="at">body</text>
+
+<line x1="734" y1="306" x2="672" y2="340" class="ln"/>
+<ellipse cx="642" cy="350" rx="34" ry="16" class="ao"/>
+<text x="642" y="354" class="at">created_at</text>
+
+<!-- FORUM has_reply FORUM_REPLY -->
+<line x1="870" y1="280" x2="920" y2="262" class="ln"/>
+<polygon points="892,240 942,240 967,258 942,276 892,276 867,258" class="rd"/>
+<text x="917" y="261" class="rt">has_reply</text>
+<text x="873" y="236" class="cd">1</text>
+<text x="968" y="260" class="cd">0..*</text>
+<line x1="967" y1="258" x2="1000" y2="252" class="ln"/>
+
+<rect x="1000" y="232" width="138" height="44" class="eb"/>
+<text x="1069" y="259" class="et">FORUM_REPLY</text>
+
+<line x1="1069" y1="232" x2="1069" y2="206" class="ln"/>
+<ellipse cx="1069" cy="190" rx="36" ry="16" class="ao"/>
+<text x="1069" y="194" class="at" text-decoration="underline">reply_id</text>
+
+<line x1="1138" y1="246" x2="1172" y2="232" class="ln"/>
+<ellipse cx="1196" cy="222" rx="24" ry="16" class="ao"/>
+<text x="1196" y="226" class="at">body</text>
+
+<line x1="1138" y1="262" x2="1172" y2="274" class="ln"/>
+<ellipse cx="1196" cy="284" rx="24" ry="16" class="ao"/>
+<text x="1196" y="288" class="at">date</text>
+
+<!-- FORUM receives_like FORUM_LIKE -->
+<line x1="870" y1="298" x2="920" y2="316" class="ln"/>
+<polygon points="892,316 942,316 967,334 942,352 892,352 867,334" class="rd"/>
+<text x="917" y="337" class="rt">receives_like</text>
+<text x="873" y="312" class="cd">1</text>
+<text x="968" y="336" class="cd">0..*</text>
+<line x1="967" y1="334" x2="1000" y2="334" class="ln"/>
+
+<rect x="1000" y="314" width="120" height="44" class="eb"/>
+<text x="1060" y="341" class="et">FORUM_LIKE</text>
+
+<line x1="1060" y1="314" x2="1060" y2="288" class="ln"/>
+<ellipse cx="1060" cy="272" rx="30" ry="16" class="ao"/>
+<text x="1060" y="276" class="at" text-decoration="underline">like_id</text>
+
+<!-- USER gets_notif USER_NOTIFICATION -->
+<line x1="870" y1="150" x2="970" y2="190" class="ln"/>
+<polygon points="942,190 992,190 1017,208 992,226 942,226 917,208" class="rd"/>
+<text x="967" y="211" class="rt">gets_notif</text>
+<text x="873" y="186" class="cd">1</text>
+<text x="1018" y="210" class="cd">1..*</text>
+<line x1="1017" y1="208" x2="1050" y2="204" class="ln"/>
+
+<rect x="1050" y="184" width="150" height="44" class="eb"/>
+<text x="1125" y="211" class="et">USER_NOTIF</text>
+
+<line x1="1125" y1="184" x2="1125" y2="158" class="ln"/>
+<ellipse cx="1125" cy="142" rx="38" ry="16" class="ao"/>
+<text x="1125" y="146" class="at">message</text>
+
+<line x1="1200" y1="196" x2="1222" y2="184" class="ln"/>
+<ellipse cx="1238" cy="172" rx="24" ry="16" class="ao"/>
+<text x="1238" y="176" class="at">is_read</text>
+
+<!-- USER visits VISITOR -->
+<line x1="730" y1="136" x2="540" y2="136" class="ln"/>
+<polygon points="512,118 562,118 587,136 562,154 512,154 487,136" class="rd"/>
+<text x="537" y="139" class="rt">visits</text>
+<text x="573" y="115" class="cd">1..*</text>
+<text x="487" y="139" class="cd">1..*</text>
+<line x1="487" y1="136" x2="440" y2="136" class="ln"/>
+
+<rect x="344" y="116" width="96" height="44" class="eb"/>
+<text x="392" y="143" class="et">VISITOR</text>
+
+<line x1="392" y1="116" x2="392" y2="92" class="ln"/>
+<ellipse cx="392" cy="76" rx="32" ry="16" class="ao"/>
+<text x="392" y="80" class="at" text-decoration="underline">visit_id</text>
+
+<line x1="344" y1="130" x2="296" y2="118" class="ln"/>
+<ellipse cx="260" cy="110" rx="36" ry="16" class="ao"/>
+<text x="260" y="114" class="at">ip_address</text>
+
+<line x1="344" y1="146" x2="295" y2="154" class="ln"/>
+<ellipse cx="259" cy="162" rx="36" ry="16" class="ao"/>
+<text x="259" y="166" class="at">visited_at</text>
+
+<!-- Section divider -->
+<line x1="60" y1="400" x2="1740" y2="400" class="ln" stroke-width="0.5" stroke-dasharray="6,4"/>
+
+<!-- ============================== SECTION 2: FUTSAL CORE ============================== -->
+<text x="900" y="435" class="hd">Part 2: Futsal, Pitch, Timeslot, Booking, Payment, Rating &amp; Subscription</text>
+
+<!-- FUTSAL entity -->
+<rect x="730" y="460" width="140" height="44" class="eb"/>
+<text x="800" y="487" class="et">FUTSAL</text>
+
+<line x1="800" y1="460" x2="800" y2="434" class="ln"/>
+<ellipse cx="800" cy="418" rx="42" ry="16" class="ao"/>
+<text x="800" y="422" class="at" text-decoration="underline">futsal_id (PK)</text>
+
+<line x1="748" y1="462" x2="682" y2="442" class="ln"/>
+<ellipse cx="650" cy="432" rx="30" ry="16" class="ao"/>
+<text x="650" y="436" class="at">name</text>
+
+<line x1="735" y1="470" x2="668" y2="466" class="ln"/>
+<ellipse cx="632" cy="466" rx="36" ry="16" class="ao"/>
+<text x="632" y="470" class="at">location</text>
+
+<line x1="732" y1="482" x2="674" y2="494" class="ln"/>
+<ellipse cx="638" cy="502" rx="34" ry="16" class="ao"/>
+<text x="638" y="506" class="at">is_active</text>
+
+<line x1="732" y1="490" x2="680" y2="516" class="ln"/>
+<ellipse cx="648" cy="524" rx="32" ry="16" class="ao"/>
+<text x="648" y="528" class="at">contact</text>
+
+<line x1="870" y1="462" x2="940" y2="444" class="ln"/>
+<ellipse cx="972" cy="434" rx="32" ry="16" class="ao"/>
+<text x="972" y="438" class="at">open_hrs</text>
+
+<line x1="870" y1="476" x2="944" y2="474" class="ln"/>
+<ellipse cx="978" cy="474" rx="30" ry="16" class="ao"/>
+<text x="978" y="478" class="at">price/hr</text>
+
+<!-- FUTSAL has_pitch PITCH -->
+<line x1="800" y1="504" x2="800" y2="532" class="ln"/>
+<polygon points="773,532 827,532 854,550 827,568 773,568 746,550" class="rd"/>
+<text x="800" y="553" class="rt">has_pitch</text>
+<text x="812" y="529" class="cd">1</text>
+<text x="812" y="578" class="cd">1..*</text>
+<line x1="800" y1="568" x2="800" y2="598" class="ln"/>
+
+<!-- PITCH entity -->
+<rect x="730" y="598" width="140" height="44" class="eb"/>
+<text x="800" y="625" class="et">PITCH</text>
+
+<line x1="730" y1="610" x2="664" y2="594" class="ln"/>
+<ellipse cx="630" cy="586" rx="34" ry="16" class="ao"/>
+<text x="630" y="590" class="at" text-decoration="underline">pitch_id</text>
+
+<line x1="730" y1="622" x2="660" y2="624" class="ln"/>
+<ellipse cx="622" cy="626" rx="38" ry="16" class="ao"/>
+<text x="622" y="630" class="at">pitch_name</text>
+
+<line x1="730" y1="634" x2="666" y2="648" class="ln"/>
+<ellipse cx="632" cy="656" rx="30" ry="16" class="ao"/>
+<text x="632" y="660" class="at">surface</text>
+
+<!-- PITCH has_media MEDIA -->
+<line x1="870" y1="614" x2="924" y2="598" class="ln"/>
+<polygon points="896,578 946,578 971,596 946,614 896,614 871,596" class="rd"/>
+<text x="921" y="599" class="rt">has_media</text>
+<text x="873" y="574" class="cd">1</text>
+<text x="972" y="598" class="cd">1..*</text>
+<line x1="971" y1="596" x2="1004" y2="590" class="ln"/>
+
+<rect x="1004" y="570" width="100" height="44" class="eb"/>
+<text x="1054" y="597" class="et">MEDIA</text>
+
+<line x1="1054" y1="570" x2="1054" y2="544" class="ln"/>
+<ellipse cx="1054" cy="528" rx="38" ry="16" class="ao"/>
+<text x="1054" y="532" class="at" text-decoration="underline">media_id</text>
+
+<line x1="1104" y1="582" x2="1136" y2="570" class="ln"/>
+<ellipse cx="1158" cy="560" rx="22" ry="16" class="ao"/>
+<text x="1158" y="564" class="at">url</text>
+
+<line x1="1104" y1="596" x2="1136" y2="608" class="ln"/>
+<ellipse cx="1158" cy="618" rx="24" ry="16" class="ao"/>
+<text x="1158" y="622" class="at">type</text>
+
+<!-- PITCH has_slot TIMESLOT -->
+<line x1="800" y1="642" x2="800" y2="670" class="ln"/>
+<polygon points="773,670 827,670 854,688 827,706 773,706 746,688" class="rd"/>
+<text x="800" y="691" class="rt">has_slot</text>
+<text x="812" y="667" class="cd">1</text>
+<text x="812" y="716" class="cd">1..*</text>
+<line x1="800" y1="706" x2="800" y2="736" class="ln"/>
+
+<!-- TIMESLOT entity -->
+<rect x="726" y="736" width="148" height="44" class="eb"/>
+<text x="800" y="763" class="et">TIMESLOT</text>
+
+<line x1="726" y1="748" x2="658" y2="732" class="ln"/>
+<ellipse cx="622" cy="724" rx="36" ry="16" class="ao"/>
+<text x="622" y="728" class="at" text-decoration="underline">slot_id</text>
+
+<line x1="726" y1="760" x2="656" y2="764" class="ln"/>
+<ellipse cx="618" cy="766" rx="38" ry="16" class="ao"/>
+<text x="618" y="770" class="at">start_time</text>
+
+<line x1="726" y1="772" x2="658" y2="786" class="ln"/>
+<ellipse cx="622" cy="796" rx="36" ry="16" class="ao"/>
+<text x="622" y="800" class="at">end_time</text>
+
+<line x1="728" y1="778" x2="664" y2="808" class="ln"/>
+<ellipse cx="630" cy="816" rx="34" ry="16" class="ao"/>
+<text x="630" y="820" class="at">available</text>
+
+<!-- TIMESLOT booked_by BOOKING -->
+<line x1="874" y1="756" x2="928" y2="740" class="ln"/>
+<polygon points="900,718 950,718 975,736 950,754 900,754 875,736" class="rd"/>
+<text x="925" y="739" class="rt">booked_by</text>
+<text x="876" y="714" class="cd">1..*</text>
+<text x="976" y="738" class="cd">1</text>
+<line x1="975" y1="736" x2="1008" y2="730" class="ln"/>
+
+<!-- BOOKING entity -->
+<rect x="1008" y="710" width="130" height="44" class="eb"/>
+<text x="1073" y="737" class="et">BOOKING</text>
+
+<line x1="1073" y1="710" x2="1073" y2="684" class="ln"/>
+<ellipse cx="1073" cy="668" rx="42" ry="16" class="ao"/>
+<text x="1073" y="672" class="at" text-decoration="underline">booking_id</text>
+
+<line x1="1138" y1="720" x2="1172" y2="706" class="ln"/>
+<ellipse cx="1196" cy="696" rx="24" ry="16" class="ao"/>
+<text x="1196" y="700" class="at">date</text>
+
+<line x1="1138" y1="736" x2="1172" y2="748" class="ln"/>
+<ellipse cx="1196" cy="758" rx="28" ry="16" class="ao"/>
+<text x="1196" y="762" class="at">status</text>
+
+<!-- BOOKING pays_for PAYMENT -->
+<line x1="1073" y1="754" x2="1073" y2="784" class="ln"/>
+<polygon points="1046,784 1100,784 1125,802 1100,820 1046,820 1021,802" class="rd"/>
+<text x="1073" y="805" class="rt">pays_for</text>
+<text x="1085" y="781" class="cd">1</text>
+<text x="1085" y="830" class="cd">1</text>
+<line x1="1073" y1="820" x2="1073" y2="850" class="ln"/>
+
+<!-- PAYMENT entity -->
+<rect x="1008" y="850" width="130" height="44" class="eb"/>
+<text x="1073" y="877" class="et">PAYMENT</text>
+
+<line x1="1008" y1="862" x2="960" y2="848" class="ln"/>
+<ellipse cx="922" cy="838" rx="38" ry="16" class="ao"/>
+<text x="922" y="842" class="at" text-decoration="underline">payment_id</text>
+
+<line x1="1008" y1="876" x2="956" y2="878" class="ln"/>
+<ellipse cx="918" cy="880" rx="38" ry="16" class="ao"/>
+<text x="918" y="884" class="at">amount</text>
+
+<line x1="1008" y1="886" x2="958" y2="900" class="ln"/>
+<ellipse cx="922" cy="910" rx="36" ry="16" class="ao"/>
+<text x="922" y="914" class="at">method</text>
+
+<line x1="1138" y1="862" x2="1170" y2="850" class="ln"/>
+<ellipse cx="1194" cy="840" rx="24" ry="16" class="ao"/>
+<text x="1194" y="844" class="at">status</text>
+
+<!-- BOOKING gets_rated RATING -->
+<line x1="1008" y1="738" x2="958" y2="792" class="ln"/>
+<polygon points="920,790 970,790 995,808 970,826 920,826 895,808" class="rd"/>
+<text x="945" y="811" class="rt">gets_rated</text>
+<text x="1002" y="787" class="cd">1</text>
+<text x="895" y="810" class="cd">0..*</text>
+<line x1="895" y1="808" x2="858" y2="808" class="ln"/>
+
+<!-- RATING entity -->
+<rect x="718" y="788" width="140" height="44" class="eb"/>
+<text x="788" y="815" class="et">RATING</text>
+
+<line x1="718" y1="800" x2="674" y2="788" class="ln"/>
+<ellipse cx="640" cy="780" rx="34" ry="16" class="ao"/>
+<text x="640" y="784" class="at" text-decoration="underline">rating_id</text>
+
+<line x1="718" y1="814" x2="674" y2="818" class="ln"/>
+<ellipse cx="638" cy="822" rx="28" ry="16" class="ao"/>
+<text x="638" y="826" class="at">score</text>
+
+<line x1="718" y1="824" x2="676" y2="840" class="ln"/>
+<ellipse cx="642" cy="850" rx="32" ry="16" class="ao"/>
+<text x="642" y="854" class="at">comment</text>
+
+<!-- FUTSAL subscribes SUBSCRIPTION -->
+<line x1="870" y1="474" x2="1030" y2="474" class="ln"/>
+<polygon points="1002,456 1052,456 1077,474 1052,492 1002,492 977,474" class="rd"/>
+<text x="1027" y="477" class="rt">subscribes</text>
+<text x="873" y="452" class="cd">1</text>
+<text x="1078" y="476" class="cd">1..*</text>
+<line x1="1077" y1="474" x2="1110" y2="474" class="ln"/>
+
+<!-- SUBSCRIPTION entity -->
+<rect x="1110" y="454" width="148" height="44" class="eb"/>
+<text x="1184" y="481" class="et">SUBSCRIPTION</text>
+
+<line x1="1184" y1="454" x2="1184" y2="428" class="ln"/>
+<ellipse cx="1184" cy="412" rx="34" ry="16" class="ao"/>
+<text x="1184" y="416" class="at" text-decoration="underline">sub_id</text>
+
+<line x1="1258" y1="464" x2="1294" y2="452" class="ln"/>
+<ellipse cx="1322" cy="440" rx="28" ry="16" class="ao"/>
+<text x="1322" y="444" class="at">plan</text>
+
+<line x1="1258" y1="480" x2="1296" y2="490" class="ln"/>
+<ellipse cx="1324" cy="498" rx="36" ry="16" class="ao"/>
+<text x="1324" y="502" class="at">end_date</text>
+
+<!-- SUBSCRIPTION sub_pays FUTSAL_PAYMENT -->
+<line x1="1184" y1="498" x2="1184" y2="528" class="ln"/>
+<polygon points="1157,528 1211,528 1236,546 1211,564 1157,564 1132,546" class="rd"/>
+<text x="1184" y="549" class="rt">sub_pays</text>
+<text x="1196" y="525" class="cd">1</text>
+<text x="1196" y="574" class="cd">1..*</text>
+<line x1="1184" y1="564" x2="1184" y2="594" class="ln"/>
+
+<!-- FUTSAL_PAYMENT entity -->
+<rect x="1110" y="594" width="148" height="44" class="eb"/>
+<text x="1184" y="621" class="et">FUTSAL_PAYMENT</text>
+
+<line x1="1110" y1="606" x2="1070" y2="594" class="ln"/>
+<ellipse cx="1034" cy="584" rx="36" ry="16" class="ao"/>
+<text x="1034" y="588" class="at" text-decoration="underline">fp_id</text>
+
+<line x1="1110" y1="620" x2="1070" y2="626" class="ln"/>
+<ellipse cx="1030" cy="632" rx="40" ry="16" class="ao"/>
+<text x="1030" y="636" class="at">amount</text>
+
+<line x1="1258" y1="606" x2="1294" y2="594" class="ln"/>
+<ellipse cx="1322" cy="584" rx="28" ry="16" class="ao"/>
+<text x="1322" y="588" class="at">status</text>
+
+<line x1="1258" y1="622" x2="1296" y2="636" class="ln"/>
+<ellipse cx="1324" cy="644" rx="30" ry="16" class="ao"/>
+<text x="1324" y="648" class="at">paid_at</text>
+
+<!-- USER makes BOOKING (link arrow) -->
+<line x1="730" y1="162" x2="560" y2="736" class="ld"/>
+<text x="530" y="456" style="fill:black;font-size:10px;font-style:italic;font-family:Arial,sans-serif;">user</text>
+<text x="530" y="466" style="fill:black;font-size:10px;font-style:italic;font-family:Arial,sans-serif;">makes</text>
+<text x="530" y="476" style="fill:black;font-size:10px;font-style:italic;font-family:Arial,sans-serif;">bookings</text>
+
+<!-- Section divider -->
+<line x1="60" y1="960" x2="1740" y2="960" class="ln" stroke-width="0.5" stroke-dasharray="6,4"/>
+
+<!-- ============================== SECTION 3: ADMIN & ANALYTICS ============================== -->
+<text x="900" y="995" class="hd">Part 3: Admin, Analytics, Payment Config &amp; Notifications</text>
+
+<!-- ADMIN entity -->
+<rect x="100" y="1020" width="120" height="44" class="eb"/>
+<text x="160" y="1047" class="et">ADMIN</text>
+
+<line x1="160" y1="1020" x2="160" y2="994" class="ln"/>
+<ellipse cx="160" cy="978" rx="38" ry="16" class="ao"/>
+<text x="160" y="982" class="at" text-decoration="underline">admin_id</text>
+
+<line x1="100" y1="1032" x2="54" y2="1018" class="ln"/>
+<ellipse cx="30" cy="1010" rx="24" ry="16" class="ao"/>
+<text x="30" y="1014" class="at">name</text>
+
+<line x1="100" y1="1046" x2="52" y2="1052" class="ln"/>
+<ellipse cx="28" cy="1060" rx="28" ry="16" class="ao"/>
+<text x="28" y="1064" class="at">email</text>
+
+<!-- ADMIN receives ADMIN_NOTIF -->
+<line x1="220" y1="1036" x2="274" y2="1020" class="ln"/>
+<polygon points="246,998 296,998 321,1016 296,1034 246,1034 221,1016" class="rd"/>
+<text x="271" y="1019" class="rt">receives</text>
+<text x="222" y="994" class="cd">1</text>
+<text x="322" y="1018" class="cd">1..*</text>
+<line x1="321" y1="1016" x2="358" y2="1010" class="ln"/>
+
+<rect x="358" y="990" width="168" height="44" class="eb"/>
+<text x="442" y="1017" class="et">ADMIN_NOTIF</text>
+
+<line x1="442" y1="990" x2="442" y2="964" class="ln"/>
+<ellipse cx="442" cy="948" rx="34" ry="16" class="ao"/>
+<text x="442" y="952" class="at" text-decoration="underline">notif_id</text>
+
+<line x1="526" y1="1002" x2="562" y2="990" class="ln"/>
+<ellipse cx="590" cy="980" rx="36" ry="16" class="ao"/>
+<text x="590" y="984" class="at">message</text>
+
+<line x1="526" y1="1018" x2="562" y2="1028" class="ln"/>
+<ellipse cx="590" cy="1038" rx="28" ry="16" class="ao"/>
+<text x="590" y="1042" class="at">is_read</text>
+
+<!-- FUTSAL ref -->
+<rect x="720" y="1020" width="160" height="44" class="eb"/>
+<text x="800" y="1047" class="et">FUTSAL (ref)</text>
+
+<!-- ADMIN manages all (dashed) -->
+<line x1="160" y1="1042" x2="720" y2="1042" class="ld"/>
+<text x="440" y="1060" style="fill:black;font-size:11px;font-style:italic;font-family:Arial,sans-serif;">manages</text>
+
+<!-- FUTSAL tracks FUTSAL_ANALYTICS -->
+<line x1="800" y1="1064" x2="800" y2="1094" class="ln"/>
+<polygon points="773,1094 827,1094 852,1112 827,1130 773,1130 748,1112" class="rd"/>
+<text x="800" y="1115" class="rt">tracks</text>
+<text x="812" y="1091" class="cd">1</text>
+<text x="812" y="1140" class="cd">1..*</text>
+<line x1="800" y1="1130" x2="800" y2="1160" class="ln"/>
+
+<rect x="700" y="1160" width="200" height="44" class="eb"/>
+<text x="800" y="1187" class="et">FUTSAL_ANALYTICS</text>
+
+<line x1="700" y1="1172" x2="644" y2="1156" class="ln"/>
+<ellipse cx="606" cy="1148" rx="38" ry="16" class="ao"/>
+<text x="606" y="1152" class="at" text-decoration="underline">analytic_id</text>
+
+<line x1="700" y1="1184" x2="640" y2="1186" class="ln"/>
+<ellipse cx="600" cy="1188" rx="40" ry="16" class="ao"/>
+<text x="600" y="1192" class="at">bookings_count</text>
+
+<line x1="700" y1="1196" x2="644" y2="1210" class="ln"/>
+<ellipse cx="608" cy="1218" rx="30" ry="16" class="ao"/>
+<text x="608" y="1222" class="at">revenue</text>
+
+<line x1="702" y1="1202" x2="650" y2="1230" class="ln"/>
+<ellipse cx="618" cy="1238" rx="28" ry="16" class="ao"/>
+<text x="618" y="1242" class="at">date</text>
+
+<!-- FUTSAL sends_notif FUTSAL_NOTIF -->
+<line x1="880" y1="1042" x2="958" y2="1026" class="ln"/>
+<polygon points="930,1004 980,1004 1005,1022 980,1040 930,1040 905,1022" class="rd"/>
+<text x="955" y="1025" class="rt">sends_notif</text>
+<text x="882" y="1000" class="cd">1</text>
+<text x="1006" y="1024" class="cd">1..*</text>
+<line x1="1005" y1="1022" x2="1040" y2="1016" class="ln"/>
+
+<rect x="1040" y="996" width="168" height="44" class="eb"/>
+<text x="1124" y="1023" class="et">FUTSAL_NOTIF</text>
+
+<line x1="1124" y1="996" x2="1124" y2="970" class="ln"/>
+<ellipse cx="1124" cy="954" rx="34" ry="16" class="ao"/>
+<text x="1124" y="958" class="at" text-decoration="underline">notif_id</text>
+
+<line x1="1208" y1="1008" x2="1244" y2="996" class="ln"/>
+<ellipse cx="1272" cy="986" rx="34" ry="16" class="ao"/>
+<text x="1272" y="990" class="at">message</text>
+
+<line x1="1208" y1="1024" x2="1244" y2="1034" class="ln"/>
+<ellipse cx="1272" cy="1044" rx="28" ry="16" class="ao"/>
+<text x="1272" y="1048" class="at">is_read</text>
+
+<!-- FUTSAL configures PAYMENT_CONFIG -->
+<line x1="880" y1="1060" x2="960" y2="1078" class="ln"/>
+<polygon points="932,1078 982,1078 1007,1096 982,1114 932,1114 907,1096" class="rd"/>
+<text x="957" y="1099" class="rt">configures</text>
+<text x="882" y="1074" class="cd">1</text>
+<text x="1008" y="1098" class="cd">1</text>
+<line x1="1007" y1="1096" x2="1040" y2="1096" class="ln"/>
+
+<rect x="1040" y="1076" width="172" height="44" class="eb"/>
+<text x="1126" y="1103" class="et">PAYMENT_CONFIG</text>
+
+<line x1="1040" y1="1088" x2="994" y2="1074" class="ln"/>
+<ellipse cx="956" cy="1064" rx="36" ry="16" class="ao"/>
+<text x="956" y="1068" class="at" text-decoration="underline">config_id</text>
+
+<line x1="1212" y1="1088" x2="1250" y2="1076" class="ln"/>
+<ellipse cx="1280" cy="1064" rx="32" ry="16" class="ao"/>
+<text x="1280" y="1068" class="at">provider</text>
+
+<line x1="1212" y1="1104" x2="1250" y2="1116" class="ln"/>
+<ellipse cx="1280" cy="1126" rx="36" ry="16" class="ao"/>
+<text x="1280" y="1130" class="at">credentials</text>
+
+<!-- BOOKING uses_config link -->
+<line x1="1126" y1="1120" x2="1126" y2="1152" class="ln"/>
+<polygon points="1099,1152 1153,1152 1178,1170 1153,1188 1099,1188 1074,1170" class="rd"/>
+<text x="1126" y="1173" class="rt">used_by</text>
+<text x="1138" y="1149" class="cd">1</text>
+<text x="1138" y="1198" class="cd">1..*</text>
+<line x1="1126" y1="1188" x2="1126" y2="1218" class="ln"/>
+
+<rect x="1056" y="1218" width="140" height="44" class="eb"/>
+<text x="1126" y="1245" class="et">BOOKING (ref)</text>
+
+<!-- FUTSAL has FUTSAL_PAY_CONFIG link to booking -->
+<line x1="880" y1="1050" x2="1040" y2="1090" class="ld"/>
+
+<!-- Section divider -->
+<line x1="60" y1="1300" x2="1740" y2="1300" class="ln" stroke-width="0.5" stroke-dasharray="6,4"/>
+
+<!-- ============================== LEGEND ============================== -->
+<text x="900" y="1340" class="hd">Legend</text>
+
+<rect x="300" y="1360" width="120" height="36" class="eb"/>
+<text x="360" y="1383" class="et">ENTITY</text>
+<text x="440" y="1383" style="fill:black;font-size:13px;font-family:Arial,sans-serif;">= Entity (strong)</text>
+
+<ellipse cx="360" cy="1440" rx="60" ry="22" class="ao"/>
+<text x="360" y="1444" class="at">attribute</text>
+<text x="440" y="1444" style="fill:black;font-size:13px;font-family:Arial,sans-serif;">= Attribute (oval)</text>
+
+<ellipse cx="360" cy="1500" rx="60" ry="22" class="ao"/>
+<text x="360" y="1497" class="at" text-decoration="underline">pk_attr</text>
+<text x="440" y="1500" style="fill:black;font-size:13px;font-family:Arial,sans-serif;">= Primary Key (underlined)</text>
+
+<polygon points="300,1552 420,1552 480,1570 420,1588 300,1588 240,1570" class="rd"/>
+<text x="360" y="1573" class="rt" style="font-size:13px;">relationship</text>
+<text x="500" y="1573" style="fill:black;font-size:13px;font-family:Arial,sans-serif;">= Relationship (diamond)</text>
+
+<line x1="300" y1="1630" x2="420" y2="1630" class="ln"/>
+<text x="440" y="1634" style="fill:black;font-size:13px;font-family:Arial,sans-serif;">= Connecting line</text>
+
+<line x1="300" y1="1680" x2="420" y2="1680" class="ld"/>
+<text x="440" y="1684" style="fill:black;font-size:13px;font-family:Arial,sans-serif;">= Derived / role specialisation</text>
+
+<text x="300" y="1730" style="fill:black;font-size:13px;font-family:Arial,sans-serif;">Cardinality:  1 = one,  1..* = one or many,  N/M = many-to-many</text>
+
+<!-- OVERALL FOOTER -->
+<line x1="60" y1="1760" x2="1740" y2="1760" class="ln" stroke-width="1"/>
+<text x="900" y="1786" text-anchor="middle" style="fill:black;font-size:13px;font-family:Arial,sans-serif;">Footsal Management System — Complete ER Diagram | Entities: USER, VISITOR, FORUM, FORUM_REPLY, FORUM_LIKE, USER_NOTIF, FUTSAL, PITCH, MEDIA, TIMESLOT, BOOKING, PAYMENT, RATING, SUBSCRIPTION, FUTSAL_PAYMENT, ADMIN, ADMIN_NOTIF, FUTSAL_NOTIF, FUTSAL_ANALYTICS, PAYMENT_CONFIG</text>
+</svg>

@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 1800" width="2400" height="1800">
+<rect width="2400" height="1800" fill="white"/>
+<defs>
+  <style>
+    .title{font-family:Arial,sans-serif;font-size:24px;font-weight:bold;fill:black;text-anchor:middle;}
+    .entity-text{font-family:Arial,sans-serif;font-size:12px;font-weight:bold;fill:black;text-anchor:middle;}
+    .entity-sub{font-family:Arial,sans-serif;font-size:10px;fill:#222;text-anchor:middle;}
+    .proc-num{font-family:Arial,sans-serif;font-size:11px;font-weight:bold;fill:black;text-anchor:middle;}
+    .proc-name{font-family:Arial,sans-serif;font-size:11px;font-weight:bold;fill:black;text-anchor:middle;}
+    .proc-sub{font-family:Arial,sans-serif;font-size:9px;fill:#333;text-anchor:middle;}
+    .ds-label{font-family:Arial,sans-serif;font-size:10px;font-weight:bold;fill:black;text-anchor:start;}
+    .ds-name{font-family:Arial,sans-serif;font-size:10px;fill:black;text-anchor:start;}
+    .fl{font-family:Arial,sans-serif;font-size:9px;fill:black;text-anchor:middle;}
+    .eb{fill:white;stroke:black;stroke-width:2.2;}
+    .pb{fill:white;stroke:black;stroke-width:2.2;}
+    .ln{stroke:black;stroke-width:1.4;fill:none;marker-end:url(#arr);}
+    .lnd{stroke:black;stroke-width:1.2;fill:none;marker-end:url(#arr);stroke-dasharray:6,3;}
+    .boundary{fill:none;stroke:black;stroke-width:1.5;stroke-dasharray:10,6;}
+    .legend-text{font-family:Arial,sans-serif;font-size:11px;fill:black;}
+  </style>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+    <path d="M1 1L9 5L1 9Z" fill="black"/>
+  </marker>
+</defs>
+
+<!-- ===== TITLE ===== -->
+<text x="1200" y="36" class="title">DFD Level 1 — AllFootsal Booking System (Main Process Decomposition)</text>
+<line x1="60" y1="48" x2="2340" y2="48" stroke="black" stroke-width="1.5"/>
+
+<!-- System boundary -->
+<rect x="290" y="58" width="1820" height="1530" rx="6" class="boundary"/>
+<text x="1200" y="74" style="font-family:Arial,sans-serif;font-size:11px;fill:black;text-anchor:middle;font-style:italic;">System Boundary</text>
+
+<!-- ================================================================ -->
+<!-- EXTERNAL ENTITIES  (left and right columns) -->
+<!-- ================================================================ -->
+
+<!-- E1: User -->
+<rect x="60" y="100" width="130" height="60" class="eb"/>
+<text x="125" y="124" class="entity-text">USER</text>
+<text x="125" y="140" class="entity-sub">E1 · Customer</text>
+<text x="125" y="154" class="entity-sub">/ Visitor</text>
+
+<!-- E2: Futsal Owner -->
+<rect x="60" y="340" width="130" height="60" class="eb"/>
+<text x="125" y="362" class="entity-text">FUTSAL OWNER</text>
+<text x="125" y="378" class="entity-sub">E2 · Facility</text>
+<text x="125" y="392" class="entity-sub">Manager</text>
+
+<!-- E3: Admin -->
+<rect x="60" y="600" width="130" height="60" class="eb"/>
+<text x="125" y="622" class="entity-text">ADMIN</text>
+<text x="125" y="638" class="entity-sub">E3 · Super</text>
+<text x="125" y="652" class="entity-sub">Administrator</text>
+
+<!-- E4: Payment Gateway -->
+<rect x="60" y="850" width="130" height="60" class="eb"/>
+<text x="125" y="872" class="entity-text">PAYMENT</text>
+<text x="125" y="888" class="entity-sub">E4 · Khalti /</text>
+<text x="125" y="902" class="entity-sub">Esewa / Stripe</text>
+
+<!-- E5: Email Service -->
+<rect x="2210" y="100" width="130" height="60" class="eb"/>
+<text x="2275" y="122" class="entity-text">EMAIL</text>
+<text x="2275" y="138" class="entity-text">SERVICE</text>
+<text x="2275" y="154" class="entity-sub">E5 · Nodemailer</text>
+
+<!-- E6: Cloud Storage -->
+<rect x="2210" y="340" width="130" height="60" class="eb"/>
+<text x="2275" y="362" class="entity-text">CLOUD</text>
+<text x="2275" y="378" class="entity-text">STORAGE</text>
+<text x="2275" y="394" class="entity-sub">E6 · Cloudinary</text>
+
+<!-- E7: SMS/Notification -->
+<rect x="2210" y="600" width="130" height="60" class="eb"/>
+<text x="2275" y="622" class="entity-text">SMS / PUSH</text>
+<text x="2275" y="638" class="entity-text">NOTIF SVC</text>
+<text x="2275" y="654" class="entity-sub">E7</text>
+
+<!-- ================================================================ -->
+<!-- 9 MAIN PROCESSES  — arranged in 3×3 grid inside boundary -->
+<!-- Col centres: 560, 1200, 1840   Row centres: 200, 560, 920 -->
+<!-- ================================================================ -->
+
+<!-- P1: User Management (top-left) -->
+<ellipse cx="560" cy="200" rx="110" ry="70" class="pb"/>
+<text x="560" y="183" class="proc-num">1.0</text>
+<text x="560" y="198" class="proc-name">User Mgmt &amp;</text>
+<text x="560" y="213" class="proc-name">Authentication</text>
+<text x="560" y="229" class="proc-sub">Register · Login · Profile</text>
+<text x="560" y="241" class="proc-sub">Sessions · Password Reset</text>
+
+<!-- P2: Facility Management (top-centre) -->
+<ellipse cx="1200" cy="200" rx="110" ry="70" class="pb"/>
+<text x="1200" y="183" class="proc-num">2.0</text>
+<text x="1200" y="198" class="proc-name">Facility</text>
+<text x="1200" y="213" class="proc-name">Management</text>
+<text x="1200" y="229" class="proc-sub">Register · Pitches · Pricing</text>
+<text x="1200" y="241" class="proc-sub">Media · Status</text>
+
+<!-- P3: Booking System (top-right) -->
+<ellipse cx="1840" cy="200" rx="110" ry="70" class="pb"/>
+<text x="1840" y="183" class="proc-num">3.0</text>
+<text x="1840" y="198" class="proc-name">Booking</text>
+<text x="1840" y="213" class="proc-name">System</text>
+<text x="1840" y="229" class="proc-sub">Availability · Create</text>
+<text x="1840" y="241" class="proc-sub">Confirm · Cancel</text>
+
+<!-- P4: Payment Processing (mid-left) -->
+<ellipse cx="560" cy="560" rx="110" ry="70" class="pb"/>
+<text x="560" y="543" class="proc-num">4.0</text>
+<text x="560" y="558" class="proc-name">Payment</text>
+<text x="560" y="573" class="proc-name">Processing</text>
+<text x="560" y="589" class="proc-sub">Gateway · Verify</text>
+<text x="560" y="601" class="proc-sub">Subscriptions · Refunds</text>
+
+<!-- P5: Community & Reviews (mid-centre) -->
+<ellipse cx="1200" cy="560" rx="110" ry="70" class="pb"/>
+<text x="1200" y="543" class="proc-num">5.0</text>
+<text x="1200" y="558" class="proc-name">Community</text>
+<text x="1200" y="573" class="proc-name">&amp; Reviews</text>
+<text x="1200" y="589" class="proc-sub">Reviews · Ratings</text>
+<text x="1200" y="601" class="proc-sub">Forum · Moderation</text>
+
+<!-- P6: Notification Management (mid-right) -->
+<ellipse cx="1840" cy="560" rx="110" ry="70" class="pb"/>
+<text x="1840" y="543" class="proc-num">6.0</text>
+<text x="1840" y="558" class="proc-name">Notification</text>
+<text x="1840" y="573" class="proc-name">Management</text>
+<text x="1840" y="589" class="proc-sub">Email · SMS · Push</text>
+<text x="1840" y="601" class="proc-sub">Delivery · Logs</text>
+
+<!-- P7: Admin Dashboard (bot-left) -->
+<ellipse cx="560" cy="920" rx="110" ry="70" class="pb"/>
+<text x="560" y="903" class="proc-num">7.0</text>
+<text x="560" y="918" class="proc-name">Admin</text>
+<text x="560" y="933" class="proc-name">Dashboard</text>
+<text x="560" y="949" class="proc-sub">Verify · Block · Reports</text>
+<text x="560" y="961" class="proc-sub">Disputes · Monitoring</text>
+
+<!-- P8: Analytics & Reporting (bot-centre) -->
+<ellipse cx="1200" cy="920" rx="110" ry="70" class="pb"/>
+<text x="1200" y="903" class="proc-num">8.0</text>
+<text x="1200" y="918" class="proc-name">Analytics &amp;</text>
+<text x="1200" y="933" class="proc-name">Reporting</text>
+<text x="1200" y="949" class="proc-sub">KPIs · Revenue</text>
+<text x="1200" y="961" class="proc-sub">Dashboards · Trends</text>
+
+<!-- P9: Offline Booking (bot-right) -->
+<ellipse cx="1840" cy="920" rx="110" ry="70" class="pb"/>
+<text x="1840" y="903" class="proc-num">9.0</text>
+<text x="1840" y="918" class="proc-name">Offline Booking</text>
+<text x="1840" y="933" class="proc-name">Handler</text>
+<text x="1840" y="949" class="proc-sub">Walk-in · Cash</text>
+<text x="1840" y="961" class="proc-sub">Receipt · Availability</text>
+
+<!-- ================================================================ -->
+<!-- DATA STORES  — two horizontal bands between process rows -->
+<!-- Band 1: y=1080–1110   Band 2: y=1180–1210  (open-ended rectangles) -->
+<!-- We draw them as open-left rectangles (standard DFD notation) -->
+<!-- ================================================================ -->
+
+<!-- Helper macro: data store = two horizontal lines + left bracket -->
+<!-- Format: top line y, label line y, x start, width -->
+
+<!-- === Row of DS at y=1060 (D1–D6) === -->
+
+<!-- D1 User DB -->
+<line x1="345" y1="1060" x2="345" y2="1090" stroke="black" stroke-width="2"/>
+<line x1="345" y1="1060" x2="680" y2="1060" stroke="black" stroke-width="2"/>
+<line x1="345" y1="1090" x2="680" y2="1090" stroke="black" stroke-width="2"/>
+<text x="355" y="1072" class="ds-label">D1</text>
+<text x="380" y="1072" class="ds-name">User Database</text>
+<text x="355" y="1086" class="ds-name">Users · Profiles · Auth</text>
+
+<!-- D2 Facility DB -->
+<line x1="720" y1="1060" x2="720" y2="1090" stroke="black" stroke-width="2"/>
+<line x1="720" y1="1060" x2="1060" y2="1060" stroke="black" stroke-width="2"/>
+<line x1="720" y1="1090" x2="1060" y2="1090" stroke="black" stroke-width="2"/>
+<text x="730" y="1072" class="ds-label">D2</text>
+<text x="755" y="1072" class="ds-name">Facility Database</text>
+<text x="730" y="1086" class="ds-name">Facilities · Pitches · Locations</text>
+
+<!-- D3 Booking DB -->
+<line x1="1100" y1="1060" x2="1100" y2="1090" stroke="black" stroke-width="2"/>
+<line x1="1100" y1="1060" x2="1440" y2="1060" stroke="black" stroke-width="2"/>
+<line x1="1100" y1="1090" x2="1440" y2="1090" stroke="black" stroke-width="2"/>
+<text x="1110" y="1072" class="ds-label">D3</text>
+<text x="1135" y="1072" class="ds-name">Booking Database</text>
+<text x="1110" y="1086" class="ds-name">Bookings · Slots · Timeslots</text>
+
+<!-- D4 Payment DB -->
+<line x1="1480" y1="1060" x2="1480" y2="1090" stroke="black" stroke-width="2"/>
+<line x1="1480" y1="1060" x2="1780" y2="1060" stroke="black" stroke-width="2"/>
+<line x1="1480" y1="1090" x2="1780" y2="1090" stroke="black" stroke-width="2"/>
+<text x="1490" y="1072" class="ds-label">D4</text>
+<text x="1515" y="1072" class="ds-name">Payment Database</text>
+<text x="1490" y="1086" class="ds-name">Payments · Transactions</text>
+
+<!-- D5 Subscription DB -->
+<line x1="1820" y1="1060" x2="1820" y2="1090" stroke="black" stroke-width="2"/>
+<line x1="1820" y1="1060" x2="2100" y2="1060" stroke="black" stroke-width="2"/>
+<line x1="1820" y1="1090" x2="2100" y2="1090" stroke="black" stroke-width="2"/>
+<text x="1830" y="1072" class="ds-label">D5</text>
+<text x="1855" y="1072" class="ds-name">Subscription DB</text>
+<text x="1830" y="1086" class="ds-name">Plans · Status · History</text>
+
+<!-- === Row of DS at y=1160 (D6–D12) === -->
+
+<!-- D6 Review DB -->
+<line x1="305" y1="1160" x2="305" y2="1190" stroke="black" stroke-width="2"/>
+<line x1="305" y1="1160" x2="580" y2="1160" stroke="black" stroke-width="2"/>
+<line x1="305" y1="1190" x2="580" y2="1190" stroke="black" stroke-width="2"/>
+<text x="315" y="1172" class="ds-label">D6</text>
+<text x="340" y="1172" class="ds-name">Review Database</text>
+<text x="315" y="1186" class="ds-name">Reviews · Ratings</text>
+
+<!-- D7 Forum DB -->
+<line x1="620" y1="1160" x2="620" y2="1190" stroke="black" stroke-width="2"/>
+<line x1="620" y1="1160" x2="895" y2="1160" stroke="black" stroke-width="2"/>
+<line x1="620" y1="1190" x2="895" y2="1190" stroke="black" stroke-width="2"/>
+<text x="630" y="1172" class="ds-label">D7</text>
+<text x="655" y="1172" class="ds-name">Forum Database</text>
+<text x="630" y="1186" class="ds-name">Posts · Replies · Likes</text>
+
+<!-- D8 Notification DB -->
+<line x1="935" y1="1160" x2="935" y2="1190" stroke="black" stroke-width="2"/>
+<line x1="935" y1="1160" x2="1230" y2="1160" stroke="black" stroke-width="2"/>
+<line x1="935" y1="1190" x2="1230" y2="1190" stroke="black" stroke-width="2"/>
+<text x="945" y="1172" class="ds-label">D8</text>
+<text x="970" y="1172" class="ds-name">Notification DB</text>
+<text x="945" y="1186" class="ds-name">Notifs · Templates · Logs</text>
+
+<!-- D9 Admin DB -->
+<line x1="1270" y1="1160" x2="1270" y2="1190" stroke="black" stroke-width="2"/>
+<line x1="1270" y1="1160" x2="1540" y2="1160" stroke="black" stroke-width="2"/>
+<line x1="1270" y1="1190" x2="1540" y2="1190" stroke="black" stroke-width="2"/>
+<text x="1280" y="1172" class="ds-label">D9</text>
+<text x="1305" y="1172" class="ds-name">Admin Database</text>
+<text x="1280" y="1186" class="ds-name">Admin users · Verif records</text>
+
+<!-- D10 Analytics DB -->
+<line x1="1580" y1="1160" x2="1580" y2="1190" stroke="black" stroke-width="2"/>
+<line x1="1580" y1="1160" x2="1860" y2="1160" stroke="black" stroke-width="2"/>
+<line x1="1580" y1="1190" x2="1860" y2="1190" stroke="black" stroke-width="2"/>
+<text x="1590" y="1172" class="ds-label">D10</text>
+<text x="1618" y="1172" class="ds-name">Analytics Database</text>
+<text x="1590" y="1186" class="ds-name">Metrics · KPIs · Reports</text>
+
+<!-- D11 Media Store -->
+<line x1="1900" y1="1160" x2="1900" y2="1190" stroke="black" stroke-width="2"/>
+<line x1="1900" y1="1160" x2="2130" y2="1160" stroke="black" stroke-width="2"/>
+<line x1="1900" y1="1190" x2="2130" y2="1190" stroke="black" stroke-width="2"/>
+<text x="1910" y="1172" class="ds-label">D11</text>
+<text x="1938" y="1172" class="ds-name">Media Store</text>
+<text x="1910" y="1186" class="ds-name">Images · Videos · URLs</text>
+
+<!-- D12 Audit Logs -->
+<line x1="2170" y1="1160" x2="2170" y2="1190" stroke="black" stroke-width="2"/>
+<line x1="2170" y1="1160" x2="2385" y2="1160" stroke="black" stroke-width="2"/>
+<line x1="2170" y1="1190" x2="2385" y2="1190" stroke="black" stroke-width="2"/>
+<text x="2180" y="1172" class="ds-label">D12</text>
+<text x="2205" y="1172" class="ds-name">Audit Logs</text>
+<text x="2180" y="1186" class="ds-name">Action · Error logs</text>
+
+<!-- ================================================================ -->
+<!-- DATA FLOWS: External Entities ↔ Processes -->
+<!-- ================================================================ -->
+
+<!-- E1 USER → P1 (register/login) -->
+<path d="M190 118 L450 166" class="ln"/>
+<text x="300" y="130" class="fl">Register/Login</text>
+<text x="300" y="141" class="fl">Credentials</text>
+
+<!-- P1 → E1 (profile, tokens) -->
+<path d="M450 192 L190 134" class="lnd"/>
+<text x="270" y="186" class="fl">Auth Token · Profile</text>
+
+<!-- E1 USER → P3 (booking request) -->
+<path d="M190 128 Q800 60 1730 160" class="ln"/>
+<text x="880" y="68" class="fl">Booking Request · Slot Selection</text>
+
+<!-- P3 → E1 (booking confirm) -->
+<path d="M1730 178 Q800 90 190 138" class="lnd"/>
+<text x="880" y="108" class="fl">Booking Confirmation · Invoice</text>
+
+<!-- E1 USER → P5 (reviews/forum) -->
+<path d="M190 144 Q600 300 1090 530" class="ln"/>
+<text x="480" y="330" class="fl">Reviews · Ratings</text>
+<text x="480" y="342" class="fl">Forum Posts</text>
+
+<!-- P5 → E1 (community content) -->
+<path d="M1090 548 Q580 350 190 152" class="lnd"/>
+<text x="560" y="420" class="fl">Forum Content</text>
+<text x="560" y="432" class="fl">Discussions</text>
+
+<!-- E2 FUTSAL OWNER → P2 (register facility) -->
+<path d="M190 358 L450 220" class="ln"/>
+<text x="270" y="270" class="fl">Register Facility</text>
+<text x="270" y="281" class="fl">Pitches · Pricing · Info</text>
+
+<!-- P2 → E2 (facility dashboard) -->
+<path d="M450 230 L190 372" class="lnd"/>
+<text x="240" y="340" class="fl">Verif Status</text>
+<text x="240" y="351" class="fl">Facility Code</text>
+
+<!-- E2 FUTSAL OWNER → P9 (offline booking) -->
+<path d="M190 370 Q900 380 1730 890" class="ln"/>
+<text x="820" y="370" class="fl">Walk-in Data · Slot · Payment</text>
+
+<!-- P9 → E2 (offline receipt) -->
+<path d="M1730 908 Q900 410 190 384" class="lnd"/>
+<text x="820" y="420" class="fl">Offline Receipt · Booking Record</text>
+
+<!-- E2 FUTSAL OWNER → P4 (subscription) -->
+<path d="M190 376 Q300 560 450 560" class="ln"/>
+<text x="265" y="540" class="fl">Subscription Plan</text>
+<text x="265" y="551" class="fl">Payment Config</text>
+
+<!-- P4 → E2 (sub status) -->
+<path d="M450 572 Q290 580 190 386" class="lnd"/>
+<text x="235" y="630" class="fl">Sub Status</text>
+<text x="235" y="641" class="fl">Payment History</text>
+
+<!-- E3 ADMIN → P7 (management) -->
+<path d="M190 618 L450 888" class="ln"/>
+<text x="250" y="780" class="fl">Admin Cmds</text>
+<text x="250" y="791" class="fl">Verif Actions</text>
+
+<!-- P7 → E3 (dashboard/reports) -->
+<path d="M450 904 L190 634" class="lnd"/>
+<text x="320" y="860" class="fl">Dashboard · Reports</text>
+<text x="320" y="871" class="fl">Analytics · Audit Logs</text>
+
+<!-- E4 PAYMENT GW → P4 (payment status) -->
+<path d="M190 868 L450 588" class="ln"/>
+<text x="252" y="706" class="fl">Txn ID · Status</text>
+<text x="252" y="717" class="fl">Receipt</text>
+
+<!-- P4 → E4 (process payment) -->
+<path d="M450 578 L190 878" class="lnd"/>
+<text x="282" y="762" class="fl">Process Payment</text>
+<text x="282" y="773" class="fl">Verify Txn</text>
+
+<!-- E5 EMAIL SVC → P6 (delivery status) -->
+<path d="M2210 128 L1950 530" class="ln"/>
+<text x="2100" y="296" class="fl">Delivery Status</text>
+<text x="2100" y="307" class="fl">Bounce Logs</text>
+
+<!-- P6 → E5 (send emails) -->
+<path d="M1950 542 L2210 140" class="lnd"/>
+<text x="2148" y="388" class="fl">Recipients</text>
+<text x="2148" y="399" class="fl">Subject · Content</text>
+
+<!-- E6 CLOUD STORAGE → P2 (media URLs) -->
+<path d="M2210 358 L1730 222" class="ln"/>
+<text x="1990" y="272" class="fl">CDN URLs · File Metadata</text>
+
+<!-- P2 → E6 (upload media) -->
+<path d="M1730 240 L2210 372" class="lnd"/>
+<text x="1990" y="348" class="fl">Media Files · Images</text>
+<text x="1990" y="359" class="fl">Videos · Metadata</text>
+
+<!-- E7 SMS/NOTIF → P6 (delivery status) -->
+<path d="M2210 618 L1950 580" class="ln"/>
+<text x="2100" y="596" class="fl">Delivery Status</text>
+
+<!-- P6 → E7 (send SMS/push) -->
+<path d="M1950 568 L2210 628" class="lnd"/>
+<text x="2100" y="618" class="fl">SMS · Push Alerts</text>
+<text x="2100" y="629" class="fl">Device Tokens</text>
+
+<!-- ================================================================ -->
+<!-- DATA FLOWS: Process ↔ Process -->
+<!-- ================================================================ -->
+
+<!-- P1 → P3 (user auth for booking) -->
+<path d="M670 200 L1730 200" class="ln"/>
+<text x="1160" y="192" class="fl">User Auth · Session Token</text>
+
+<!-- P1 ↔ P4 (user context for payment) -->
+<path d="M560 270 L560 490" class="ln"/>
+<text x="575" y="390" class="fl">User ID · Profile</text>
+
+<!-- P3 → P4 (booking triggers payment) -->
+<path d="M1730 210 Q1200 280 670 530" class="ln"/>
+<text x="1180" y="340" class="fl">Booking ID · Amount</text>
+<text x="1180" y="351" class="fl">Payment Request</text>
+
+<!-- P4 → P3 (payment confirms booking) -->
+<path d="M670 548 Q1200 380 1730 220" class="lnd"/>
+<text x="1090" y="440" class="fl">Payment Confirmed</text>
+
+<!-- P3 → P6 (booking triggers notification) -->
+<path d="M1840 270 L1840 490" class="ln"/>
+<text x="1856" y="390" class="fl">Booking Alert</text>
+<text x="1856" y="401" class="fl">Trigger</text>
+
+<!-- P4 → P6 (payment triggers notification) -->
+<path d="M670 560 Q1200 500 1730 560" class="ln"/>
+<text x="1160" y="516" class="fl">Payment Status · Notification Trigger</text>
+
+<!-- P2 → P3 (facility/slot data for booking) -->
+<path d="M1200 270 L1200 490" class="ln"/>
+<text x="1216" y="390" class="fl">Slot Availability</text>
+<text x="1216" y="401" class="fl">Facility Data</text>
+
+<!-- P2 → P8 (facility data → analytics) -->
+<path d="M1090 230 Q900 580 1090 890" class="ln"/>
+<text x="890" y="560" class="fl">Facility Data</text>
+
+<!-- P3 → P8 (booking data → analytics) -->
+<path d="M1730 270 Q1600 700 1310 900" class="ln"/>
+<text x="1630" y="620" class="fl">Booking Metrics</text>
+
+<!-- P4 → P8 (payment data → analytics) -->
+<path d="M670 630 Q900 900 1090 920" class="ln"/>
+<text x="720" y="850" class="fl">Revenue · Txn Data</text>
+
+<!-- P5 → P6 (review triggers notification) -->
+<path d="M1310 560 L1730 560" class="ln"/>
+<text x="1520" y="552" class="fl">Review Trigger</text>
+
+<!-- P7 → P8 (admin requests analytics) -->
+<path d="M670 920 L1090 920" class="ln"/>
+<text x="880" y="912" class="fl">Report Request</text>
+
+<!-- P8 → P7 (analytics → admin) -->
+<path d="M1090 932 L670 932" class="lnd"/>
+<text x="880" y="944" class="fl">KPIs · Metrics</text>
+
+<!-- P9 → P3 (offline booking into booking db) -->
+<path d="M1730 920 Q1600 990 1440 1060" class="ln"/>
+<text x="1620" y="985" class="fl">Offline Booking Record</text>
+
+<!-- P7 → P1 (admin manages users) -->
+<path d="M560 850 L560 270" class="lnd"/>
+<text x="530" y="560" class="fl">Verify/Block</text>
+<text x="530" y="571" class="fl">User Action</text>
+
+<!-- P7 → P2 (admin manages facilities) -->
+<path d="M612 880 Q900 780 1090 270" class="lnd"/>
+<text x="900" y="660" class="fl">Verify/Block Facility</text>
+
+<!-- ================================================================ -->
+<!-- DATA FLOWS: Processes ↔ Data Stores -->
+<!-- ================================================================ -->
+
+<!-- P1 ↔ D1 -->
+<path d="M506 268 L506 1060" class="ln"/>
+<text x="458" y="680" class="fl">R/W User Data</text>
+
+<!-- P2 ↔ D2 -->
+<path d="M1146 268 L855 1060" class="ln"/>
+<text x="960" y="700" class="fl">R/W Facility Data</text>
+
+<!-- P3 ↔ D3 -->
+<path d="M1796 268 L1270 1060" class="ln"/>
+<text x="1600" y="640" class="fl">R/W Booking Records</text>
+
+<!-- P4 ↔ D4 -->
+<path d="M514 628 L1555 1060" class="ln"/>
+<text x="900" y="810" class="fl">R/W Payment Records</text>
+
+<!-- P4 ↔ D5 -->
+<path d="M528 628 Q1100 900 1900 1060" class="ln"/>
+<text x="1100" y="890" class="fl">R/W Subscription Data</text>
+
+<!-- P5 ↔ D6 -->
+<path d="M1150 628 L420 1160" class="ln"/>
+<text x="700" y="880" class="fl">R/W Reviews</text>
+
+<!-- P5 ↔ D7 -->
+<path d="M1154 628 L750 1160" class="ln"/>
+<text x="850" y="930" class="fl">R/W Forum Posts</text>
+
+<!-- P6 ↔ D8 -->
+<path d="M1786 628 L1100 1160" class="ln"/>
+<text x="1360" y="900" class="fl">R/W Notification Records</text>
+
+<!-- P7 ↔ D9 -->
+<path d="M506 990 L1340 1160" class="ln"/>
+<text x="780" y="1110" class="fl">R/W Admin Records</text>
+
+<!-- P7 ↔ D12 -->
+<path d="M516 990 Q1500 1100 2220 1160" class="ln"/>
+<text x="1400" y="1090" class="fl">Write Audit Logs</text>
+
+<!-- P7 ↔ D1 (admin reads users) -->
+<path d="M508 1000 L508 1090" class="lnd"/>
+<text x="518" y="1046" class="fl">R User DB</text>
+
+<!-- P7 ↔ D4 (admin reads payments) -->
+<path d="M562 990 L1530 1090" class="lnd"/>
+<text x="1080" y="1076" class="fl">R Payment Data</text>
+
+<!-- P8 ↔ D10 -->
+<path d="M1200 990 L1690 1160" class="ln"/>
+<text x="1510" y="1090" class="fl">R/W Analytics Data</text>
+
+<!-- P8 reads D3 -->
+<path d="M1154 988 L1200 1090" class="lnd"/>
+<text x="1115" y="1046" class="fl">R Booking Data</text>
+
+<!-- P8 reads D4 -->
+<path d="M1200 990 L1550 1090" class="lnd"/>
+
+<!-- P2 ↔ D11 (media store) -->
+<path d="M1310 230 Q2000 400 1990 1160" class="ln"/>
+<text x="1980" y="680" class="fl">Store Media</text>
+
+<!-- P9 ↔ D3 (offline writes booking db) -->
+<path d="M1840 990 L1295 1090" class="ln"/>
+<text x="1650" y="1060" class="fl">Write Offline Booking</text>
+
+<!-- P9 reads D2 -->
+<path d="M1794 990 Q1500 1060 900 1086" class="lnd"/>
+<text x="1280" y="1052" class="fl">R Facility/Slot Data</text>
+
+<!-- ================================================================ -->
+<!-- LEGEND  -->
+<!-- ================================================================ -->
+<rect x="60" y="1230" width="2280" height="110" rx="4" fill="none" stroke="black" stroke-width="1"/>
+<text x="1200" y="1254" style="font-family:Arial,sans-serif;font-size:13px;font-weight:bold;fill:black;text-anchor:middle;">Legend</text>
+
+<!-- Entity -->
+<rect x="90" y="1268" width="80" height="30" fill="white" stroke="black" stroke-width="2"/>
+<text x="190" y="1288" class="legend-text">External Entity (rectangle)</text>
+
+<!-- Process -->
+<ellipse cx="380" cy="1283" rx="50" ry="22" fill="white" stroke="black" stroke-width="2"/>
+<text x="445" y="1288" class="legend-text">Process (circle + number)</text>
+
+<!-- Data store -->
+<line x1="640" y1="1268" x2="640" y2="1298" stroke="black" stroke-width="2"/>
+<line x1="640" y1="1268" x2="780" y2="1268" stroke="black" stroke-width="2"/>
+<line x1="640" y1="1298" x2="780" y2="1298" stroke="black" stroke-width="2"/>
+<text x="650" y="1280" style="font-family:Arial,sans-serif;font-size:9px;font-weight:bold;fill:black;">Dx</text>
+<text x="670" y="1280" style="font-family:Arial,sans-serif;font-size:9px;fill:black;">Data Store</text>
+<text x="795" y="1288" class="legend-text">Data Store (open rectangle, Dx label)</text>
+
+<!-- Solid flow -->
+<line x1="1120" y1="1283" x2="1220" y2="1283" stroke="black" stroke-width="1.5" marker-end="url(#arr)"/>
+<text x="1240" y="1288" class="legend-text">Data Flow IN to process</text>
+
+<!-- Dashed flow -->
+<line x1="1480" y1="1283" x2="1580" y2="1283" stroke="black" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arr)"/>
+<text x="1600" y="1288" class="legend-text">Data Flow OUT from process</text>
+
+<!-- DS list row 2 -->
+<text x="90" y="1330" style="font-family:Arial,sans-serif;font-size:10px;fill:#222;">
+  Stores: D1=User DB  D2=Facility DB  D3=Booking DB  D4=Payment DB  D5=Subscription DB  D6=Review DB  D7=Forum DB  D8=Notification DB  D9=Admin DB  D10=Analytics DB  D11=Media Store  D12=Audit Logs
+</text>
+<text x="90" y="1346" style="font-family:Arial,sans-serif;font-size:10px;fill:#222;">
+  Entities: E1=User  E2=Futsal Owner  E3=Admin  E4=Payment Gateway  E5=Email Service  E6=Cloud Storage  E7=SMS/Notification Service    |    R=Read  W=Write  R/W=Read+Write
+</text>
+
+<!-- footer -->
+<line x1="60" y1="1360" x2="2340" y2="1360" stroke="black" stroke-width="1"/>
+<text x="1200" y="1384" style="font-family:Arial,sans-serif;font-size:11px;fill:black;text-anchor:middle;">
+  AllFootsal Booking System · DFD Level 1 · 9 Processes · 12 Data Stores · 7 External Entities · 50+ Data Flows · Version 1.0 · June 2026
+</text>
+
+</svg>

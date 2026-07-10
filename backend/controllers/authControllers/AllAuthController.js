@@ -181,16 +181,39 @@ const Login = async (req, res) => {
 const VerifyOtp = async (req, res) => {
   try {
     const email = req.query.email?.toLowerCase();
-    const { otp } = req.body;
+    const otp =
+      req.body?.otp?.otp ??
+      req.body?.otp?.code ??
+      req.body?.otp ??
+      req.body?.code ??
+      req.body?.verificationCode;
 
     if (!email || !otp) {
       return res.status(400).json({ error: "Email and OTP are required" });
     }
 
-    // Check both possible keys
-    let storedData =
-      await redisClient.get(`user:otp:${email}`) ||
-      await redisClient.get(`footsal:otp:${email}`);
+    const registrationKey = `user:otp:${email}`;
+    const footsalRegistrationKey = `footsal:otp:${email}`;
+    const resetKey = `otp:reset:${email}`;
+    const genericKey = `otp:${email}`;
+
+    let storedData = await redisClient.get(registrationKey);
+    let otpSource = registrationKey;
+
+    if (!storedData) {
+      storedData = await redisClient.get(footsalRegistrationKey);
+      otpSource = footsalRegistrationKey;
+    }
+
+    if (!storedData) {
+      storedData = await redisClient.get(resetKey);
+      otpSource = resetKey;
+    }
+
+    if (!storedData) {
+      storedData = await redisClient.get(genericKey);
+      otpSource = genericKey;
+    }
 
     if (!storedData) {
       return res.status(400).json({
@@ -198,12 +221,24 @@ const VerifyOtp = async (req, res) => {
       });
     }
 
-    const parsedData = JSON.parse(storedData);
+    let parsedData = storedData;
+    try {
+      parsedData = JSON.parse(storedData);
+    } catch (parseError) {
+      parsedData = { otp: storedData };
+    }
 
     // Correct comparison
     if (String(otp).trim() !== String(parsedData.otp).trim()) {
       return res.status(400).json({
         error: "Invalid OTP",
+      });
+    }
+
+    if (otpSource === resetKey || otpSource === genericKey) {
+      return res.status(200).json({
+        message: "OTP verified successfully",
+        purpose: "forgot_password",
       });
     }
 
@@ -351,7 +386,7 @@ const ChangePassword = async (req, res) => {
 // forgot password
 const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
+    const email = req.body?.email?.toLowerCase();
 
     if (!email) {
       return res.status(400).json({
@@ -371,11 +406,7 @@ const forgotPassword = async (req, res) => {
 
     const otp = generateOTP(6);
 
-    await redisClient.setEx(
-      `otp:reset:${email}`,
-      300, // 5 minutes
-      otp
-    );
+    await redisClient.setEx(`otp:reset:${email}`, 300, otp);
 
     await sendOtp(
       email,
@@ -399,7 +430,9 @@ const forgotPassword = async (req, res) => {
 //forgot password
 const changeForgotPassword = async (req, res) => {
   try {
-    const { email, otp, newPassword, cNewPassword } = req.body;
+    const email = req.body?.email?.toLowerCase();
+    const otp = req.body?.otp?.otp ?? req.body?.otp?.code ?? req.body?.otp;
+    const { newPassword, cNewPassword } = req.body;
 
     if (!email || !otp || !newPassword || !cNewPassword) {
       return res.status(400).json({
@@ -422,7 +455,7 @@ const changeForgotPassword = async (req, res) => {
       });
     }
 
-    if (otp !== storedOtp) {
+    if (String(otp).trim() !== String(storedOtp).trim()) {
       return res.status(400).json({
         error: "Invalid OTP",
       });
