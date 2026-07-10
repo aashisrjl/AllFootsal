@@ -21,6 +21,7 @@ import Notifications from "./pages/Notifications";
 import Contact from "./pages/Contact";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import SetPassword from "./pages/SetPassword";
 import Register from "./pages/Register";
 import EmailVerification from "./pages/EmailVerification";
 import Pricing from "./pages/Pricing";
@@ -73,6 +74,7 @@ const App = () => (
               <Route path="/auth/login" element={<Login />} />
               <Route path="/auth/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/reset-password" element={<ResetPassword />} />
+              <Route path="/auth/set-password" element={<SetPassword />} />
               <Route path="/auth/register" element={<Register />} />
               <Route path="/auth/verify-email" element={<EmailVerification />} />
               <Route path="/auth/register/footsal" element={<FootsalAuthRegister />} />
