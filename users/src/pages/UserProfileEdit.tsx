@@ -44,9 +44,10 @@ const UserProfileEdit = () => {
                 <Label htmlFor="email" className="text-[0.7rem] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Email Address</Label>
                 <Input 
                   id="email" 
-                  type="email" 
+                  type="email"
+                  disabled
                   defaultValue={user.email} 
-                  className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl focus:ring-emerald-500"
+                  className="bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 rounded-xl focus:ring-emerald-500 disabled:opacity-100 disabled:cursor-not-allowed"
                 />
               </div>
 

@@ -4,9 +4,9 @@ import { ChevronDown, MessageCircle, ArrowRight } from "lucide-react";
 
 const faqs = [
   {
-    question: "What is NepFootsal?",
+    question: "What is AllFutsal?",
     answer:
-      "NepFootsal is a digital futsal ecosystem that connects players, venues, and organizers across Nepal. You can book futsal courts, manage tournaments, and grow your futsal community — all in one platform.",
+      "AllFutsal is a digital futsal ecosystem that connects players, venues, and organizers across Nepal. You can book futsal courts, manage tournaments, and grow your futsal community — all in one platform.",
   },
   {
     question: "How can I register my futsal venue?",
@@ -24,7 +24,7 @@ const faqs = [
       "Absolutely! Players can browse listed futsals, view available time slots, and book directly through our secure online booking system.",
   },
   {
-    question: "Is NepFootsal available across Nepal?",
+    question: "Is AllFutsal available across Nepal?",
     answer:
       "Yes! Our platform is expanding nationwide, and we aim to connect futsal venues, players, and tournaments from every region of Nepal.",
   },
@@ -59,7 +59,7 @@ export default function FAQ() {
               Frequently asked questions
             </h2>
             <p className="mt-6 text-lg text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
-              Find answers to common questions about booking, management, and the NepFootsal ecosystem.
+              Find answers to common questions about booking, management, and the AllFutsal ecosystem.
             </p>
 
             <div className="mt-10 p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl dark:shadow-emerald-500/5">
