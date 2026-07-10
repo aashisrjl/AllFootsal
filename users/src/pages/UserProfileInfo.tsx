@@ -137,7 +137,6 @@ const UserProfileInfo = () => {
       setIsSavingProfile(true);
       const res = await updateProfile({
         username: formValues.username,
-        email: formValues.email,
         phoneNumber: formValues.phoneNumber,
       });
 
@@ -495,8 +494,8 @@ const UserProfileInfo = () => {
                 id="email"
                 type="email"
                 value={formValues.email}
-                onChange={(e) => setFormValues((prev) => ({ ...prev, email: e.target.value }))}
-                className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-slate-100 focus-visible:ring-emerald-500 shadow-sm"
+                disabled
+                className="bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-700/80 text-slate-500 dark:text-slate-400 focus-visible:ring-emerald-500 shadow-sm disabled:opacity-100 disabled:cursor-not-allowed"
               />
             </div>
 

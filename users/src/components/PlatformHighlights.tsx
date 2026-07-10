@@ -71,7 +71,7 @@ export default function PlatformHighlights() {
               }}
             >
               <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
-                NepFootsal Player Portal
+                AllFutsal Player Portal
               </h3>
               <p className="mt-3 text-slate-600 dark:text-slate-400 text-base sm:text-lg leading-relaxed">
                 Find nearby futsals, compare slots, and reserve confidently —
@@ -108,7 +108,7 @@ export default function PlatformHighlights() {
               transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
             >
               <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
-                NepFootsal Owner Portal
+                AllFutsal Owner Portal
               </h3>
               <p className="mt-3 text-slate-600 dark:text-slate-400 text-base sm:text-lg leading-relaxed">
                 A clean dashboard to manage pitches, schedules, payments, and
@@ -209,7 +209,7 @@ export default function PlatformHighlights() {
               }}
             >
               <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
-                NepFootsal Admin Dashboard
+                AllFutsal Admin Dashboard
               </h3>
               <p className="mt-3 text-slate-600 dark:text-slate-400 text-base sm:text-lg leading-relaxed">
                 Tools for administrators to keep the ecosystem healthy and
