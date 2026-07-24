@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserBookings } from "@/lib/userApi";
 import { getPaymentByBookingId, getFutsalById } from "@/lib/futsalApi";
@@ -13,11 +13,14 @@ import { Loader2, ArrowLeft, CalendarDays, Clock, MapPin, SearchX, X, RefreshCw,
 import toast from 'react-hot-toast';
 import { Separator } from "@/components/ui/separator";
 
+const CANCELLATION_WINDOW_HOURS = 15;
+
 const BookingDetails = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { isAuthenticated, user } = useAuth();
     const { cancelBooking } = useBooking();
+    const queryClient = useQueryClient();
 
     const { data: userBookingsData, isLoading: isBookingsLoading } = useQuery({
         queryKey: ['user-bookings'],
@@ -81,7 +84,8 @@ const BookingDetails = () => {
     const handleCancel = async () => {
         if (!user) return;
         try {
-            await cancelBooking(booking.id, user.id);
+            await cancelBooking(booking.id, booking.facilityId || booking.futsal_id || booking.futsalId || "");
+            await queryClient.invalidateQueries({ queryKey: ['user-bookings'] });
             toast.success("Booking cancelled successfully!");
         } catch(e) {
             toast.error("Failed to cancel this booking.");
@@ -94,7 +98,7 @@ const BookingDetails = () => {
 
     const bookingDateTime = new Date(`${booking.booking_date}T${booking.start_time || "00:00"}`);
     const timeUntilBooking = bookingDateTime.getTime() - new Date().getTime();
-    const canBeCancelled = (booking.status === "confirmed" || booking.status === "pending") && (timeUntilBooking >= 24 * 60 * 60 * 1000);
+    const canBeCancelled = (booking.status === "confirmed" || booking.status === "pending") && (timeUntilBooking >= CANCELLATION_WINDOW_HOURS * 60 * 60 * 1000);
 
     // Compute dynamic colors based on status
     const isCancelled = booking.status === 'cancelled';

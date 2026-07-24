@@ -94,17 +94,18 @@ const postFutsalLocation = async (req, res) => {
         type: DataTypes.INSERT,
       },
     );
+
+    return res.status(200).json({
+      success: true,
+      message: "Location Inserted succesfully",
+      data,
+    });
   } catch {
     return res.status(400).json({
       success: false,
       message: "unable to insert location",
     });
   }
-  res.status(200).json({
-    success: true,
-    message: "Location Inserted succesfully",
-    data,
-  });
 };
 
 // for futsal

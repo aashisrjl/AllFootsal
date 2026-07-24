@@ -15,11 +15,26 @@ const generateEsewaSignature = ({
   return hmac.digest("base64");
 };
 
+const resolveEsewaCredentials = ({ merchantCode, secretKey, isLive }) => {
+  if (!isLive) {
+    return {
+      merchantCode: DEFAULT_ESEWA_MERCHANT_CODE,
+      secretKey: DEFAULT_ESEWA_SECRET_KEY,
+    };
+  }
+
+  return {
+    merchantCode,
+    secretKey,
+  };
+};
+
 const createEsewaPayment_user_futsal = ({
   amount,
   transactionUuid,
   merchantCode = DEFAULT_ESEWA_MERCHANT_CODE,
   secretKey = DEFAULT_ESEWA_SECRET_KEY,
+  isLive = false,
   successUrl,
   failureUrl
 }) => {
@@ -31,6 +46,12 @@ const createEsewaPayment_user_futsal = ({
     throw new Error("transactionUuid is required for eSewa payment");
   }
 
+  const resolvedCredentials = resolveEsewaCredentials({
+    merchantCode,
+    secretKey,
+    isLive,
+  });
+
   if (!merchantCode || !secretKey) {
     throw new Error("merchantCode and secretKey are required for eSewa payment");
   }
@@ -38,8 +59,8 @@ const createEsewaPayment_user_futsal = ({
   const signature = generateEsewaSignature({
     amount,
     transactionUuid,
-    merchantCode,
-    secretKey
+    merchantCode: resolvedCredentials.merchantCode,
+    secretKey: resolvedCredentials.secretKey
   });
 
   return {
@@ -57,7 +78,8 @@ const createEsewaPayment_user_futsal = ({
       failureUrl ||
       `${process.env.USER_FRONTEND_URL || "http://localhost:3001"}/payment/failure`,
     signed_field_names: "total_amount,transaction_uuid,product_code",
-    signature
+    signature,
+    isLive: Boolean(isLive)
   };
 };
 
