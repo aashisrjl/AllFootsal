@@ -31,6 +31,18 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(500).json({
+    error: 'Something went wrong!',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+  });
+});
+
 // super admin operation using adminjs
 setupAdminPanel(app)
 
@@ -129,23 +141,12 @@ app.get('/', (req, res) => {
   });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  if (res.headersSent) {
-    return next(err);
-  }
-  res.status(500).json({
-    error: 'Something went wrong!',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
-  });
-});
-
 
 // 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
+
 
 app.listen(PORT, () => {
   console.log(`Footsal Backend Server running on port ${PORT}`);
