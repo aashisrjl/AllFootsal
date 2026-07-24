@@ -16,6 +16,8 @@ import { facilities, pitches } from "@/data/mockData";
 import { useBooking } from "@/contexts/BookingContext";
 import { useAuth } from "@/contexts/AuthContext";
 
+const CANCELLATION_WINDOW_HOURS = 15;
+
 interface BookingCardProps {
   booking: Booking;
 }
@@ -46,12 +48,14 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
 
   const handleCancel = async () => {
     if (!user) return;
-    await cancelBooking(booking.id, user.id);
+    await cancelBooking(booking.id, (booking as any).facilityId || (booking as any).futsal_id || (booking as any).futsalId || "");
   };
 
+  const bookingDateTime = new Date(`${booking.date}T${booking.startTime}`);
+  const cancellationDeadline = new Date(bookingDateTime.getTime() - CANCELLATION_WINDOW_HOURS * 60 * 60 * 1000);
   const canBeCancelled = 
     (booking.status === "confirmed" || booking.status === "pending") &&
-    new Date(`${booking.date}T${booking.startTime}`) > new Date();
+    new Date() <= cancellationDeadline;
 
   // Maintenance flags are omitted temporarily due to global shard layout
   const isUnderMaintenance = false;

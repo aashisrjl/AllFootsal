@@ -163,7 +163,7 @@ export default function Footer() {
               </li>
               <li className="flex items-start gap-3">
                 <Mail size={20} className="text-emerald-300 flex-shrink-0 mt-1" />
-                <span className="text-slate-300/80">info@allfootsal.com</span>
+                <span className="text-slate-300/80">info@allfutsal.com</span>
               </li>
             </ul>
           </div>
@@ -209,7 +209,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 pt-8 text-center text-slate-300/70">
-          <p>&copy; 2025 AllFootsal. All rights reserved.</p>
+          <p>&copy; 2026 AllFutsal. All rights reserved.</p>
           <p className="mt-2 text-sm">Designed to grow Nepal's futsal community.</p>
         </div>
       </div>

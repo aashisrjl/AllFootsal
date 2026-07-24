@@ -10,6 +10,7 @@ const {
 
 const PAST_BOOKING_MSG =
     "Cannot modify a booking whose date or timeslot has already passed";
+const CANCELLATION_WINDOW_HOURS = 15;
 
 const fetchAdminBookingWithSlot = async (code, bookingId) => {
     const rows = await sequelize.query(
@@ -61,6 +62,30 @@ const resolveBookingTenantCode = async (req) => {
     const futsalByCode = await Footsal.findOne({ where: { futsalCode: futsalId } });
     return futsalByCode?.futsalCode || null;
 }
+
+const buildBookingDateTime = (bookingDate, startTime) => {
+    return new Date(`${bookingDate}T${startTime}:00`);
+};
+
+const canCancelBooking = (bookingDate, startTime) => {
+    const bookingDateTime = buildBookingDateTime(bookingDate, startTime);
+    const cancellationDeadline = new Date(
+        bookingDateTime.getTime() - CANCELLATION_WINDOW_HOURS * 60 * 60 * 1000
+    );
+
+    return new Date() <= cancellationDeadline;
+};
+
+const releaseBookedTimeslot = async (code, timeslotId, transaction) => {
+    await sequelize.query(
+        `UPDATE timeslot_${code} SET is_available = 1 WHERE id = ?`,
+        {
+            replacements: [timeslotId],
+            type: QueryTypes.UPDATE,
+            transaction,
+        }
+    );
+};
 
 //by admin
 const getBookingsByAdmin = async (req,res) => {
@@ -323,24 +348,26 @@ const cancelBooking = async (req,res) => {
     }
 
     const bookingItem = booking[0];
-    const bookingDateTime = new Date(`${bookingItem.booking_date}T${bookingItem.start_time}:00`);
-    const cancellationCutoff = new Date(bookingDateTime.getTime() - 2 * 60 * 60 * 1000);
-
-    if (new Date() > cancellationCutoff) {
+    if (!canCancelBooking(bookingItem.booking_date, bookingItem.start_time)) {
         return res.status(400).json({
             success: false,
-            message: "Cancellation period has expired. You can only cancel at least 2 hours before the booking time."
+            message: `Cancellation period has expired. You can only cancel at least ${CANCELLATION_WINDOW_HOURS} hours before the booking time.`
         });
     }
 
-    await sequelize.query(
-        `UPDATE booking_${code} SET status = 'cancelled' 
-         WHERE id = ? AND user_id = ?`,
-        {
-            replacements: [bookingId, userId],
-            type: QueryTypes.UPDATE,
-        }
-    );
+    await sequelize.transaction(async (transaction) => {
+        await sequelize.query(
+            `UPDATE booking_${code} SET status = 'cancelled' 
+             WHERE id = ? AND user_id = ?`,
+            {
+                replacements: [bookingId, userId],
+                type: QueryTypes.UPDATE,
+                transaction,
+            }
+        );
+
+        await releaseBookedTimeslot(code, bookingItem.timeslot_id, transaction);
+    });
 
     try {
         const [user, futsal] = await Promise.all([
@@ -368,13 +395,12 @@ const cancelBooking = async (req,res) => {
             });
         }
 
-        // In-app notifications
         await Promise.all([
             createUserNotification({
                 userId,
                 type: "booking_cancelled",
                 title: "Booking Cancelled",
-                message: `Your booking for ${bookingItem.pitch_name} on ${bookingItem.booking_date} at ${bookingItem.start_time} - ${bookingItem.end_time} has been cancelled.`,
+                message: `Your booking for ${bookingItem.pitch_name} on ${bookingItem.booking_date} at ${bookingItem.start_time} - ${bookingItem.end_time} has been cancelled and the timeslot is now available again.`,
                 relatedId: bookingId,
                 relatedType: "booking",
             }),
@@ -382,7 +408,7 @@ const cancelBooking = async (req,res) => {
                 futsalId: futsal.id,
                 type: "booking_cancelled",
                 title: "Booking Cancelled by User",
-                message: `A booking for ${bookingItem.pitch_name} on ${bookingItem.booking_date} at ${bookingItem.start_time} - ${bookingItem.end_time} was cancelled by the user.`,
+                message: `A booking for ${bookingItem.pitch_name} on ${bookingItem.booking_date} at ${bookingItem.start_time} - ${bookingItem.end_time} was cancelled and the timeslot has been released.`,
                 relatedId: bookingId,
                 relatedType: "booking",
             }),
@@ -405,14 +431,19 @@ const cancelBookingByAdmin = async (req,res) => {
     const row = await fetchAdminBookingWithSlot(code, bookingId);
     if (respondIfPastOrMissingBooking(res, row)) return;
 
-    await sequelize.query(
-        `UPDATE booking_${code} SET status = 'cancelled' 
-         WHERE id = ?`,
-        {
-            replacements: [bookingId],
-            type: QueryTypes.UPDATE,
-        }
-    );
+    await sequelize.transaction(async (transaction) => {
+        await sequelize.query(
+            `UPDATE booking_${code} SET status = 'cancelled' 
+             WHERE id = ?`,
+            {
+                replacements: [bookingId],
+                type: QueryTypes.UPDATE,
+                transaction,
+            }
+        );
+
+        await releaseBookedTimeslot(code, row.timeslot_id, transaction);
+    });
 
     res.status(200).json({
         success:true,

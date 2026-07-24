@@ -1,3 +1,5 @@
+const FORUM_ORDER = [["createdAt", "DESC"], ["id", "DESC"]];
+
 //create 
 const { Forum, User } = require('../../models');
 
@@ -57,7 +59,7 @@ const createForum = async (req,res)=>{
 //get all forums
 const getAllForums = async (req,res)=>{
     try {
-        const forums = await Forum.findAll();
+        const forums = await Forum.findAll({ order: FORUM_ORDER });
         if(forums.length === 0){
             return res.status(404).json({
                 success:false,
@@ -84,7 +86,10 @@ const getForumsByUserId = async (req,res)=>{
             message:"User ID is required"});
     }
     try {
-        const forums = await Forum.findAll({where:{user_id:userId}});
+        const forums = await Forum.findAll({
+            where:{user_id:userId},
+            order: FORUM_ORDER
+        });
         if(forums.length === 0){
             return res.status(404).json({
                 success:false,
@@ -112,6 +117,7 @@ const getForumsByFutsalId = async (req,res)=>{
     try {
         const forums = await Forum.findAll({
             where:{futsal_id:futsalId},
+            order: FORUM_ORDER,
             include: [{
                 model: User,
                 as: 'user',
@@ -149,7 +155,10 @@ const getForumsByCategory = async (req,res)=>{
             message:"Category is required"});
     }
     try {
-        const forums = await Forum.findAll({where:{category}});
+        const forums = await Forum.findAll({
+            where:{category},
+            order: FORUM_ORDER
+        });
         if(forums.length === 0){
             return res.status(404).json({
                 success:false,

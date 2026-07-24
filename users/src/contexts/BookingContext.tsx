@@ -4,10 +4,9 @@ import {
   createBooking as createBookingAPI,
   getUserBookings as getUserBookingsAPI,
   getAllBookings as getAllBookingsAPI,
-  updateBookingStatus as updateBookingStatusAPI,
 } from "@/data/mockData";
 import { toast } from "@/components/ui/use-toast";
-import { getFutsalTimeSlots } from "@/lib/futsalApi";
+import { cancelBooking as cancelBookingAPI, getFutsalTimeSlots } from "@/lib/futsalApi";
 
 interface BookingContextType {
   selectedDate: string;
@@ -26,7 +25,7 @@ interface BookingContextType {
   ) => Promise<Booking | null>;
   fetchUserBookings: (userId: string) => void;
   getAllBookings: () => Booking[];
-  cancelBooking: (bookingId: string, userId: string) => Promise<boolean>;
+  cancelBooking: (bookingId: string, futsalId: string) => Promise<boolean>;
 }
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
@@ -131,23 +130,25 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
     return getAllBookingsAPI();
   };
 
-  const cancelBooking = async (bookingId: string, userId: string): Promise<boolean> => {
+  const cancelBooking = async (bookingId: string, futsalId: string): Promise<boolean> => {
     try {
-      const booking = updateBookingStatusAPI(bookingId, 'cancelled');
-      
-      if (booking) {
-        // Refresh user bookings
-        fetchUserBookings(userId);
-        
+      if (!futsalId) {
         toast({
-          title: "Booking Cancelled",
-          description: "Your booking has been successfully cancelled.",
+          title: "Cancellation Failed",
+          description: "Missing futsal information for this booking.",
+          variant: "destructive",
         });
-        
-        return true;
+        return false;
       }
-      
-      return false;
+
+      await cancelBookingAPI(futsalId, bookingId);
+
+      toast({
+        title: "Booking Cancelled",
+        description: "Your booking has been successfully cancelled.",
+      });
+
+      return true;
     } catch (error) {
       toast({
         title: "Cancellation Failed",

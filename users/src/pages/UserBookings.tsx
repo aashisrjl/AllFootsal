@@ -12,6 +12,8 @@ import {
     PlusCircle, Layers
 } from "lucide-react";
 
+const CANCELLATION_WINDOW_HOURS = 15;
+
 // ─── Status Config ─────────────────────────────────────────────────────────────
 const STATUS_CONFIG: Record<string, {
     label: string; dot: string; badge: string; border: string; icon: React.ElementType;
@@ -79,7 +81,7 @@ const BookingRow = ({ booking, onCancel }: { booking: any; onCancel: (id: string
 
     const canCancel =
         (booking.status === "confirmed" || booking.status === "pending") &&
-        bookingDate && (new Date(`${bookingDate}T${startTime || "00:00"}`).getTime() - new Date().getTime() >= 24 * 60 * 60 * 1000);
+        bookingDate && (new Date(`${bookingDate}T${startTime || "00:00"}`).getTime() - new Date().getTime() >= CANCELLATION_WINDOW_HOURS * 60 * 60 * 1000);
 
     const formattedDate = bookingDate
         ? new Date(bookingDate).toLocaleDateString("en-US", {
