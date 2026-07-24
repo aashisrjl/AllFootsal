@@ -700,7 +700,8 @@ const createPayment = async (req, res) => {
                     amount,
                     transactionUuid,
                     merchantCode: paymentConfig.merchantCode,
-                    secretKey: paymentConfig.secretKey
+                    secretKey: paymentConfig.secretKey,
+                    isLive: paymentConfig.isLive
                 });
 
                 rawResponse = gatewayResponse;

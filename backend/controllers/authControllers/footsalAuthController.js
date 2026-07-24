@@ -8,7 +8,7 @@ const { sendNotificationEmail } = require("../../utils/notifications/emailNotifi
 const bcrypt = require("bcryptjs");
 
 module.exports = RegisterFootsal = async (req, res) => {
-  const { footsalName, ownerName, email, password, phoneNumber } = req.body;
+  const { footsalName, ownerName,ownerEmail, email, password, phoneNumber } = req.body;
   // basic validation
   if (!footsalName || !ownerName || !email || !password || !phoneNumber) {
     return res.status(400).json({
@@ -55,6 +55,7 @@ module.exports = RegisterFootsal = async (req, res) => {
     futsalCode: futsal_code,
     futsalName: footsalName,
     ownerName,
+    ownerEmail,
     email,
     password: hashedPassword,
     phoneNumber,

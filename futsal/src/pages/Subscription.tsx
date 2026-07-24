@@ -33,7 +33,7 @@ interface CreatePaymentRes {
   data: PaymentResponse;
   payment_url?: string;
   pidx?: string;
-  esewaConfig?: Record<string, string | number>;
+  esewaConfig?: Record<string, string | number | boolean>;
 }
 
 interface PendingPaymentCache {
@@ -42,7 +42,6 @@ interface PendingPaymentCache {
   pidx?: string;
 }
 
-const ESEWA_GATEWAY_URL = 'https://rc-epay.esewa.com.np/api/epay/main/v2/form';
 const PENDING_KEY = 'futsal_pending_subscription_payment';
 
 const planOptions: Array<{ plan: SubscriptionPlan; label: string; price: string }> = [
@@ -121,12 +120,20 @@ const Subscription = () => {
     localStorage.removeItem(PENDING_KEY);
   };
 
-  const submitEsewaForm = (esewaConfig: Record<string, string | number>) => {
+  const submitEsewaForm = (esewaConfig: Record<string, string | number | boolean>) => {
+    const gatewayUrl = esewaConfig.isLive
+      ? 'https://epay.esewa.com.np/api/epay/main/v2/form'
+      : 'https://rc-epay.esewa.com.np/api/epay/main/v2/form';
+
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = ESEWA_GATEWAY_URL;
+    form.action = gatewayUrl;
 
     Object.entries(esewaConfig).forEach(([key, value]) => {
+      if (key === 'isLive') {
+        return;
+      }
+
       const input = document.createElement('input');
       input.type = 'hidden';
       input.name = key;
