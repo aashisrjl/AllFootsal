@@ -36,6 +36,13 @@ const statusStyles: Record<string, string> = {
   completed: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
 };
 
+const getDisplayBookingStatus = (status: string, pastSlot: boolean) => {
+  if (!pastSlot) return status;
+  if (status === 'pending') return 'cancelled';
+  if (status === 'confirmed') return 'completed';
+  return status;
+};
+
 const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div>
     <p className="text-[10px] uppercase tracking-wider font-bold text-app-muted">{label}</p>
@@ -107,6 +114,7 @@ const BookingDetail = () => {
   const { booking, customer, pitch, timeslot, payment, source } = detail;
   const bookingDateStr = normalizeBookingDate(booking.booking_date);
   const isPast = isBookingInPast(bookingDateStr, timeslot?.end_time);
+  const displayStatus = getDisplayBookingStatus(booking.status, isPast);
   const bookingDate = booking.booking_date
     ? new Date(booking.booking_date).toLocaleDateString('en-GB', {
         weekday: 'long',
@@ -134,10 +142,10 @@ const BookingDetail = () => {
         </div>
         <span
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-extrabold uppercase tracking-wider ${
-            statusStyles[booking.status] || statusStyles.pending
+            statusStyles[displayStatus] || statusStyles.pending
           }`}
         >
-          {booking.status}
+          {displayStatus}
         </span>
       </div>
 
@@ -286,7 +294,7 @@ const BookingDetail = () => {
       {/* Actions */}
       {isPast ? (
         <p className="text-sm text-app-muted border border-app-border rounded-xl px-4 py-3 bg-app-surface">
-          This booking&apos;s date or timeslot has passed. Confirm, reject, cancel, and unconfirm are not available.
+          This booking&apos;s date or timeslot has passed. Its display status now follows the past-slot rules used in the booking list, and confirm, reject, cancel, and unconfirm are not available.
         </p>
       ) : (
       <div className="flex flex-wrap gap-3 pt-2">

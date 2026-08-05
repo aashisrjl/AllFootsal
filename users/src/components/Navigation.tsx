@@ -158,7 +158,7 @@ export default function Navigation() {
         <div className="md:hidden bg-white border-t shadow-md">
           <div className="px-4 pt-2 pb-4 space-y-2">
             <button
-              onClick={() => scrollToSection("/pricing")}
+              onClick={() => navigate("/pricing")}
               className="block w-full text-left py-2 text-gray-700 hover:text-green-600"
             >
               Pricing

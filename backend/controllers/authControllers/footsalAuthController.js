@@ -80,6 +80,9 @@ module.exports = RegisterFootsal = async (req, res) => {
      text=`Your OTP code is ${otp} Expires in 5 minutes.`
     );
 
+  // create a tanent for the new footsal
+  await createTenantTables(newFootsal.futsalCode);
+
   await sendNotificationEmail({
     to: email,
     subject: "Welcome to AllFootsal Owner Portal",
