@@ -397,8 +397,8 @@ const Subscription = () => {
         <p className="text-sm text-app-muted mb-4">
           Choose a method below. Online payments redirect to gateway and return here for verification.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
-          {(['khalti', 'esewa', 'cash', 'bank_transfer'] as PaymentMethod[]).map((method) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          {(['khalti', 'esewa', 'cash'] as PaymentMethod[]).map((method) => (
             <button
               key={method}
               disabled={!canPay || actionLoading}
