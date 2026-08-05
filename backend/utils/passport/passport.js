@@ -99,7 +99,9 @@ passport.use(
     },
     async (req, accessToken, refreshToken, profile, done) => {
       try {
-        const email = profile.emails[0].value;
+        const facebookId = profile.id;
+        const email = profile.emails?.[0]?.value || profile._json?.email || `facebook_${facebookId}@facebook.local`;
+
         let user = await User.findOne({ where: { email } });
 
         const device = profile._json?.device || req.headers["user-agent"] || "unknown";

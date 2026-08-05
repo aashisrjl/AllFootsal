@@ -25,6 +25,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
+    facebookId: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     profileImage: {
       type: DataTypes.STRING,
       allowNull: true

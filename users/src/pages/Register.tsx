@@ -230,7 +230,7 @@ const Register = () => {
                     className="flex-1 h-12 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all"
                     onClick={() => {
                       window.location.href =
-                        "https://accounts.google.com/signin";
+                        "http://localhost:3000/api/v1/auth/user/google"; 
                     }}
                   >
                     <FaGoogle className="text-rose-500 text-xl" />
@@ -241,7 +241,7 @@ const Register = () => {
                     className="flex-1 h-12 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all"
                     onClick={() => {
                       window.location.href =
-                        "https://www.facebook.com/login.php";
+                        "http://localhost:3000/api/v1/auth/user/facebook"; 
                     }}
                   >
                     <FaFacebookF className="text-blue-600 text-xl" />

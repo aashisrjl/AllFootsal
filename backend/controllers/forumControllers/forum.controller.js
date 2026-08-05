@@ -1,7 +1,62 @@
 const FORUM_ORDER = [["createdAt", "DESC"], ["id", "DESC"]];
 
 //create 
-const { Forum, User } = require('../../models');
+const { Op } = require('sequelize');
+const { Forum, User, ForumReply, ForumLike, sequelize } = require('../../models');
+
+const deleteForumCascade = async (forumId, transaction) => {
+    const replies = await ForumReply.findAll({
+        where: { forum_id: forumId },
+        attributes: ['id'],
+        raw: true,
+        transaction,
+    });
+
+    const replyIds = replies.map((reply) => reply.id);
+
+    await ForumLike.destroy({
+        where: { forum_id: forumId },
+        transaction,
+    });
+
+    if (replyIds.length > 0) {
+        await ForumLike.destroy({
+            where: { reply_id: { [Op.in]: replyIds } },
+            transaction,
+        });
+    }
+
+    await ForumReply.destroy({
+        where: { forum_id: forumId },
+        transaction,
+    });
+
+    await Forum.destroy({
+        where: { id: forumId },
+        transaction,
+    });
+};
+
+const ensureForumCreatorExists = async (forum) => {
+    if (!forum || !forum.user_id) {
+        return forum;
+    }
+
+    if (forum.user) {
+        return forum;
+    }
+
+    const creator = await User.findByPk(forum.user_id);
+    if (creator) {
+        return forum;
+    }
+
+    await sequelize.transaction(async (transaction) => {
+        await deleteForumCascade(forum.id, transaction);
+    });
+
+    return null;
+};
 
 const createForum = async (req,res)=>{
     const {title, content,slug, category} = req.body;
@@ -60,7 +115,16 @@ const createForum = async (req,res)=>{
 const getAllForums = async (req,res)=>{
     try {
         const forums = await Forum.findAll({ order: FORUM_ORDER });
-        if(forums.length === 0){
+        const visibleForums = [];
+
+        for (const forum of forums) {
+            const cleanedForum = await ensureForumCreatorExists(forum);
+            if (cleanedForum) {
+                visibleForums.push(cleanedForum);
+            }
+        }
+
+        if(visibleForums.length === 0){
             return res.status(404).json({
                 success:false,
                 message:"No forums found"});
@@ -68,7 +132,7 @@ const getAllForums = async (req,res)=>{
         res.status(200).json({
             success: true,
             message: "Forums fetched successfully",
-            data: forums
+            data: visibleForums
         });
     } catch (error) {
         console.error("Error fetching forums:", error);
@@ -90,7 +154,16 @@ const getForumsByUserId = async (req,res)=>{
             where:{user_id:userId},
             order: FORUM_ORDER
         });
-        if(forums.length === 0){
+        const visibleForums = [];
+
+        for (const forum of forums) {
+            const cleanedForum = await ensureForumCreatorExists(forum);
+            if (cleanedForum) {
+                visibleForums.push(cleanedForum);
+            }
+        }
+
+        if(visibleForums.length === 0){
             return res.status(404).json({
                 success:false,
                 message:"No forums found for this user"});
@@ -98,7 +171,7 @@ const getForumsByUserId = async (req,res)=>{
         res.status(200).json({  
             success:true,
             message:"Forums fetched successfully",
-            data:forums
+            data:visibleForums
         });
     } catch (error) {
         console.error("Error fetching forums by user ID:", error);
@@ -124,13 +197,22 @@ const getForumsByFutsalId = async (req,res)=>{
                 attributes: ['username']
             }]
         });
-        if(forums.length === 0){
+        const visibleForums = [];
+
+        for (const forum of forums) {
+            const cleanedForum = await ensureForumCreatorExists(forum);
+            if (cleanedForum) {
+                visibleForums.push(cleanedForum);
+            }
+        }
+
+        if(visibleForums.length === 0){
             return res.status(404).json({
                 success:false,
                 message:"No forums found for this futsal"});
         }
         // Map to include user_name
-        const forumsWithUser = forums.map(forum => ({
+        const forumsWithUser = visibleForums.map(forum => ({
             ...forum.toJSON(),
             user_name: forum.user?.username || 'Anonymous'
         }));
@@ -159,7 +241,16 @@ const getForumsByCategory = async (req,res)=>{
             where:{category},
             order: FORUM_ORDER
         });
-        if(forums.length === 0){
+        const visibleForums = [];
+
+        for (const forum of forums) {
+            const cleanedForum = await ensureForumCreatorExists(forum);
+            if (cleanedForum) {
+                visibleForums.push(cleanedForum);
+            }
+        }
+
+        if(visibleForums.length === 0){
             return res.status(404).json({
                 success:false,
                 message:"No forums found for this category"});
@@ -167,7 +258,7 @@ const getForumsByCategory = async (req,res)=>{
         res.status(200).json({  
             success:true,
             message:"Forums fetched by Category successfully",
-            data:forums
+            data:visibleForums
         });
     } catch (error) {
         console.error("Error fetching forums by category:", error);
@@ -185,15 +276,16 @@ const getForumById = async (req,res)=>{
     }
     try {
         const forum = await Forum.findByPk(forumId);
-        if(!forum){
+        const visibleForum = await ensureForumCreatorExists(forum);
+        if(!visibleForum){
             return res.status(404).json({
                 success:false,
-                message:"Forum not found"});
+                message:"Forum not found or creator no longer exists"});
         }       
         res.status(200).json({  
             success:true,
             message:"Forum fetched successfully",
-            data:forum
+            data:visibleForum
         });
     } catch (error) {   
         console.error("Error fetching forum by ID:", error);
@@ -210,16 +302,17 @@ const getForumBySlug = async (req,res)=>{
             message:"Forum slug is required"});
     }
     try {
-        const forum = await Forum.findAll({where:{slug}});
-        if(!forum){
+        const forum = await Forum.findOne({where:{slug}});
+        const visibleForum = await ensureForumCreatorExists(forum);
+        if(!visibleForum){
             return res.status(404).json({
                 success:false,
-                message:"Forum not found"});
+                message:"Forum not found or creator no longer exists"});
         }       
         res.status(200).json({  
             success:true,
             message:"Forum fetched successfully",
-            data:forum
+            data:visibleForum
         });
     } catch (error) {   
         console.error("Error fetching forum by slug:", error);
@@ -258,31 +351,9 @@ const deleteForum = async (req, res) => {
             });
         }
 
-        // Cascade delete - delete associated likes and replies
-        const { ForumLike, ForumReply } = require("../../models");
-        
-        // Delete all likes on this forum
-        await ForumLike.destroy({
-            where: { forum_id: forumId }
+        await sequelize.transaction(async (transaction) => {
+            await deleteForumCascade(forumId, transaction);
         });
-
-        // Delete all replies and their likes
-        const replies = await ForumReply.findAll({
-            where: { forum_id: forumId }
-        });
-
-        for (const reply of replies) {
-            await ForumLike.destroy({
-                where: { reply_id: reply.id }
-            });
-        }
-
-        await ForumReply.destroy({
-            where: { forum_id: forumId }
-        });
-
-        // Delete the forum
-        await forum.destroy();
 
         res.status(200).json({
             success: true,
