@@ -1,6 +1,6 @@
 const express = require("express");
 const isFutsalAuthenticated = require("../../../middleware/authMiddleware/futsalAuthenticated");
-const { getBookingStats, getBookingByIdAdmin, cancelBookingByAdmin, confirmBookingByAdmin, rejectBookingByAdmin, unconfirmBookingByAdmin, deleteBookingByAdmin, getBookingsByUser, createBooking, createBookingByAdmin, cancelBooking, deleteBookingByUser, getBookingsByAdmin } = require("../../../controllers/footsalControllers/bookingController/booking.controller");
+const { getBookingStats, getBookingByIdAdmin, cancelBookingByAdmin, confirmBookingByAdmin, rejectBookingByAdmin, unconfirmBookingByAdmin, deleteBookingByAdmin, getBookingsByUser, createBooking, createBookingByAdmin, cancelBooking, rescheduleBooking, deleteBookingByUser, getBookingsByAdmin } = require("../../../controllers/footsalControllers/bookingController/booking.controller");
 const resolveFutsalTenant = require("../../../middleware/tanentMiddleware/tanent.middleware");
 const isUserAuthenticated = require("../../../middleware/authMiddleware/userAuthenticate");
 
@@ -78,6 +78,12 @@ router.patch(
   "/futsal/:futsalId/bookings/:bookingId/cancel", // #swagger.tags = ['Futsal/Tenant/Bookings']
   isUserAuthenticated,
   cancelBooking
+);
+
+router.patch(
+  "/futsal/:futsalId/bookings/:bookingId/reschedule", // #swagger.tags = ['Futsal/Tenant/Bookings']
+  isUserAuthenticated,
+  rescheduleBooking
 );
 
 router.delete(

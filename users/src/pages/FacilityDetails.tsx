@@ -578,6 +578,15 @@ const FacilityDetails = () => {
                 </div>
               )}
             </div>
+
+            <div className="mt-10 flex justify-center">
+              <Button
+                onClick={() => navigate(`/futsals/${id}/reviews`)}
+                className="h-12 px-8 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-600/20"
+              >
+                Submit Review
+              </Button>
+            </div>
           </div>
         </section>
 

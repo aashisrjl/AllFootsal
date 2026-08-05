@@ -76,6 +76,12 @@ const canCancelBooking = (bookingDate, startTime) => {
     return new Date() <= cancellationDeadline;
 };
 
+const getLocalDayOfWeek = (dateString) => {
+    const [year, month, day] = String(dateString).split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    return Number.isNaN(date.getTime()) ? null : date.getDay() + 1;
+};
+
 const releaseBookedTimeslot = async (code, timeslotId, transaction) => {
     await sequelize.query(
         `UPDATE timeslot_${code} SET is_available = 1 WHERE id = ?`,
@@ -421,6 +427,219 @@ const cancelBooking = async (req,res) => {
         success:true,
         message:"Booking cancelled successfully"
     })
+}
+
+const rescheduleBooking = async (req, res) => {
+    const code = await resolveBookingTenantCode(req);
+    const userId = req.userId;
+    const bookingId = req.params.bookingId;
+    const { pitch_id, timeslot_id, booking_date } = req.body;
+
+    if (!code) {
+        return res.status(404).json({
+            success: false,
+            message: "Futsal not found",
+        });
+    }
+
+    if (!pitch_id || !timeslot_id || !booking_date) {
+        return res.status(400).json({
+            success: false,
+            message: "pitch_id, timeslot_id and booking_date are required",
+        });
+    }
+
+    const currentRows = await sequelize.query(
+        `SELECT b.*, t.start_time, t.end_time
+         FROM booking_${code} b
+         JOIN timeslot_${code} t ON b.timeslot_id = t.id
+         WHERE b.id = ? AND b.user_id = ?`,
+        {
+            replacements: [bookingId, userId],
+            type: QueryTypes.SELECT,
+        }
+    );
+
+    const currentBooking = currentRows[0];
+    if (!currentBooking) {
+        return res.status(404).json({
+            success: false,
+            message: "Booking not found",
+        });
+    }
+
+    if (["cancelled", "rejected", "completed"].includes(currentBooking.status)) {
+        return res.status(400).json({
+            success: false,
+            message: "This booking can no longer be rescheduled",
+        });
+    }
+
+    if (!canCancelBooking(currentBooking.booking_date, currentBooking.start_time)) {
+        return res.status(400).json({
+            success: false,
+            message: `Rescheduling period has expired. You can only reschedule at least ${CANCELLATION_WINDOW_HOURS} hours before the booking time.`,
+        });
+    }
+
+    const normalizedBookingDate = String(booking_date).slice(0, 10);
+    if (isBookingDateBeforeToday(normalizedBookingDate)) {
+        return res.status(400).json({
+            success: false,
+            message: "You cannot reschedule to a past date.",
+        });
+    }
+
+    if (
+        String(currentBooking.booking_date).slice(0, 10) === normalizedBookingDate &&
+        Number(currentBooking.pitch_id) === Number(pitch_id) &&
+        Number(currentBooking.timeslot_id) === Number(timeslot_id)
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: "Please choose a different date or timeslot.",
+        });
+    }
+
+    const requestedDayOfWeek = getLocalDayOfWeek(normalizedBookingDate);
+    if (!requestedDayOfWeek) {
+        return res.status(400).json({
+            success: false,
+            message: "Valid booking_date is required",
+        });
+    }
+
+    const targetRows = await sequelize.query(
+        `SELECT t.*, p.name AS pitch_name, p.price_per_hour
+         FROM timeslot_${code} t
+         JOIN pitch_${code} p ON p.id = t.pitch_id
+         WHERE t.id = ? AND t.pitch_id = ? AND t.day_of_week = ?`,
+        {
+            replacements: [timeslot_id, pitch_id, requestedDayOfWeek],
+            type: QueryTypes.SELECT,
+        }
+    );
+
+    const targetSlot = targetRows[0];
+    if (!targetSlot) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid timeslot for the selected pitch and date",
+        });
+    }
+
+    if (Number(targetSlot.is_available) === 0) {
+        return res.status(400).json({
+            success: false,
+            message: "Selected timeslot is not available",
+        });
+    }
+
+    if (isBookingInPast(normalizedBookingDate, targetSlot.end_time)) {
+        return res.status(400).json({
+            success: false,
+            message: PAST_BOOKING_MSG,
+        });
+    }
+
+    const conflictingRows = await sequelize.query(
+        `SELECT id
+         FROM booking_${code}
+         WHERE pitch_id = ? AND timeslot_id = ? AND booking_date = ?
+           AND status IN ('pending', 'confirmed', 'completed')
+           AND id != ?`,
+        {
+            replacements: [pitch_id, timeslot_id, normalizedBookingDate, bookingId],
+            type: QueryTypes.SELECT,
+        }
+    );
+
+    if (conflictingRows.length > 0) {
+        return res.status(400).json({
+            success: false,
+            message: "This slot is already booked",
+        });
+    }
+
+    const updatedAmount = Number(targetSlot.price ?? targetSlot.price_per_hour ?? currentBooking.amount ?? 0);
+    const oldPitchNameRow = await sequelize.query(
+        `SELECT name FROM pitch_${code} WHERE id = ?`,
+        {
+            replacements: [currentBooking.pitch_id],
+            type: QueryTypes.SELECT,
+        }
+    );
+    const oldPitchName = oldPitchNameRow[0]?.name || `Pitch ${currentBooking.pitch_id}`;
+
+    await sequelize.transaction(async (transaction) => {
+        await sequelize.query(
+            `UPDATE booking_${code}
+             SET pitch_id = ?, timeslot_id = ?, booking_date = ?, amount = ?, updated_at = NOW()
+             WHERE id = ? AND user_id = ?`,
+            {
+                replacements: [pitch_id, timeslot_id, normalizedBookingDate, updatedAmount, bookingId, userId],
+                type: QueryTypes.UPDATE,
+                transaction,
+            }
+        );
+
+        await releaseBookedTimeslot(code, currentBooking.timeslot_id, transaction);
+    });
+
+    try {
+        const [user, futsal] = await Promise.all([
+            User.findByPk(userId),
+            Footsal.findOne({ where: { futsalCode: code } }),
+        ]);
+
+        const bookingLabel = `${targetSlot.pitch_name} on ${normalizedBookingDate} at ${targetSlot.start_time} - ${targetSlot.end_time}`;
+
+        if (user?.email) {
+            await sendEmail({
+                option: {
+                    to: user.email,
+                    subject: "Booking rescheduled successfully",
+                    text: `Your booking has been rescheduled from ${oldPitchName} on ${currentBooking.booking_date} at ${currentBooking.start_time} - ${currentBooking.end_time} to ${bookingLabel}.`,
+                },
+            });
+        }
+
+        if (futsal?.email) {
+            await sendEmail({
+                option: {
+                    to: futsal.email,
+                    subject: "Booking rescheduled",
+                    text: `A booking has been rescheduled from ${oldPitchName} on ${currentBooking.booking_date} at ${currentBooking.start_time} - ${currentBooking.end_time} to ${bookingLabel}.`,
+                },
+            });
+        }
+
+        await Promise.all([
+            user && createUserNotification({
+                userId,
+                type: "booking_created",
+                title: "Booking Rescheduled",
+                message: `Your booking has been moved to ${bookingLabel}.`,
+                relatedId: Number(bookingId),
+                relatedType: "booking",
+            }),
+            futsal && createFutsalNotification({
+                futsalId: futsal.id,
+                type: "booking_request",
+                title: "Booking Rescheduled",
+                message: `A booking was rescheduled to ${bookingLabel}.`,
+                relatedId: Number(bookingId),
+                relatedType: "booking",
+            }),
+        ]);
+    } catch (notificationError) {
+        console.error("Error sending booking reschedule notifications:", notificationError);
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: "Booking rescheduled successfully",
+    });
 }
 
 //admin can cancel any booking
@@ -1104,6 +1323,7 @@ module.exports = {
     getBookingsByUser,
     cancelBooking,
     cancelBookingByAdmin,
+    rescheduleBooking,
     confirmBookingByAdmin,
     rejectBookingByAdmin,
     unconfirmBookingByAdmin,

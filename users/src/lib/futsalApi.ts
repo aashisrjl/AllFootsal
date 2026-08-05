@@ -138,6 +138,19 @@ export const cancelBooking = async (futsalId: number | string, bookingId: number
     return res.data;
 };
 
+export const rescheduleBooking = async (
+    futsalId: number | string,
+    bookingId: number | string,
+    data: {
+        pitch_id: number | string;
+        timeslot_id: number | string;
+        booking_date: string;
+    }
+) => {
+    const res = await API.patch(`/futsal/${futsalId}/bookings/${bookingId}/reschedule`, data);
+    return res.data;
+};
+
 // payments
 export const getUserPayments = async (futsalId: number | string) => {
     const res = await API.get(`/futsal/${futsalId}/payments/me`);

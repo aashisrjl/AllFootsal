@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserBookings } from "@/lib/userApi";
-import { getPaymentByBookingId, getFutsalById } from "@/lib/futsalApi";
+import { getPaymentByBookingId, getFutsalById, getFutsalPitches, getFutsalTimeSlots, rescheduleBooking } from "@/lib/futsalApi";
 import { useBooking } from "@/contexts/BookingContext";
 import Header from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -12,6 +12,31 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, ArrowLeft, CalendarDays, Clock, MapPin, SearchX, X, RefreshCw, Phone, Download, ShieldCheck, Mail } from "lucide-react";
 import toast from 'react-hot-toast';
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+const getLocalDateString = (date = new Date()) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+};
+
+const getDayOfWeek = (dateString: string) => {
+    const [year, month, day] = dateString.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    return Number.isNaN(date.getTime()) ? null : date.getDay() + 1;
+};
+
+const isPastSlot = (dateString: string, startTime: string) => {
+    const today = getLocalDateString();
+    if (dateString < today) return true;
+    if (dateString > today) return false;
+
+    const [hours, minutes] = startTime.split(":").map(Number);
+    const slotTime = new Date();
+    slotTime.setHours(hours, minutes, 0, 0);
+    return slotTime < new Date();
+};
 
 const CANCELLATION_WINDOW_HOURS = 15;
 
@@ -21,6 +46,11 @@ const BookingDetails = () => {
     const { isAuthenticated, user } = useAuth();
     const { cancelBooking } = useBooking();
     const queryClient = useQueryClient();
+    const [isRescheduleOpen, setIsRescheduleOpen] = React.useState(false);
+    const [reschedulePitchId, setReschedulePitchId] = React.useState<string>("");
+    const [rescheduleDate, setRescheduleDate] = React.useState<string>("");
+    const [rescheduleTimeSlotId, setRescheduleTimeSlotId] = React.useState<string>("");
+    const [rescheduleSubmitting, setRescheduleSubmitting] = React.useState(false);
 
     const { data: userBookingsData, isLoading: isBookingsLoading } = useQuery({
         queryKey: ['user-bookings'],
@@ -44,6 +74,39 @@ const BookingDetails = () => {
         enabled: !!booking?.facilityId
     });
     const facilityProfile = futsalRes?.data;
+
+    const { data: pitchesRes, isLoading: isPitchesLoading } = useQuery({
+        queryKey: ['booking-reschedule-pitches', booking?.facilityId],
+        queryFn: () => getFutsalPitches(booking?.facilityId as string),
+        enabled: !!booking?.facilityId && isRescheduleOpen,
+    });
+
+    const { data: rescheduleSlotsRes, isLoading: isRescheduleSlotsLoading } = useQuery({
+        queryKey: ['booking-reschedule-slots', booking?.facilityId, reschedulePitchId, rescheduleDate],
+        queryFn: async () => {
+            const dayOfWeek = getDayOfWeek(rescheduleDate);
+            if (!booking?.facilityId || !reschedulePitchId || !dayOfWeek) return { timeslots: [] };
+            return getFutsalTimeSlots(booking.facilityId, reschedulePitchId, dayOfWeek, rescheduleDate);
+        },
+        enabled: !!booking?.facilityId && isRescheduleOpen && !!reschedulePitchId && !!rescheduleDate,
+    });
+
+    const pitches = pitchesRes?.data || [];
+    const currentPitchId = String(booking?.pitch_id || booking?.pitchId || "");
+    const currentTimeslotId = String(booking?.timeslot_id || booking?.timeSlotId || "");
+    const currentBookingDate = String(booking?.booking_date || booking?.date || "").slice(0, 10);
+    const rescheduleSlots = (rescheduleSlotsRes?.timeslots || []).filter((slot: any) => String(slot.id) !== currentTimeslotId);
+
+    React.useEffect(() => {
+        if (!isRescheduleOpen || !booking) return;
+        setReschedulePitchId(currentPitchId);
+        setRescheduleDate(currentBookingDate || getLocalDateString());
+        setRescheduleTimeSlotId("");
+    }, [isRescheduleOpen, booking?.id]);
+
+    React.useEffect(() => {
+        setRescheduleTimeSlotId("");
+    }, [reschedulePitchId, rescheduleDate]);
 
     if (!isAuthenticated) {
         navigate("/login");
@@ -93,7 +156,34 @@ const BookingDetails = () => {
     };
 
     const handleUpdate = () => {
-        toast.info("Rescheduling & Updates are handled manually. Please call the facility directly to shift this timeslot.");
+        if (!canBeCancelled) {
+            toast.error("This reservation can no longer be rescheduled.");
+            return;
+        }
+        setIsRescheduleOpen(true);
+    };
+
+    const handleRescheduleSubmit = async () => {
+        if (!booking?.facilityId || !reschedulePitchId || !rescheduleDate || !rescheduleTimeSlotId) {
+            toast.error("Please select a date, pitch, and timeslot.");
+            return;
+        }
+
+        try {
+            setRescheduleSubmitting(true);
+            await rescheduleBooking(booking.facilityId, booking.id, {
+                pitch_id: reschedulePitchId,
+                timeslot_id: rescheduleTimeSlotId,
+                booking_date: rescheduleDate,
+            });
+            await queryClient.invalidateQueries({ queryKey: ['user-bookings'] });
+            toast.success("Booking rescheduled successfully!");
+            setIsRescheduleOpen(false);
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "Failed to reschedule this booking.");
+        } finally {
+            setRescheduleSubmitting(false);
+        }
     };
 
     const bookingDateTime = new Date(`${booking.booking_date}T${booking.start_time || "00:00"}`);
@@ -259,11 +349,12 @@ const BookingDetails = () => {
                         <div className="flex flex-col gap-3">
                             <Button 
                                 variant="outline" 
-                                className="w-full h-14 bg-card border-border text-foreground hover:bg-muted rounded-2xl gap-2 font-semibold transition-all hover:border-muted-foreground/30"
+                                className="w-full h-14 bg-card border-border text-foreground hover:bg-muted rounded-2xl gap-2 font-semibold transition-all hover:border-muted-foreground/30 disabled:opacity-60"
+                                disabled={!canBeCancelled}
                                 onClick={handleUpdate}
                             >
                                 <RefreshCw className="h-5 w-5 text-sky-500" />
-                                Reschedule Match
+                                {canBeCancelled ? "Reschedule Match" : "Reschedule Locked"}
                             </Button>
                             
                             <Button 
@@ -281,6 +372,104 @@ const BookingDetails = () => {
                 </div>
             </main>
             <Footer />
+
+            <Dialog open={isRescheduleOpen} onOpenChange={setIsRescheduleOpen}>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Reschedule Match</DialogTitle>
+                        <DialogDescription>
+                            Choose a new date, pitch, and timeslot for this reservation.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-5">
+                        <div className="grid gap-4 md:grid-cols-3">
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-foreground">Date</label>
+                                <input
+                                    type="date"
+                                    value={rescheduleDate}
+                                    min={getLocalDateString()}
+                                    onChange={(e) => setRescheduleDate(e.target.value)}
+                                    className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/40"
+                                />
+                            </div>
+                            <div className="space-y-2 md:col-span-2">
+                                <label className="text-sm font-semibold text-foreground">Pitch</label>
+                                <select
+                                    value={reschedulePitchId}
+                                    onChange={(e) => setReschedulePitchId(e.target.value)}
+                                    className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/40"
+                                >
+                                    {pitches.map((pitch: any) => (
+                                        <option key={pitch.id} value={pitch.id}>
+                                            {pitch.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between gap-3">
+                                <label className="text-sm font-semibold text-foreground">Available Timeslots</label>
+                                {(isPitchesLoading || isRescheduleSlotsLoading) && (
+                                    <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading
+                                    </span>
+                                )}
+                            </div>
+
+                            {rescheduleSlots.length > 0 ? (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                    {rescheduleSlots.map((slot: any) => {
+                                        const slotStart = String(slot.start_time || "").slice(0, 5);
+                                        const slotEnd = String(slot.end_time || "").slice(0, 5);
+                                        const disabled = Number(slot.is_available) === 0 || Number(slot.is_actually_booked) === 1 || isPastSlot(rescheduleDate, slotStart);
+
+                                        return (
+                                            <button
+                                                key={slot.id}
+                                                type="button"
+                                                disabled={disabled}
+                                                onClick={() => setRescheduleTimeSlotId(String(slot.id))}
+                                                className={`rounded-xl border px-3 py-3 text-left transition-all ${
+                                                    rescheduleTimeSlotId === String(slot.id)
+                                                        ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500'
+                                                        : 'border-border bg-background text-foreground hover:border-emerald-500/40'
+                                                } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            >
+                                                <p className="text-sm font-bold">{slotStart} - {slotEnd}</p>
+                                                <p className="text-[11px] text-muted-foreground mt-1">
+                                                    {disabled ? 'Unavailable' : 'Select slot'}
+                                                </p>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="rounded-xl border border-dashed border-border p-5 text-sm text-muted-foreground">
+                                    No available timeslots for the selected date and pitch.
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="rounded-xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+                            Current booking: {booking.pitch_name || booking.pitchName || 'Pitch'} on {String(booking.booking_date || booking.date || '').slice(0, 10)} at {booking.start_time || booking.startTime || '00:00'} - {booking.end_time || booking.endTime || '00:00'}
+                        </div>
+                    </div>
+
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <Button variant="outline" onClick={() => setIsRescheduleOpen(false)} disabled={rescheduleSubmitting}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleRescheduleSubmit} disabled={rescheduleSubmitting || !rescheduleTimeSlotId} className="gap-2">
+                            {rescheduleSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                            Reschedule
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
