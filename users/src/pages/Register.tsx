@@ -14,6 +14,7 @@ import {
 } from "@/assets/images";
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
 import  logo_transparent  from "/logo_transparent.png";
+import { getNepalPhoneError } from "@/lib/utils";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -32,8 +33,9 @@ const Register = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    console.log(`📝 Input changed: ${id} = ${value}`);
-    setFormData({ ...formData, [id]: value });
+    const nextValue = id === "phone" ? value.replace(/\D/g, "").slice(0, 10) : value;
+    console.log(`📝 Input changed: ${id} = ${nextValue}`);
+    setFormData({ ...formData, [id]: nextValue });
   };
 
   // Step 1 - submit personal info
@@ -62,6 +64,13 @@ const Register = () => {
         toast.error("Please enter a valid email address.");
         return;
       }
+    }
+
+    const phoneError = getNepalPhoneError(formData.phone);
+    if (phoneError) {
+      console.warn("❌ Phone validation failed:", formData.phone);
+      toast.error(phoneError);
+      return;
     }
 
     console.log("✅ All validations passed, moving to step 2");
@@ -197,9 +206,11 @@ const Register = () => {
                     <Input
                       id="phone"
                       type="tel"
-                      placeholder="Enter your phone number"
+                      inputMode="numeric"
+                      placeholder="98XXXXXXXX"
                       value={formData.phone}
                       onChange={handleChange}
+                      maxLength={10}
                       required
                       className="h-12 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-emerald-500 rounded-xl"
                     />
