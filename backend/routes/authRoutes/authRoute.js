@@ -66,7 +66,7 @@ router.get(
 
 router.get(
   `/auth/user/facebook`, // #swagger.tags = ['Auth/User']
-  passport.authenticate("facebook-user", { scope: ["email"], session: false })
+  passport.authenticate("facebook-user", { scope: ["public_profile"], session: false })
 );
 
 router.get(

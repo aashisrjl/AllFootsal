@@ -14,6 +14,7 @@ import {
 } from "@/assets/images";
 
 import logo_transparent from "/logo_transparent.png";
+import { getNepalPhoneError, looksLikePhoneInput } from '@/lib/utils';
 
 const Login: React.FC = () => {
   const [emailOrPhone, setEmailOrPhone] = useState('');
@@ -33,9 +34,18 @@ const Login: React.FC = () => {
     setError(null);
     setIsLoading(true);
 
+    const isPhone = looksLikePhoneInput(emailOrPhone);
+    if (isPhone) {
+      const phoneError = getNepalPhoneError(emailOrPhone);
+      if (phoneError) {
+        setError(phoneError);
+        toast.error(phoneError);
+        setIsLoading(false);
+        return;
+      }
+    }
+
     try {
-      // Basic detection for email vs phone
-      const isPhone = /^\d+$/.test(emailOrPhone.trim());
       const credentials: any = { password };
 
       if (isPhone) {

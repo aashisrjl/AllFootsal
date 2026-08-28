@@ -15,6 +15,7 @@ import {
   Logo,
 } from "@/assets/images";
 import logo_transparent from "/logo_transparent.png";
+import { getNepalPhoneError, looksLikePhoneInput } from "@/lib/utils";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -25,6 +26,15 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (looksLikePhoneInput(email)) {
+      const phoneError = getNepalPhoneError(email);
+      if (phoneError) {
+        toast.error(phoneError);
+        return;
+      }
+    }
+
     setIsLoading(true);
     try {
       const success = await login(email, password);

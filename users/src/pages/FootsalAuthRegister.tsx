@@ -11,6 +11,7 @@ import {
   RegisterIllustration,
 } from "@/assets/images";
 import  logo_transparent  from "/logo_transparent.png";
+import { getNepalPhoneError } from "@/lib/utils";
 
 
 const FootsalAuthRegister = () => {
@@ -31,7 +32,9 @@ const FootsalAuthRegister = () => {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    const { id, value } = e.target;
+    const nextValue = id === "phoneNumber" ? value.replace(/\D/g, "").slice(0, 10) : value;
+    setFormData({ ...formData, [id]: nextValue });
   };
 
   // Step 1 - submit futsal info
@@ -49,8 +52,9 @@ const FootsalAuthRegister = () => {
       return;
     }
 
-    if (!/^[0-9]{10}$/.test(formData.phoneNumber)) {
-      toast.error("Please enter a valid 10-digit phone number.");
+    const phoneError = getNepalPhoneError(formData.phoneNumber);
+    if (phoneError) {
+      toast.error(phoneError);
       return;
     }
 
@@ -203,9 +207,11 @@ const FootsalAuthRegister = () => {
                   <Input
                     id="phoneNumber"
                     type="tel"
-                    placeholder="Enter 10-digit phone number"
+                    inputMode="numeric"
+                    placeholder="98XXXXXXXX"
                     value={formData.phoneNumber}
                     onChange={handleChange}
+                    maxLength={10}
                     required
                     className="h-11 focus-visible:ring-emerald-500 dark:bg-slate-800 dark:border-slate-700 rounded-xl"
                   />
