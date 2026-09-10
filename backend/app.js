@@ -10,6 +10,15 @@ const swaggerFile = require('./swagger-output.json');
 const { setupAdminPanel } = require('./config/adminConfig')
 const { CORS_ALLOWED_ORIGINS } = process.env
 
+// Prevent server crashes from uncaught errors
+process.on('uncaughtException', (err) => {
+  console.error('⚠️ Uncaught Exception (handled):', err.message || err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('⚠️ Unhandled Rejection (handled):', reason?.message || reason);
+});
+
 const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
 
@@ -31,20 +40,12 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  if (res.headersSent) {
-    return next(err);
-  }
-  res.status(500).json({
-    error: 'Something went wrong!',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
-  });
-});
-
 // super admin operation using adminjs
-setupAdminPanel(app)
+try {
+  setupAdminPanel(app);
+} catch (err) {
+  console.warn("⚠️ Admin panel setup warning (non-fatal):", err.message);
+}
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -147,6 +148,17 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
+// Global Express error handler (catches errors thrown in routes)
+app.use((err, req, res, next) => {
+  console.error('⚠️ Server Error:', err.stack || err.message || err);
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(err.status || 500).json({
+    error: err.name || 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+  });
+});
 
 app.listen(PORT, () => {
   console.log(`Footsal Backend Server running on port ${PORT}`);
