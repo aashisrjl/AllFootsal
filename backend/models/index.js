@@ -200,8 +200,13 @@ db.FutsalNotification.belongsTo(db.Footsal, {
   foreignKey: "futsal_id"
 });
 
-db.sequelize.sync({ force: false }).then(() => {
-  console.log("✅ Database connection established! Use 'npm run migrate' to sync schema changes.");
-});
+db.sequelize
+  .sync({ force: false })
+  .then(() => {
+    console.log("✅ Database connection established! Use 'npm run migrate' to sync schema changes.");
+  })
+  .catch((err) => {
+    console.error("⚠️ Database sync warning (non-fatal):", err.message);
+  });
 
 module.exports = db;

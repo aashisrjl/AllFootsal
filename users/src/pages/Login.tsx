@@ -16,6 +16,7 @@ import {
 } from "@/assets/images";
 import logo_transparent from "/logo_transparent.png";
 import { getNepalPhoneError, looksLikePhoneInput } from "@/lib/utils";
+import { API_BASE_URL } from "@/lib/authApi";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -150,7 +151,7 @@ const Login = () => {
                 variant="outline"
                 className="flex-1 h-12 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all"
                 onClick={() => {
-                  window.location.href = "http://localhost:3000/api/v1/auth/user/google";
+                  window.location.href = `${API_BASE_URL}/auth/user/google`;
                 }}
               >
                 <FaGoogle className="text-rose-500 text-xl" />
@@ -160,7 +161,7 @@ const Login = () => {
                 variant="outline"
                 className="flex-1 h-12 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all"
                 onClick={() => {
-                  window.location.href = "http://localhost:3000/api/v1/auth/user/facebook";
+                  window.location.href = `${API_BASE_URL}/auth/user/facebook`;
                 }}
               >
                 <FaFacebookF className="text-blue-600 text-xl" />
